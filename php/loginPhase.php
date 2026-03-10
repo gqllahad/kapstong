@@ -1,7 +1,5 @@
 <?php
-
-include("kapstongConnection");
-
+include("kapstongConnection.php");
 ?>
 
 <!doctype html>
@@ -11,7 +9,7 @@ include("kapstongConnection");
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kapstong</title>
-  <link rel="stylesheet" href="loginPhase.css" />
+  <link rel="stylesheet" href="../css/loginPhase.css" />
   <meta name="description" content="Kapstong for you and me!" />
 </head>
 
@@ -94,7 +92,7 @@ include("kapstongConnection");
 
     <form action="starts.php" method="POST">
       <div class="login-container scroll-reveal">
-        <h2>Sign In</h2>
+        <h2 style="padding: 3% 3%;">Sign In</h2>
         <div class="login-inner-container">
           <div class="login-box">
             <input type="text" name="loginEmail" required />
@@ -136,6 +134,6 @@ include("kapstongConnection");
   </section>
 </body>
 
-<script src="loginPhase.js"></script>
+<script src="../js/loginPhase.js"></script>
 
 </html>

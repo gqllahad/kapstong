@@ -1,0 +1,53 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Variables */
+:root {
+    --bg-primary: #F5FAFF;
+    --sec-primary: #EDF6FF;
+
+    --primary: #2563EB;
+    --dark: #1E90FF;
+    --light: #f9fafb; /* #0F2D02*/
+
+    --pri-button: #1D4ED8;
+    --pri-button-sub: #DBEAFE;
+
+    --sign-button : #F97316;
+    --sign-button-sub : #f76700;
+
+    --front-text : #111827
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(
+        135deg,
+        var(--bg-primary),
+        var(--sec-primary)
+    );
+    color: var(--dark);
+    line-height: 1.6;
+    padding-top: 72px;
+    overflow-x: hidden;
+}
+
+.layout{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.upper-text{
+    color: var(--front-text);
+    font-size: 1.5rem;
+    font-style: italic;
+    font-weight: 600;
+
+}
+

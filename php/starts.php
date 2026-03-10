@@ -26,7 +26,7 @@ if (isset($_POST['login-submit'])) {
             $_SESSION['user_id'] = $row['userID'];
             $_SESSION['email'] = $row['email'];
             $_SESSION['name'] = $row['name'];
-            $_SESSION['role'] = 'student';
+            $_SESSION['role'] = $row['role'];
             $_SESSION['isVerified'] = $row['isVerified'];
             $_SESSION['mobileNumber'] = $row['mobileNumber'];
 
