@@ -19,7 +19,12 @@
     --sign-button : #F97316;
     --sign-button-sub : #f76700;
 
-    --front-text : #111827
+    --approved-color : #10c552;
+    --approved-color-sub : #02c74a;
+
+    --declined-color : #67b1fc;
+
+    --front-text : #111827;
 }
 
 body {
@@ -43,11 +48,234 @@ body {
     width: 100%;
 }
 
+
+.sign-logo {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    margin : 1% 0;
+          
+}
+
+.sign-logo img {
+    max-width: 150px;   
+    height: auto;       
+    object-fit: contain; 
+    border-radius: 50%;
+}
+
 .upper-text{
     color: var(--front-text);
     font-size: 1.5rem;
     font-style: italic;
     font-weight: 600;
+}
 
+.stepper{
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 400px;
+    margin: 40px auto;
+}
+
+.progress-line{
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: #ccc;
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+.progress-fill{
+    height: 100%;
+    width: 0%;
+    background: var(--approved-color);
+    transition: 0.3s ease;
+}
+
+.step{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    position: relative;
+    z-index: 1;
+}
+
+.step.active{
+    background: var(--primary);
+}
+
+.step.completed{
+    background:#22c55e;
+    /* background : var(--sign-button); */
+}
+
+.form-step {
+  display: none;
+}
+
+.form-step.active {
+  display: block;
+}
+
+.form-inputs{
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap : 10px;
+  margin: 4% 0;
+}
+
+/* grids per input */
+.full{
+  grid-column: span 6;
+}
+
+.duos{
+  grid-column: span 3;
+}
+
+.trios{
+  grid-column: span 2;
+}
+
+hr { 
+  margin : 2% 0;
+}
+
+/* inputs */
+.gender-group{
+  color: var(--front-text);
+}
+
+.sign-box{
+   margin: 7% 5%;
+    position: relative;
+    width: 100%;
+    min-width: 300px;
+    background: transparent;
+    border-radius: 10px;
+    box-sizing: border-box;   
+}
+
+.sign-box span{
+    position: absolute;
+    color: var(--front-text);
+    top: 50%;
+    left: 10%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 1rem;
+    padding: 0 4px;
+    transition: 0.3s ease;
+}
+
+.sign-box input{
+    min-width: 280px;
+    height: 50px;
+    background: var(--light);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    box-sizing: border-box;
+    text-align: left;
+    padding-left: 14px;
+    font-size: 1.1rem;
+    outline: none;
+}
+
+.sign-box input:focus ~ span,
+.sign-box input:valid ~ span {
+    transform: translate(-20px, -50px);
+
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+.sign-box.birthdate span {
+    transform: translate(-15px, -50px);
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+.sign-box.username span{
+  left : 30%;
+}
+
+.gender-group {
+    align-items: flex-start; 
+    
+}
+
+.section-label {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+.gender-options {
+    display: flex;
+    justify-content : center;
+    gap: 2rem; 
+}
+
+.gender-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    font-size: 1.3rem;
+    margin: 2% 0;
+}
+
+.gender-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+}
+
+
+.next-button, .back-button {
+    margin-top: 1.3rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
+    transform: translateY(10px);
+    width: 50%;
+    max-width: 200px;
+    height: 50px;
+    transition: all 0.5s ease;
+}
+
+.next-button{
+  background : var(--approved-color);
+}
+
+.back-button{
+  background : var(--primary);
+}
+
+.next-button:hover{
+    opacity: 0.9;
+    background-color: var(--approved-color-sub);
+    transform: translateY(0);
+}
+
+.back-button:hover{
+    opacity: 0.9;
+    background-color: var(--dark);
+    transform: translateY(0);
 }
 

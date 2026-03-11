@@ -43,3 +43,28 @@ if (isset($_POST['login-submit'])) {
         exit();
     }
 }
+
+if (isset($_POST['signupForm'])) {
+
+    //Student Information 
+    $fName = $_POST['firstName'];
+    $lName = $_POST['lastName'];
+    $mName = $_POST['middleName'];
+    $fullName = $lName . $fName . $mName;
+
+    $email = $_POST['signEmail'];
+    $mobile = $_POST['signTel'];
+    $gender = $_POST['gender'];
+    $birth = $_POST['signBirth'];
+
+    // Academic Information
+    $course = $_POST['signCourse'];
+    $level = $_POST['signLevel'];
+    $schoolYear = $_POST['signSY'];
+
+    // Account Details
+    $studentID = $_POST['studentID'];
+    $studentID = trim($studentID);
+
+    $password = password_hash($_POST['signPassword'], PASSWORD_DEFAULT);
+}
