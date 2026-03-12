@@ -50,7 +50,7 @@ if (isset($_POST['signupForm'])) {
     $fName = $_POST['firstName'];
     $lName = $_POST['lastName'];
     $mName = $_POST['middleName'];
-    $fullName = $lName . $fName . $mName;
+    $fullName = $lName . " " .  $fName . " " . $mName;
 
     $email = $_POST['signEmail'];
     $mobile = $_POST['signTel'];
@@ -67,4 +67,58 @@ if (isset($_POST['signupForm'])) {
     $studentID = trim($studentID);
 
     $password = password_hash($_POST['signPassword'], PASSWORD_DEFAULT);
-}
+
+    $sqlCheck = $conn->prepare("SELECT COUNT(*) FROM users WHERE email = ? OR studentID = ?");
+
+    $sqlCheck->bind_param("ss", $userEmail, $studentID);
+    $sqlCheck->execute();
+    $sqlCheck->bind_result($checkCount);
+    $sqlCheck->fetch();
+    $sqlCheck->close();
+
+    if ($checkCount > 0) {
+        header("Location: signupStudent.php?error=ID+Already+Exists.");
+        exit();
+    }
+
+    $conn->begin_transaction();
+
+    try {
+        $sqlInsertUsers = $conn->prepare("INSERT INTO users (name, email, mobileNumber, studentID, password) VALUES (?, ?, ?, ?, ?)");
+        $sqlInsertStudent = $conn->prepare("INSERT INTO ojtstudent (studentID, email, birthDate, mobileNumber, gender, course, yearLevel, name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+        $sqlInsertStudent->bind_param(
+            "ssssssss",
+            $studentID,
+            $email,
+            $birth,
+            $mobile,
+            $gender,
+            $course,
+            $level,
+            $fullName
+        );
+
+        $sqlInsertUsers->bind_param(
+            "sssss",
+            $fullName,
+            $email,
+            $mobile,
+            $studentID,
+            $password
+        );
+
+        $sqlInsertUsers->execute();
+        $sqlInsertStudent->execute();
+
+        $conn->commit();
+
+
+        header("Location: signupStudent.php?success=Account+created+successfully!");
+        exit();
+    } catch (Exception $e) {
+        $conn->rollback();
+        header("Location: signupStudent.php?error=Database+error");
+        exit();
+    }
+};

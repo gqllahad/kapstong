@@ -8,13 +8,17 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 
 
-
-$showModal = false;
 if (!isset($_SESSION['role'])) {
-    $showModal = true;
+    header("Location: loginPhase.php?error=login+required!");
+    exit();
 }
 
-$role = $_SESSION['role'];
+// $showModal = false;
+// if (!isset($_SESSION['role'])) {
+//     $showModal = true;
+// }
+
+$role = $_SESSION['role'] ?? null;
 
 ?>
 
@@ -37,7 +41,7 @@ $role = $_SESSION['role'];
 
 
 <body>
-    <?php if ($showModal): ?>
+    <!-- <?php if ($showModal): ?>
         <div class="modal-backdrop">
             <div class="modal-box">
                 <h2>Access Denied</h2>
@@ -45,9 +49,7 @@ $role = $_SESSION['role'];
                 <a href="loginPhase.php">Go to Login Page</a>
             </div>
         </div>
-    <?php endif; ?>
-
-
+    <?php endif; ?> -->
 
     <header class="navbar">
 

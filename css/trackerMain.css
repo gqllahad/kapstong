@@ -92,6 +92,7 @@ padding:20px;
 background:#eee;
 }
 
+/* Modals */
 .modal-backdrop {
   background-color: rgba(0, 0, 0, 0.9); 
     backdrop-filter: blur(6px); 

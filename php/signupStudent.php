@@ -29,7 +29,9 @@ require_once("functions.php");
 
         <main class="content">
 
-            <section class="sign-logo"> <img src="../images/download.jpg" alt="logo"> </section>
+            <section class="sign-logo"> <a href="loginPhase.php">
+                    <img src="../images/download.jpg" alt="logo">
+                </a> </section>
 
             <section class="upper-text"> SIGN UP</section>
 
@@ -100,8 +102,9 @@ require_once("functions.php");
                     <h3>Step 2: Academic Information</h3>
                     <hr>
                     <div class="form-inputs">
-                        <div class="sign-box duos"> <input name="studentID" id="studentID1" type="text" required />
+                        <div class="sign-box duos studentID"> <input name="studentID" id="studentID1" type="text" required />
                             <span>Student ID </span>
+                            <p id="studentID-warning" style="color:red; display:none; font-weight : 600; font-size: 0.6rem;">Student ID already taken!</p>
                         </div>
 
                         <div class="sign-box duos"> <input name="signCourse" type="text" required />
@@ -128,7 +131,7 @@ require_once("functions.php");
                     <h3>Step 3: Account Info</h3>
                     <hr>
                     <div class="form-inputs">
-                        <div class="sign-box full username"> <input id="studentID2" type="text" required />
+                        <div class="sign-box full username"> <input id="studentID2" type="text" required readonly />
                             <span>Student ID </span>
                         </div>
 

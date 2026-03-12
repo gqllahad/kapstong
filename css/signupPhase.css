@@ -195,14 +195,14 @@ hr {
 }
 
 .sign-box input:focus ~ span,
-.sign-box input:valid ~ span {
+.sign-box input:valid ~ span, .sign-box.id-taken span {
     transform: translate(-20px, -50px);
 
     font-size: 1rem;
     color: var(--primary);
 }
 
-.sign-box.birthdate span {
+.sign-box.birthdate span , .sign-box.username span{
     transform: translate(-15px, -50px);
     font-size: 1rem;
     color: var(--primary);
@@ -210,6 +210,12 @@ hr {
 
 .sign-box.username span{
   left : 30%;
+}
+
+.next-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .gender-group {

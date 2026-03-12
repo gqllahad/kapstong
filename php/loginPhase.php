@@ -1,5 +1,12 @@
 <?php
 include("kapstongConnection.php");
+
+$invaderLogin = false;
+if (isset($_GET['error'])) {
+  $invaderLogin = true;
+}
+
+
 ?>
 
 <!doctype html>
@@ -14,6 +21,18 @@ include("kapstongConnection.php");
 </head>
 
 <body>
+
+  <?php if ($invaderLogin): ?>
+    <div class="modal-backdrop" id="accessDenied">
+      <div class="modal-box">
+        <h2>Access Denied</h2>
+        <p>Please make sure you login first.</p>
+        <button id="invaderLogin">Go to login</button>
+      </div>
+    </div>
+  <?php endif; ?>
+
+
   <header class="header">
     <div class="container">
       <h1 class="logo-text">

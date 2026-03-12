@@ -4,9 +4,13 @@ const progressFill = document.querySelector('.progress-fill');
 
 let currentStep = 0;
 
+// next student ID 
+const nextButtonStep2 = document.getElementById("next2");
+
 // Account details variables
 const studentIDStep2 = document.getElementById("studentID1");
 const studentIDStep3 = document.getElementById("studentID2");
+const warningText = document.getElementById("studentID-warning");
 
 const passwordInput = document.getElementById("passwordInput");
 const confirmPasswordInput = document.getElementById("confirmPasswordInput");
@@ -71,8 +75,6 @@ function validateStep(stepIndex) {
     return true; 
 }
 
-
-
 //Next
 document.querySelectorAll('[id^="next"]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -95,6 +97,7 @@ document.querySelectorAll('[id^="prev"]').forEach(btn => {
   });
 });
 
+
 //account details
 studentIDStep2.addEventListener("input", () => {
     studentIDStep3.value = studentIDStep2.value;
@@ -107,6 +110,29 @@ confirmPasswordInput.addEventListener("focus", () => {
     }
 });
 
+
+// STUDENT CHECK
+studentIDStep2.addEventListener("input", () => {
+    const studentID = studentIDStep2.value.trim();
+    if(studentID === "") return;
+
+    fetch(`checkStudentID.php?id=${encodeURIComponent(studentID)}`)
+      .then(res => res.json())
+      .then(data => {
+          if(data.exists) {
+              warningText.style.display = "block";
+              studentIDStep2.setCustomValidity("Student ID already taken!");
+              studentIDStep2.parentElement.classList.add("id-taken");
+              nextButtonStep2.disabled = true;
+          } else {
+              warningText.style.display = "none";
+              studentIDStep2.setCustomValidity(""); 
+              studentIDStep2.parentElement.classList.remove("id-taken");
+              nextButtonStep2.disabled = false;
+          }
+      })
+      .catch(err => console.error(err));
+});
 
 // document.getElementById('signupForm').addEventListener('submit', (e) => {
 //   e.preventDefault();

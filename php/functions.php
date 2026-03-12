@@ -27,3 +27,19 @@ function logout()
     header("Location: ../php/loginPhase.php");
     exit;
 }
+
+
+// checkstudent
+function isStudentIDTaken($conn, $studentID)
+{
+    $checkStudent = $conn->prepare("SELECT COUNT(*) FROM users WHERE studentID = ?");
+    $checkStudent->bind_param("s", $studentID);
+    $checkStudent->execute();
+
+    $count = 0;
+    $checkStudent->bind_result($count);
+    $checkStudent->fetch();
+    $checkStudent->close();
+
+    return $count > 0;
+}
