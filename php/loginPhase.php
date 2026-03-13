@@ -2,10 +2,15 @@
 include("kapstongConnection.php");
 
 $invaderLogin = false;
+$wrongPassword = false;
+
 if (isset($_GET['error'])) {
   $invaderLogin = true;
 }
 
+if (isset($_GET['warning'])) {
+  $wrongPassword = true;
+}
 
 ?>
 
@@ -28,6 +33,15 @@ if (isset($_GET['error'])) {
         <h2>Access Denied</h2>
         <p>Please make sure you login first.</p>
         <button id="invaderLogin">Go to login</button>
+      </div>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($wrongPassword): ?>
+    <div class="modal-backdrop" id="errorLogin">
+      <div class="modal-box">
+        <h2>Error</h2>
+        <p>Incorrect email or password.</p>
       </div>
     </div>
   <?php endif; ?>
@@ -114,7 +128,7 @@ if (isset($_GET['error'])) {
         <h2 style="padding: 3% 3%;">Sign In</h2>
         <div class="login-inner-container">
           <div class="login-box">
-            <input type="text" name="loginEmail" required />
+            <input type="email" name="loginEmail" required />
             <span>Email</span>
           </div>
 

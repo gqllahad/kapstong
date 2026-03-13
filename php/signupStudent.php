@@ -26,7 +26,6 @@ require_once("functions.php");
     <!-- layout -->
     <div class="layout">
 
-
         <main class="content">
 
             <section class="sign-logo"> <a href="loginPhase.php">
@@ -65,9 +64,10 @@ require_once("functions.php");
                             <span>Middle name</span>
                         </div>
 
-                        <div class="sign-box trios">
-                            <input name="signEmail" type="email" class="full" required />
+                        <div class="sign-box trios studentEmail">
+                            <input name="signEmail" type="email" class="full" id="studentEmail" required />
                             <span>Email</span>
+                            <p id="studentEmail-warning" style="color:red; display:none; font-weight : 600; font-size: 0.5rem;">Email already been used!</p>
                         </div>
                         <div class="sign-box trios birthdate">
                             <input name="signBirth" type="date" required />
@@ -76,7 +76,7 @@ require_once("functions.php");
 
                         <div class="sign-box trios">
                             <input name="signTel" type="tel" class="duos" required />
-                            <span> Moile Number </span>
+                            <span> Mobile Number </span>
                         </div>
 
 
@@ -131,8 +131,12 @@ require_once("functions.php");
                     <h3>Step 3: Account Info</h3>
                     <hr>
                     <div class="form-inputs">
-                        <div class="sign-box full username"> <input id="studentID2" type="text" required readonly />
+                        <div class="sign-box duos username"> <input id="studentID2" type="text" required readonly />
                             <span>Student ID </span>
+                        </div>
+
+                        <div class="sign-box duos email"> <input id="studentEmail2" type="email" required readonly />
+                            <span>Email </span>
                         </div>
 
                         <div class="sign-box duos"> <input name="signPassword" id="passwordInput" type="password" required />

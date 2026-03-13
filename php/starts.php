@@ -34,12 +34,12 @@ if (isset($_POST['login-submit'])) {
             exit();
         } else {
 
-            header("Location: loginPhase.php?error=Incorrect+Password");
+            header("Location: loginPhase.php?warning=Incorrect+Password");
             exit();
         }
     } else {
 
-        header("Location: loginPhase.php?error=ID+not+Found");
+        header("Location: loginPhase.php?warning=ID+not+Found");
         exit();
     }
 }

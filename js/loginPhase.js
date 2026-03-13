@@ -5,6 +5,8 @@ const signUp = document.getElementById("ls-switch");
 const invaderLogin = document.getElementById("invaderLogin");
 const modalInvader = document.getElementById("accessDenied");
 
+const modalLoginError = document.getElementById("errorLogin");
+
 function revealOnScroll() {
   const windowHeight = window.innerHeight;
 
@@ -35,6 +37,23 @@ if (invaderLogin && modalInvader) {
     if (loginSection) loginSection.scrollIntoView({ behavior: "smooth" });
   });
 }
+
+// login error
+if (modalLoginError) {
+
+  setTimeout(() => {
+    modalLoginError.style.display = "none";
+
+    const url = new URL(window.location);
+    url.searchParams.delete("warning");
+    window.history.replaceState({}, document.title, url.toString());
+
+    const loginSection = document.getElementById("log-container");
+    if (loginSection) loginSection.scrollIntoView({ behavior: "smooth" });
+
+    }, 2000);
+}
+
 
 window.addEventListener("scroll", revealOnScroll);
 

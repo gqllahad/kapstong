@@ -43,3 +43,17 @@ function isStudentIDTaken($conn, $studentID)
 
     return $count > 0;
 }
+
+function isEmailTaken($conn, $studentEmail)
+{
+    $checkEmail = $conn->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
+    $checkEmail->bind_param("s", $studentEmail);
+    $checkEmail->execute();
+
+    $count = 0;
+    $checkEmail->bind_result($count);
+    $checkEmail->fetch();
+    $checkEmail->close();
+
+    return $count > 0;
+}

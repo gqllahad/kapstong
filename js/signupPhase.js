@@ -5,12 +5,18 @@ const progressFill = document.querySelector('.progress-fill');
 let currentStep = 0;
 
 // next student ID 
+const nextButtonStep1 = document.getElementById("next1");
 const nextButtonStep2 = document.getElementById("next2");
 
 // Account details variables
 const studentIDStep2 = document.getElementById("studentID1");
 const studentIDStep3 = document.getElementById("studentID2");
+
+const studentEmail1 = document.getElementById("studentEmail");
+const studentEmail2 = document.getElementById("studentEmail2");
+
 const warningText = document.getElementById("studentID-warning");
+const warningTextEmail = document.getElementById("studentEmail-warning");
 
 const passwordInput = document.getElementById("passwordInput");
 const confirmPasswordInput = document.getElementById("confirmPasswordInput");
@@ -103,6 +109,10 @@ studentIDStep2.addEventListener("input", () => {
     studentIDStep3.value = studentIDStep2.value;
 });
 
+studentEmail1.addEventListener("input", () => {
+    studentEmail2.value = studentEmail1.value;
+});
+
 confirmPasswordInput.addEventListener("focus", () => {
     if (!passwordInput.value) {
         alert("Please enter your password first!");
@@ -129,6 +139,29 @@ studentIDStep2.addEventListener("input", () => {
               studentIDStep2.setCustomValidity(""); 
               studentIDStep2.parentElement.classList.remove("id-taken");
               nextButtonStep2.disabled = false;
+          }
+      })
+      .catch(err => console.error(err));
+});
+
+
+studentEmail1.addEventListener("input", () => {
+    const studentEmail = studentEmail1.value.trim();
+    if(studentEmail === "") return;
+
+    fetch(`checkStudentID.php?email=${encodeURIComponent(studentEmail)}`)
+      .then(res => res.json())
+      .then(data => {
+          if(data.exists) {
+              warningTextEmail.style.display = "block";
+              studentEmail1.setCustomValidity("Email already been used!");
+              studentEmail1.parentElement.classList.add("email-taken");
+              nextButtonStep1.disabled = true;
+          } else {
+              warningTextEmail.style.display = "none";
+              studentEmail1.setCustomValidity(""); 
+              studentEmail1.parentElement.classList.remove("email-taken");
+              nextButtonStep1.disabled = false;
           }
       })
       .catch(err => console.error(err));

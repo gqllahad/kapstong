@@ -13,3 +13,15 @@ if (isset($_GET['id'])) {
     }
     exit;
 }
+
+if (isset($_GET['email'])) {
+
+    $studentEmail = $_GET['email'];
+    if ($studentEmail) {
+        $existsEmail = isEmailTaken($conn, $studentEmail);
+        echo json_encode(["exists" => $existsEmail]);
+    } else {
+        echo json_encode(["exists" => false]);
+    }
+    exit;
+}
