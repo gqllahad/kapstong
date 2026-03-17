@@ -32,47 +32,69 @@ $studentName = $_SESSION['name'];
 
 <body>
 
-    <header>
+    <header class="navbar">
         <h1>OJT Student Dashboard</h1>
         <nav>
-            <a href="#">Home</a>
-            <a href="#">Tasks</a>
             <a href="#">Profile</a>
-            <a href="logoutPhase.php">Logout</a>
         </nav>
     </header>
 
     <div class="layout">
         <aside class="sidebar">
-            <ul>
-                <li><a href="#"><i class="bi bi-house"></i> Home</a></li>
-                <li><a href="#"><i class="bi bi-journal-text"></i> My Tasks</a></li>
-                <li><a href="#"><i class="bi bi-file-earmark-text"></i> Submissions</a></li>
-                <li><a href="#"><i class="bi bi-chat-left-text"></i> Messages</a></li>
-                <li><a href="logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            <ul class="menu">
+                <li class="active">
+                    <button><i class="bi bi-house"></i> Home</button>
+                </li>
+                <li>
+                    <button><i class="bi bi-journal-text"></i> My Tasks</button>
+                </li>
+                <li><button><i class="bi bi-file-earmark-text"></i>Submissions</button></li>
+                <li><button><i class="bi bi-chat-left-text"></i> Messages</button></li>
+                <li><a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
             </ul>
         </aside>
 
         <main class="content">
-            <section class="page-header">
-                <h2>Welcome, <?php echo htmlspecialchars($studentName); ?>!</h2>
-                <p>Here’s your OJT progress and tasks.</p>
+
+            <section class="student-dashboard">
+                <section class="page-header">
+                    <h2>Welcome, <?php echo htmlspecialchars($studentName); ?>!</h2>
+                    <p>Here's your OJT progress and tasks.</p>
+                </section>
+
+                <section class="cards">
+                    <div class="card">
+                        <h3>OJT Status</h3>
+                        <p>View your current OJT assignments.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Notifications</h3>
+                        <p>Check announcements from your mentor.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Documents</h3>
+                        <p>Upload or review submitted reports.</p>
+                    </div>
+                </section>
             </section>
 
-            <section class="cards">
-                <div class="card">
-                    <h3>OJT Status</h3>
-                    <p>View your current OJT assignments.</p>
-                </div>
-                <div class="card">
-                    <h3>Notifications</h3>
-                    <p>Check announcements from your mentor.</p>
-                </div>
-                <div class="card">
-                    <h3>Documents</h3>
-                    <p>Upload or review submitted reports.</p>
-                </div>
+            <section class="student-documents">
+                <section class="cards">
+                    <div class="card">
+                        <h3>OJT Status</h3>
+                        <p>View your current OJT assignments.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Notifications</h3>
+                        <p>Check announcements from your mentor.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Documents</h3>
+                        <p>Upload or review submitted reports.</p>
+                    </div>
+                </section>
             </section>
+
 
             <section class="content-section">
                 <h2>OJT Details</h2>
@@ -85,7 +107,7 @@ $studentName = $_SESSION['name'];
         <p>© 2026 OJT Tracking System</p>
     </footer>
 
-    <script src="js/dashboard.js"></script>
+    <script src="../../js/student/studentDashboard.js"></script>
 </body>
 
 </html>

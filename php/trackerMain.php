@@ -17,7 +17,7 @@ $role = $_SESSION['role'] ?? null;
 
 switch ($role) {
 
-    case "admin":
+    case "ADMIN":
         header("Location: admin/adminDashboard.php");
         exit();
 

@@ -52,7 +52,7 @@ require_once("functions.php");
                     <hr>
                     <div class="form-inputs">
 
-                        <div class="sign-box trios">
+                        <div class="sign-box trios lastName">
                             <input name="lastName" type="text" required />
                             <span>Last name</span>
                         </div>

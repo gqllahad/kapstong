@@ -81,6 +81,13 @@ function validateStep(stepIndex) {
     return true; 
 }
 
+// Last name caps
+document.querySelectorAll('input[name="lastName"]').forEach(input => {
+    input.addEventListener("input", function () {
+        this.value = this.value.toUpperCase();
+    });
+});
+
 //Next
 document.querySelectorAll('[id^="next"]').forEach(btn => {
   btn.addEventListener('click', () => {

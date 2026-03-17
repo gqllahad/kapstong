@@ -192,6 +192,11 @@ hr {
     padding-left: 14px;
     font-size: 1.1rem;
     outline: none;
+    
+}
+
+.sign-box.lastName input{
+    text-transform : uppercase;
 }
 
 .sign-box input:focus ~ span,
@@ -220,7 +225,6 @@ hr {
 
 .gender-group {
     align-items: flex-start; 
-    
 }
 
 .section-label {

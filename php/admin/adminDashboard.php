@@ -8,7 +8,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 
 
-if ($_SESSION['role'] !== "admin") {
+if ($_SESSION['role'] !== "ADMIN") {
     header("Location: ../trackerMain.php");
     exit();
 }
@@ -27,7 +27,7 @@ if ($_SESSION['role'] !== "admin") {
 
     <title>OJT MAIN PAGE</title>
 
-    <link rel="stylesheet" href="../css/trackerMain.css">
+    <link rel="stylesheet" href="../../css/admin/adminDashboard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 
@@ -57,11 +57,11 @@ if ($_SESSION['role'] !== "admin") {
         <!-- SIDEBAR -->
         <aside class="sidebar">
 
-            <ul>
-                <li><a href="#"><i class="bi bi-house"></i> Home</a></li>
-                <li><a href="#"><i class="bi bi-receipt"></i> Preparations</a></li>
-                <li><a href="#"><i class="bi bi-people"></i> Students</a></li>
-                <li><a href="logoutPhase.php"><i class="bi bi-people"></i> Log-out</a></li>
+            <ul class="menu">
+                <li><button><i class="bi bi-house"></i> Home</button></li>
+                <li><button><i class="bi bi-journal-text"></i> Preparations</button></li>
+                <li><button><i class="bi bi-file-earmark-text"></i>Students</button></li>
+                <li><a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
             </ul>
 
         </aside>
@@ -71,7 +71,6 @@ if ($_SESSION['role'] !== "admin") {
         <main class="content">
 
             <section class="page-header">
-                <?php echo ($role); ?>
                 <h1>Admin Dashboard</h1>
                 <p>Welcome Inigo Joints</p>
             </section>
@@ -114,5 +113,6 @@ if ($_SESSION['role'] !== "admin") {
     </footer>
 
 </body>
+<script src="../../js/admin/adminDashboard.js"></script>
 
 </html>
