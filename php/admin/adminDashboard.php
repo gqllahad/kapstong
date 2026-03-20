@@ -103,6 +103,18 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             </section>
 
+
+            <section class="wrapper">
+
+                <h2>Bar graph</h2>
+                <div id="myPlot">
+                </div>
+
+            </section>
+
+
+
+
         </main>
 
     </div>
@@ -113,6 +125,9 @@ if ($_SESSION['role'] !== "ADMIN") {
     </footer>
 
 </body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script src="../../js/admin/adminDashboard.js"></script>
 
 </html>

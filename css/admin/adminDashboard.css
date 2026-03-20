@@ -230,3 +230,24 @@ background:#eee;
 .modal-box a:hover {
     background-color: #2980b9;
 }
+
+/* bargraph trial */
+
+.wrapper {
+    
+	padding: 80px 0;
+	text-align: center;
+}
+
+.wrapper h2 {
+	font-size: 50px;
+	font-weight: 700;
+	color: #000000;
+	padding-bottom: 50px;
+}
+
+.wrapper #myPlot {
+	margin: 0 auto;
+     width : 100%;
+    max-width: 700px;
+}

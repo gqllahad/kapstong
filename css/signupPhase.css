@@ -22,7 +22,8 @@
     --approved-color : #10c552;
     --approved-color-sub : #02c74a;
 
-    --declined-color : #67b1fc;
+    --declined-color : #ff0000;
+    --declined-color-sub : #f51a1a;
 
     --front-text : #111827;
 }
@@ -200,11 +201,20 @@ hr {
 }
 
 .sign-box input:focus ~ span,
-.sign-box input:valid ~ span, .sign-box.id-taken span, .sign-box.email-taken span, .sign-box.birthdate span {
+.sign-box input:valid ~ span, .sign-box input:not(:placeholder-shown) ~ span, .sign-box.birthdate span {
     transform: translate(-20px, -55px);
-
     font-size: 1rem;
     color: var(--primary);
+}
+
+.sign-box.studentID.id-taken span, .sign-box.studentEmail.email-taken span{
+    transform: translate(-20px, -55px);
+    font-size: 1rem;
+    color: var(--declined-color);
+}
+
+.sign-box.studentEmail.email-taken input, .sign-box.studentID.id-taken input {
+    border: 1px solid var(--declined-color);
 }
 
  .sign-box.username span{
@@ -253,7 +263,6 @@ hr {
     width: 20px;
     height: 20px;
 }
-
 
 .next-button, .back-button {
     margin-top: 1.3rem;

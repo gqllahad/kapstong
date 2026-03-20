@@ -52,11 +52,10 @@ function validateStep(stepIndex) {
     const inputs = currentForm.querySelectorAll("input[required]");
 
     for (let input of inputs) {
-        if (!input.value.trim()) {
-            alert("Please fill all required fields in this step.");
-            input.focus();
-            return false; 
-        }
+        if (!input.checkValidity()) {
+                input.reportValidity(); 
+                return false;
+            }
       
         if (input.type === "radio") {
             const name = input.name;
@@ -67,7 +66,6 @@ function validateStep(stepIndex) {
             }
         }
     }
-
 
     if (stepIndex === 2) { 
         if (confirmPasswordInput.value !== passwordInput.value) {

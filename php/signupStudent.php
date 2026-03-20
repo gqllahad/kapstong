@@ -53,19 +53,19 @@ require_once("functions.php");
                     <div class="form-inputs">
 
                         <div class="sign-box trios lastName">
-                            <input name="lastName" type="text" required />
+                            <input name="lastName" type="text" placeholder=" " required />
                             <span>Last name</span>
                         </div>
-                        <div class="sign-box trios"> <input name="firstName" type="text" required />
+                        <div class="sign-box trios"> <input name="firstName" type="text" placeholder=" " required />
                             <span>First name</span>
                         </div>
 
-                        <div class="sign-box trios"> <input name="middleName" type="text" required />
+                        <div class="sign-box trios"> <input name="middleName" type="text" placeholder=" " required />
                             <span>Middle name</span>
                         </div>
 
                         <div class="sign-box trios studentEmail">
-                            <input name="signEmail" type="email" class="full" id="studentEmail" required />
+                            <input name="signEmail" type="email" class="full" id="studentEmail" placeholder=" " required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" />
                             <span>Email</span>
                             <p id="studentEmail-warning" style="color:red; display:none; font-weight : 600; font-size: 0.5rem;">Email already been used!</p>
                         </div>
@@ -75,10 +75,9 @@ require_once("functions.php");
                         </div>
 
                         <div class="sign-box trios">
-                            <input name="signTel" type="tel" class="duos" required />
+                            <input name="signTel" type="tel" class="duos" required placeholder=" " />
                             <span> Mobile Number </span>
                         </div>
-
 
                         <div class="gender-group full">
                             <label class="section-label">Gender:</label>
