@@ -4,6 +4,13 @@ const navBar = document.querySelector('.navbar');
 
 const menuItems = document.querySelectorAll('.menu li');
 
+// colors
+const statusColors = {
+    good: "#28a745",     
+    warning: "#ffc107",  
+    danger: "#dc3545"    
+};
+
 // bar chart
 const xArray = ["Italy", "France", "Spain", "USA", "Argentina"];
 const yArray = [55, 49, 44, 24, 15];
@@ -19,20 +26,34 @@ const layout = {
 };
 
 // Functions 
+
+function getStatusColor(value) {
+    if (value >= 1) return statusColors.good;
+    if (value >= 20) return statusColors.warning;
+    return statusColors.danger;
+}
+
 function loadChart() {
     fetch("../../php/admin/functions/getChartData.php")
         .then(res => res.json())
         .then(data => {
+            
+            // color
+            const colors = data.values.map(value => getStatusColor(value));
 
-            const chartData = [{
+            // bar chart
+            const barChartData = [{
                 x: data.labels,
                 y: data.values,
                 type: "bar",
+                marker: {
+                    color: colors
+                },
                 text: data.values,
                 textposition: "outside"
             }];
 
-            const layout = {
+            const barLayout = {
                 title: "Users per Role",
                 yaxis : {
                     dtick : 1
@@ -40,14 +61,82 @@ function loadChart() {
                 
             };
 
-            Plotly.newPlot("myPlot", chartData, layout);
+            Plotly.newPlot("myPlot", barChartData, barLayout);
+
+            // pie chart
+            // const pieData = [{
+            //     labels: data.labels,
+            //     values: data.values,
+            //     type: "pie",
+            //     textinfo: "label+percent",
+            //     insidetextorientation: "radial"
+            // }];
+
+            // const pieLayout = {
+            //     title: "User Distribution",
+            // };
+
+            // Plotly.newPlot("pieChart", pieData, pieLayout);
+
+
         })
         .catch(err => console.error(err));
 }
 
+
+function loadPieChart() {
+    fetch("../../php/admin/functions/getChartData.php")
+        .then(res => res.json())
+        .then(data => {
+
+            const ctx = document.getElementById('pieChart2');
+
+            //colors
+            const pieColors = data.labels.map(label => {
+                if (label === "ADMIN") {
+                    return "#28a745";
+                } else if (label === "student") {
+                    return "#dc3545"; 
+                }
+                return "#6c757d"; 
+            });
+
+            // Destroy previous chart
+            if (window.pieChartInstance) {
+                window.pieChartInstance.destroy();
+            }
+
+            window.pieChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                         backgroundColor: pieColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+        })
+        .catch(err => console.error("Pie chart error:", err));
+}
+
 // bar chart (go)
-document.addEventListener("DOMContentLoaded", loadChart);
-setInterval(loadChart, 5000);
+// document.addEventListener("DOMContentLoaded", loadChart, loadPieChart);
+// setInterval(loadChart, 5000);
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadChart();   
+    loadPieChart();   
+});
 
 // menu items (active)
 menuItems.forEach(item => {

@@ -70,6 +70,8 @@ if ($_SESSION['role'] !== "ADMIN") {
         <!-- MAIN -->
         <main class="content">
 
+
+
             <section class="page-header">
                 <h1>Admin Dashboard</h1>
                 <p>Welcome Inigo Joints</p>
@@ -97,22 +99,29 @@ if ($_SESSION['role'] !== "ADMIN") {
 
 
             <section class="content-section">
-
                 <h2>Content Section</h2>
                 <p>tables, charts, or components</p>
-
             </section>
 
+            <section class="dashboard-layout">
+                <section class="wrapper bar-chart">
+                    <h2>Bar graph</h2>
+                    <div id="myPlot">
+                    </div>
 
-            <section class="wrapper">
+                </section>
 
-                <h2>Bar graph</h2>
-                <div id="myPlot">
-                </div>
+                <!-- <section class="wrapper pie-chart">
+                <h2>Pie Chart (Users per Role)</h2>
+                <div id="pieChart"></div>
+            </section> -->
 
+
+                <section class="wrapper pie-chart-plain">
+                    <h2>Pie Chart (Users per Role)</h2>
+                    <canvas id="pieChart2"></canvas>
+                </section>
             </section>
-
-
 
 
         </main>
@@ -128,6 +137,8 @@ if ($_SESSION['role'] !== "ADMIN") {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../../js/admin/adminDashboard.js"></script>
+
 
 </html>
