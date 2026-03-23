@@ -108,10 +108,9 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <h2>Bar graph</h2>
                     <div id="myPlot">
                     </div>
-
                 </section>
 
-                <!-- <section class="wrapper pie-chart">
+                <!-- <section class="wrapper pie-chart">`
                 <h2>Pie Chart (Users per Role)</h2>
                 <div id="pieChart"></div>
             </section> -->

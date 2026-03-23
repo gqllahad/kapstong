@@ -110,11 +110,11 @@ require_once("functions.php");
                             <span>Course / Program</span>
                         </div>
 
-                        <div class="sign-box duos"> <input name="signLevel" type="text" required />
+                        <div class="sign-box duos"> <input name="signLevel" type="text" placeholder=" " required />
                             <span>Year Level</span>
                         </div>
 
-                        <div class="sign-box duos"> <input name="signSY" type="text" required />
+                        <div class="sign-box duos"> <input name="signSY" type="text" placeholder=" " required />
                             <span>School Year</span>
                         </div>
 
@@ -138,11 +138,11 @@ require_once("functions.php");
                             <span>Email </span>
                         </div>
 
-                        <div class="sign-box duos"> <input name="signPassword" id="passwordInput" type="password" required />
+                        <div class="sign-box duos"> <input name="signPassword" id="passwordInput" placeholder=" " type="password" required />
                             <span>Password</span>
                         </div>
 
-                        <div class="sign-box duos"> <input name="signConfirmPassword" id="confirmPasswordInput" type="password" required />
+                        <div class="sign-box duos"> <input name="signConfirmPassword" id="confirmPasswordInput" placeholder=" " type="password" required />
                             <span> Confirm Password</span>
                         </div>
 

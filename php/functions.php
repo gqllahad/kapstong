@@ -24,7 +24,7 @@ function logout()
 
     session_destroy();
 
-    header("Location: ../php/loginPhase.php");
+    header("Location: ../php/loginPhase.php#log-container");
     exit;
 }
 

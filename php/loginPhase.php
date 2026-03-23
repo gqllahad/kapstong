@@ -37,14 +37,14 @@ if (isset($_GET['warning'])) {
     </div>
   <?php endif; ?>
 
-  <?php if ($wrongPassword): ?>
+  <!-- <?php if ($wrongPassword): ?>
     <div class="modal-backdrop" id="errorLogin">
       <div class="modal-box">
         <h2>Error</h2>
         <p>Incorrect email or password.</p>
       </div>
     </div>
-  <?php endif; ?>
+  <?php endif; ?> -->
 
 
   <header class="header">
@@ -60,6 +60,15 @@ if (isset($_GET['warning'])) {
         <a href="#log-container" id="login">Login</a>
       </nav>
     </div>
+
+    <?php if ($wrongPassword): ?>
+      <div class="incorrectLogin-box" id="incorrectLogin">
+        <p>⚠ Incorrect Email or Password!</p>
+      </div>
+
+    <?php endif; ?>
+
+
   </header>
 
   <section class="log-start" id="log-start">
@@ -128,12 +137,12 @@ if (isset($_GET['warning'])) {
         <h2 style="padding: 3% 3%;">Sign In</h2>
         <div class="login-inner-container">
           <div class="login-box">
-            <input type="email" name="loginEmail" required />
+            <input type="email" name="loginEmail" id="loginEmail" placeholder=" " required />
             <span>Email</span>
           </div>
 
           <div class="login-box">
-            <input type="password" name="loginPassword" required />
+            <input type="password" name="loginPassword" id="loginPassword" placeholder=" " required />
             <span>Password</span>
           </div>
         </div>
@@ -147,6 +156,8 @@ if (isset($_GET['warning'])) {
             class="login-submit"
             name="login-submit" />
         </div>
+
+
       </div>
     </form>
   </section>
@@ -154,7 +165,7 @@ if (isset($_GET['warning'])) {
   <hr />
 
   <section class="log-about" id="log-about">
-    <div class="abount-container">
+    <div class="about-container container">
       <h2>Developers</h2>
       <p>
         Lorem ipsum dolor sit, amet consectetur adipisicing elit. Culpa illum
@@ -162,7 +173,7 @@ if (isset($_GET['warning'])) {
         quod sequi dolorem sed consectetur fugiat consequuntur natus cum
         sapiente ea aut.
       </p>
-      <button id="btn">CHAHAHA</button>
+      <button id="btn">haha</button>
     </div>
   </section>
 </body>
