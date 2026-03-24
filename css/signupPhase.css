@@ -39,16 +39,25 @@ body {
     line-height: 1.6;
     padding-top: 72px;
     overflow-x: hidden;
+    text-align: center;
+    width: 100%;
 }
 
 .layout{
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
     width: 100%;
+    padding: 0 15px;
 }
 
+.content {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
 
 .sign-logo {
     width: 100%;
@@ -78,8 +87,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 400px;
-    margin: 40px auto;
+    width: 100%;
+    max-width: 400px;
+    margin : 20px; 
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 10px;
+
 }
 
 .progress-line{
@@ -133,7 +147,10 @@ body {
 
 .form-inputs{
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  width: 100%;
+    max-width: 100%;
+  /* grid-template-columns: repeat(6, 1fr); */
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap : 10px;
   margin: 4% 0;
 }
@@ -161,10 +178,10 @@ hr {
 }
 
 .sign-box{
-   margin: 7% 5%;
+    margin: 20px 0;
     position: relative;
     width: 100%;
-    min-width: 300px;
+    min-width: unset;
     background: transparent;
     border-radius: 10px;
     box-sizing: border-box;   
@@ -174,7 +191,7 @@ hr {
     position: absolute;
     color: var(--front-text);
     top: 50%;
-    left: 10%;
+    left: 7%;
     transform: translateY(-50%);
     pointer-events: none;
     font-size: 1rem;
@@ -183,7 +200,8 @@ hr {
 }
 
 .sign-box input{
-    min-width: 280px;
+    width: 100%;
+    min-width: unset;
     height: 50px;
     background: var(--light);
     border: 1px solid var(--primary);
@@ -193,7 +211,6 @@ hr {
     padding-left: 14px;
     font-size: 1.1rem;
     outline: none;
-    
 }
 
 .sign-box.lastName input{
@@ -218,13 +235,9 @@ hr {
 }
 
  .sign-box.username span{
-    transform: translate(-15px, -50px);
+    transform: translate(-5px, -50px);
     font-size: 1rem;
     color: var(--primary);
-}
-
-.sign-box.username span{
-  left : 30%;
 }
 
 .next-button:disabled {
@@ -298,3 +311,55 @@ hr {
     transform: translateY(0);
 }
 
+/* Mobile media */
+
+@media (max-width: 768px) {
+    .sign-logo img {
+        max-width: 100px;
+    }
+
+    .upper-text {
+        font-size: 1.2rem;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .form-inputs {
+        grid-template-columns: repeat(1, 1fr);
+        margin: 8% 0 ;
+    }
+
+    .full,
+    .duos,
+    .trios {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .sign-box span {
+        font-size: 0.9rem;
+    }
+
+    .sign-box input {
+        font-size: 0.75rem;
+        height: 45px;
+    }
+}
+
+@media (max-width: 768px) {
+    .next-button,
+    .back-button {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .gender-options {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+}

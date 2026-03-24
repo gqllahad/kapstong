@@ -3,6 +3,7 @@ include("kapstongConnection.php");
 
 $invaderLogin = false;
 $wrongPassword = false;
+$successSignUp = false;
 
 if (isset($_GET['error'])) {
   $invaderLogin = true;
@@ -10,6 +11,10 @@ if (isset($_GET['error'])) {
 
 if (isset($_GET['warning'])) {
   $wrongPassword = true;
+}
+
+if (isset($_GET['success'])) {
+  $successSignUp = true;
 }
 
 ?>
@@ -64,6 +69,13 @@ if (isset($_GET['warning'])) {
     <?php if ($wrongPassword): ?>
       <div class="incorrectLogin-box" id="incorrectLogin">
         <p>⚠ Incorrect Email or Password!</p>
+      </div>
+
+    <?php endif; ?>
+
+    <?php if ($successSignUp): ?>
+      <div class="signSuccess-box" id="signSuccess">
+        <p>Account Created!</p>
       </div>
 
     <?php endif; ?>
@@ -128,7 +140,7 @@ if (isset($_GET['warning'])) {
       id="sign-container"
       style="text-align: left; margin: 0 5%">
       <h1>Don't have an account?</h1>
-      <p>This site is safe, if you're a citizen in Barangay Granby</p>
+      <p>If your an OJT student, Signup now!</p>
       <button id="ls-switch" class="ls-switch">Sign Up</button>
     </div>
 

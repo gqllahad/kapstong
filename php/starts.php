@@ -6,7 +6,13 @@ ini_set('display_errors', 1);
 
 
 if (isset($_POST['login-submit'])) {
-    $userEmail = $_POST["loginEmail"];
+    $userEmail = filter_var($_POST["loginEmail"], FILTER_VALIDATE_EMAIL);
+
+    if (!$userEmail) {
+        header("Location: loginPhase.php?warning=Invalid+email+or+password");
+        exit();
+    }
+
     $userPassword = $_POST["loginPassword"];
 
     $sql_prep = $conn->prepare("SELECT * FROM users WHERE email = ?");
@@ -21,7 +27,12 @@ if (isset($_POST['login-submit'])) {
 
         if (password_verify($userPassword, $row['password'])) {
 
+            ini_set('session.cookie_httponly', 1);
+            ini_set('session.use_strict_mode', 1);
+            ini_set('session.cookie_secure', 0);
+
             session_start();
+            session_regenerate_id(true);
 
             $_SESSION['user_id'] = $row['userID'];
             $_SESSION['email'] = $row['email'];
@@ -39,7 +50,7 @@ if (isset($_POST['login-submit'])) {
         }
     } else {
 
-        header("Location: loginPhase.php?warning=ID+not+Found");
+        header("Location: loginPhase.php?warning=Invalid+email+or+password");
         exit();
     }
 }
@@ -52,7 +63,13 @@ if (isset($_POST['signupForm'])) {
     $mName = $_POST['middleName'];
     $fullName = $lName . " " .  $fName . " " . $mName;
 
-    $email = $_POST['signEmail'];
+    $email = filter_var($_POST['signEmail'], FILTER_VALIDATE_EMAIL);
+
+    if (!$email) {
+        header("Location: signupStudent.php?error=Invalid+email");
+        exit();
+    }
+
     $mobile = $_POST['signTel'];
     $gender = $_POST['gender'];
     $birth = $_POST['signBirth'];
@@ -70,7 +87,7 @@ if (isset($_POST['signupForm'])) {
 
     $sqlCheck = $conn->prepare("SELECT COUNT(*) FROM users WHERE email = ? OR studentID = ?");
 
-    $sqlCheck->bind_param("ss", $userEmail, $studentID);
+    $sqlCheck->bind_param("ss", $email, $studentID);
     $sqlCheck->execute();
     $sqlCheck->bind_result($checkCount);
     $sqlCheck->fetch();
@@ -113,8 +130,7 @@ if (isset($_POST['signupForm'])) {
 
         $conn->commit();
 
-
-        header("Location: signupStudent.php?success=Account+created+successfully!");
+        header("Location: loginPhase.php?success=Account+created+successfully!#log-container");
         exit();
     } catch (Exception $e) {
         $conn->rollback();

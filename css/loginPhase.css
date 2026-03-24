@@ -108,11 +108,7 @@ hr {
 
 #login {
     padding: 15px 25px;
-    border-radius: 12%;
-    transition: background-color 0.3s ease;
-}
-
-#login:hover{
+    border-radius: 10%;
     border: 1px solid var(--light);
     background-color: var(--pri-button);
     color: var(--sec-primary);
@@ -326,7 +322,63 @@ hr {
     background-color: var(--dark);
     transform: translateY(0);
 }
+/* modal success signup */
+.signSuccess-box{
+    display: flex;
+    border: none;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 0;
+    min-height: 0;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 255, 21, 0.25),
+        rgba(0, 255, 0, 0.05)
+    );
 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(0,0,0,0.2),
+        0 0 12px rgba(0, 255, 21, 0.6);
+    opacity: 0;
+    transform: translateY(-40px); 
+    transition: all 1.3s ease-out; 
+}
+
+.signSuccess-box.active{
+    opacity: 1;
+    max-height: 100px;
+    transform: translateY(0);
+     margin: 0.75rem auto;
+    padding: 0.75rem 1rem;
+    animation: shake 0.7s ease;
+}
+
+.signSuccess-box p {
+    display: flex;
+    align-items: center;
+    left: auto;
+    margin: 0;
+    position: static;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--front-text); 
+     word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* new Modal Incorrect */
 .incorrectLogin-box{
     display: flex;
     border: none;
@@ -381,6 +433,8 @@ hr {
      word-wrap: break-word;
     overflow-wrap: break-word;
 }
+
+
 
 .ls-switch{
      margin-top: 1.3rem;
@@ -471,7 +525,6 @@ hr {
 
 /* media */
 
-
 @media (max-width: 768px) {
     .header {
         height: auto;
@@ -499,14 +552,10 @@ hr {
 
 @media (max-width: 768px) {
     #login {
-        padding: 0;
-        border-radius: 0;
-        background: none;
-        border: none;
-    }
-
-    #login:hover{
-        border-bottom: 2px solid var(--dark);
+        border-radius: 10%;
+        border: 1px solid var(--light);
+        background-color: var(--pri-button);
+        color: var(--sec-primary);
     }
 }
 

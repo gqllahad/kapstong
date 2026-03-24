@@ -6,8 +6,8 @@ const menuItems = document.querySelectorAll('.menu li');
 
 // colors
 const statusColors = {
-    good: "#28a745",     
-    warning: "#ffc107",  
+    good: "#6c5eec",     
+    warning: "#1b2cc4",  
     danger: "#dc3545"    
 };
 
@@ -50,7 +50,7 @@ function loadChart() {
                     color: colors
                 },
                 text: data.values,
-                textposition: "outside"
+                textposition: "inside"
             }];
 
             const barLayout = {
@@ -62,23 +62,6 @@ function loadChart() {
             };
 
             Plotly.newPlot("myPlot", barChartData, barLayout);
-
-            // pie chart
-            // const pieData = [{
-            //     labels: data.labels,
-            //     values: data.values,
-            //     type: "pie",
-            //     textinfo: "label+percent",
-            //     insidetextorientation: "radial"
-            // }];
-
-            // const pieLayout = {
-            //     title: "User Distribution",
-            // };
-
-            // Plotly.newPlot("pieChart", pieData, pieLayout);
-
-
         })
         .catch(err => console.error(err));
 }
@@ -94,9 +77,9 @@ function loadPieChart() {
             //colors
             const pieColors = data.labels.map(label => {
                 if (label === "ADMIN") {
-                    return "#28a745";
+                    return "#5c77f0";
                 } else if (label === "student") {
-                    return "#dc3545"; 
+                    return "#4e69e0"; 
                 }
                 return "#6c757d"; 
             });
@@ -107,7 +90,7 @@ function loadPieChart() {
             }
 
             window.pieChartInstance = new Chart(ctx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: data.labels,
                     datasets: [{
@@ -121,7 +104,8 @@ function loadPieChart() {
                         legend: {
                             position: 'bottom'
                         }
-                    }
+                    },
+                    cutout : '70%'
                 }
             });
 

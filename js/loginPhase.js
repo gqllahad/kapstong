@@ -8,6 +8,9 @@ const modalInvader = document.getElementById("accessDenied");
 const modalLoginError = document.getElementById("errorLogin");
 const loginError = document.getElementById("incorrectLogin");
 
+//sucess signup
+const modalSignSuccess = document.getElementById("signSuccess");
+
 const loginEmail = document.getElementById("loginEmail");
 const loginPass = document.getElementById("loginPassword");
 
@@ -41,6 +44,25 @@ if (invaderLogin && modalInvader) {
     const loginSection = document.getElementById("log-container");
     if (loginSection) loginSection.scrollIntoView({ behavior: "smooth" });
   });
+}
+
+// signup success
+
+if(modalSignSuccess){
+    const loginSection = document.getElementById("log-container");
+    if (loginSection) loginSection.scrollIntoView({ behavior: "smooth" });
+
+    modalSignSuccess.classList.add("active");
+
+    setTimeout(() => {
+
+      modalSignSuccess.classList.remove("active");
+      
+      const url = new URL(window.location);
+      url.searchParams.delete("success");
+      window.history.replaceState({}, document.title, url.toString());
+
+    }, 4000);
 }
 
 // incorrect login
