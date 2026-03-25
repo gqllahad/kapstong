@@ -66,7 +66,7 @@ function loadChart() {
         .catch(err => console.error(err));
 }
 
-
+// pie chart
 function loadPieChart() {
     fetch("../../php/admin/functions/getChartData.php")
         .then(res => res.json())

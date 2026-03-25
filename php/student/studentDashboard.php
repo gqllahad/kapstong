@@ -34,8 +34,11 @@ $studentName = $_SESSION['name'];
 
     <header class="navbar">
         <h1>OJT Student Dashboard</h1>
-        <nav>
+        <button id="menuToggle">☰</button>
+        <nav class="profile-menu" id="profileMenu" hidden>
             <a href="#">Profile</a>
+            <hr style="width: 75%; text-align: left;">
+            <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
     </header>
 
@@ -50,7 +53,6 @@ $studentName = $_SESSION['name'];
                 </li>
                 <li><button><i class="bi bi-file-earmark-text"></i>Submissions</button></li>
                 <li><button><i class="bi bi-chat-left-text"></i> Messages</button></li>
-                <li><a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
             </ul>
         </aside>
 
@@ -63,43 +65,33 @@ $studentName = $_SESSION['name'];
                 </section>
 
                 <section class="cards">
-                    <div class="card">
+                    <div class="card pending-task">
                         <h3>OJT Status</h3>
                         <p>View your current OJT assignments.</p>
                     </div>
-                    <div class="card">
+                    <div class="card notification">
                         <h3>Notifications</h3>
                         <p>Check announcements from your mentor.</p>
                     </div>
-                    <div class="card">
+                    <div class="card submitted-task">
                         <h3>Documents</h3>
                         <p>Upload or review submitted reports.</p>
                     </div>
                 </section>
             </section>
 
-            <section class="student-documents">
-                <section class="cards">
-                    <div class="card">
-                        <h3>OJT Status</h3>
-                        <p>View your current OJT assignments.</p>
-                    </div>
-                    <div class="card">
-                        <h3>Notifications</h3>
-                        <p>Check announcements from your mentor.</p>
-                    </div>
-                    <div class="card">
-                        <h3>Documents</h3>
-                        <p>Upload or review submitted reports.</p>
-                    </div>
+            <section class="dashboard-charts">
+                <section class="wrapper line-chart">
+                    <h2>Line Chart (Users per Role)</h2>
+                    <canvas id="lineChart"></canvas>
+                </section>
+
+                <section class="wrapper pie-chart">
+                    <h2>Attendance Evaluation</h2>
+                    <canvas id="pieChart"></canvas>
                 </section>
             </section>
 
-
-            <section class="content-section">
-                <h2>OJT Details</h2>
-                <p>Track your tasks, mentors, and schedules here.</p>
-            </section>
         </main>
     </div>
 
@@ -107,7 +99,9 @@ $studentName = $_SESSION['name'];
         <p>© 2026 OJT Tracking System</p>
     </footer>
 
-    <script src="../../js/student/studentDashboard.js"></script>
 </body>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../../js/student/studentDashboard.js"></script>
 
 </html>

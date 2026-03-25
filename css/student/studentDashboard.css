@@ -7,6 +7,9 @@ font-family:Arial, Helvetica, sans-serif;
 
 body{
 background:#f5f6fa;
+display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* Variables */
@@ -27,6 +30,21 @@ background:#f5f6fa;
     --approved-color : #22c55e;
     --approved-color-sub : #02c74a;
 
+    --card--pending-task : #f59e0b;
+    --card--pending-task-sub : #f3cb2d;
+    --card--pending-task-border : #fbbf24;
+    --card--pending-task-text : #92400e;
+
+    --card--notification : #3b82f6;
+    --card--notification-sub : #4092fd;
+    --card--notification-border : #60a5fa;
+    --card--notification-text : #1e3a8a;
+
+    --card--submitted-task : #10b981;
+    --card--submitted-task-sub : #0fe275;
+    --card--submitted-task-border : #34d399;
+    --card--submitted-task-text : #065f46;
+
     --front-text : #111827
 }
 
@@ -41,16 +59,58 @@ background:var(--primary);
 color:white;
 margin-left: 105px;
 transition: margin-left 0.9s ease;
+width: 100%;
+position: fixed;
+margin-left: 0; 
 }
 
 .navbar.shifted{
     margin-left: 230px;
 }
 
-.nav-links a{
-color:white;
-margin-left:20px;
-text-decoration:none;
+#menuToggle {
+    font-size: 25px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.profile-menu {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+    overflow: hidden;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.profile-menu {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: 0.2s ease;
+}
+
+.profile-menu:not([hidden]) {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.profile-menu a {
+    padding: 15px 15px;
+    text-decoration: none;
+    color: #333;
+    transition: 0.2s;
+}
+
+.profile-menu a:hover {
+    background: #f1f1f1;
 }
 
 /* LAYOUT */
@@ -63,7 +123,7 @@ min-height:90vh;
 /* SIDEBAR */
 
 .sidebar{
-    position: fixed; /*sticky*/
+    position: fixed; /*fixed*/
     top: 0;
     bottom: 0;
     left: 0; /*Right*/
@@ -95,9 +155,10 @@ min-height:90vh;
 .menu li, .menu li i{
     background: transparent;
     overflow: hidden;
-    padding: 0.7rem;
+    padding: 0.4rem;
     margin: 10% 0;
     border-radius: 8px;
+    cursor: pointer;
     transition: all 0.5s ease;
 }
 
@@ -136,7 +197,7 @@ min-height:90vh;
 }
 
 .menu i, .menu a i{
-    font-size: 1.3rem;
+    font-size: 1.2rem;
 }
 
 
@@ -151,6 +212,7 @@ background:#f0f0f0;
 flex:1;
 padding:40px;
 margin-left: 105px;
+margin-top: 70px;
 transition: margin-left 0.9s ease;
 }
 
@@ -158,14 +220,52 @@ transition: margin-left 0.9s ease;
 margin-bottom:30px;
 }
 
-.student-documents{
-    display: none;
+/* charts */
+.wrapper {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 15px;
+    border-right: 4px solid var(--primary);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    transition: 0.3s ease;
+}
+
+.wrapper:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.wrapper h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.wrapper canvas {
+    width: 100% !important;
+    height: 260px !important;
+}
+
+.line-chart {
+    width: 65%;
+
+}
+
+.pie-chart{
+    width: 25%;
+}
+
+.dashboard-charts {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 
-
 /* CARDS */
-
 .cards{
 display:flex;
 gap:20px;
@@ -180,10 +280,121 @@ box-shadow:0 2px 8px rgba(0,0,0,0.1);
 flex:1;
 }
 
+.card.pending-task{
+    background: var(--card--pending-task);
+    border: 1px solid var(--card--pending-task-border);
+    transition: all 0.3s ease;
+}
+
+.card.pending-task:hover{
+    background: var(--card--pending-task-sub);
+    transform: translateY(-5px);
+}
+
+.card.notification{
+    background: var(--card--notification);
+    border: 1px solid var(--card--notification-border);
+    transition: all 0.3s ease;
+}
+
+.card.notification:hover{
+    background: var(--card--notification-sub);
+    transform: translateY(-5px);
+}
+
+.card.submitted-task{
+    background: var(--card--submitted-task);
+    border: 1px solid var(--card--submitted-task-border);
+    transition: all 0.3s ease;
+}
+
+.card.submitted-task:hover{
+    background: var(--card--submitted-task-sub);
+    transform: translateY(-5px);
+}
+
+.card.submitted-task h3, .card.pending-task h3, .card.notification h3{
+    font-weight: bolder;
+    margin-bottom: 5px;
+}
+
+.card.submitted-task p, .card.pending-task p, .card.notification p{
+    font-size: 0.75rem;
+}
+
+
+
 /* FOOTER */
 
 .footer{
-text-align:center;
-padding:20px;
-background:#eee;
+    text-align:center;
+    padding:20px;
+    background:#eee;
+    width: 100%;
+    margin-top: auto;
+}
+
+/* media */
+@media (max-width: 768px) {
+    .line-chart,
+    .pie-chart {
+        width: 100%;
+    }
+
+    .wrapper canvas {
+        height: 220px !important;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* NAVBAR */
+    .navbar {
+        flex-wrap: wrap;          
+        padding: 12px 16px;       
+        gap: 10px;
+    }
+
+    .navbar h1 {
+        font-size: 16px;
+        flex: 1 1 100%;       
+        text-align: left;
+    }
+
+    .navbar.shifted {
+        margin-left: 0;
+    }
+
+    #menuToggle {
+        order: 2;
+        margin-left: auto;
+        font-size: 35px;
+    }
+
+    .profile-menu {
+        right: 10px;
+        top: 60px;
+    }
+
+    .footer{       
+         width: 100%;
+         position: fixed;
+         bottom: 0;
+    }
+
+    .menu li {
+        padding: 12px 10px;
+        margin: 6px 0;
+    }
+
+    .menu li button,
+    .menu li a {
+        font-size: 14px;        
+        gap: 12px;              
+        padding: 40px 12px;
+    }
+
+    .menu i {
+        font-size: 1.5rem;      
+    }
 }
