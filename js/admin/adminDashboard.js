@@ -2,6 +2,10 @@ const sideBar = document.querySelector('.sidebar');
 const mainContent = document.querySelector('.content');
 const navBar = document.querySelector('.navbar');
 
+// menu profile
+const menuToggle = document.getElementById("menuToggle");
+const profileMenu = document.getElementById("profileMenu");
+
 const menuItems = document.querySelectorAll('.menu li');
 
 // colors
@@ -122,7 +126,20 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPieChart();   
 });
 
-// menu items (active)
+// menu (Upper) 
+menuToggle.addEventListener("click", (e) => {
+    e.stopPropagation(); 
+    profileMenu.hidden = !profileMenu.hidden;
+});
+
+document.addEventListener("click", (e) => {
+    if (!menuToggle.contains(e.target) && !profileMenu.contains(e.target)) {
+        profileMenu.hidden = true;
+    }
+});
+
+
+// sidebar items SIDE (active)
 menuItems.forEach(item => {
     item.addEventListener('click', () => {
 

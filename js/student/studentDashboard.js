@@ -10,7 +10,6 @@ const navBar = document.querySelector('.navbar');
 const menuItems = document.querySelectorAll('.menu li');
 
 // profile menu
-
 menuToggle.addEventListener("click", (e) => {
     e.stopPropagation(); 
     profileMenu.hidden = !profileMenu.hidden;
@@ -21,6 +20,7 @@ document.addEventListener("click", (e) => {
         profileMenu.hidden = true;
     }
 });
+
 
 menuItems.forEach(item => {
     item.addEventListener('click', () => {

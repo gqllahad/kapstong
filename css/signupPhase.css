@@ -277,6 +277,37 @@ hr {
     height: 20px;
 }
 
+/* warnings */
+.name-warning {
+    color: var(--declined-color);
+    font-size: 0.6rem;
+    display: none;
+    font-weight: 600;
+    margin-top: 3px;
+}
+
+.sign-box.name-error input{
+    border: 1px solid var(--declined-color);
+}
+
+.birth-warning {
+    color: var(--declined-color);
+    font-size: 0.6rem;
+    display: none;
+    font-weight: 600;
+    margin-top: 3px;
+}
+
+.sign-box.birth-error input {
+    border: 1px solid var(--declined-color);
+    background-color: #fff5f5;
+}
+
+.sign-box.tel-error input {
+    border: 1px solid var(--declined-color);
+    background-color: #fff5f5;
+}
+
 .next-button, .back-button {
     margin-top: 1.3rem;
     padding: 0.75rem 1.5rem;

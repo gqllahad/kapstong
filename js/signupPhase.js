@@ -21,6 +21,10 @@ const warningTextEmail = document.getElementById("studentEmail-warning");
 const passwordInput = document.getElementById("passwordInput");
 const confirmPasswordInput = document.getElementById("confirmPasswordInput");
 
+// validations element
+const birthInputs = document.querySelectorAll('input[name="signBirth"]');
+const telInput = document.querySelector('input[name="signTel"]');
+
 
 // functions vanilla java
 function updateStepper() {
@@ -79,11 +83,141 @@ function validateStep(stepIndex) {
     return true; 
 }
 
-// Last name caps
-document.querySelectorAll('input[name="lastName"]').forEach(input => {
+// Name error handling
+document.querySelectorAll('.name-input').forEach(input => {
+
     input.addEventListener("input", function () {
+
         this.value = this.value.toUpperCase();
+
+        const regex = /^[A-Z\s]*$/;
+        const parent = this.parentElement;
+        const warning = parent.querySelector(".name-warning");
+
+        if (!regex.test(this.value)) {
+            parent.classList.add("name-error");
+            warning.style.display = "block";
+            this.setCustomValidity("Invalid characters");
+            nextButtonStep1.disabled = true;
+        } else {
+            parent.classList.remove("name-error");
+            warning.style.display = "none";
+            this.setCustomValidity("");
+            nextButtonStep1.disabled = false;
+        }
     });
+});
+
+// birthdate error handling
+birthInputs.forEach(input => {
+    input.addEventListener("input", function () {
+        const parent = this.parentElement;
+        const warning = parent.querySelector(".birth-warning");
+
+        const value = this.value;
+
+        const birthDate = new Date(value);
+        if (!value || isNaN(birthDate.getTime())) {
+            parent.classList.add("birth-error");
+            warning.textContent = "Please enter a valid date.";
+            warning.style.display = "block";
+            this.setCustomValidity("Invalid date");
+            nextButtonStep1.disabled = true;
+            return;
+        }
+
+        if (birthDate.getFullYear() < 1900) {
+            parent.classList.add("birth-error");
+            warning.textContent = "Year is too far in the past.";
+            warning.style.display = "block";
+            this.setCustomValidity("Year too old");
+            nextButtonStep1.disabled = true;
+            return;
+        }
+
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        if (age < 15) {
+            parent.classList.add("birth-error");
+            warning.textContent = "You must be at least 18 years old.";
+            warning.style.display = "block";
+            this.setCustomValidity("You must be at least 18 years old.");
+            nextButtonStep1.disabled = true;
+        } else {
+            parent.classList.remove("birth-error");
+            warning.style.display = "none";
+            this.setCustomValidity("");
+            nextButtonStep1.disabled = false;
+        }
+    });
+});
+
+// mobile number error handling
+
+telInput.addEventListener("focus", function () {
+    if (this.value === "") {
+        this.value = "09";
+    }
+    setTimeout(() => {
+        this.selectionStart = this.selectionEnd = this.value.length;
+    }, 0);
+});
+
+telInput.addEventListener("keydown", function (e) {
+    if ((this.selectionStart <= 2) && 
+        (e.key === "Backspace" || e.key === "Delete")) {
+        e.preventDefault();
+    }
+});
+
+telInput.addEventListener("input", function() {
+    const parent = this.parentElement;
+    let warning = parent.querySelector(".tel-warning");
+    const value = this.value.trim();
+
+    if (!warning) {
+        warning = document.createElement("p");
+        warning.classList.add("tel-warning");
+        warning.style.color = "var(--declined-color)";
+        warning.style.fontSize = "0.6rem";
+        warning.style.fontWeight = "600";
+        warning.style.display = "none";
+        parent.appendChild(warning);
+    }
+
+    let digits = this.value.replace(/\D/g, "");
+
+    if (!digits.startsWith("09")) {
+        digits = "09" + digits.slice(2);
+    }
+
+    if (digits.length > 11) digits = digits.slice(0, 11);
+
+    let formatted = "";
+    for (let i = 0; i < digits.length; i++) {
+        formatted += digits[i];
+        if (i === 1 || i === 4 || i === 7) formatted += " ";
+    }
+
+    this.value = formatted.trim();
+
+    if (digits.length !== 11) {
+        parent.classList.add("tel-error");
+        warning.textContent = "Enter a valid mobile number";
+        warning.style.display = "block";
+        this.setCustomValidity("Invalid mobile number");
+        nextButtonStep1.disabled = true;
+    } else {
+        parent.classList.remove("tel-error");
+        warning.style.display = "none";
+        this.setCustomValidity("");
+        nextButtonStep1.disabled = false;
+    }
 });
 
 //Next
@@ -154,6 +288,17 @@ studentEmail1.addEventListener("input", () => {
     const studentEmail = studentEmail1.value.trim();
     if(studentEmail === "") return;
 
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.(com|net|org|edu|ph|gov)$/;
+
+    if (!emailRegex.test(studentEmail)) {
+        warningTextEmail.style.display = "block";
+        warningTextEmail.textContent = "Enter a valid email address (e.g., example@gmail.com)";
+        studentEmail1.setCustomValidity("Invalid email format");
+        studentEmail1.parentElement.classList.add("email-taken");
+        nextButtonStep1.disabled = true;
+        return;
+    }
+
     fetch(`checkStudentID.php?email=${encodeURIComponent(studentEmail)}`)
       .then(res => res.json())
       .then(data => {
@@ -171,6 +316,11 @@ studentEmail1.addEventListener("input", () => {
       })
       .catch(err => console.error(err));
 });
+
+studentEmail1.addEventListener("blur", checkEmail);
+
+// 1995215248
+
 
 // document.getElementById('signupForm').addEventListener('submit', (e) => {
 //   e.preventDefault();

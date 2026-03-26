@@ -41,11 +41,11 @@ if ($_SESSION['role'] !== "ADMIN") {
             <h2>OJT SYSTEM</h2>
         </div>
 
-        <nav class="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Dashboard</a>
-            <a href="#">Students</a>
+        <button id="menuToggle">☰</button>
+        <nav class="profile-menu" id="profileMenu" hidden>
             <a href="#">Profile</a>
+            <hr style="width: 75%; text-align: left;">
+            <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
 
     </header>
@@ -60,7 +60,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <li><button><i class="bi bi-house"></i> Home</button></li>
                 <li><button><i class="bi bi-journal-text"></i> Preparations</button></li>
                 <li><button><i class="bi bi-file-earmark-text"></i>Students</button></li>
-                <li><a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
             </ul>
 
         </aside>
@@ -71,32 +70,27 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             <section class="cards">
 
-                <div class="card">
+                <div class="card unverified-student">
                     <h3>UNVERIFIED STUDENTS</h3>
-                    <p>WOWERs</p>
+                    <p>Students awaiting account verification.</p>
                 </div>
 
-                <div class="card">
+                <div class="card student">
                     <h3>STUDENTS</h3>
-                    <p>WOWERs</p>
+                    <p>Total number of verified and active students.</p>
                 </div>
 
-                <div class="card">
+                <div class="card unverified-supervisor">
                     <h3>UNVERIFIED SUPERVISORS</h3>
-                    <p>WOWERs</p>
+                    <p>Supervisors pending approval and verification.</p>
                 </div>
 
-                <div class="card">
+                <div class="card supervisor">
                     <h3>SUPERVISORS</h3>
-                    <p>WOWERs</p>
+                    <p>Total number of verified supervisors.</p>
                 </div>
 
             </section>
-
-            <!-- <section class="content-section">
-                <h2>Content Section</h2>
-                <p>tables, charts, or components</p>
-            </section> -->
 
             <!-- dashboard -->
             <section class="dashboard-layout">

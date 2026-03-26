@@ -52,15 +52,18 @@ require_once("functions.php");
                     <div class="form-inputs">
 
                         <div class="sign-box trios lastName">
-                            <input name="lastName" type="text" placeholder=" " required />
+                            <input name="lastName" class="name-input" type="text" placeholder=" " required />
                             <span>Last name</span>
+                            <p class="name-warning">Only letters are allowed.</p>
                         </div>
-                        <div class="sign-box trios"> <input name="firstName" type="text" placeholder=" " required />
+                        <div class="sign-box trios"> <input name="firstName" class="name-input" type="text" placeholder=" " required />
                             <span>First name</span>
+                            <p class="name-warning">Only letters are allowed.</p>
                         </div>
 
-                        <div class="sign-box trios"> <input name="middleName" type="text" placeholder=" " required />
+                        <div class="sign-box trios"> <input name="middleName" class="name-input" type="text" placeholder=" " required />
                             <span>Middle name</span>
+                            <p class="name-warning">Only letters are allowed.</p>
                         </div>
 
                         <div class="sign-box trios studentEmail">
@@ -69,12 +72,13 @@ require_once("functions.php");
                             <p id="studentEmail-warning" style="color:red; display:none; font-weight : 600; font-size: 0.5rem;">Email already been used!</p>
                         </div>
                         <div class="sign-box trios birthdate">
-                            <input name="signBirth" type="date" required />
+                            <input name="signBirth" type="date" max="2008-03-26" required />
                             <span> Birth date </span>
+                            <p class="birth-warning">You must be at least 15 years old.</p>
                         </div>
 
                         <div class="sign-box trios">
-                            <input name="signTel" type="tel" class="duos" required placeholder=" " />
+                            <input name="signTel" type="tel" class="duos" maxlength="14" required placeholder=" " />
                             <span> Mobile Number </span>
                         </div>
 
