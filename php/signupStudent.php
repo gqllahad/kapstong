@@ -2,8 +2,6 @@
 
 require_once("functions.php");
 
-
-
 ?>
 
 <!DOCTYPE html>
@@ -56,45 +54,83 @@ require_once("functions.php");
                             <span>Last name</span>
                             <p class="name-warning">Only letters are allowed.</p>
                         </div>
-                        <div class="sign-box trios"> <input name="firstName" class="name-input" type="text" placeholder=" " required />
+                        <div class="sign-box trios firstName"> <input name="firstName" class="name-input" type="text" placeholder=" " required />
                             <span>First name</span>
                             <p class="name-warning">Only letters are allowed.</p>
                         </div>
 
-                        <div class="sign-box trios"> <input name="middleName" class="name-input" type="text" placeholder=" " required />
+                        <div class="sign-box trios middleName"> <input name="middleName" class="name-input" type="text" placeholder=" " />
                             <span>Middle name</span>
                             <p class="name-warning">Only letters are allowed.</p>
                         </div>
 
-                        <div class="sign-box trios studentEmail">
+                        <div class="sign-box duos studentEmail">
                             <input name="signEmail" type="email" class="full" id="studentEmail" placeholder=" " required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" />
                             <span>Email</span>
                             <p id="studentEmail-warning" style="color:red; display:none; font-weight : 600; font-size: 0.5rem;">Email already been used!</p>
                         </div>
-                        <div class="sign-box trios birthdate">
+
+                        <div class="sign-box duos studentMobile">
+                            <input name="signTel" type="tel" class="duos" maxlength="14" required placeholder=" " />
+                            <span> Mobile Number </span>
+                        </div>
+
+                        <div class="sign-box duos birthdate">
                             <input name="signBirth" type="date" max="2008-03-26" required />
                             <span> Birth date </span>
                             <p class="birth-warning">You must be at least 15 years old.</p>
                         </div>
 
-                        <div class="sign-box trios">
-                            <input name="signTel" type="tel" class="duos" maxlength="14" required placeholder=" " />
-                            <span> Mobile Number </span>
+                        <div class="sign-box duos">
+
+                            <select name="gender" required>
+                                <option value="" disabled selected hidden>Select you gender...</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <span>Gender</span>
                         </div>
 
-                        <div class="gender-group full">
-                            <label class="section-label">Gender:</label>
-                            <div class="gender-options">
-                                <label class="gender-option">
-                                    <input type="radio" name="gender" value="male" required>
-                                    <span>Male</span>
-                                </label>
-                                <label class="gender-option">
-                                    <input type="radio" name="gender" value="female">
-                                    <span>Female</span>
-                                </label>
-                            </div>
+                        <input type="hidden" name="province" value="Cavite">
+
+                        <div class="sign-box trios">
+                            <select name="city" required>
+                                <option value="" disabled selected hidden>Select City...</option>
+                                <option value="Tanza">Tanza</option>
+                                <option value="Trece Martires">Trece Martires</option>
+                                <option value="Dasmariñas">Dasmariñas</option>
+                                <option value="Bacoor">Bacoor</option>
+                                <option value="Imus">Imus</option>
+                                <option value="General Trias">General Trias</option>
+                                <option value="Silang">Silang</option>
+                                <option value="Kawit">Kawit</option>
+                                <option value="Rosario">Rosario</option>
+                                <option value="Noveleta">Noveleta</option>
+                                <option value="Naic">Naic</option>
+                                <option value="Ternate">Ternate</option>
+                                <option value="Maragondon">Maragondon</option>
+                                <option value="Indang">Indang</option>
+                                <option value="Alfonso">Alfonso</option>
+                                <option value="Amadeo">Amadeo</option>
+                                <option value="Tagaytay">Tagaytay</option>
+                                <option value="Mendez">Mendez</option>
+                                <option value="General Emilio Aguinaldo">General Emilio Aguinaldo</option>
+                                <option value="Magallanes">Magallanes</option>
+                            </select>
+                            <span>City / Municipality</span>
                         </div>
+
+                        <div class="sign-box trios">
+                            <input name="barangay" type="text" placeholder="" required />
+                            <span>Barangay</span>
+                        </div>
+
+                        <div class="sign-box trios">
+                            <input name="street" type="text" placeholder="" required />
+                            <span>Street / House No.</span>
+                        </div>
+
                     </div>
                     <hr>
                     <button class="next-button" type="button" id="next1">Next</button>
@@ -109,17 +145,33 @@ require_once("functions.php");
                             <p id="studentID-warning" style="color:red; display:none; font-weight : 600; font-size: 0.6rem;">Student ID already taken!</p>
                         </div>
 
-                        <div class="sign-box duos"> <input name="signCourse" type="text" required />
+                        <div class="sign-box duos">
+                            <select name="signCourse" id="signCourse" required>
+                                <option value="" disabled selected hidden></option>
+                            </select>
                             <span>Course / Program</span>
                         </div>
 
-                        <div class="sign-box duos"> <input name="signLevel" type="text" placeholder=" " required />
+                        <div class="sign-box duos">
+                            <select name="signLevel" required>
+                                <option value="" disabled selected hidden></option>
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                            </select>
                             <span>Year Level</span>
                         </div>
 
-                        <div class="sign-box duos"> <input name="signSY" type="text" placeholder=" " required />
+
+
+                        <!-- <div class="sign-box duos"> <input name="signSY" type="text" placeholder=" " required />
+                            <select name="signSY" required>
+                                <option value="" disabled selected>Select school year</option>
+                                
+                            </select>
                             <span>School Year</span>
-                        </div>
+                        </div> -->
 
                     </div>
                     <hr>

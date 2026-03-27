@@ -195,16 +195,17 @@ hr {
     transform: translateY(-50%);
     pointer-events: none;
     font-size: 1rem;
+    font-weight: 600;
     padding: 0 4px;
     transition: 0.3s ease;
 }
 
-.sign-box input{
+.sign-box input, .sign-box select{
     width: 100%;
     min-width: unset;
     height: 50px;
     background: var(--light);
-    border: 1px solid var(--primary);
+    border: 1px solid var(--front-text);
     border-radius: 10px;
     box-sizing: border-box;
     text-align: left;
@@ -217,14 +218,45 @@ hr {
     text-transform : uppercase;
 }
 
-.sign-box input:focus ~ span,
-.sign-box input:valid ~ span, .sign-box input:not(:placeholder-shown) ~ span, .sign-box.birthdate span {
+.sign-box.birthdate input:not(:placeholder-shown) ~ span {
+    color: var(--front-text);
+    transform: translate(-20px, -55px);
+}
+
+.sign-box input:not([type="date"]):focus ~ span,
+.sign-box input:not([type="date"]):valid ~ span,
+.sign-box input:not([type="date"]):not(:placeholder-shown) ~ span{
     transform: translate(-20px, -55px);
     font-size: 1rem;
     color: var(--primary);
 }
 
-.sign-box.studentID.id-taken span, .sign-box.studentEmail.email-taken span{
+.sign-box input[type="date"]:focus ~ span,
+.sign-box input[type="date"].has-value ~ span {
+    transform: translate(-20px, -55px);
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+.sign-box select:focus ~ span,
+.sign-box select:not([value=""]) ~ span {
+    transform: translate(-20px, -55px);
+    font-size: 1rem;
+    color: var(--front-text);
+}
+
+.sign-box select:focus ~ span,
+.sign-box select.has-value ~ span {
+    transform: translate(-20px, -55px);
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+.sign-box input:focus, .sign-box input:valid, .sign-box select:focus, .sign-box select:valid {
+    border: 1px solid var(--primary);
+}
+
+.sign-box.studentID.id-taken span, .sign-box.studentEmail.email-taken span, .sign-box.lastName.name-error span, .sign-box.firstName.name-error span, .sign-box.middleName.name-error span,.sign-box.studentMobile.errorMobile span{
     transform: translate(-20px, -55px);
     font-size: 1rem;
     color: var(--declined-color);
@@ -283,11 +315,15 @@ hr {
     font-size: 0.6rem;
     display: none;
     font-weight: 600;
-    margin-top: 3px;
+    margin-top: 1px;
 }
 
 .sign-box.name-error input{
     border: 1px solid var(--declined-color);
+}
+
+.sign-box.name-error span{
+    color: var(--declined-color);
 }
 
 .birth-warning {

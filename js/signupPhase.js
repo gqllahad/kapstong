@@ -109,6 +109,17 @@ document.querySelectorAll('.name-input').forEach(input => {
 });
 
 // birthdate error handling
+
+document.querySelectorAll("input[type='date']").forEach(input => {
+    if (input.value !== "") {
+        input.classList.add("has-value");
+    }
+
+    input.addEventListener("change", function () {
+        this.classList.toggle("has-value", this.value !== "");
+    });
+});
+
 birthInputs.forEach(input => {
     input.addEventListener("input", function () {
         const parent = this.parentElement;
@@ -153,6 +164,17 @@ birthInputs.forEach(input => {
             warning.style.display = "none";
             this.setCustomValidity("");
             nextButtonStep1.disabled = false;
+        }
+    });
+});
+
+// address handling
+document.querySelectorAll("select").forEach(select => {
+    select.addEventListener("change", function () {
+        if (this.value !== "") {
+            this.classList.add("has-value");
+        } else {
+            this.classList.remove("has-value");
         }
     });
 });
@@ -210,14 +232,35 @@ telInput.addEventListener("input", function() {
         parent.classList.add("tel-error");
         warning.textContent = "Enter a valid mobile number";
         warning.style.display = "block";
+        warning.parentElement.classList.add("errorMobile");
         this.setCustomValidity("Invalid mobile number");
         nextButtonStep1.disabled = true;
     } else {
         parent.classList.remove("tel-error");
         warning.style.display = "none";
+         warning.parentElement.classList.remove("errorMobile");
         this.setCustomValidity("");
         nextButtonStep1.disabled = false;
     }
+});
+
+// manage courses
+document.addEventListener("DOMContentLoaded", function() {
+    const courseSelect = document.getElementById('signCourse');
+
+    fetch('getCourses.php')
+        .then(res => res.json())
+        .then(data => {
+            if (data.acro && data.values) {
+                data.acro.forEach((acro, index) => {
+                    const option = document.createElement('option');
+                    option.value = acro;
+                    option.textContent = data.values[index];
+                    courseSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(err => console.error("Error loading courses:", err));
 });
 
 //Next

@@ -74,6 +74,13 @@ if (isset($_POST['signupForm'])) {
     $gender = $_POST['gender'];
     $birth = $_POST['signBirth'];
 
+    $province = $_POST['province'];
+    $city = $_POST['city'];
+    $barangay = $_POST['barangay'];
+    $street = $_POST['street'];
+
+    $fullAddress = $street . " " . $barangay . " " . $city . ", " . $province;
+
     // Academic Information
     $course = $_POST['signCourse'];
     $level = $_POST['signLevel'];
