@@ -19,6 +19,7 @@ require_once("functions.php");
 
 
 <body>
+    <div id="toast" class="toast"></div>
 
     <!-- layout -->
     <div class="layout">
@@ -47,6 +48,7 @@ require_once("functions.php");
                 <div class="form-step active">
                     <h3>Step 1: Student Information</h3>
                     <hr>
+
                     <div class="form-inputs">
 
                         <div class="sign-box trios lastName">
@@ -59,7 +61,7 @@ require_once("functions.php");
                             <p class="name-warning">Only letters are allowed.</p>
                         </div>
 
-                        <div class="sign-box trios middleName"> <input name="middleName" class="name-input" type="text" placeholder=" " />
+                        <div class="sign-box trios middleName"> <input name="middleName" class="name-input" type="text" placeholder=" " required />
                             <span>Middle name</span>
                             <p class="name-warning">Only letters are allowed.</p>
                         </div>
@@ -122,8 +124,18 @@ require_once("functions.php");
                         </div>
 
                         <div class="sign-box trios">
-                            <input name="barangay" type="text" placeholder="" required />
+                            <input name="barangay" type="text" list="barangays" placeholder="" required />
                             <span>Barangay</span>
+
+                            <datalist id="barangays">
+                                <option value="Sahud-ulan"></option>
+                                <option value="Capipisa"></option>
+                                <option value="Biga"></option>
+                                <option value="Julugan"></option>
+                                <option value="Calibuyo"></option>
+                                <option value="Halayhay"></option>
+                                <option value="Rosario"></option>
+                            </datalist>
                         </div>
 
                         <div class="sign-box trios">
@@ -149,29 +161,32 @@ require_once("functions.php");
                             <select name="signCourse" id="signCourse" required>
                                 <option value="" disabled selected hidden></option>
                             </select>
-                            <span>Course / Program</span>
+                            <span>Program</span>
                         </div>
 
-                        <div class="sign-box duos">
+                        <div class="sign-box trios">
                             <select name="signLevel" required>
                                 <option value="" disabled selected hidden></option>
-                                <option value="1">1st Year</option>
-                                <option value="2">2nd Year</option>
-                                <option value="3">3rd Year</option>
-                                <option value="4">4th Year</option>
+                                <option value="1st year">1st Year</option>
+                                <option value="2nd year">2nd Year</option>
+                                <option value="3rd year">3rd Year</option>
+                                <option value="4th year">4th Year</option>
                             </select>
                             <span>Year Level</span>
                         </div>
 
+                        <div class="sign-box trios"> <input name="signSY" type="text" id="academic-year" readonly />
+                            <span>Academic Year</span>
+                        </div>
 
-
-                        <!-- <div class="sign-box duos"> <input name="signSY" type="text" placeholder=" " required />
-                            <select name="signSY" required>
-                                <option value="" disabled selected>Select school year</option>
-                                
+                        <div class="sign-box trios">
+                            <select name="signLevel" required>
+                                <option value="" disabled selected hidden></option>
+                                <option value="1st semester">1st Semester</option>
+                                <option value="2nd semester">2nd Semester</option>
                             </select>
-                            <span>School Year</span>
-                        </div> -->
+                            <span>Semester</span>
+                        </div>
 
                     </div>
                     <hr>
@@ -194,13 +209,15 @@ require_once("functions.php");
                         </div>
 
                         <div class="sign-box duos"> <input name="signPassword" id="passwordInput" placeholder=" " type="password" required />
+
+                            <i class="toggle-pass" onclick="togglePassword('passwordInput', this)">👁</i>
                             <span>Password</span>
                         </div>
 
                         <div class="sign-box duos"> <input name="signConfirmPassword" id="confirmPasswordInput" placeholder=" " type="password" required />
                             <span> Confirm Password</span>
+                            <i class="toggle-pass" onclick="togglePassword('confirmPasswordInput', this)">👁</i>
                         </div>
-
                     </div>
                     <hr>
 

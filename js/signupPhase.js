@@ -60,20 +60,11 @@ function validateStep(stepIndex) {
                 input.reportValidity(); 
                 return false;
             }
-      
-        if (input.type === "radio") {
-            const name = input.name;
-            const checked = currentForm.querySelectorAll(`input[name="${name}"]:checked`);
-            if (checked.length === 0) {
-                alert(`Please select an option for ${name}.`);
-                return false;
-            }
-        }
     }
 
     if (stepIndex === 2) { 
         if (confirmPasswordInput.value !== passwordInput.value) {
-            alert("Passwords do not match!");
+            showToast("Passwords do not match!", 3000);
             confirmPasswordInput.value = "";
             confirmPasswordInput.focus();
             return false;
@@ -263,6 +254,64 @@ document.addEventListener("DOMContentLoaded", function() {
         .catch(err => console.error("Error loading courses:", err));
 });
 
+// academic year
+function getAcademicYear() {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+
+    let startYear, endYear;
+
+    if (currentMonth >= 6) {
+        startYear = currentYear;
+        endYear = currentYear + 1;
+    } else {
+        startYear = currentYear - 1;
+        endYear = currentYear;
+    }
+
+    return startYear + "-" + endYear;
+};
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("academic-year").value = getAcademicYear();
+});
+
+// toggle passwords
+function togglePassword(inputId, icon) {
+    const input = document.getElementById(inputId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.textContent = "🙈"; 
+    } else {
+        input.type = "password";
+        icon.textContent = "👁";
+    }
+};
+
+// toast
+function showToast(message, duration = 2500) {
+    const toast = document.getElementById("toast");
+
+    toast.innerHTML = message; 
+    const timerBar = document.createElement("div");
+    timerBar.classList.add("toast-timer");
+    toast.appendChild(timerBar);
+
+    toast.classList.add("show");
+
+    timerBar.style.transition = `width ${duration}ms linear`;
+    setTimeout(() => {
+        timerBar.style.width = "0%";
+    }, 10); 
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, duration);
+};
+
+
 //Next
 document.querySelectorAll('[id^="next"]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -297,7 +346,7 @@ studentEmail1.addEventListener("input", () => {
 
 confirmPasswordInput.addEventListener("focus", () => {
     if (!passwordInput.value) {
-        alert("Please enter your password first!");
+        showToast("Passwords do not match!", 3000);
         passwordInput.focus();
     }
 });

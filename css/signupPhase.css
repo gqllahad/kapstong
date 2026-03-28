@@ -272,6 +272,23 @@ hr {
     color: var(--primary);
 }
 
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-right: 40px; /* space for icon */
+}
+
+.toggle-pass {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+}
+
 .next-button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
@@ -308,6 +325,42 @@ hr {
     width: 20px;
     height: 20px;
 }
+
+/* quick notif */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white; 
+    color: #e74c3c;
+    padding: 15px 20px;
+    border-left: 5px solid #e74c3c;
+    border-radius: 8px;
+    font-size: 16px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10000;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    overflow: hidden;
+    min-width: 250px;
+}
+
+/* Show toast */
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-timer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: #e74c3c;
+    width: 100%;
+    transform-origin: left;
+}
+
 
 /* warnings */
 .name-warning {
@@ -376,6 +429,12 @@ hr {
     opacity: 0.9;
     background-color: var(--dark);
     transform: translateY(0);
+}
+
+/* animations */
+@keyframes shrink {
+    from { width: 100%; }
+    to { width: 0%; }
 }
 
 /* Mobile media */
