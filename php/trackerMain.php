@@ -13,7 +13,9 @@ if (!isset($_SESSION['role'])) {
     exit();
 }
 
+
 $role = $_SESSION['role'] ?? null;
+$isVerified = $_SESSION['isVerified'] ?? null;
 
 switch ($role) {
 
@@ -22,6 +24,10 @@ switch ($role) {
         exit();
 
     case "student":
+        if ($isVerified === 'NOT VERIFIED' || $isVerified === 'PENDING') {
+            header("Location: student/subStudent/pendingStudentDashboard.php");
+            exit();
+        }
         header("Location: student/studentDashboard.php");
         exit();
 

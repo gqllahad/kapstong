@@ -361,7 +361,6 @@ hr {
     transform-origin: left;
 }
 
-
 /* warnings */
 .name-warning {
     color: var(--declined-color);

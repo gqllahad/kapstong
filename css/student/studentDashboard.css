@@ -332,6 +332,152 @@ flex:1;
     margin-top: auto;
 }
 
+
+
+/* unverfied Student */
+.verify-banner {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background-color: #fff3cd;
+    border-left: 6px solid #ffc107;
+    color: #856404;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 35px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    width: fit-content;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pending-banner {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background-color: #d1ecf1;
+    border-left: 6px solid #17a2b8;
+    color: #0c5460; 
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 35px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    width: fit-content;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.verify-banner:hover, .pending-banner:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 2px 5px rgba(0,0,0,5);
+}
+
+.verify-banner i, .pending-banner i{
+    font-size: 24px;
+}
+
+
+/* cards unverified students */
+.unverified-card {
+     background-color: #fff4e5;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.unverified-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+}
+
+/* === Specific Card Types (Optional Colors / Visual Cues) === */
+.profile-card {
+    border-left: 5px solid #007bff; /* Blue */
+}
+
+.unverified-documents-card {
+    border-left: 5px solid #ffc107; /* Yellow / Pending */
+}
+
+.unverified-notifications-card {
+    border-left: 5px solid #17a2b8; /* Teal / Info */
+}
+
+.tips-card {
+    border-left: 5px solid #6c757d; /* Gray / Neutral */
+}
+
+/* === Headings === */
+.unverified-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #343a40;
+}
+
+/* === Paragraphs === */
+.unverified-card p, .unverified-card li {
+    color: #495057;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* === Lists === */
+.unverified-card ul {
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+/* === Buttons / Links === */
+.btn-edit, .btn-upload {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-edit {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.btn-edit:hover {
+    background-color: #0056b3;
+}
+
+.btn-upload {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-upload:hover {
+    background-color: #e0a800;
+    color: #fff;
+}
+
+.unverified-dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.tips-card a {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+.tips-card a:hover {
+    color: #0056b3;
+}
+
+
+
+
 /* media */
 @media (max-width: 768px) {
     .line-chart,
