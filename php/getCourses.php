@@ -3,7 +3,6 @@ require_once("kapstongConnection.php");
 
 header('Content-Type: application/json');
 
-// Example: count users per role
 $sql = "SELECT prg_acro, prg_name FROM program order by prg_acro";
 $result = $conn->query($sql);
 

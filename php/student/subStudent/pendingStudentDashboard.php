@@ -18,6 +18,8 @@ if ($_SESSION['isVerified'] !== "NOT VERIFIED" && $_SESSION['isVerified'] !== "P
     exit();
 }
 
+$studentID = $_SESSION['studentID'];
+$documents = getStudentDocuments($conn, $studentID);
 $studentName = $_SESSION['name'];
 $studentStatus = $_SESSION['isVerified'];
 
@@ -42,7 +44,7 @@ $studentStatus = $_SESSION['isVerified'];
         <nav class="profile-menu" id="profileMenu" hidden>
             <a href="#">Profile</a>
             <hr style="width: 75%; text-align: left;">
-            <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            <a href="../../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
     </header>
 
@@ -59,13 +61,13 @@ $studentStatus = $_SESSION['isVerified'];
             </ul>
         </aside>
 
-
-
         <main class="content">
+
+            <div id="overlay" class="overlay"></div>
 
             <section class="student-dashboard">
                 <section class="page-header">
-                    <h2>Welcome, <?php echo htmlspecialchars($studentName); ?>!</h2>
+                    <h2>Welcome! <?php echo htmlspecialchars($studentName); ?>.</h2>
                     <p>Get started by verifying your account.</p>
                 </section>
 
@@ -94,16 +96,51 @@ $studentStatus = $_SESSION['isVerified'];
                         <h3>Profile Info</h3>
                         <p>Course: BSIT</p>
                         <p>Year: 3rd Year</p>
-                        <a href="edit_profile.php" class="btn-edit">Edit Info</a>
+                        <button class="btn-edit" id="btn-edit">Edit Info</button>
                     </div>
 
                     <div class="unverified-card unverified-documents-card">
-                        <h3>Pending Documents</h3>
-                        <ul>
-                            <li>ID: Not Uploaded</li>
-                            <li>Registration Form: Not Uploaded</li>
-                        </ul>
-                        <a href="upload_documents.php" class="btn-upload">Upload Now</a>
+                        <h3>Documents</h3>
+
+                        <?php if (!$documents): ?>
+                            <p>No documents uploaded yet.</p>
+                            <button class="btn-upload" id="btn-upload-now">Upload Now</button>
+                        <?php else: ?>
+
+                            <div class="document-item">
+                                <div class="doc-preview">
+                                    <img src="../../../uploads/student_uploads/<?php echo $studentID . '/' . $documents['idUpload']; ?>" class="preview-img">
+                                </div>
+                                <div class="doc-info">
+                                    <p><strong>ID:</strong></p>
+                                    <?php if ($documents['status'] === 'PENDING'): ?>
+                                        <span class="status pending">Waiting for Approval</span>
+                                    <?php elseif ($documents['status'] === 'APPROVED'): ?>
+                                        <span class="status approved">Approved</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="doc-preview">
+                                    <img src="../../../uploads/student_uploads/<?php echo $studentID . '/' . $documents['regFormUpload']; ?>" class="preview-img">
+                                </div>
+                                <div class="doc-info">
+                                    <p><strong>Registration Form:</strong></p>
+                                    <?php if ($documents['status'] === 'PENDING'): ?>
+                                        <span class="status pending">Waiting for Approval</span>
+                                    <?php elseif ($documents['status'] === 'APPROVED'): ?>
+                                        <span class="status approved">Approved</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <!-- Allow replace if not approved -->
+                            <?php if ($documents['status'] !== 'APPROVED'): ?>
+                                <button class="btn-upload" id="btn-upload-now">Change Files</button>
+                            <?php endif; ?>
+
+                        <?php endif; ?>
                     </div>
 
                     <div class="unverified-card unverified-notifications-card">
@@ -145,6 +182,117 @@ $studentStatus = $_SESSION['isVerified'];
                     <canvas id="pieChart"></canvas>
                 </section>
             </section> -->
+
+                <!-- edit info modal  -->
+                <div id="editModal" class="edit-modal">
+                    <div class="modal-header">
+                        <h3>Edit your Info</h3>
+                        <button id="closeEditModal" class="modal-close">&times;</button>
+                    </div>
+                    <form action="edit_student_action.php" method="post" class="modal-form">
+
+                        <!-- Personal Info -->
+                        <div class="form-section">
+                            <h4>Personal Information</h4>
+
+                            <div class="form-group-edit">
+                                <label for="fullName">Full Name</label>
+                                <input type="text" name="fullName" id="fullName"
+                                    value="<?php echo htmlspecialchars($studentName ?? ''); ?>" required>
+                            </div>
+
+                            <div class="form-group-edit">
+                                <label for="email">Email Address</label>
+                                <input type="email" name="email" id="email"
+                                    value="<?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group-edit">
+                                <label for="mobile">Mobile Number</label>
+                                <input type="text" name="mobile" id="mobile"
+                                    value="<?php echo htmlspecialchars($_SESSION['mobileNumber'] ?? ''); ?>" required>
+                            </div>
+
+                            <div class="form-group-edit">
+                                <label for="birthDate">Birth Date</label>
+                                <input type="date" name="birthDate" id="birthDate"
+                                    value="<?php echo htmlspecialchars($student['birthDate'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+
+                        <!-- Academic Info -->
+                        <div class="form-section">
+                            <h4>Academic Information</h4>
+
+                            <div class="form-group-edit">
+                                <label for="course">Course</label>
+                                <input type="text" name="course" id="course"
+                                    value="<?php echo htmlspecialchars($student['course'] ?? ''); ?>" required>
+                            </div>
+
+                            <div class="form-group-edit">
+                                <label for="yearLevel">Year Level</label>
+                                <select name="yearLevel" id="yearLevel" required>
+                                    <option value="1st Year">1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year">4th Year</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group-edit">
+                                <label for="gender">Gender</label>
+                                <select name="gender" id="gender" required>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="form-section">
+                            <h4>Address</h4>
+
+                            <div class="form-group-edit">
+                                <label for="address">Full Address</label>
+                                <input type="text" name="address" id="address"
+                                    value="<?php echo htmlspecialchars($student['address'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="modal-actions">
+                            <button type="submit" class="btn-upload" name="editInfoStudent">Save Changes</button>
+                            <button type="button" id="cancelEditModal" class="btn-edit">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- uploads modal -->
+                <div id="uploadModal" class="upload-modal">
+                    <div class="modal-header">
+                        <h3>Upload Your Documents</h3>
+                        <button id="closeModal" class="modal-close">&times;</button>
+                    </div>
+                    <form action="upload_documents_action.php" method="post" enctype="multipart/form-data" class="modal-form">
+                        <div class="form-group">
+                            <label for="idUpload">Student ID</label>
+                            <input type="file" name="idUpload" id="idUpload" required>
+                            <div class="file-preview" id="idPreview"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="regFormUpload">Registration Form</label>
+                            <input type="file" name="regFormUpload" id="regFormUpload" required>
+                            <div class="file-preview" id="regPreview"></div>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="submit" class="btn-upload" name="submitDocuments">Upload</button>
+                            <button type="button" id="cancelModal" class="btn-edit">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+
 
         </main>
     </div>

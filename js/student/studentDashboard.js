@@ -9,6 +9,44 @@ const navBar = document.querySelector('.navbar');
 
 const menuItems = document.querySelectorAll('.menu li');
 
+// unverified Students
+const uploadBtnNow = document.getElementById('btn-upload-now');
+const uploadBtn = document.querySelector('.btn-upload');
+const overlay = document.getElementById('overlay');
+const uploadModal = document.getElementById('uploadModal');
+const closeModalBtn = document.getElementById('closeModal');
+const cancelModalBtn = document.getElementById('cancelModal');
+
+const editInfo = document.getElementById("btn-edit");
+const editModal = document.getElementById('editModal');
+const cancelEditModalBtn = document.getElementById('cancelEditModal');
+const closeEditModalBtn = document.getElementById('closeEditModal');
+
+
+// functions
+function handleFilePreview(inputElem, previewElem) {
+    inputElem.addEventListener('change', () => {
+        const file = inputElem.files[0];
+        previewElem.innerHTML = '';
+
+        if (!file) return;
+
+        // Only allow jpg/png
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Only JPG or PNG files are allowed!');
+            inputElem.value = ''; 
+            return;
+        }
+
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.classList.add('preview-img');
+        previewElem.appendChild(img);
+    });
+}
+
+
 // profile menu
 menuToggle.addEventListener("click", (e) => {
     e.stopPropagation(); 
@@ -20,7 +58,6 @@ document.addEventListener("click", (e) => {
         profileMenu.hidden = true;
     }
 });
-
 
 menuItems.forEach(item => {
     item.addEventListener('click', () => {
@@ -153,7 +190,45 @@ function loadLineChart() {
         .catch(err => console.error("Line chart error:", err));
 }
 
+// unverified student
+editInfo.addEventListener('click', () => {
+    overlay.classList.add('show');
+    editModal.classList.add('show');
+});
+
+closeEditModalBtn.addEventListener('click', () => {
+   overlay.classList.remove('show');
+    editModal.classList.remove('show');
+});
+
+cancelEditModalBtn.addEventListener('click', () => {
+   overlay.classList.remove('show');
+    editModal.classList.remove('show');
+});
+
+
+uploadBtnNow.addEventListener('click', () => {
+    overlay.classList.add('show');
+    uploadModal.classList.add('show');
+});
+
+
+closeModalBtn.addEventListener('click', () => {
+   overlay.classList.remove('show');
+    uploadModal.classList.remove('show');
+});
+
+overlay.addEventListener('click', () => {
+    overlay.classList.remove('show');
+    uploadModal.classList.remove('show');
+});
+
+
+
 window.addEventListener("DOMContentLoaded", () => {
     loadLineChart();
     loadPieChart();
 });
+
+handleFilePreview(document.getElementById('idUpload'), document.getElementById('idPreview'));
+handleFilePreview(document.getElementById('regFormUpload'), document.getElementById('regPreview'));

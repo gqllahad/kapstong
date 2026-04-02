@@ -57,3 +57,16 @@ function isEmailTaken($conn, $studentEmail)
 
     return $count > 0;
 }
+
+function getStudentDocuments($conn, $studentID)
+{
+    $stmt = $conn->prepare("SELECT idUpload, regFormUpload, status FROM student_documents WHERE studentID = ?");
+    $stmt->bind_param("s", $studentID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        return $result->fetch_assoc();
+    }
+    return null;
+}

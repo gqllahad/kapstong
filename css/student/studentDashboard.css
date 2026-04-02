@@ -394,43 +394,88 @@ flex:1;
 
 /* === Specific Card Types (Optional Colors / Visual Cues) === */
 .profile-card {
-    border-left: 5px solid #007bff; /* Blue */
+    border-left: 5px solid #007bff; 
 }
 
 .unverified-documents-card {
-    border-left: 5px solid #ffc107; /* Yellow / Pending */
+    border-left: 5px solid #ffc107; 
 }
 
 .unverified-notifications-card {
-    border-left: 5px solid #17a2b8; /* Teal / Info */
+    border-left: 5px solid #17a2b8; 
 }
 
 .tips-card {
-    border-left: 5px solid #6c757d; /* Gray / Neutral */
+    border-left: 5px solid #6c757d; 
 }
 
-/* === Headings === */
 .unverified-card h3 {
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 1.2rem;
-    color: #343a40;
+    color: #202427;
 }
 
-/* === Paragraphs === */
 .unverified-card p, .unverified-card li {
-    color: #495057;
+    color: #343a40;
     font-size: 0.95rem;
     line-height: 1.5;
 }
 
-/* === Lists === */
 .unverified-card ul {
     padding-left: 20px;
     margin: 10px 0;
 }
 
-/* === Buttons / Links === */
+.unverified-documents-card .document-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.unverified-documents-card .document-item:last-child {
+    border-bottom: none;
+}
+
+.doc-preview img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.doc-info p {
+    margin: 0;
+    font-weight: 600;
+    color: #333;
+}
+
+.status {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    border-radius: 5px;
+    font-weight: 600;
+}
+
+.status.pending {
+    background-color: #fff4e5;
+    color: #ff9f1c;
+}
+
+.status.approved {
+    background-color: #e5f6eb;
+    color: #22c55e;
+}
+
+.unverified-documents-card .btn-upload {
+    margin-top: 15px;
+}
+
 .btn-edit, .btn-upload {
     display: inline-block;
     margin-top: 10px;
@@ -464,6 +509,7 @@ flex:1;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
+    align-items: start;
 }
 
 .tips-card a {
@@ -473,6 +519,257 @@ flex:1;
 
 .tips-card a:hover {
     color: #0056b3;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5); 
+    backdrop-filter: blur(3px);   
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Unverified Modals */
+.upload-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    padding: 30px 25px;
+    width: 90%;
+    max-width: 450px;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.edit-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    padding: 30px 25px;
+    width: 90%;
+    max-width: 450px;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Show modal */
+.upload-modal.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.edit-modal.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* edit groups */
+.edit-modal {
+    max-height: 90vh;
+    overflow-y: auto; /* scroll if long */
+}
+
+.form-section {
+    margin-bottom: 20px;
+}
+
+.form-section h4 {
+    font-size: 1rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.form-group-edit {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+.form-group-edit label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.form-group-edit input,
+.form-group-edit select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.form-group-edit input:focus,
+.form-group-edit select:focus {
+    border-color: #2563EB;
+    box-shadow: 0 0 5px rgba(37,99,235,0.3);
+    outline: none;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+
+
+/* Modal Header */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+    color: #ff4d4f;
+}
+
+/* Form */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.95rem;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+
+.form-group input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input[type="file"]:focus, .form-group input[type="file"]:valid {
+    outline: none;
+    border-color: #2563EB;
+    box-shadow: 0 0 5px rgba(37,99,235,0.3);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.modal-actions .btn-upload {
+    background-color: #2563EB;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modal-actions .btn-upload:hover {
+    background-color: #1e40af;
+}
+
+.modal-actions .btn-edit {
+    background-color: #f3f4f6;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modal-actions .btn-edit:hover {
+    background-color: #e5e7eb;
+}
+
+.file-preview {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;    
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.preview-img {
+    width: 120px;
+    height: 120px;
+    min-width: 120px;
+    min-height: 120px;
+    max-width: 120px;
+    max-height: 120px;
+
+    object-fit: cover;
+
+    border-radius: 8px;
+    border: 1px solid #ccc;
+
+    display: block;
+    flex-shrink: 0;
+
+}
+
+.file-preview span {
+    font-size: 0.85rem;
+    color: #555;
 }
 
 
@@ -540,5 +837,15 @@ flex:1;
 
     .menu i {
         font-size: 1.5rem;      
+    }
+}
+
+@media (max-width: 480px) {
+    .upload-modal {
+        padding: 20px;
+    }
+    .modal-actions {
+        flex-direction: column-reverse;
+        gap: 8px;
     }
 }

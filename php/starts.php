@@ -41,6 +41,8 @@ if (isset($_POST['login-submit'])) {
             $_SESSION['isVerified'] = $row['isVerified'];
             $_SESSION['mobileNumber'] = $row['mobileNumber'];
 
+            $_SESSION['studentID'] = $row["studentID"];
+
             header("Location: trackerMain.php?login=Logging In..");
             exit();
         } else {
