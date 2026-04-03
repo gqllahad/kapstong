@@ -1,0 +1,107 @@
+[33mcommit ef5587f420083b13024bfc1daae7daf07cf8acb9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Thu Apr 2 17:32:59 2026 +0800
+
+    Added a unverified student features
+
+[33mcommit 3f3f9b9b88a96cc2273f990e4469b65b77b76957[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Tue Mar 31 00:23:57 2026 +0800
+
+    place some student unverified and pending file
+
+[33mcommit ec25928bc942bc5744fef8571167aeb1d67e9030[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Sun Mar 29 03:45:52 2026 +0800
+
+    Added some toasts in the signup(minor additions)
+
+[33mcommit dc524475a7040ff78dc33ac8c80906719afbbc6f[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Fri Mar 27 23:54:31 2026 +0800
+
+    Added validations in the signup
+
+[33mcommit 2cfbdf2660b811dd72ba76d7b14a5d4847202042[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Fri Mar 27 01:39:47 2026 +0800
+
+    Added some validations to signup
+
+[33mcommit c3de60796ba81955c682fe207ba65f185f0eb690[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Wed Mar 25 18:22:49 2026 +0800
+
+    added dashboard to the student (finish also the dashboard mobile view)
+
+[33mcommit 2318dac0c2b7dbb47384ba88dd08dfde1ef7953b[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Tue Mar 24 18:57:58 2026 +0800
+
+    fix the mobile in signing up, Added some dashboards elements and maybe a little bit of housekeeping in that part
+
+[33mcommit 09ad9dd7c90eb3ee33c3b777f5f500285b2268af[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Mon Mar 23 19:16:33 2026 +0800
+
+    Focus on validations and logins and mobile viewing
+
+[33mcommit ac5d9b061823301f2fd496f77ffe1b307fb5a371[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Sat Mar 21 23:34:58 2026 +0800
+
+    Admin changes added some charts (not finished, might change)
+
+[33mcommit da27f15f73eec9e71a05ce499c212259a1996305[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Sat Mar 21 01:08:45 2026 +0800
+
+    Fix some validations in the signup
+
+[33mcommit e6796e1366a0f804773ed95c6b25f92720b57cc9[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Tue Mar 17 15:33:10 2026 +0800
+
+    Did the sidebar and menu that may transition to an  interactive UI
+
+[33mcommit ecfd94079aec5942c97ac06f6b26ff1d266edf1a[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Fri Mar 13 21:50:46 2026 +0800
+
+    Added some new files and folders (for cleaner code) still doing the one file trick.
+
+[33mcommit d2f7302d57ba1dcfb7b9637cc772758247dbfd26[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Thu Mar 12 23:05:31 2026 +0800
+
+    Finished the Signup Moving on to other stuffs
+
+[33mcommit 6df4d3ee2042687e078918c5835364433e171281[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Wed Mar 11 21:00:51 2026 +0800
+
+    wrapping things up in the signupPhase (also added some designs and validations next)
+
+[33mcommit f9a21641c1eee80a207dba94bf9d8594ceb598d2[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Tue Mar 10 18:22:50 2026 +0800
+
+    Major addition of contents (more cleaner code ahead)
+
+[33mcommit fd853d7bb8c2d9271d6233be2cc43b08a734baaa[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Fri Mar 6 22:51:03 2026 +0800
+
+    Close to completing the loginPhase
+
+[33mcommit a91278dbb4cee13e5298eb2437b92b4f2a3f5d0f[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Thu Mar 5 23:06:59 2026 +0800
+
+    Added some minor changes and additions
+
+[33mcommit 2c55eacf70e9b0fc0884e7c0533ffc3311d2b3d5[m
+Author: Inigo Joints <madrigalinigojones@gmail.com>
+Date:   Wed Mar 4 11:46:45 2026 +0800
+
+    New start kapstong

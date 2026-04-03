@@ -10,13 +10,23 @@ const navBar = document.querySelector('.navbar');
 const menuItems = document.querySelectorAll('.menu li');
 
 // unverified Students
+
+// uploads/ preview
 const uploadBtnNow = document.getElementById('btn-upload-now');
-const uploadBtn = document.querySelector('.btn-upload');
+const cancelUploadNow = document.getElementById('cancelUploadModal');
+
+const changeFilesBtn = document.getElementById('btn-change-files');
+const removeFilesBtn = document.getElementById('btn-remove-files');
 const overlay = document.getElementById('overlay');
 const uploadModal = document.getElementById('uploadModal');
 const closeModalBtn = document.getElementById('closeModal');
 const cancelModalBtn = document.getElementById('cancelModal');
 
+const previewFilesBtn = document.getElementById('btn-preview');
+const previewFilesModal = document.getElementById('previewFilesModal');
+const closePreviewModalBtn = document.getElementById('closePreviewModal');
+
+// edit info
 const editInfo = document.getElementById("btn-edit");
 const editModal = document.getElementById('editModal');
 const cancelEditModalBtn = document.getElementById('cancelEditModal');
@@ -203,13 +213,81 @@ closeEditModalBtn.addEventListener('click', () => {
 
 cancelEditModalBtn.addEventListener('click', () => {
    overlay.classList.remove('show');
-    editModal.classList.remove('show');
+   editModal.classList.remove('show');
 });
 
 
-uploadBtnNow.addEventListener('click', () => {
+previewFilesBtn?.addEventListener('click', () => {
     overlay.classList.add('show');
-    uploadModal.classList.add('show');
+    previewFilesModal.classList.add('show');
+});
+
+closePreviewModalBtn?.addEventListener('click', () => {
+    overlay.classList.remove('show');
+    previewFilesModal.classList.remove('show');
+});
+
+if (uploadBtnNow) {
+    uploadBtnNow.addEventListener('click', () => {
+        overlay.classList.add('show');
+        uploadModal.classList.add('show');
+    });
+}
+
+if (cancelUploadNow) {
+    cancelUploadNow.addEventListener('click', () => {
+        overlay.classList.remove('show');
+        uploadModal.classList.remove('show');
+    });
+}
+
+changeFilesBtn?.addEventListener('click', () => {
+    overlay.classList.add('show');
+    uploadModal.classList.add('show'); 
+    previewFilesModal.classList.remove('show'); 
+});
+
+removeFilesBtn?.addEventListener('click', () => {
+    const confirmDelete = confirm("Are you sure you want to remove your uploaded documents?");
+    if (!confirmDelete) return;
+
+    fetch("delete_documents_action.php", { method: "POST" })
+        .then(res => res.text())
+        .then(() => window.location.reload())
+        .catch(err => console.error(err));
+});
+
+// if (deleteBtn) {
+//     deleteBtn.addEventListener('click', () => {
+
+//         const confirmDelete = confirm("Are you sure you want to remove your uploaded documents?");
+
+//         if (!confirmDelete) return;
+
+//         fetch("delete_documents_action.php", {
+//             method: "POST"
+//         })
+//         .then(res => res.text())
+//         .then(response => {
+//             // reload page after deletion
+//             window.location.reload();
+//         })
+//         .catch(err => console.error("Delete error:", err));
+//     });
+// }
+
+// show files upload now
+document.querySelectorAll('.btn-toggle-file').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        if (target.style.display === 'none' || target.style.display === '') {
+            target.style.display = 'block';
+            btn.textContent = 'Hide File ▲';
+        } else {
+            target.style.display = 'none';
+            btn.textContent = 'View File ▼';
+        }
+    });
 });
 
 
@@ -221,6 +299,8 @@ closeModalBtn.addEventListener('click', () => {
 overlay.addEventListener('click', () => {
     overlay.classList.remove('show');
     uploadModal.classList.remove('show');
+    previewFilesModal.classList.remove('show');
+    editModal.classList.remove('show');
 });
 
 

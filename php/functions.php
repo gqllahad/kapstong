@@ -70,3 +70,16 @@ function getStudentDocuments($conn, $studentID)
     }
     return null;
 }
+
+function getStudentInfo($conn, $studentID)
+{
+    $stmt = $conn->prepare("SELECT studentID, mobileNumber, course, gender, yearLevel, birthDate FROM ojtstudent WHERE studentID = ?");
+    $stmt->bind_param("s", $studentID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        return $result->fetch_assoc();
+    }
+    return null;
+}

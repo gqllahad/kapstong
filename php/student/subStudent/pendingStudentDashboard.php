@@ -19,6 +19,11 @@ if ($_SESSION['isVerified'] !== "NOT VERIFIED" && $_SESSION['isVerified'] !== "P
 }
 
 $studentID = $_SESSION['studentID'];
+
+if ($studentID) {
+    $studentInfo = getStudentInfo($conn, $studentID);
+}
+
 $documents = getStudentDocuments($conn, $studentID);
 $studentName = $_SESSION['name'];
 $studentStatus = $_SESSION['isVerified'];
@@ -94,9 +99,15 @@ $studentStatus = $_SESSION['isVerified'];
                 <div class="unverified-dashboard-cards">
                     <div class="unverified-card profile-card">
                         <h3>Profile Info</h3>
-                        <p>Course: BSIT</p>
-                        <p>Year: 3rd Year</p>
-                        <button class="btn-edit" id="btn-edit">Edit Info</button>
+                        <?php if (!empty($studentInfo)): ?>
+                            <p><strong>Student ID:</strong> <?php echo htmlspecialchars($studentInfo['studentID']); ?></p>
+                            <p><strong>Gender:</strong> <?php echo htmlspecialchars($studentInfo['gender']); ?></p>
+                            <p><strong>Course:</strong> <?php echo htmlspecialchars($studentInfo['course']); ?></p>
+                            <p><strong>Year Level:</strong> <?php echo htmlspecialchars($studentInfo['yearLevel']); ?></p>
+                            <button class="btn-edit" id="btn-edit">Edit Info</button>
+                        <?php else: ?>
+                            <p>No profile information available.</p>
+                        <?php endif; ?>
                     </div>
 
                     <div class="unverified-card unverified-documents-card">
@@ -107,37 +118,9 @@ $studentStatus = $_SESSION['isVerified'];
                             <button class="btn-upload" id="btn-upload-now">Upload Now</button>
                         <?php else: ?>
 
-                            <div class="document-item">
-                                <div class="doc-preview">
-                                    <img src="../../../uploads/student_uploads/<?php echo $studentID . '/' . $documents['idUpload']; ?>" class="preview-img">
-                                </div>
-                                <div class="doc-info">
-                                    <p><strong>ID:</strong></p>
-                                    <?php if ($documents['status'] === 'PENDING'): ?>
-                                        <span class="status pending">Waiting for Approval</span>
-                                    <?php elseif ($documents['status'] === 'APPROVED'): ?>
-                                        <span class="status approved">Approved</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <div class="document-item">
-                                <div class="doc-preview">
-                                    <img src="../../../uploads/student_uploads/<?php echo $studentID . '/' . $documents['regFormUpload']; ?>" class="preview-img">
-                                </div>
-                                <div class="doc-info">
-                                    <p><strong>Registration Form:</strong></p>
-                                    <?php if ($documents['status'] === 'PENDING'): ?>
-                                        <span class="status pending">Waiting for Approval</span>
-                                    <?php elseif ($documents['status'] === 'APPROVED'): ?>
-                                        <span class="status approved">Approved</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <!-- Allow replace if not approved -->
                             <?php if ($documents['status'] !== 'APPROVED'): ?>
-                                <button class="btn-upload" id="btn-upload-now">Change Files</button>
+                                <p>Your documents is on review.</p>
+                                <button class="btn-preview" id="btn-preview">Preview Files</button>
                             <?php endif; ?>
 
                         <?php endif; ?>
@@ -277,19 +260,72 @@ $studentStatus = $_SESSION['isVerified'];
                     <form action="upload_documents_action.php" method="post" enctype="multipart/form-data" class="modal-form">
                         <div class="form-group">
                             <label for="idUpload">Student ID</label>
-                            <input type="file" name="idUpload" id="idUpload" required>
+                            <input type="file" name="idUpload" id="idUpload">
                             <div class="file-preview" id="idPreview"></div>
                         </div>
                         <div class="form-group">
                             <label for="regFormUpload">Registration Form</label>
-                            <input type="file" name="regFormUpload" id="regFormUpload" required>
+                            <input type="file" name="regFormUpload" id="regFormUpload">
                             <div class="file-preview" id="regPreview"></div>
                         </div>
                         <div class="modal-actions">
                             <button type="submit" class="btn-upload" name="submitDocuments">Upload</button>
-                            <button type="button" id="cancelModal" class="btn-edit">Cancel</button>
+                            <button type="button" id="cancelUploadModal" class="btn-edit">Cancel</button>
                         </div>
                     </form>
+                </div>
+
+                <!-- preview uploads modal -->
+                <div id="previewFilesModal" class="upload-modal">
+                    <div class="modal-header">
+                        <h3>Uploaded Documents</h3>
+                        <button id="closePreviewModal" class="modal-close">&times;</button>
+                    </div>
+
+                    <div class="modal-form">
+                        <div class="document-item">
+                            <div class="doc-info">
+                                <p><strong>ID:</strong></p>
+                                <?php if (empty($documents['idUpload'])): ?>
+                                    <span class="status missing">File Missing..</span>
+                                <?php elseif ($documents['status'] === 'PENDING'): ?>
+                                    <span class="status pending">Waiting for Approval..</span>
+                                <?php elseif ($documents['status'] === 'APPROVED'): ?>
+                                    <span class="status approved">Approved</span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="doc-preview show">
+                                <?php if (!empty($documents['idUpload'])): ?>
+                                    <img src="../../../uploads/student_uploads/<?php echo $studentID . '/' . $documents['idUpload']; ?>" class="preview-img">
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="document-item">
+                            <div class="doc-info">
+                                <p><strong>Registration Form:</strong></p>
+                                <?php if (empty($documents['regFormUpload'])): ?>
+                                    <span class="status missing">File Missing..</span>
+                                <?php elseif ($documents['status'] === 'PENDING'): ?>
+                                    <span class="status pending">Waiting for Approval..</span>
+                                <?php elseif ($documents['status'] === 'APPROVED'): ?>
+                                    <span class="status approved">Approved</span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="doc-preview show">
+                                <?php if (!empty($documents['regFormUpload'])): ?>
+                                    <img src="../../../uploads/student_uploads/<?php echo $studentID . '/' . $documents['regFormUpload']; ?>" class="preview-img">
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <?php if ($documents['status'] !== 'APPROVED'): ?>
+                            <div class="modal-actions">
+                                <button class="btn-upload" id="btn-change-files">Change Files</button>
+                                <button class="btn-delete" id="btn-remove-files">Remove Files</button>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
 
 
