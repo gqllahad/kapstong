@@ -4,7 +4,6 @@ session_start();
 require_once("../../kapstongConnection.php");
 require_once("../../functions.php");
 
-// Security check
 if (!isset($_SESSION['studentID'])) {
     header("Location: ../../loginPhase.php?error=Unauthorized");
     exit();
@@ -34,7 +33,6 @@ if (isset($_POST['submitDocuments'])) {
     $idName = $existing['idUpload'] ?? null;
     $regName = $existing['regFormUpload'] ?? null;
 
-    // Process ID Upload
     if (isset($_FILES['idUpload']) && $_FILES['idUpload']['error'] !== 4) {
         $idFile = $_FILES['idUpload'];
         if (!in_array($idFile['type'], $allowedTypes)) {
@@ -46,7 +44,6 @@ if (isset($_POST['submitDocuments'])) {
         move_uploaded_file($idFile['tmp_name'], $uploadDir . $idName);
     }
 
-    // Process Registration Form Upload
     if (isset($_FILES['regFormUpload']) && $_FILES['regFormUpload']['error'] !== 4) {
         $regFile = $_FILES['regFormUpload'];
         if (!in_array($regFile['type'], $allowedTypes)) {
@@ -87,9 +84,6 @@ if (isset($_POST['submitDocuments'])) {
     $verifyStmt = $conn->prepare("UPDATE users SET isVerified = 'PENDING' WHERE studentID=?");
     $verifyStmt->bind_param("s", $studentID);
     $verifyStmt->execute();
-
-    header("Location: pendingStudentDashboard.php?success=Documents+submitted");
-    exit();
 }
 
 header("Location: pendingStudentDashboard.php");

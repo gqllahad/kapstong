@@ -72,6 +72,8 @@ require_once("functions.php");
                             <p id="studentEmail-warning" style="color:red; display:none; font-weight : 600; font-size: 0.5rem;">Email already been used!</p>
                         </div>
 
+                        <input type="hidden" name="rawTel" id="rawTel">
+
                         <div class="sign-box duos studentMobile">
                             <input name="signTel" type="tel" class="duos" maxlength="14" required placeholder=" " />
                             <span> Mobile Number </span>
@@ -180,7 +182,7 @@ require_once("functions.php");
                         </div>
 
                         <div class="sign-box trios">
-                            <select name="signLevel" required>
+                            <select name="signSemester" required>
                                 <option value="" disabled selected hidden></option>
                                 <option value="1st semester">1st Semester</option>
                                 <option value="2nd semester">2nd Semester</option>

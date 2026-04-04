@@ -72,7 +72,7 @@ if (isset($_POST['signupForm'])) {
         exit();
     }
 
-    $mobile = $_POST['signTel'];
+    $mobile = $_POST['rawTel'];
     $gender = $_POST['gender'];
     $birth = $_POST['signBirth'];
 
@@ -86,6 +86,7 @@ if (isset($_POST['signupForm'])) {
     // Academic Information
     $course = $_POST['signCourse'];
     $level = $_POST['signLevel'];
+    $semester = $_POST['signSemester'];
     $schoolYear = $_POST['signSY'];
 
     // Account Details
@@ -111,10 +112,10 @@ if (isset($_POST['signupForm'])) {
 
     try {
         $sqlInsertUsers = $conn->prepare("INSERT INTO users (name, email, mobileNumber, studentID, password) VALUES (?, ?, ?, ?, ?)");
-        $sqlInsertStudent = $conn->prepare("INSERT INTO ojtstudent (studentID, email, birthDate, mobileNumber, gender, course, yearLevel, name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $sqlInsertStudent = $conn->prepare("INSERT INTO ojtstudent (studentID, email, birthDate, mobileNumber, gender, course, yearLevel, name, address, semester, schoolYear) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         $sqlInsertStudent->bind_param(
-            "ssssssss",
+            "sssssssssss",
             $studentID,
             $email,
             $birth,
@@ -122,7 +123,10 @@ if (isset($_POST['signupForm'])) {
             $gender,
             $course,
             $level,
-            $fullName
+            $fullName,
+            $fullAddress,
+            $semester,
+            $schoolYear
         );
 
         $sqlInsertUsers->bind_param(

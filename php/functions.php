@@ -73,7 +73,24 @@ function getStudentDocuments($conn, $studentID)
 
 function getStudentInfo($conn, $studentID)
 {
-    $stmt = $conn->prepare("SELECT studentID, mobileNumber, course, gender, yearLevel, birthDate FROM ojtstudent WHERE studentID = ?");
+    $stmt = $conn->prepare("
+        SELECT 
+            s.studentID,
+            s.email,
+            s.name,
+            s.semester,
+            s.schoolYear,
+            s.mobileNumber,
+            s.course,
+            p.prg_name AS course_name,
+            s.gender,
+            s.yearLevel,
+            s.birthDate,
+            s.address
+        FROM ojtstudent s
+        LEFT JOIN program p ON s.course = p.prg_acro
+        WHERE s.studentID = ?
+    ");
     $stmt->bind_param("s", $studentID);
     $stmt->execute();
     $result = $stmt->get_result();

@@ -9,7 +9,22 @@ const navBar = document.querySelector('.navbar');
 
 const menuItems = document.querySelectorAll('.menu li');
 
+// profile modal
+const openProfileBtn = document.getElementById('openProfileBtn');
+const profileModal = document.getElementById('profileModal');
+
+const profileUpload = document.getElementById('profileUpload');
+const profilePreview = document.getElementById('profilePreview');
+
+
 // unverified Students
+
+// layouts 
+const unverifiedStudentDashboardButton  = document.getElementById("unverified-student-dashboard-button");
+const unverifiedStudentDocumentsButton  = document.getElementById("unverified-student-documents-button");
+
+const unverifiedStudentDashboard  = document.getElementById("unverified-student-dashboard");
+const unverifiedStudentDocuments  = document.getElementById("unverified-student-documents");
 
 // uploads/ preview
 const uploadBtnNow = document.getElementById('btn-upload-now');
@@ -32,8 +47,33 @@ const editModal = document.getElementById('editModal');
 const cancelEditModalBtn = document.getElementById('cancelEditModal');
 const closeEditModalBtn = document.getElementById('closeEditModal');
 
+// unverified
+
 
 // functions
+
+// unverified
+
+function previewImage(src) {
+    const modal = document.getElementById("imagePreviewModal");
+    const img = document.getElementById("previewImg");
+
+    img.src = src;
+    modal.style.display = "flex";
+}
+
+function previewImage(src) {
+    const modal = document.getElementById("imagePreviewModal");
+    const img = document.getElementById("previewImg");
+
+    img.src = src;
+    modal.style.display = "flex";
+}
+
+
+// unverified
+
+
 function handleFilePreview(inputElem, previewElem) {
     inputElem.addEventListener('change', () => {
         const file = inputElem.files[0];
@@ -200,7 +240,28 @@ function loadLineChart() {
         .catch(err => console.error("Line chart error:", err));
 }
 
-// unverified student
+// unverified features
+
+// layouts
+
+unverifiedStudentDashboardButton.addEventListener("click", () => {
+
+    unverifiedStudentDashboard.style.display = "block";
+    unverifiedStudentDocuments.style.display = "none";
+
+});
+
+unverifiedStudentDocumentsButton.addEventListener("click", () =>{
+
+    unverifiedStudentDashboard.style.display = "none";
+    unverifiedStudentDocuments.style.display = "block";
+
+});
+
+
+
+
+// dashboard features
 editInfo.addEventListener('click', () => {
     overlay.classList.add('show');
     editModal.classList.add('show');
@@ -257,44 +318,60 @@ removeFilesBtn?.addEventListener('click', () => {
         .catch(err => console.error(err));
 });
 
-// if (deleteBtn) {
-//     deleteBtn.addEventListener('click', () => {
-
-//         const confirmDelete = confirm("Are you sure you want to remove your uploaded documents?");
-
-//         if (!confirmDelete) return;
-
-//         fetch("delete_documents_action.php", {
-//             method: "POST"
-//         })
-//         .then(res => res.text())
-//         .then(response => {
-//             // reload page after deletion
-//             window.location.reload();
-//         })
-//         .catch(err => console.error("Delete error:", err));
-//     });
-// }
-
-// show files upload now
-document.querySelectorAll('.btn-toggle-file').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const target = document.getElementById(btn.dataset.target);
-        if (target.style.display === 'none' || target.style.display === '') {
-            target.style.display = 'block';
-            btn.textContent = 'Hide File ▲';
-        } else {
-            target.style.display = 'none';
-            btn.textContent = 'View File ▼';
-        }
-    });
-});
-
-
 closeModalBtn.addEventListener('click', () => {
    overlay.classList.remove('show');
     uploadModal.classList.remove('show');
 });
+
+document.getElementById("closeImagePreview").addEventListener("click", () => {
+    document.getElementById("imagePreviewModal").style.display = "none";
+});
+
+// unverified features
+
+// profiel modal
+
+// openProfileBtn.addEventListener('click', () => {
+//     profileModal.style.display = 'flex'; 
+// });
+
+// document.getElementById('closeProfileModal').addEventListener('click', () => {
+//     profileModal.style.display = 'none';
+// });
+
+// profileUpload.addEventListener('change', function(e) {
+//     const file = e.target.files[0];
+//     if (!file) return;
+
+//     const reader = new FileReader();
+//     reader.onload = function(event) {
+//         profilePreview.src = event.target.result;
+//     }
+//     reader.readAsDataURL(file);
+// });
+
+// document.getElementById('saveProfileBtn').addEventListener('click', () => {
+//     const file = profileUpload.files[0];
+//     if (!file) return alert("Please select a profile picture!");
+
+//     const formData = new FormData();
+//     formData.append('profilePic', file);
+
+//     fetch('saveProfile.php', {
+//         method: 'POST',
+//         body: formData
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         if(data.success) {
+//             alert('Profile updated!');
+//             profileModal.style.display = 'none';
+//         } else {
+//             alert('Error uploading profile picture.');
+//         }
+//     })
+//     .catch(err => console.error(err));
+// });
 
 overlay.addEventListener('click', () => {
     overlay.classList.remove('show');
@@ -302,7 +379,6 @@ overlay.addEventListener('click', () => {
     previewFilesModal.classList.remove('show');
     editModal.classList.remove('show');
 });
-
 
 
 window.addEventListener("DOMContentLoaded", () => {

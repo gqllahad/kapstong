@@ -172,26 +172,12 @@ document.querySelectorAll("select").forEach(select => {
 
 // mobile number error handling
 
-telInput.addEventListener("focus", function () {
-    if (this.value === "") {
-        this.value = "09";
-    }
-    setTimeout(() => {
-        this.selectionStart = this.selectionEnd = this.value.length;
-    }, 0);
-});
-
-telInput.addEventListener("keydown", function (e) {
-    if ((this.selectionStart <= 2) && 
-        (e.key === "Backspace" || e.key === "Delete")) {
-        e.preventDefault();
-    }
-});
-
 telInput.addEventListener("input", function() {
     const parent = this.parentElement;
     let warning = parent.querySelector(".tel-warning");
     const value = this.value.trim();
+
+    
 
     if (!warning) {
         warning = document.createElement("p");
@@ -205,11 +191,23 @@ telInput.addEventListener("input", function() {
 
     let digits = this.value.replace(/\D/g, "");
 
-    if (!digits.startsWith("09")) {
-        digits = "09" + digits.slice(2);
-    }
+    document.getElementById("rawTel").value = digits;
 
     if (digits.length > 11) digits = digits.slice(0, 11);
+
+    if (!digits.startsWith("09")) {
+        parent.classList.add("tel-error");
+        warning.textContent = "Mobile number must start with 09";
+        warning.style.display = "block";
+        this.setCustomValidity("Invalid mobile number");
+        nextButtonStep1.disabled = true;
+        return;
+    } else {
+        parent.classList.remove("tel-error");
+        warning.style.display = "none";
+        this.setCustomValidity("");
+        nextButtonStep1.disabled = false;
+    }
 
     let formatted = "";
     for (let i = 0; i < digits.length; i++) {

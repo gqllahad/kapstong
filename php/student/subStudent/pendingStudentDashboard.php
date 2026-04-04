@@ -47,7 +47,7 @@ $studentStatus = $_SESSION['isVerified'];
         <h1>OJT Student Dashboard</h1>
         <button id="menuToggle">☰</button>
         <nav class="profile-menu" id="profileMenu" hidden>
-            <a href="#">Profile</a>
+            <a id="openProfileBtn">Profile</a>
             <hr style="width: 75%; text-align: left;">
             <a href="../../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
@@ -57,12 +57,12 @@ $studentStatus = $_SESSION['isVerified'];
         <aside class="sidebar">
             <ul class="menu">
                 <li class="active">
-                    <button><i class="bi bi-house"></i>Home</button>
+                    <button id="unverified-student-dashboard-button"><i class="bi bi-house"></i>Home Page</button>
                 </li>
                 <li>
-                    <button><i class="bi bi-journal-text"></i>My Documents</button>
+                    <button id="unverified-student-documents-button"><i class="bi bi-journal-text"></i>My Documents</button>
                 </li>
-                <li><button><i class="bi bi-chat-left-text"></i> Messages</button></li>
+                <li><button id="unverified-student-messages-button"><i class="bi bi-chat-left-text"></i> Messages</button></li>
             </ul>
         </aside>
 
@@ -70,7 +70,7 @@ $studentStatus = $_SESSION['isVerified'];
 
             <div id="overlay" class="overlay"></div>
 
-            <section class="student-dashboard">
+            <section class="unverified-student-dashboard" id="unverified-student-dashboard">
                 <section class="page-header">
                     <h2>Welcome! <?php echo htmlspecialchars($studentName); ?>.</h2>
                     <p>Get started by verifying your account.</p>
@@ -138,33 +138,32 @@ $studentStatus = $_SESSION['isVerified'];
                 </div>
 
 
-                <!-- <section class="cards">
-                    <div class="card pending-task">
-                        <h3>OJT Status</h3>
-                        <p>View your current OJT assignments.</p>
+                <!-- profile modal -->
+                <!-- <div class="upload-modal" id="profileModal">
+                    <div class="modal-header">
+                        <h3>My Profile</h3>
+                        <button id="closeProfileModal" class="modal-close">&times;</button>
                     </div>
-                    <div class="card notification">
-                        <h3>Notifications</h3>
-                        <p>Check announcements from your mentor.</p>
-                    </div>
-                    <div class="card submitted-task">
-                        <h3>Documents</h3>
-                        <p>Upload or review submitted reports.</p>
-                    </div>
-                </section>
-            </section> -->
 
-                <!-- <section class="dashboard-charts">
-                <section class="wrapper line-chart">
-                    <h2>Line Chart (Users per Role)</h2>
-                    <canvas id="lineChart"></canvas>
-                </section>
+                    <div class="modal-form">
+                        
+                        <div class="profile-picture-container">
+                            <img id="profilePreview" src="<?php echo $user['profile_pic'] ?? 'default-avatar.png'; ?>" class="profile-img" alt="Profile Picture">
+                            <label for="profileUpload" class="upload-overlay">📷 Change</label>
+                            <input type="file" id="profileUpload" accept="image/*" style="display:none">
+                        </div>
 
-                <section class="wrapper pie-chart">
-                    <h2>Attendance Evaluation</h2>
-                    <canvas id="pieChart"></canvas>
-                </section>
-            </section> -->
+                       
+                        <div class="profile-info">
+                            <p><strong>Name:</strong> <?php echo htmlspecialchars($user['name']); ?></p>
+                            <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button class="btn-upload" id="saveProfileBtn">Save Changes</button>
+                        </div>
+                    </div>
+                </div> -->
 
                 <!-- edit info modal  -->
                 <div id="editModal" class="edit-modal">
@@ -327,6 +326,133 @@ $studentStatus = $_SESSION['isVerified'];
                         <?php endif; ?>
                     </div>
                 </div>
+
+            </section>
+
+
+            <!--student docuemnts -->
+            <section class="unverified-student-documents" id="unverified-student-documents">
+                <div class="documents-wrapper">
+
+                    <h2>Documents</h2>
+
+                    <div class="info-section">
+                        <h3>Personal Information</h3>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Student ID</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['studentID'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['name'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['email'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Birth Date</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['birthDate'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Mobile Number</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['mobileNumber'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['gender'] ?? ''); ?>" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>Academic Information</h3>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Course</label>
+                                <input type="text" value="<?php echo htmlspecialchars(
+                                                                ($studentInfo['course'] ?? '') . ' - ' . ($studentInfo['course_name'] ?? '')
+                                                            );  ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Year Level</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['yearLevel'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Semester</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['semester'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>School Year</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['schoolYear'] ?? ''); ?>" readonly>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>Address</h3>
+
+                        <div class="form-group">
+                            <label>Full Address</label>
+                            <input type="text" value="<?php echo htmlspecialchars($studentInfo['address'] ?? ''); ?>" readonly>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>Uploaded Documents</h3>
+
+                        <div class="documents-grid">
+
+                            <div class="doc-card">
+                                <p><strong>Student ID</strong></p>
+
+                                <?php if (!empty($documents['idUpload'])): ?>
+                                    <button class="btn-preview"
+                                        onclick="previewImage('<?php echo '../../../uploads/student_uploads/' . $studentID . '/' . $documents['idUpload']; ?>')">
+                                        View ID
+                                    </button>
+                                <?php else: ?>
+                                    <span class="status missing">No file uploaded</span>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="doc-card">
+                                <p><strong>Registration Form</strong></p>
+
+                                <?php if (!empty($documents['regFormUpload'])): ?>
+                                    <button class="btn-preview"
+                                        onclick="previewImage('<?php echo '../../../uploads/student_uploads/' . $studentID . '/' . $documents['regFormUpload']; ?>')">
+                                        View Form
+                                    </button>
+                                <?php else: ?>
+                                    <span class="status missing">No file uploaded</span>
+                                <?php endif; ?>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="imagePreviewModal" class="image-modal">
+                    <span id="closeImagePreview">&times;</span>
+                    <img id="previewImg">
+                </div>
+
+            </section>
+
 
 
 
