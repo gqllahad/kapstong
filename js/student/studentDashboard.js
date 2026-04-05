@@ -16,6 +16,23 @@ const profileModal = document.getElementById('profileModal');
 const profileUpload = document.getElementById('profileUpload');
 const profilePreview = document.getElementById('profilePreview');
 
+const profileContainer = document.querySelector('.profile-picture-container');
+const profileInput = document.getElementById('profileInput');
+const profilePic = document.getElementById('profilePic');
+
+const closeModalProfileBtn = document.getElementById('closeProfileModal');
+
+// Account Settings
+const openAccountSettings = document.getElementById('openAccountSettingsBtn');
+const accountSettings = document.getElementById('account-settings');
+
+const changePasswordModal = document.getElementById('change-password-modal');
+const forgotPinModal = document.getElementById('forgot-pin-modal');
+
+
+const closeModalAccountBtn = document.getElementById('closeAccountModal');
+
+
 
 // unverified Students
 
@@ -331,53 +348,107 @@ document.getElementById("closeImagePreview").addEventListener("click", () => {
 
 // profiel modal
 
-// openProfileBtn.addEventListener('click', () => {
-//     profileModal.style.display = 'flex'; 
-// });
+openProfileBtn.addEventListener("click", () => {
 
-// document.getElementById('closeProfileModal').addEventListener('click', () => {
-//     profileModal.style.display = 'none';
-// });
+    overlay.classList.add("show");
 
-// profileUpload.addEventListener('change', function(e) {
-//     const file = e.target.files[0];
-//     if (!file) return;
+    profileModal.classList.add("show");
 
-//     const reader = new FileReader();
-//     reader.onload = function(event) {
-//         profilePreview.src = event.target.result;
+});
+
+closeModalProfileBtn.addEventListener('click', () => {
+   overlay.classList.remove('show');
+    profileModal.classList.remove('show');
+});
+
+profileContainer.addEventListener('click', () => {
+    profileInput.click();
+});
+
+profileInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            profilePic.src = e.target.result; 
+        }
+        reader.readAsDataURL(file);
+
+        // Optionally, here you can add an AJAX call to upload the file to the server
+        // e.g., using fetch() to save the profile picture in the database
+    }
+});
+
+
+// Account Settings 
+
+openAccountSettings.addEventListener("click", () => {
+
+    overlay.classList.add("show");
+    accountSettings.classList.add("show");
+
+});
+
+closeModalAccountBtn.addEventListener('click', () => {
+    overlay.classList.remove('show');
+    accountSettings.classList.remove('show');
+});
+
+// document.getElementById('saveAccountSettings').addEventListener('click', () => {
+//     const oldPass = document.getElementById('oldPassword').value;
+//     const newPass = document.getElementById('newPassword').value;
+//     const confirmPass = document.getElementById('confirmPassword').value;
+//     const pin = document.getElementById('forgotPin').value;
+//     const emailNotif = document.getElementById('emailNotif').checked;
+
+//     if(newPass !== confirmPass) {
+//         alert("New password and confirmation do not match!");
+//         return;
 //     }
-//     reader.readAsDataURL(file);
+
+//     // TODO: Send data via AJAX to PHP backend for saving
+//     console.log({oldPass, newPass, pin, emailNotif});
 // });
 
-// document.getElementById('saveProfileBtn').addEventListener('click', () => {
-//     const file = profileUpload.files[0];
-//     if (!file) return alert("Please select a profile picture!");
+document.getElementById('openChangePassword').addEventListener('click', () => {
+    accountSettings.classList.remove('show');
+    changePasswordModal.classList.add('show');
+});
 
-//     const formData = new FormData();
-//     formData.append('profilePic', file);
+document.getElementById('openForgotPIN').addEventListener('click', () => {
+    accountSettings.classList.remove('show');
+    forgotPinModal.classList.add('show');
+});
 
-//     fetch('saveProfile.php', {
-//         method: 'POST',
-//         body: formData
-//     })
-//     .then(res => res.json())
-//     .then(data => {
-//         if(data.success) {
-//             alert('Profile updated!');
-//             profileModal.style.display = 'none';
-//         } else {
-//             alert('Error uploading profile picture.');
-//         }
-//     })
-//     .catch(err => console.error(err));
-// });
+// Back buttons
+document.getElementById('backToAccountSettings1').addEventListener('click', () => {
+    changePasswordModal.classList.remove('show');
+    accountSettings.classList.add('show');
+});
+
+document.getElementById('backToAccountSettings2').addEventListener('click', () => {
+    forgotPinModal.classList.remove('show');
+    accountSettings.classList.add('show');
+});
+
+// Close main modal example
+document.getElementById('closeAccountModal').addEventListener('click', () => {
+    accountSettings.classList.remove('show');
+});
+
+
 
 overlay.addEventListener('click', () => {
     overlay.classList.remove('show');
     uploadModal.classList.remove('show');
     previewFilesModal.classList.remove('show');
     editModal.classList.remove('show');
+    profileModal.classList.remove('show');
+
+    accountSettings.classList.remove("show");
+    changePasswordModal.classList.remove('show');
+    forgotPinModal.classList.remove('show');
+    
 });
 
 

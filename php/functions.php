@@ -83,6 +83,7 @@ function getStudentInfo($conn, $studentID)
             s.mobileNumber,
             s.course,
             p.prg_name AS course_name,
+            p.prg_department AS course_dpt,
             s.gender,
             s.yearLevel,
             s.birthDate,

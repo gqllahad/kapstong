@@ -88,6 +88,7 @@ margin-left: 0;
     overflow: hidden;
     z-index: 1000;
     pointer-events: none;
+    cursor: pointer;
 }
 
 .profile-menu {
@@ -325,110 +326,135 @@ flex:1;
 
 /* profile modal */
 
-/* #profileModal {
-    display: none;
+.profile-modal{
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-#profileModal .modal-content {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
     background: #fff;
-    padding: 2rem;
-    border-radius: 10px;
-    width: 400px;
-    max-width: 90%;
-    position: relative;
-}
-
-.upload-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(4px);
-    background: rgba(0,0,0,0.5);
-    z-index: 9999;
-    justify-content: center;
-    align-items: center;
-}
-
-.upload-modal .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.8rem 1rem;
-    border-bottom: 1px solid #ddd;
-}
-
-.upload-modal .modal-close {
-    font-size: 1.5rem;
-    border: none;
-    background: none;
-    cursor: pointer;
-}
-
-.upload-modal .modal-form {
-    background: #fff;
-    padding: 1rem;
     border-radius: 12px;
-    max-width: 400px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    padding: 30px 25px;
     width: 90%;
-    text-align: center;
+    max-width: 750px;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.profile-modal.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.form-section-profile {
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.duos{
+  grid-column: span 1;
 }
 
 .profile-picture-container {
     position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 1rem auto;
+    width: 250px;
+    height: 250px;
+    margin: 0 auto 30px auto;
+    cursor: pointer;
 }
 
-.profile-img {
+.profile-picture-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
     border-radius: 50%;
-    border: 3px solid #4a90e2;
+    object-fit: cover;
+    border: 3px solid #3498db;
+    transition: 0.3s all ease-in-out;
 }
 
-.upload-overlay {
+.profile-picture-container:hover img {
+    opacity: 0.7;
+}
+
+.change-overlay {
     position: absolute;
-    bottom: 0;
-    width: 100%;
-    background: rgba(0,0,0,0.5);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     color: #fff;
-    text-align: center;
-    padding: 0.3rem;
-    border-radius: 0 0 50% 50%;
-    cursor: pointer;
-    font-size: 0.9rem;
+    font-weight: bold;
+    background: rgba(0,0,0,0.6);
+    padding: 5px 10px;
+    border-radius: 8px;
+    opacity: 0;
+    transition: 0.3s ease-in-out;
+    pointer-events: none;
 }
 
-.profile-info p {
-    margin: 0.5rem 0;
-    font-size: 1rem;
+.profile-picture-container:hover .change-overlay {
+    opacity: 1;
 }
 
-.modal-actions {
-    margin-top: 1rem;
+/* Account settings */
+.account-settings-modal{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    padding: 30px 25px;
+    width: 90%;
+    max-width: 750px;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
 }
 
-.btn-upload {
-    padding: 0.5rem 1rem;
+.account-settings-modal.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.account-btn {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
     border: none;
-    background: #4a90e2;
+    border-radius: 8px;
+    background-color: #3498db;
     color: white;
-    border-radius: 6px;
+    font-size: 16px;
     cursor: pointer;
-} */
+}
 
+.account-btn:hover {
+    background-color: #2980b9;
+}
+
+.modal-close-profile {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.modal-close-profile-sub{
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
 
 
 /* FOOTER */
@@ -785,6 +811,15 @@ flex:1;
     transition: color 0.2s ease;
 }
 
+.modal-close-profile {
+    background: none;
+    border: none;
+    font-size: 1.9rem;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
 .modal-close:hover {
     color: #ff4d4f;
 }
@@ -799,7 +834,7 @@ flex:1;
 .form-group label {
     display: block;
     font-size: 0.95rem;
-    color: var(--primary);
+    color: var(--front-text);
     margin-bottom: 5px;
 }
 

@@ -48,6 +48,7 @@ $studentStatus = $_SESSION['isVerified'];
         <button id="menuToggle">☰</button>
         <nav class="profile-menu" id="profileMenu" hidden>
             <a id="openProfileBtn">Profile</a>
+            <a id="openAccountSettingsBtn">Account Setting</a>
             <hr style="width: 75%; text-align: left;">
             <a href="../../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
@@ -69,6 +70,116 @@ $studentStatus = $_SESSION['isVerified'];
         <main class="content">
 
             <div id="overlay" class="overlay"></div>
+
+            <!-- profile modal -->
+            <div class="profile-modal" id="profileModal">
+                <div class="modal-header">
+                    <h3>Profile</h3>
+                    <button id="closeProfileModal" class="modal-close-profile">&times;</button>
+                </div>
+
+                <div class="profile-picture-container">
+                    <img id="profilePic"
+                        src="../../../uploads/student_uploads/12345/student_id.jpg"
+                        alt="Profile Picture">
+                    <div class="change-overlay">Change Profile</div>
+                    <input type="file" id="profileInput" accept="image/*" style="display:none;">
+                </div>
+
+                <div class="form-section-profile">
+
+                    <div class="form-group-edit duos">
+                        <label>Full Name</label>
+                        <input type="text" name="fullName" id="fullName"
+                            value="<?php echo htmlspecialchars($studentName ?? ''); ?>" readonly>
+                    </div>
+
+                    <div class="form-group-edit duos">
+                        <label>Email Address</label>
+                        <input type="text" name="email" id="email"
+                            value="<?php echo htmlspecialchars($studentInfo['email'] ?? ''); ?>" readonly>
+                    </div>
+
+                    <div class="form-group-edit duos">
+                        <label>Course</label>
+                        <input type="text" value="<?php echo htmlspecialchars(
+                                                        ($studentInfo['course'] ?? '') . ' - ' . ($studentInfo['course_name'] ?? '')
+                                                    );  ?>" readonly>
+                    </div>
+
+                    <div class="form-group-edit duos">
+                        <label>Department</label>
+                        <input type="text" value="<?php echo htmlspecialchars(
+                                                        ($studentInfo['course_dpt'] ?? '')
+                                                    );  ?>" readonly>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <!-- Account settings modal -->
+
+            <div class="account-settings-modal" id="account-settings">
+                <div class="modal-header">
+                    <h3>Account Settings</h3>
+                    <button id="closeAccountModal" class="modal-close-profile">&times;</button>
+                </div>
+
+                <div class="form-section-account">
+                    <button class="account-btn" id="openChangePassword">Change Password</button>
+                    <button class="account-btn" id="openForgotPIN">Forgot Password PIN</button>
+                </div>
+
+            </div>
+
+            <!-- change password -->
+            <div class="account-settings-modal" id="change-password-modal">
+                <div class="modal-header">
+                    <h3>Change Password</h3>
+                    <button id="backToAccountSettings1" class="modal-close-profile-sub">&larr; Back</button>
+                </div>
+
+                <div class="form-section-account">
+                    <div class="form-group-edit">
+                        <label>Old Password</label>
+                        <input type="password" id="oldPassword" placeholder="Enter old password">
+                    </div>
+
+                    <div class="form-group-edit">
+                        <label>New Password</label>
+                        <input type="password" id="newPassword" placeholder="Enter new password">
+                    </div>
+
+                    <div class="form-group-edit">
+                        <label>Confirm New Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                    </div>
+
+                    <div class="form-group-edit">
+                        <button id="savePassword" class="account-btn">Save Password</button>
+                    </div>
+                </div>
+            </div>
+
+            <!--  pin -->
+            <div class="account-settings-modal" id="forgot-pin-modal">
+                <div class="modal-header">
+                    <h3>Forgot Password PIN</h3>
+                    <button id="backToAccountSettings2" class="modal-close-profile-sub">&larr; Back</button>
+                </div>
+
+                <div class="form-section-account">
+                    <div class="form-group-edit">
+                        <label>Set 4-digit PIN</label>
+                        <input type="number" id="forgotPin" placeholder="Enter 4-digit PIN">
+                    </div>
+
+                    <div class="form-group-edit">
+                        <button id="savePin" class="account-btn">Save PIN</button>
+                    </div>
+                </div>
+            </div>
 
             <section class="unverified-student-dashboard" id="unverified-student-dashboard">
                 <section class="page-header">
@@ -136,34 +247,6 @@ $studentStatus = $_SESSION['isVerified'];
                         <p>If you need assistance, contact your OJT coordinator or click <a href="support.php">here</a>.</p>
                     </div>
                 </div>
-
-
-                <!-- profile modal -->
-                <!-- <div class="upload-modal" id="profileModal">
-                    <div class="modal-header">
-                        <h3>My Profile</h3>
-                        <button id="closeProfileModal" class="modal-close">&times;</button>
-                    </div>
-
-                    <div class="modal-form">
-                        
-                        <div class="profile-picture-container">
-                            <img id="profilePreview" src="<?php echo $user['profile_pic'] ?? 'default-avatar.png'; ?>" class="profile-img" alt="Profile Picture">
-                            <label for="profileUpload" class="upload-overlay">📷 Change</label>
-                            <input type="file" id="profileUpload" accept="image/*" style="display:none">
-                        </div>
-
-                       
-                        <div class="profile-info">
-                            <p><strong>Name:</strong> <?php echo htmlspecialchars($user['name']); ?></p>
-                            <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
-                        </div>
-
-                        <div class="modal-actions">
-                            <button class="btn-upload" id="saveProfileBtn">Save Changes</button>
-                        </div>
-                    </div>
-                </div> -->
 
                 <!-- edit info modal  -->
                 <div id="editModal" class="edit-modal">
@@ -450,7 +533,6 @@ $studentStatus = $_SESSION['isVerified'];
                     <span id="closeImagePreview">&times;</span>
                     <img id="previewImg">
                 </div>
-
             </section>
 
 
