@@ -240,6 +240,8 @@ document.addEventListener("DOMContentLoaded", function() {
     fetch('getCourses.php')
         .then(res => res.json())
         .then(data => {
+            courseSelect.innerHTML = '<option value="">Select Course</option>';
+
             if (data.acro && data.values) {
                 data.acro.forEach((acro, index) => {
                     const option = document.createElement('option');

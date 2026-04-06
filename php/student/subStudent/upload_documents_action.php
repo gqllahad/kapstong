@@ -55,15 +55,6 @@ if (isset($_POST['submitDocuments'])) {
         move_uploaded_file($regFile['tmp_name'], $uploadDir . $regName);
     }
 
-    // if (
-    //     !move_uploaded_file($idFile['tmp_name'], $uploadDir . $idName) ||
-    //     !move_uploaded_file($regFile['tmp_name'], $uploadDir . $regName)
-    // ) {
-
-    //     header("Location: pendingStudentDashboard.php?error=Upload failed");
-    //     exit();
-    // }
-
     if ($existing) {
         $stmt = $conn->prepare("
             UPDATE student_documents 

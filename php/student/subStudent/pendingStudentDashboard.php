@@ -71,6 +71,14 @@ $studentStatus = $_SESSION['isVerified'];
 
             <div id="overlay" class="overlay"></div>
 
+            <!-- response modal -->
+            <div id="responseModal" class="response-modal" style="display:none;">
+                <div class="modal-content">
+                    <p id="responseMessage"></p>
+                    <button onclick="closeResponseModal()">OK</button>
+                </div>
+            </div>
+
             <!-- profile modal -->
             <div class="profile-modal" id="profileModal">
                 <div class="modal-header">
@@ -139,27 +147,31 @@ $studentStatus = $_SESSION['isVerified'];
                     <h3>Change Password</h3>
                     <button id="backToAccountSettings1" class="modal-close-profile-sub">&larr; Back</button>
                 </div>
+                <form action="../student_functions/settings.php" method="POST" class="modal-form">
+                    <div class="form-section-account">
 
-                <div class="form-section-account">
-                    <div class="form-group-edit">
-                        <label>Old Password</label>
-                        <input type="password" id="oldPassword" placeholder="Enter old password">
-                    </div>
+                        <input type="hidden" name="email" value="<?php echo htmlspecialchars($studentInfo['email'] ?? ''); ?>">
 
-                    <div class="form-group-edit">
-                        <label>New Password</label>
-                        <input type="password" id="newPassword" placeholder="Enter new password">
-                    </div>
+                        <div class="form-group-edit">
+                            <label>Old Password</label>
+                            <input type="password" id="oldPassword" name="oldPassword" placeholder="Enter old password">
+                        </div>
 
-                    <div class="form-group-edit">
-                        <label>Confirm New Password</label>
-                        <input type="password" id="confirmPassword" placeholder="Confirm new password">
-                    </div>
+                        <div class="form-group-edit">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password">
+                        </div>
 
-                    <div class="form-group-edit">
-                        <button id="savePassword" class="account-btn">Save Password</button>
+                        <div class="form-group-edit">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
+                        </div>
+
+                        <div class="form-group-edit">
+                            <button type="submit" id="savePassword" class="account-btn" name="changePasswordStudent">Save Password</button>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
 
             <!--  pin -->
@@ -261,27 +273,29 @@ $studentStatus = $_SESSION['isVerified'];
                             <h4>Personal Information</h4>
 
                             <div class="form-group-edit">
-                                <label for="fullName">Full Name</label>
-                                <input type="text" name="fullName" id="fullName"
-                                    value="<?php echo htmlspecialchars($studentName ?? ''); ?>" required>
-                            </div>
-
-                            <div class="form-group-edit">
-                                <label for="email">Email Address</label>
-                                <input type="email" name="email" id="email"
-                                    value="<?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?>" readonly>
+                                <label for="fullNameEdit">Full Name</label>
+                                <input type="text" name="fullName" id="fullNameEdit"
+                                    value="<?php echo htmlspecialchars($studentName ?? 'N/A'); ?>">
                             </div>
 
                             <div class="form-group-edit">
                                 <label for="mobile">Mobile Number</label>
-                                <input type="text" name="mobile" id="mobile"
-                                    value="<?php echo htmlspecialchars($_SESSION['mobileNumber'] ?? ''); ?>" required>
+                                <input type="tel" name="mobile" id="mobile" maxlength="11"
+                                    value="<?php echo htmlspecialchars($studentInfo['mobileNumber'] ?? 'N/A'); ?>">
                             </div>
 
                             <div class="form-group-edit">
                                 <label for="birthDate">Birth Date</label>
                                 <input type="date" name="birthDate" id="birthDate"
-                                    value="<?php echo htmlspecialchars($student['birthDate'] ?? ''); ?>" required>
+                                    value="<?php echo htmlspecialchars($studentInfo['birthDate'] ?? 'N/A'); ?>">
+                            </div>
+
+                            <div class="form-group-edit">
+                                <label for="gender">Gender</label>
+                                <select name="gender" id="gender">
+                                    <option value="Male" <?php if (($studentInfo['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
+                                    <option value="Female" <?php if (($studentInfo['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
+                                </select>
                             </div>
                         </div>
 
@@ -291,25 +305,26 @@ $studentStatus = $_SESSION['isVerified'];
 
                             <div class="form-group-edit">
                                 <label for="course">Course</label>
-                                <input type="text" name="course" id="course"
-                                    value="<?php echo htmlspecialchars($student['course'] ?? ''); ?>" required>
-                            </div>
+                                <select name="course" id="edit_course" data-current="<?php echo htmlspecialchars($studentInfo['course'] ?? ''); ?>">
 
-                            <div class="form-group-edit">
-                                <label for="yearLevel">Year Level</label>
-                                <select name="yearLevel" id="yearLevel" required>
-                                    <option value="1st Year">1st Year</option>
-                                    <option value="2nd Year">2nd Year</option>
-                                    <option value="3rd Year">3rd Year</option>
-                                    <option value="4th Year">4th Year</option>
                                 </select>
                             </div>
 
                             <div class="form-group-edit">
-                                <label for="gender">Gender</label>
-                                <select name="gender" id="gender" required>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
+                                <label for="yearLevel">Year Level</label>
+                                <select name="yearLevel" id="yearLevel">
+                                    <option value="1st Year" <?php if (($studentInfo['yearLevel'] ?? '') == '1st Year') echo 'selected'; ?>>1st Year</option>
+                                    <option value="2nd Year" <?php if (($studentInfo['yearLevel'] ?? '') == '2nd Year') echo 'selected'; ?>>2nd Year</option>
+                                    <option value="3rd Year" <?php if (($studentInfo['yearLevel'] ?? '') == '3rd Year') echo 'selected'; ?>>3rd Year</option>
+                                    <option value="4th Year" <?php if (($studentInfo['yearLevel'] ?? '') == '4th Year') echo 'selected'; ?>>4th Year</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group-edit">
+                                <label for="semester">Semester</label>
+                                <select name="semester" id="semester">
+                                    <option value="1st Semester" <?php if (($studentInfo['semester'] ?? '') == '1st Semester') echo 'selected'; ?>>1st Semester</option>
+                                    <option value="2nd Semester" <?php if (($studentInfo['semester'] ?? '') == '2nd Semester') echo 'selected'; ?>>2nd Semester</option>
                                 </select>
                             </div>
                         </div>
@@ -321,7 +336,7 @@ $studentStatus = $_SESSION['isVerified'];
                             <div class="form-group-edit">
                                 <label for="address">Full Address</label>
                                 <input type="text" name="address" id="address"
-                                    value="<?php echo htmlspecialchars($student['address'] ?? ''); ?>" required>
+                                    value="<?php echo htmlspecialchars($studentInfo['address'] ?? ''); ?>">
                             </div>
                         </div>
 
@@ -535,9 +550,6 @@ $studentStatus = $_SESSION['isVerified'];
                 </div>
             </section>
 
-
-
-
         </main>
     </div>
 
@@ -545,9 +557,25 @@ $studentStatus = $_SESSION['isVerified'];
         <p>© 2026 OJT Tracking System</p>
     </footer>
 
+    <!-- scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../../js/student/studentDashboard.js"></script>
+
+    <?php if (isset($_SESSION['success'])): ?>
+        <script>
+            showResponseModal("<?php echo $_SESSION['success']; ?>");
+        </script>
+    <?php unset($_SESSION['success']);
+    endif; ?>
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <script>
+            showResponseModal("<?php echo $_SESSION['error']; ?>");
+        </script>
+    <?php unset($_SESSION['error']);
+    endif; ?>
 </body>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="../../../js/student/studentDashboard.js"></script>
+
 
 </html>

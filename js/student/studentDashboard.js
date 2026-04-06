@@ -61,6 +61,9 @@ const closePreviewModalBtn = document.getElementById('closePreviewModal');
 // edit info
 const editInfo = document.getElementById("btn-edit");
 const editModal = document.getElementById('editModal');
+
+const editForm = document.querySelector('#editModal form');
+
 const cancelEditModalBtn = document.getElementById('cancelEditModal');
 const closeEditModalBtn = document.getElementById('closeEditModal');
 
@@ -79,12 +82,11 @@ function previewImage(src) {
     modal.style.display = "flex";
 }
 
-function previewImage(src) {
-    const modal = document.getElementById("imagePreviewModal");
-    const img = document.getElementById("previewImg");
+function closeEditModal() {
+    overlay.classList.remove('show');
+    editModal.classList.remove('show');
 
-    img.src = src;
-    modal.style.display = "flex";
+    editForm.reset(); 
 }
 
 
@@ -111,6 +113,19 @@ function handleFilePreview(inputElem, previewElem) {
         img.classList.add('preview-img');
         previewElem.appendChild(img);
     });
+}
+
+// response modal
+function showResponseModal(message) {
+    const modal = document.getElementById("responseModal");
+    const msg = document.getElementById("responseMessage");
+
+    msg.innerText = message;
+    modal.style.display = "flex";
+}
+
+function closeResponseModal() {
+    document.getElementById("responseModal").style.display = "none";
 }
 
 
@@ -275,24 +290,75 @@ unverifiedStudentDocumentsButton.addEventListener("click", () =>{
 
 });
 
-
-
-
 // dashboard features
+
+
+// edit info 
 editInfo.addEventListener('click', () => {
     overlay.classList.add('show');
     editModal.classList.add('show');
+
+     initialFormData = new FormData(editForm);
+
 });
 
-closeEditModalBtn.addEventListener('click', () => {
-   overlay.classList.remove('show');
-    editModal.classList.remove('show');
+editForm.addEventListener('submit', function (e) {
+    let currentFormData = new FormData(editForm);
+
+    let changed = false;
+
+    for (let [key, value] of currentFormData.entries()) {
+        if (value !== initialFormData.get(key)) {
+            changed = true;
+            break;
+        }
+    }
+
+    if (!changed) {
+        alert("No changes were made.");
+        e.preventDefault();
+        return;
+    }
+
+    const confirmSave = confirm("Are you sure you want to save changes?");
+    if (!confirmSave) {
+        e.preventDefault();
+    }
 });
 
-cancelEditModalBtn.addEventListener('click', () => {
-   overlay.classList.remove('show');
-   editModal.classList.remove('show');
+
+document.addEventListener("DOMContentLoaded", function() {
+    const courseSelect = document.getElementById('edit_course');
+
+    if (!courseSelect) return;
+
+    const currentCourse = courseSelect.dataset.current;
+
+    fetch('../../getCourses.php')
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.acro && data.values) {
+                data.acro.forEach((acro, index) => {
+                    const option = document.createElement('option');
+                    option.value = acro;
+                    option.textContent = data.values[index];
+
+                    if (acro === currentCourse) {
+                        option.selected = true;
+                    }
+
+                    courseSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(err => console.error("Error loading courses:", err));
 });
+
+closeEditModalBtn.addEventListener('click', closeEditModal);
+cancelEditModalBtn.addEventListener('click', closeEditModal);
+
+// edit info
 
 
 previewFilesBtn?.addEventListener('click', () => {
@@ -437,7 +503,6 @@ document.getElementById('closeAccountModal').addEventListener('click', () => {
 });
 
 
-
 overlay.addEventListener('click', () => {
     overlay.classList.remove('show');
     uploadModal.classList.remove('show');
@@ -448,6 +513,8 @@ overlay.addEventListener('click', () => {
     accountSettings.classList.remove("show");
     changePasswordModal.classList.remove('show');
     forgotPinModal.classList.remove('show');
+
+    editForm.reset();
     
 });
 
