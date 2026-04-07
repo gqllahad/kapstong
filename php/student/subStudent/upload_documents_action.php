@@ -70,12 +70,20 @@ if (isset($_POST['submitDocuments'])) {
         $stmt->bind_param("sss", $studentID, $idName, $regName);
     }
 
-    $stmt->execute();
+    if ($stmt->execute()) {
+        $_SESSION['upload_success'] = "File Uploaded successfully!";
+    } else {
+        $_SESSION['upload_error'] = "Uploading failed!";
+        header("Location: pendingStudentDashboard.php");
+        exit();
+    }
 
     $verifyStmt = $conn->prepare("UPDATE users SET isVerified = 'PENDING' WHERE studentID=?");
     $verifyStmt->bind_param("s", $studentID);
     $verifyStmt->execute();
-}
 
-header("Location: pendingStudentDashboard.php");
-exit();
+    $_SESSION['isVerified'] = 'PENDING';
+
+    header("Location: pendingStudentDashboard.php");
+    exit();
+}

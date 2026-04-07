@@ -9,9 +9,17 @@ const navBar = document.querySelector('.navbar');
 
 const menuItems = document.querySelectorAll('.menu li');
 
+const overlay = document.getElementById('overlay');
+
 // profile modal
 const openProfileBtn = document.getElementById('openProfileBtn');
+const openProfilePendingBtn = document.getElementById('openProfilePendingBtn');
+
+const profilePendingModal = document.getElementById('profilePendingModal');
 const profileModal = document.getElementById('profileModal');
+
+const openProfileVerifiedBtn = document.getElementById('openProfileVerifiedBtn');
+const profileVerifiedModal = document.getElementById('profileVerifiedModal');
 
 const profileUpload = document.getElementById('profileUpload');
 const profilePreview = document.getElementById('profilePreview');
@@ -21,6 +29,7 @@ const profileInput = document.getElementById('profileInput');
 const profilePic = document.getElementById('profilePic');
 
 const closeModalProfileBtn = document.getElementById('closeProfileModal');
+const closeModalProfilePendingBtn = document.getElementById('closeProfilePendingModal');
 
 // Account Settings
 const openAccountSettings = document.getElementById('openAccountSettingsBtn');
@@ -33,15 +42,23 @@ const forgotPinModal = document.getElementById('forgot-pin-modal');
 const closeModalAccountBtn = document.getElementById('closeAccountModal');
 
 
+// layouts feautres verified student
+const studentDashboardBtn = document.getElementById("student-dashboard-btn");
+const studentTasksBtn = document.getElementById("student-tasks-btn");
+const studentDocumentsBtn = document.getElementById("student-documents-btn");
+
+const studentDashboard = document.getElementById("student-dashboard");
+const studentTasks = document.getElementById("student-tasks");
+const studentDocuments = document.getElementById("student-documents");
 
 // unverified Students
 
 // layouts 
-const unverifiedStudentDashboardButton  = document.getElementById("unverified-student-dashboard-button");
-const unverifiedStudentDocumentsButton  = document.getElementById("unverified-student-documents-button");
+const unverifiedStudentDashboardButton = document.getElementById("unverified-student-dashboard-button");
+const unverifiedStudentDocumentsButton = document.getElementById("unverified-student-documents-button");
 
-const unverifiedStudentDashboard  = document.getElementById("unverified-student-dashboard");
-const unverifiedStudentDocuments  = document.getElementById("unverified-student-documents");
+const unverifiedStudentDashboard = document.getElementById("unverified-student-dashboard");
+const unverifiedStudentDocuments = document.getElementById("unverified-student-documents");
 
 // uploads/ preview
 const uploadBtnNow = document.getElementById('btn-upload-now');
@@ -49,7 +66,10 @@ const cancelUploadNow = document.getElementById('cancelUploadModal');
 
 const changeFilesBtn = document.getElementById('btn-change-files');
 const removeFilesBtn = document.getElementById('btn-remove-files');
-const overlay = document.getElementById('overlay');
+
+const unverifiedPreview = document.getElementById("closeUnverifiedImagePreview");
+const verifiedPreview = document.getElementById("closeImagePreview");
+
 const uploadModal = document.getElementById('uploadModal');
 const closeModalBtn = document.getElementById('closeModal');
 const cancelModalBtn = document.getElementById('cancelModal');
@@ -69,7 +89,6 @@ const closeEditModalBtn = document.getElementById('closeEditModal');
 
 // unverified
 
-
 // functions
 
 // unverified
@@ -82,16 +101,22 @@ function previewImage(src) {
     modal.style.display = "flex";
 }
 
+function previewImageUnverified(src){
+    const modal = document.getElementById("imageUnverifiedPreviewModal");
+    const img = document.getElementById("previewUnverifiedImg");
+
+    img.src = src;
+    modal.style.display = "flex";
+}
+
 function closeEditModal() {
     overlay.classList.remove('show');
     editModal.classList.remove('show');
 
-    editForm.reset(); 
+    editForm.reset();
 }
 
-
 // unverified
-
 
 function handleFilePreview(inputElem, previewElem) {
     inputElem.addEventListener('change', () => {
@@ -104,7 +129,7 @@ function handleFilePreview(inputElem, previewElem) {
         const allowedTypes = ['image/jpeg', 'image/png'];
         if (!allowedTypes.includes(file.type)) {
             alert('Only JPG or PNG files are allowed!');
-            inputElem.value = ''; 
+            inputElem.value = '';
             return;
         }
 
@@ -116,52 +141,29 @@ function handleFilePreview(inputElem, previewElem) {
 }
 
 // response modal
-function showResponseModal(message) {
+function showResponseModal(message, type = 'success') {
     const modal = document.getElementById("responseModal");
     const msg = document.getElementById("responseMessage");
 
     msg.innerText = message;
-    modal.style.display = "flex";
+    
+    modal.classList.remove("show");
+
+    void modal.offsetWidth;
+
+    setTimeout(() => {
+        modal.classList.add("show");
+    }, 10);
+
+    setTimeout(() => {
+        closeResponseModal();
+    }, 2000);
 }
 
 function closeResponseModal() {
-    document.getElementById("responseModal").style.display = "none";
+    const modal = document.getElementById("responseModal");
+    modal.classList.remove("show");
 }
-
-
-// profile menu
-menuToggle.addEventListener("click", (e) => {
-    e.stopPropagation(); 
-    profileMenu.hidden = !profileMenu.hidden;
-});
-
-document.addEventListener("click", (e) => {
-    if (!menuToggle.contains(e.target) && !profileMenu.contains(e.target)) {
-        profileMenu.hidden = true;
-    }
-});
-
-menuItems.forEach(item => {
-    item.addEventListener('click', () => {
-
-        menuItems.forEach(li => li.classList.remove('active'));
-
-        item.classList.add('active');
-
-    });
-});
-
-// sideMenu galaw
-sideBar.addEventListener('mouseenter', () => {
-      mainContent.classList.add('shifted');
-      navBar.classList.add('shifted');
-    });
-
-sideBar.addEventListener('mouseleave', () => {
-    mainContent.classList.remove('shifted');
-    navBar.classList.remove('shifted');
-});
-
 
 // Chartss
 function loadPieChart() {
@@ -176,9 +178,9 @@ function loadPieChart() {
                 if (label === "ADMIN") {
                     return "#5c77f0";
                 } else if (label === "student") {
-                    return "#4e69e0"; 
+                    return "#4e69e0";
                 }
-                return "#6c757d"; 
+                return "#6c757d";
             });
 
             // Destroy previous chart
@@ -192,7 +194,7 @@ function loadPieChart() {
                     labels: data.labels,
                     datasets: [{
                         data: data.values,
-                         backgroundColor: pieColors
+                        backgroundColor: pieColors
                     }]
                 },
                 options: {
@@ -221,12 +223,11 @@ function loadLineChart() {
                 if (label === "ADMIN") {
                     return "#5c77f0";
                 } else if (label === "student") {
-                    return "#4e69e0"; 
+                    return "#4e69e0";
                 }
-                return "#6c757d"; 
+                return "#6c757d";
             });
 
-            // Destroy previous chart
             if (window.lineChartInstance) {
                 window.lineChartInstance.destroy();
             }
@@ -242,7 +243,7 @@ function loadLineChart() {
                         backgroundColor: 'rgba(92, 119, 240, 0.2)',
                         fill: true,
                         tension: 0.3,
-                        pointHoverRadius : 6,
+                        pointHoverRadius: 6,
                         pointRadius: 5
                     }]
                 },
@@ -272,28 +273,106 @@ function loadLineChart() {
         .catch(err => console.error("Line chart error:", err));
 }
 
+
+// profile menu
+menuToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileMenu.hidden = !profileMenu.hidden;
+});
+
+document.addEventListener("click", (e) => {
+    if (!menuToggle.contains(e.target) && !profileMenu.contains(e.target)) {
+        profileMenu.hidden = true;
+    }
+});
+
+menuItems.forEach(item => {
+    item.addEventListener('click', () => {
+
+        menuItems.forEach(li => li.classList.remove('active'));
+
+        item.classList.add('active');
+
+    });
+});
+
+// Account Settings 
+
+if(openAccountSettings){
+openAccountSettings.addEventListener("click", () => {
+    overlay.classList.add("show");
+    accountSettings.classList.add("show");
+});
+
+closeModalAccountBtn.addEventListener('click', () => {
+    overlay.classList.remove('show');
+    accountSettings.classList.remove('show');
+});
+
+
+document.getElementById('openChangePassword').addEventListener('click', () => {
+    accountSettings.classList.remove('show');
+    changePasswordModal.classList.add('show');
+});
+
+document.getElementById('openForgotPIN').addEventListener('click', () => {
+    accountSettings.classList.remove('show');
+    forgotPinModal.classList.add('show');
+});
+
+document.getElementById('backToAccountSettings1').addEventListener('click', () => {
+    changePasswordModal.classList.remove('show');
+    accountSettings.classList.add('show');
+});
+
+document.getElementById('backToAccountSettings2').addEventListener('click', () => {
+    forgotPinModal.classList.remove('show');
+    accountSettings.classList.add('show');
+});
+
+document.getElementById('closeAccountModal').addEventListener('click', () => {
+    accountSettings.classList.remove('show');
+});
+}
+
+// sideMenu galaw
+sideBar.addEventListener('mouseenter', () => {
+    mainContent.classList.add('shifted');
+    navBar.classList.add('shifted');
+});
+
+sideBar.addEventListener('mouseleave', () => {
+    mainContent.classList.remove('shifted');
+    navBar.classList.remove('shifted');
+});
+
 // unverified features
 
 // layouts
 
-unverifiedStudentDashboardButton.addEventListener("click", () => {
+if(unverifiedStudentDashboardButton){
+    unverifiedStudentDashboardButton.addEventListener("click", () => {
 
     unverifiedStudentDashboard.style.display = "block";
     unverifiedStudentDocuments.style.display = "none";
 
-});
+    });
+}
 
-unverifiedStudentDocumentsButton.addEventListener("click", () =>{
+if(unverifiedStudentDocumentsButton){
+    unverifiedStudentDocumentsButton.addEventListener("click", () => {
 
     unverifiedStudentDashboard.style.display = "none";
     unverifiedStudentDocuments.style.display = "block";
 
-});
+    });
+}
 
 // dashboard features
-
-
 // edit info 
+
+if(editInfo){
+
 editInfo.addEventListener('click', () => {
     overlay.classList.add('show');
     editModal.classList.add('show');
@@ -325,7 +404,6 @@ editForm.addEventListener('submit', function (e) {
         e.preventDefault();
     }
 });
-
 
 document.addEventListener("DOMContentLoaded", function() {
     const courseSelect = document.getElementById('edit_course');
@@ -359,8 +437,6 @@ closeEditModalBtn.addEventListener('click', closeEditModal);
 cancelEditModalBtn.addEventListener('click', closeEditModal);
 
 // edit info
-
-
 previewFilesBtn?.addEventListener('click', () => {
     overlay.classList.add('show');
     previewFilesModal.classList.add('show');
@@ -402,127 +478,148 @@ removeFilesBtn?.addEventListener('click', () => {
 });
 
 closeModalBtn.addEventListener('click', () => {
-   overlay.classList.remove('show');
+    overlay.classList.remove('show');
     uploadModal.classList.remove('show');
 });
+}
 
-document.getElementById("closeImagePreview").addEventListener("click", () => {
-    document.getElementById("imagePreviewModal").style.display = "none";
+if(unverifiedPreview){
+    unverifiedPreview.addEventListener("click", () => {
+    document.getElementById("imageUnverifiedPreviewModal").style.display = "none";
 });
-
-// unverified features
+}
 
 // profiel modal
 
+// unverified profile
+
+if (openProfilePendingBtn && profilePendingModal) {
+    openProfilePendingBtn.addEventListener("click", () => {
+        overlay.classList.add("show");
+        profilePendingModal.classList.add("show");
+    });
+}
+
+if (closeModalProfilePendingBtn && profilePendingModal) {
+    closeModalProfilePendingBtn.addEventListener('click', () => {
+        overlay.classList.remove('show');
+        profilePendingModal.classList.remove('show');
+    });
+}
+
+// unverified profile
+
+if(openProfileBtn){
 openProfileBtn.addEventListener("click", () => {
 
     overlay.classList.add("show");
-
     profileModal.classList.add("show");
 
 });
 
 closeModalProfileBtn.addEventListener('click', () => {
-   overlay.classList.remove('show');
+    overlay.classList.remove('show');
     profileModal.classList.remove('show');
 });
+
+
 
 profileContainer.addEventListener('click', () => {
     profileInput.click();
 });
+}
 
-profileInput.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if(file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            profilePic.src = e.target.result; 
-        }
-        reader.readAsDataURL(file);
-
-        // Optionally, here you can add an AJAX call to upload the file to the server
-        // e.g., using fetch() to save the profile picture in the database
-    }
-});
-
-
-// Account Settings 
-
-openAccountSettings.addEventListener("click", () => {
-
-    overlay.classList.add("show");
-    accountSettings.classList.add("show");
-
-});
-
-closeModalAccountBtn.addEventListener('click', () => {
-    overlay.classList.remove('show');
-    accountSettings.classList.remove('show');
-});
-
-// document.getElementById('saveAccountSettings').addEventListener('click', () => {
-//     const oldPass = document.getElementById('oldPassword').value;
-//     const newPass = document.getElementById('newPassword').value;
-//     const confirmPass = document.getElementById('confirmPassword').value;
-//     const pin = document.getElementById('forgotPin').value;
-//     const emailNotif = document.getElementById('emailNotif').checked;
-
-//     if(newPass !== confirmPass) {
-//         alert("New password and confirmation do not match!");
-//         return;
+// not included
+// profileInput.addEventListener('change', (event) => {
+//     const file = event.target.files[0];
+//     if (file) {
+//         const reader = new FileReader();
+//         reader.onload = (e) => {
+//             profilePic.src = e.target.result;
+//         }
+//         reader.readAsDataURL(file);
 //     }
-
-//     // TODO: Send data via AJAX to PHP backend for saving
-//     console.log({oldPass, newPass, pin, emailNotif});
 // });
 
-document.getElementById('openChangePassword').addEventListener('click', () => {
-    accountSettings.classList.remove('show');
-    changePasswordModal.classList.add('show');
-});
 
-document.getElementById('openForgotPIN').addEventListener('click', () => {
-    accountSettings.classList.remove('show');
-    forgotPinModal.classList.add('show');
-});
+// verified students
 
-// Back buttons
-document.getElementById('backToAccountSettings1').addEventListener('click', () => {
-    changePasswordModal.classList.remove('show');
-    accountSettings.classList.add('show');
-});
+if(studentDashboardBtn){
+    studentDashboardBtn.addEventListener("click", () => {
 
-document.getElementById('backToAccountSettings2').addEventListener('click', () => {
-    forgotPinModal.classList.remove('show');
-    accountSettings.classList.add('show');
-});
+        studentDashboard.style.display = "block";
 
-// Close main modal example
-document.getElementById('closeAccountModal').addEventListener('click', () => {
-    accountSettings.classList.remove('show');
-});
+        studentTasks.style.display = "none";
+
+    });
+}
+
+if(studentTasksBtn){
+    studentTasksBtn.addEventListener("click", () => {
+
+        studentDashboard.style.display = "none";
+
+        studentTasks.style.display = "block";
+        
+    });
+}
+
+if(studentDocumentsBtn){
+    studentDocumentsBtn.addEventListener("click", () => {
+
+        studentDashboard.style.display = "none";
+        studentTasks.style.display = "none";
+
+        studentDocuments.style.display = "block";
+        
+    });
+}
+
+if(verifiedPreview){
+    verifiedPreview.addEventListener("click", () => {
+        document.getElementById("imagePreviewModal").style.display = "none";
+    });
+}
 
 
+if(overlay){
 overlay.addEventListener('click', () => {
     overlay.classList.remove('show');
-    uploadModal.classList.remove('show');
-    previewFilesModal.classList.remove('show');
-    editModal.classList.remove('show');
-    profileModal.classList.remove('show');
 
-    accountSettings.classList.remove("show");
-    changePasswordModal.classList.remove('show');
-    forgotPinModal.classList.remove('show');
+    uploadModal?.classList.remove('show');
+    previewFilesModal?.classList.remove('show');
+    editModal?.classList.remove('show');
+    profileModal?.classList.remove('show');
 
-    editForm.reset();
-    
+    accountSettings?.classList.remove("show");
+    changePasswordModal?.classList.remove('show');
+    forgotPinModal?.classList.remove('show');
+
+    if (editForm) editForm.reset();
 });
+};
+
+if(unverifiedStudentDashboard){
+    handleFilePreview(document.getElementById('idUpload'), document.getElementById('idPreview'));
+    handleFilePreview(document.getElementById('regFormUpload'), document.getElementById('regPreview'));
+}
 
 
+// verified students
+if(studentDashboardBtn){
 window.addEventListener("DOMContentLoaded", () => {
     loadLineChart();
     loadPieChart();
 });
 
-handleFilePreview(document.getElementById('idUpload'), document.getElementById('idPreview'));
-handleFilePreview(document.getElementById('regFormUpload'), document.getElementById('regPreview'));
+document.addEventListener("DOMContentLoaded", () => {
+    const bars = document.querySelectorAll(".progress-bar-fill");
+    bars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = "0%";
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 100);
+    });
+});
+};

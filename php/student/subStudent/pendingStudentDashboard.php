@@ -9,12 +9,12 @@ header("Pragma: no-cache");
 
 
 if ($_SESSION['role'] !== "student") {
-    header("Location: ../trackerMain.php");
+    header("Location: ../../trackerMain.php");
     exit();
 }
 
 if ($_SESSION['isVerified'] !== "NOT VERIFIED" && $_SESSION['isVerified'] !== "PENDING") {
-    header("Location: ../trackerMain.php");
+    header("Location: ../../trackerMain.php");
     exit();
 }
 
@@ -47,8 +47,8 @@ $studentStatus = $_SESSION['isVerified'];
         <h1>OJT Student Dashboard</h1>
         <button id="menuToggle">☰</button>
         <nav class="profile-menu" id="profileMenu" hidden>
-            <a id="openProfileBtn">Profile</a>
-            <a id="openAccountSettingsBtn">Account Setting</a>
+            <a id="openProfilePendingBtn">Profile</a>
+            <!-- <a id="openAccountSettingsBtn">Account Setting</a> -->
             <hr style="width: 75%; text-align: left;">
             <a href="../../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
@@ -72,23 +72,23 @@ $studentStatus = $_SESSION['isVerified'];
             <div id="overlay" class="overlay"></div>
 
             <!-- response modal -->
-            <div id="responseModal" class="response-modal" style="display:none;">
-                <div class="modal-content">
+            <div id="responseModal" class="response-modal">
+                <div class="modal-content" id="modal-content-response">
                     <p id="responseMessage"></p>
-                    <button onclick="closeResponseModal()">OK</button>
+                    <button class="response-btn" onclick="closeResponseModal()">OK</button>
                 </div>
             </div>
 
             <!-- profile modal -->
-            <div class="profile-modal" id="profileModal">
+            <div class="profile-modal" id="profilePendingModal">
                 <div class="modal-header">
                     <h3>Profile</h3>
-                    <button id="closeProfileModal" class="modal-close-profile">&times;</button>
+                    <button id="closeProfilePendingModal" class="modal-close-profile">&times;</button>
                 </div>
 
                 <div class="profile-picture-container">
                     <img id="profilePic"
-                        src="../../../uploads/student_uploads/12345/student_id.jpg"
+                        src="../../../uploads/default.jpg"
                         alt="Profile Picture">
                     <div class="change-overlay">Change Profile</div>
                     <input type="file" id="profileInput" accept="image/*" style="display:none;">
@@ -122,77 +122,10 @@ $studentStatus = $_SESSION['isVerified'];
                                                     );  ?>" readonly>
                     </div>
 
-
                 </div>
             </div>
 
-            <!-- Account settings modal -->
-
-            <div class="account-settings-modal" id="account-settings">
-                <div class="modal-header">
-                    <h3>Account Settings</h3>
-                    <button id="closeAccountModal" class="modal-close-profile">&times;</button>
-                </div>
-
-                <div class="form-section-account">
-                    <button class="account-btn" id="openChangePassword">Change Password</button>
-                    <button class="account-btn" id="openForgotPIN">Forgot Password PIN</button>
-                </div>
-
-            </div>
-
-            <!-- change password -->
-            <div class="account-settings-modal" id="change-password-modal">
-                <div class="modal-header">
-                    <h3>Change Password</h3>
-                    <button id="backToAccountSettings1" class="modal-close-profile-sub">&larr; Back</button>
-                </div>
-                <form action="../student_functions/settings.php" method="POST" class="modal-form">
-                    <div class="form-section-account">
-
-                        <input type="hidden" name="email" value="<?php echo htmlspecialchars($studentInfo['email'] ?? ''); ?>">
-
-                        <div class="form-group-edit">
-                            <label>Old Password</label>
-                            <input type="password" id="oldPassword" name="oldPassword" placeholder="Enter old password">
-                        </div>
-
-                        <div class="form-group-edit">
-                            <label>New Password</label>
-                            <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password">
-                        </div>
-
-                        <div class="form-group-edit">
-                            <label>Confirm New Password</label>
-                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
-                        </div>
-
-                        <div class="form-group-edit">
-                            <button type="submit" id="savePassword" class="account-btn" name="changePasswordStudent">Save Password</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <!--  pin -->
-            <div class="account-settings-modal" id="forgot-pin-modal">
-                <div class="modal-header">
-                    <h3>Forgot Password PIN</h3>
-                    <button id="backToAccountSettings2" class="modal-close-profile-sub">&larr; Back</button>
-                </div>
-
-                <div class="form-section-account">
-                    <div class="form-group-edit">
-                        <label>Set 4-digit PIN</label>
-                        <input type="number" id="forgotPin" placeholder="Enter 4-digit PIN">
-                    </div>
-
-                    <div class="form-group-edit">
-                        <button id="savePin" class="account-btn">Save PIN</button>
-                    </div>
-                </div>
-            </div>
-
+            <!-- home -->
             <section class="unverified-student-dashboard" id="unverified-student-dashboard">
                 <section class="page-header">
                     <h2>Welcome! <?php echo htmlspecialchars($studentName); ?>.</h2>
@@ -280,7 +213,7 @@ $studentStatus = $_SESSION['isVerified'];
 
                             <div class="form-group-edit">
                                 <label for="mobile">Mobile Number</label>
-                                <input type="tel" name="mobile" id="mobile" maxlength="11"
+                                <input type="tel" name="mobileNumber" id="mobile" maxlength="11"
                                     value="<?php echo htmlspecialchars($studentInfo['mobileNumber'] ?? 'N/A'); ?>">
                             </div>
 
@@ -427,7 +360,6 @@ $studentStatus = $_SESSION['isVerified'];
 
             </section>
 
-
             <!--student docuemnts -->
             <section class="unverified-student-documents" id="unverified-student-documents">
                 <div class="documents-wrapper">
@@ -518,7 +450,7 @@ $studentStatus = $_SESSION['isVerified'];
 
                                 <?php if (!empty($documents['idUpload'])): ?>
                                     <button class="btn-preview"
-                                        onclick="previewImage('<?php echo '../../../uploads/student_uploads/' . $studentID . '/' . $documents['idUpload']; ?>')">
+                                        onclick="previewImageUnverified('<?php echo '../../../uploads/student_uploads/' . $studentID . '/' . $documents['idUpload']; ?>')">
                                         View ID
                                     </button>
                                 <?php else: ?>
@@ -531,7 +463,7 @@ $studentStatus = $_SESSION['isVerified'];
 
                                 <?php if (!empty($documents['regFormUpload'])): ?>
                                     <button class="btn-preview"
-                                        onclick="previewImage('<?php echo '../../../uploads/student_uploads/' . $studentID . '/' . $documents['regFormUpload']; ?>')">
+                                        onclick="previewImageUnverified('<?php echo '../../../uploads/student_uploads/' . $studentID . '/' . $documents['regFormUpload']; ?>')">
                                         View Form
                                     </button>
                                 <?php else: ?>
@@ -544,9 +476,9 @@ $studentStatus = $_SESSION['isVerified'];
 
                 </div>
 
-                <div id="imagePreviewModal" class="image-modal">
-                    <span id="closeImagePreview">&times;</span>
-                    <img id="previewImg">
+                <div id="imageUnverifiedPreviewModal" class="image-modal">
+                    <span id="closeUnverifiedImagePreview">&times;</span>
+                    <img id="previewUnverifiedImg">
                 </div>
             </section>
 
@@ -561,21 +493,24 @@ $studentStatus = $_SESSION['isVerified'];
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../../js/student/studentDashboard.js"></script>
 
-    <?php if (isset($_SESSION['success'])): ?>
-        <script>
-            showResponseModal("<?php echo $_SESSION['success']; ?>");
-        </script>
-    <?php unset($_SESSION['success']);
-    endif; ?>
+    <?php
+    $messages = [
+        'profile_success',
+        'profile_error',
+        'upload_success',
+        'upload_error',
+        'delete_success',
+        'delete_error'
+    ];
 
-    <?php if (isset($_SESSION['error'])): ?>
-        <script>
-            showResponseModal("<?php echo $_SESSION['error']; ?>");
-        </script>
-    <?php unset($_SESSION['error']);
-    endif; ?>
+    foreach ($messages as $msgKey) {
+        if (isset($_SESSION[$msgKey])) {
+            $message = $_SESSION[$msgKey];
+            echo "<script>showResponseModal(`$message`);</script>";
+            unset($_SESSION[$msgKey]);
+        }
+    }
+    ?>
 </body>
-
-
 
 </html>

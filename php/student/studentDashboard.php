@@ -13,10 +13,21 @@ if ($_SESSION['role'] !== "student") {
     exit();
 }
 
+if ($_SESSION['isVerified'] !== "VERIFIED") {
+    header("Location: ../trackerMain.php");
+    exit();
+}
+
+$studentID = $_SESSION['studentID'];
 $studentName = $_SESSION['name'];
 
-?>
+if ($studentID) {
+    $studentInfo = getStudentInfo($conn, $studentID);
+}
 
+$documents = getStudentDocuments($conn, $studentID);
+
+?>
 
 
 <!DOCTYPE html>
@@ -36,7 +47,8 @@ $studentName = $_SESSION['name'];
         <h1>OJT Student Dashboard</h1>
         <button id="menuToggle">☰</button>
         <nav class="profile-menu" id="profileMenu" hidden>
-            <a href="#">Profile</a>
+            <a id="openProfileBtn">Profile</a>
+            <a id="openAccountSettingsBtn">Account Setting</a>
             <hr style="width: 75%; text-align: left;">
             <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
@@ -46,19 +58,134 @@ $studentName = $_SESSION['name'];
         <aside class="sidebar">
             <ul class="menu">
                 <li class="active">
-                    <button><i class="bi bi-house"></i> Home</button>
+                    <button id="student-dashboard-btn"><i class="bi bi-house"></i> Home Page</button>
                 </li>
                 <li>
-                    <button><i class="bi bi-journal-text"></i> My Tasks</button>
+                    <button id="student-tasks-btn"><i class="bi bi-journal-text"></i> My Tasks</button>
                 </li>
-                <li><button><i class="bi bi-file-earmark-text"></i>Submissions</button></li>
+                <li><button id="student-documents-btn"><i class="bi bi-file-earmark-text"></i>My Documents</button></li>
                 <li><button><i class="bi bi-chat-left-text"></i> Messages</button></li>
             </ul>
         </aside>
 
         <main class="content">
 
-            <section class="student-dashboard">
+            <div id="overlay" class="overlay"></div>
+
+            <!-- profile modal -->
+            <div class="profile-modal" id="profileModal">
+                <div class="modal-header">
+                    <h3>Profile</h3>
+                    <button id="closeProfileModal" class="modal-close-profile">&times;</button>
+                </div>
+
+                <div class="profile-picture-container">
+                    <img id="profilePic"
+                        src="../../../uploads/default.jpg"
+                        alt="Profile Picture">
+                    <div class="change-overlay">Change Profile</div>
+                    <input type="file" id="profileInput" accept="image/*" style="display:none;">
+                </div>
+
+                <div class="form-section-profile">
+
+                    <div class="form-group-edit duos">
+                        <label>Full Name</label>
+                        <input type="text" name="fullName" id="fullName"
+                            value="<?php echo htmlspecialchars($studentName ?? ''); ?>" readonly>
+                    </div>
+
+                    <div class="form-group-edit duos">
+                        <label>Email Address</label>
+                        <input type="text" name="email" id="email"
+                            value="<?php echo htmlspecialchars($studentInfo['email'] ?? ''); ?>" readonly>
+                    </div>
+
+                    <div class="form-group-edit duos">
+                        <label>Course</label>
+                        <input type="text" value="<?php echo htmlspecialchars(
+                                                        ($studentInfo['course'] ?? '') . ' - ' . ($studentInfo['course_name'] ?? '')
+                                                    );  ?>" readonly>
+                    </div>
+
+                    <div class="form-group-edit duos">
+                        <label>Department</label>
+                        <input type="text" value="<?php echo htmlspecialchars(
+                                                        ($studentInfo['course_dpt'] ?? '')
+                                                    );  ?>" readonly>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Account settings modal -->
+            <div class="account-settings-modal" id="account-settings">
+                <div class="modal-header">
+                    <h3>Account Settings</h3>
+                    <button id="closeAccountModal" class="modal-close-profile">&times;</button>
+                </div>
+
+                <div class="form-section-account">
+                    <button class="account-btn" id="openChangePassword">Change Password</button>
+                    <button class="account-btn" id="openForgotPIN">Forgot Password PIN</button>
+                </div>
+
+            </div>
+
+            <!-- change password -->
+            <div class="account-settings-modal" id="change-password-modal">
+                <div class="modal-header">
+                    <h3>Change Password</h3>
+                    <button id="backToAccountSettings1" class="modal-close-profile-sub">&larr; Back</button>
+                </div>
+                <form action="student_functions/settings.php" method="POST" class="modal-form">
+                    <div class="form-section-account">
+
+                        <input type="hidden" name="email" value="<?php echo htmlspecialchars($studentInfo['email'] ?? ''); ?>">
+
+                        <div class="form-group-edit">
+                            <label>Old Password</label>
+                            <input type="password" id="oldPassword" name="oldPassword" placeholder="Enter old password">
+                        </div>
+
+                        <div class="form-group-edit">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password">
+                        </div>
+
+                        <div class="form-group-edit">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
+                        </div>
+
+                        <div class="form-group-edit">
+                            <button type="submit" id="savePassword" class="account-btn" name="changePasswordStudent">Save Password</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!--  pin -->
+            <div class="account-settings-modal" id="forgot-pin-modal">
+                <div class="modal-header">
+                    <h3>Forgot Password PIN</h3>
+                    <button id="backToAccountSettings2" class="modal-close-profile-sub">&larr; Back</button>
+                </div>
+
+                <div class="form-section-account">
+                    <div class="form-group-edit">
+                        <label>Set 4-digit PIN</label>
+                        <input type="number" id="forgotPin" placeholder="Enter 4-digit PIN">
+                    </div>
+
+                    <div class="form-group-edit">
+                        <button id="savePin" class="account-btn">Save PIN</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- dashboard -->
+            <section class="student-dashboard" id="student-dashboard">
                 <section class="page-header">
                     <h2>Welcome, <?php echo htmlspecialchars($studentName); ?>!</h2>
                     <p>Here's your OJT progress and tasks.</p>
@@ -78,18 +205,191 @@ $studentName = $_SESSION['name'];
                         <p>Upload or review submitted reports.</p>
                     </div>
                 </section>
+
+
+                <section class="dashboard-charts">
+                    <section class="wrapper line-chart">
+                        <h2>Line Chart (Users per Role)</h2>
+                        <canvas id="lineChart"></canvas>
+                    </section>
+
+                    <section class="wrapper pie-chart">
+                        <h2>Attendance Evaluation</h2>
+                        <canvas id="pieChart"></canvas>
+                    </section>
+                </section>
             </section>
 
-            <section class="dashboard-charts">
-                <section class="wrapper line-chart">
-                    <h2>Line Chart (Users per Role)</h2>
-                    <canvas id="lineChart"></canvas>
-                </section>
+            <!-- Tasks -->
+            <section class="student-tasks" id="student-tasks">
+                <h2>Your Tasks</h2>
 
-                <section class="wrapper pie-chart">
-                    <h2>Attendance Evaluation</h2>
-                    <canvas id="pieChart"></canvas>
-                </section>
+                <!-- Task list container -->
+                <div class="tasks-container">
+
+                    <!-- Example Task -->
+                    <div class="task-card">
+                        <div class="task-header">
+                            <h3>Complete Safety Training</h3>
+                            <span class="task-status in-progress">In Progress</span>
+                        </div>
+                        <div class="task-progress">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 30%;"></div>
+                            </div>
+                            <span class="progress-text">3/10</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card">
+                        <div class="task-header">
+                            <h3>Submit Weekly Report</h3>
+                            <span class="task-status pending">Pending</span>
+                        </div>
+                        <div class="task-progress">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 0%;"></div>
+                            </div>
+                            <span class="progress-text">0/5</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card">
+                        <div class="task-header">
+                            <h3>Attend Orientation</h3>
+                            <span class="task-status completed">Completed</span>
+                        </div>
+                        <div class="task-progress">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 100%;"></div>
+                            </div>
+                            <span class="progress-text">5/5</span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- student documents -->
+            <section class="student-documents" id="student-documents">
+                <div class="documents-wrapper">
+
+                    <h2>Documents</h2>
+
+                    <div class="info-section">
+                        <h3>Personal Information</h3>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Student ID</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['studentID'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['name'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['email'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Birth Date</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['birthDate'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Mobile Number</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['mobileNumber'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['gender'] ?? ''); ?>" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>Academic Information</h3>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Course</label>
+                                <input type="text" value="<?php echo htmlspecialchars(
+                                                                ($studentInfo['course'] ?? '') . ' - ' . ($studentInfo['course_name'] ?? '')
+                                                            );  ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Year Level</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['yearLevel'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Semester</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['semester'] ?? ''); ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>School Year</label>
+                                <input type="text" value="<?php echo htmlspecialchars($studentInfo['schoolYear'] ?? ''); ?>" readonly>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>Address</h3>
+
+                        <div class="form-group">
+                            <label>Full Address</label>
+                            <input type="text" value="<?php echo htmlspecialchars($studentInfo['address'] ?? ''); ?>" readonly>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>Uploaded Documents</h3>
+
+                        <div class="documents-grid">
+
+                            <div class="doc-card">
+                                <p><strong>Student ID</strong></p>
+
+                                <?php if (!empty($documents['idUpload'])): ?>
+                                    <button class="btn-preview"
+                                        onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $documents['idUpload']; ?>')">
+                                        View ID
+                                    </button>
+                                <?php else: ?>
+                                    <span class="status missing">No file uploaded</span>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="doc-card">
+                                <p><strong>Registration Form</strong></p>
+
+                                <?php if (!empty($documents['regFormUpload'])): ?>
+                                    <button class="btn-preview"
+                                        onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $documents['regFormUpload']; ?>')">
+                                        View Form
+                                    </button>
+                                <?php else: ?>
+                                    <span class="status missing">No file uploaded</span>
+                                <?php endif; ?>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="imagePreviewModal" class="image-modal">
+                    <span id="closeImagePreview">&times;</span>
+                    <img id="previewImg">
+                </div>
             </section>
 
         </main>

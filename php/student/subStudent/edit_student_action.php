@@ -78,9 +78,9 @@ if (!empty($fields)) {
     $stmt->bind_param($types, ...$params);
 
     if ($stmt->execute()) {
-        $_SESSION['success'] = "Profile updated successfully!";
+        $_SESSION['profile_success'] = "Profile updated successfully!";
     } else {
-        $_SESSION['error'] = "Update failed!";
+        $_SESSION['profile_error'] = "Update failed!";
     }
 
     $stmt->close();

@@ -29,12 +29,19 @@ if ($documents) {
 
     $stmt = $conn->prepare("DELETE FROM student_documents WHERE studentID=?");
     $stmt->bind_param("s", $studentID);
-    $stmt->execute();
+
+    if ($stmt->execute()) {
+        $_SESSION['delete_success'] = "Upload Deleted successfully!";
+    } else {
+        $_SESSION['delete_error'] = "Deletion failed!";
+    }
+
+
 
     $verifyStmt = $conn->prepare("UPDATE users SET isVerified='NOT VERIFIED' WHERE studentID=?");
     $verifyStmt->bind_param("s", $studentID);
     $verifyStmt->execute();
-}
 
-echo "success";
+    $_SESSION['isVerified'] = 'NOT VERIFIED';
+}
 // echo 'NOT VERIFIED';
