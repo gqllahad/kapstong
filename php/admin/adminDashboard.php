@@ -57,9 +57,9 @@ if ($_SESSION['role'] !== "ADMIN") {
         <aside class="sidebar">
 
             <ul class="menu">
-                <li><button><i class="bi bi-house"></i> Home</button></li>
+                <li><button id="admin-dashboard-btn"><i class="bi bi-house"></i> Home</button></li>
                 <li><button><i class="bi bi-journal-text"></i> Preparations</button></li>
-                <li><button><i class="bi bi-file-earmark-text"></i>Students</button></li>
+                <li><button id="admin-approval-btn"><i class="bi bi-file-earmark-text"></i>Students</button></li>
             </ul>
 
         </aside>
@@ -69,7 +69,7 @@ if ($_SESSION['role'] !== "ADMIN") {
         <main class="content">
 
 
-            <section class="admin-dashboard">
+            <section class="admin-dashboard" id="admin-dashboard">
                 <section class="cards">
 
                     <div class="card unverified-student">
@@ -138,8 +138,38 @@ if ($_SESSION['role'] !== "ADMIN") {
             </section>
 
             <!-- application approvals -->
-            <section class="admin-approval">
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos aperiam eum earum ipsam voluptatibus a alias officiis quasi facilis optio inventore provident iusto, non quo asperiores laudantium exercitationem laborum animi!</p>
+            <section class="admin-approval" id="admin-approval">
+
+                <h2>Approval Dashboard</h2>
+
+                <div class="approval-grid">
+
+                    <!-- Unverified Students -->
+                    <div class="approval-card unverified-student">
+                        <h3>Unverified Students</h3>
+                        <button class="approve-btn" id="viewAllUnverifiedStudents">View All Unverified Students</button>
+                    </div>
+
+                    <!-- All Students -->
+                    <div class="approval-card student">
+                        <h3>All Students</h3>
+                        <button class="approve-btn" id="viewAllStudents">View All Studens</button>
+                    </div>
+
+                    <!-- All Supervisors -->
+                    <div class="approval-card supervisor">
+                        <h3>All Supervisors</h3>
+                        <button class="approve-btn" id="viewAllSupervisor">View All Supervisors</button>
+                    </div>
+
+                </div>
+
+                <div id="approvalTableContainer" style="margin-top:20px;">
+                    <?php
+
+                    echo renderApprovalTable($conn, 'student', 'NOT VERIFIED');
+                    ?>
+                </div>
 
             </section>
 

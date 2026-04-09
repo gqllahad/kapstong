@@ -101,3 +101,79 @@ function getStudentInfo($conn, $studentID)
     }
     return null;
 }
+
+function renderApprovalTable($conn, $type, $verifiedFilter)
+{
+    $where = "WHERE users.role = '$type'";
+
+    $vf = strtoupper($verifiedFilter);
+    if ($vf === 'NOT VERIFIED') {
+        $where .= " AND users.isVerified != 'VERIFIED'";
+    } elseif ($vf === 'VERIFIED') {
+        $where .= " AND users.isVerified = 'VERIFIED'";
+    }
+
+    $sql = "SELECT 
+        users.userID,
+        users.name,
+        users.email,
+        users.isVerified,
+        students.course,
+        students.yearLevel
+    FROM users users
+    LEFT JOIN ojtstudent AS students
+        ON users.studentID = students.studentID
+    $where
+    ORDER BY users.dateCreated DESC";
+
+    $result = $conn->query($sql);
+
+    $output = '
+    <table class="approval-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Course</th>
+                <th>Year</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+    ';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $status = $row['isVerified'];
+
+            $output .= '
+            <tr>
+                <td>' . $row['userID'] . '</td>
+                <td>' . $row['name'] . '</td>
+                <td>' . $row['email'] . '</td>
+                <td>' . ($row['course'] ?? '-') . '</td>
+                <td>' . ($row['yearLevel'] ?? '-') . '</td>
+                <td>
+                    <span class="status ' . strtolower(str_replace(' ', '-', $status)) . '">' . $status . '</span>
+                </td>
+                <td>';
+
+            if ($status !== 'VERIFIED') {
+                $output .= '<button class="approve-btn" onclick="approveUser(' . $row['userID'] . ')">Approve</button>';
+            } else {
+                $output .= '<span style="color:lime;">✔</span>';
+            }
+
+            $output .= '</td></tr>';
+        }
+    } else {
+        $output .= '<tr><td colspan="7">No records found</td></tr>';
+    }
+
+    $output .= '</tbody></table>';
+
+    return $output;
+}

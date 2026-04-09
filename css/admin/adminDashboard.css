@@ -34,30 +34,30 @@ body{
     --front-text : #111827;
 
     /* cards */
-    --card-unverified-student: #FFF4E5;
-    --card-unverified-student-border: #FFA726;
-    --card-unverified-student-h3: #EF6C00;
-    --card-unverified-student-p: #6D4C41;
-    --card-unverified-student-hover: #FFE0B2;
+    --card-unverified-student: #3E1F00;          
+    --card-unverified-student-border: #FB8C00; 
+    --card-unverified-student-h3: #ffffff;     
+    --card-unverified-student-p: #ffffff;      
+    --card-unverified-student-hover: #5A2A00; 
     
-    --card--student: #E3F2FD;
-    --card--student-border: #42A5F5;
-    --card--student-h3: #1565C0;
-    --card--student-p: #1E88E5;
-    --card--student-hover: #BBDEFB;
+    --card--student: #0D2A4A;
+    --card--student-border: #1565C0;
+    --card--student-h3: #ffffff;
+    --card--student-p: #ffffff;
+    --card--student-hover: #123A63;
     
-     --card--unverified-supervisor: #FBE9E7;
-    --card--unverified-supervisor-border: #FF7043;
-    --card--unverified-supervisor-h3: #D84315;
-    --card--unverified-supervisor-p: #6D4C41;
-    --card--unverified-supervisor-hover: #FFCCBC;
+    --card--unverified-supervisor: #3B0F0A;       
+    --card--unverified-supervisor-border: #E64A19; 
+    --card--unverified-supervisor-h3: #ffffff;     
+    --card--unverified-supervisor-p: #ffffff;     
+    --card--unverified-supervisor-hover: #54140E;
 
-    --card--supervisor: #F3E5F5;
-    --card--supervisor-border: #AB47BC;
-    --card--supervisor-h3: #6A1B9A;
-    --card--supervisor-p: #8E24AA;
-    --card--supervisor-hover: #E1BEE7;
-}
+    --card--supervisor: #2C0A3D;            
+    --card--supervisor-border: #6A1B9A;     
+    --card--supervisor-h3: #f3f3f3;         
+    --card--supervisor-p: #ffffff;          
+    --card--supervisor-hover: #3A0F52; 
+    }
 
 /* NAVBAR */
 
@@ -418,8 +418,82 @@ background:#eee;
     display: block;
 }
 
-.admin-approval{
+.admin-approval {
     display: none;
+    padding: 20px;
+}
+
+.admin-approval h2 {
+    margin-bottom: 20px;
+    color: #000000;
+}
+
+.approval-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    padding: 25px;
+     background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+}
+
+.approval-card {
+    padding: 15px;
+    border-radius: 10px;
+    transition: 0.3s ease;
+}
+
+.student {
+    background: var(--card--student);
+    border: 1px solid var(--card--student-border);
+}
+.student h3 { color: var(--card--student-h3); }
+
+.unverified-student {
+    background: var(--card-unverified-student);
+    border: 1px solid var(--card-unverified-student-border);
+}
+.unverified-student h3 { color: var(--card-unverified-student-h3); }
+
+.supervisor {
+    background: var(--card--supervisor);
+    border: 1px solid var(--card--supervisor-border);
+}
+.supervisor h3 { color: var(--card--supervisor-h3); }
+
+.unverified-supervisor {
+    background: var(--card--unverified-supervisor);
+    border: 1px solid var(--card--unverified-supervisor-border);
+}
+.unverified-supervisor h3 { color: var(--card--unverified-supervisor-h3); }
+
+.approval-card ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.approval-card li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.approve-btn {
+    background: var(--primary);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: white;
+    cursor: pointer;
+}
+
+.approve-btn:hover {
+    background: var(--pri-button);
 }
 
 
@@ -588,6 +662,33 @@ background:#eee;
     font-size: 1rem;
     font-weight: 600;
 }
+
+
+.approval-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.approval-table th, 
+.approval-table td {
+    padding: 10px;
+    text-align: left;
+}
+
+.approval-table th {
+    background: #222;
+    color: #fff;
+}
+
+.approval-table tr:nth-child(even) {
+    background: rgba(255,255,255,0.05);
+}
+
+/* Status Colors */
+.status.verified { color: lime; }
+.status.pending { color: orange; }
+.status.not-verified { color: red; }
 
 
 /* mobile */

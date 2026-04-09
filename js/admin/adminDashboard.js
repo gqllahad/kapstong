@@ -8,6 +8,13 @@ const profileMenu = document.getElementById("profileMenu");
 
 const menuItems = document.querySelectorAll('.menu li');
 
+// layouts
+const adminDashboardBtn = document.getElementById('admin-dashboard-btn');
+const adminApprovalBtn = document.getElementById('admin-approval-btn');
+
+const adminDashboard = document.getElementById('admin-dashboard');
+const adminApproval = document.getElementById('admin-approval');
+
 // colors
 const statusColors = {
     good: "#6c5eec",     
@@ -36,6 +43,7 @@ function getStatusColor(value) {
     if (value >= 20) return statusColors.warning;
     return statusColors.danger;
 }
+
 
 function loadBarChart() {
     fetch("../../php/admin/functions/getChartData.php")
@@ -190,4 +198,23 @@ sideBar.addEventListener('mouseleave', () => {
     mainContent.classList.remove('shifted');
     navBar.classList.remove('shifted');
 });
+
+adminDashboardBtn.addEventListener("click", () => {
+    adminDashboard.style.display = "block";
+
+    adminApproval.style.display = "none";
+});
+
+adminApprovalBtn.addEventListener("click", () => {
+
+    adminApproval.style.display = "block";
+
+    adminDashboard.style.display = "none";
+});
+
+
+
+
+
+
 
