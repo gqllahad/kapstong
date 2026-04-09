@@ -283,10 +283,10 @@ function togglePassword(inputId, icon) {
 
     if (input.type === "password") {
         input.type = "text";
-        icon.textContent = "🙈"; 
+        icon.textContent = "Show"; 
     } else {
         input.type = "password";
-        icon.textContent = "👁";
+        icon.textContent = "Hide";
     }
 };
 

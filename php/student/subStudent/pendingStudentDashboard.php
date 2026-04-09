@@ -86,12 +86,17 @@ $studentStatus = $_SESSION['isVerified'];
                     <button id="closeProfilePendingModal" class="modal-close-profile">&times;</button>
                 </div>
 
-                <div class="profile-picture-container">
-                    <img id="profilePic"
-                        src="../../../uploads/default.jpg"
-                        alt="Profile Picture">
+                <form id="profileUpload" action="../student_functions/profile_upload.php" method="POST" enctype="multipart/form-data">
+                    <input type="file" id="profileInput" name="profilePicture" accept=".jpg, .jpeg, .png" style="display:none;">
+                </form>
+
+                <div class="profile-picture-container" onclick="document.getElementById('profileInput').click();">
+                    <img id="profilePic" src="<?php
+                                                echo isset($documents['profilePicture']) && !empty($documents['profilePicture'])
+                                                    ? '../../../uploads/student_uploads/' . $studentID . '/' . $documents['profilePicture']
+                                                    : '../../../uploads/default.jpg';
+                                                ?>">
                     <div class="change-overlay">Change Profile</div>
-                    <input type="file" id="profileInput" accept="image/*" style="display:none;">
                 </div>
 
                 <div class="form-section-profile">
@@ -169,7 +174,7 @@ $studentStatus = $_SESSION['isVerified'];
                     <div class="unverified-card unverified-documents-card">
                         <h3>Documents</h3>
 
-                        <?php if (!$documents): ?>
+                        <?php if (!$documents || $documents['status'] === 'NOT UPLOADED'): ?>
                             <p>No documents uploaded yet.</p>
                             <button class="btn-upload" id="btn-upload-now">Upload Now</button>
                         <?php else: ?>

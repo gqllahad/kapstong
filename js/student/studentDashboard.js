@@ -24,9 +24,13 @@ const profileVerifiedModal = document.getElementById('profileVerifiedModal');
 const profileUpload = document.getElementById('profileUpload');
 const profilePreview = document.getElementById('profilePreview');
 
+
+
 const profileContainer = document.querySelector('.profile-picture-container');
+// const profileInput = document.getElementById('profileInput');
+// const profilePic = document.getElementById('profilePic');
 const profileInput = document.getElementById('profileInput');
-const profilePic = document.getElementById('profilePic');
+const profileForm = document.getElementById('profileUpload');
 
 const closeModalProfileBtn = document.getElementById('closeProfileModal');
 const closeModalProfilePendingBtn = document.getElementById('closeProfilePendingModal');
@@ -164,6 +168,18 @@ function closeResponseModal() {
     const modal = document.getElementById("responseModal");
     modal.classList.remove("show");
 }
+
+function togglePassword(inputId, icon) {
+    const input = document.getElementById(inputId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.textContent = "Show"; 
+    } else {
+        input.type = "password";
+        icon.textContent = "Hide";
+    }
+};
 
 // Chartss
 function loadPieChart() {
@@ -522,24 +538,76 @@ closeModalProfileBtn.addEventListener('click', () => {
     profileModal.classList.remove('show');
 });
 
-
-
-profileContainer.addEventListener('click', () => {
-    profileInput.click();
-});
+// profileContainer.addEventListener('click', () => {
+//     profileInput.click();
+// });
 }
 
 // not included
-// profileInput.addEventListener('change', (event) => {
+// profileInput.addEventListener('change', function (event) {
 //     const file = event.target.files[0];
+
 //     if (file) {
-//         const reader = new FileReader();
-//         reader.onload = (e) => {
-//             profilePic.src = e.target.result;
+//         // Check file type (MIME)
+//         if (file.type !== "image/jpeg") {
+//             alert("Only JPG images are allowed.");
+//             profileInput.value = ""; // reset input
+//             return;
 //         }
+
+//         const reader = new FileReader();
+
+//         reader.onload = function (e) {
+//             profilePic.src = e.target.result;
+//         };
+
 //         reader.readAsDataURL(file);
 //     }
 // });
+
+// function uploadProfilePic() {
+//     const input = document.getElementById('profileInput');
+//     if (input.files.length === 0) return;
+
+//     const file = input.files[0];
+
+//     // Accept JPG and PNG
+//     if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+//         alert("Only JPG or PNG files are allowed!");
+//         input.value = "";
+//         return;
+//     }
+
+//     const formData = new FormData();
+//     formData.append('profileImage', file);
+
+//     fetch('../php/student/student_functions/profile_upload.php', {
+//         method: 'POST',
+//         body: formData
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             document.getElementById('profilePic').src = data.url + '?' + new Date().getTime();
+//         } else {
+//             alert(data.message);
+//             input.value = ""; // reset input on error
+//         }
+//     })
+//     .catch(err => {
+//         console.error(err);
+//         alert("Upload failed!");
+//         input.value = ""; // reset input on error
+//     });
+// }
+
+if(profileInput){
+profileInput.addEventListener('change', () => {
+    if (profileInput.files.length > 0) {
+        profileForm.submit();
+    }
+});
+}
 
 
 // verified students
@@ -547,9 +615,10 @@ profileContainer.addEventListener('click', () => {
 if(studentDashboardBtn){
     studentDashboardBtn.addEventListener("click", () => {
 
-        studentDashboard.style.display = "block";
-
         studentTasks.style.display = "none";
+        studentDocuments.style.display = "none";
+
+        studentDashboard.style.display = "block";
 
     });
 }
@@ -558,6 +627,7 @@ if(studentTasksBtn){
     studentTasksBtn.addEventListener("click", () => {
 
         studentDashboard.style.display = "none";
+        studentDocuments.style.display = "none";
 
         studentTasks.style.display = "block";
         

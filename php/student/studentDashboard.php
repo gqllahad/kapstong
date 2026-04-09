@@ -79,12 +79,18 @@ $documents = getStudentDocuments($conn, $studentID);
                     <button id="closeProfileModal" class="modal-close-profile">&times;</button>
                 </div>
 
-                <div class="profile-picture-container">
-                    <img id="profilePic"
-                        src="../../../uploads/default.jpg"
-                        alt="Profile Picture">
+
+                <form id="profileUpload" action="./student_functions/profile_upload.php" method="POST" enctype="multipart/form-data">
+                    <input type="file" id="profileInput" name="profilePicture" accept=".jpg, .jpeg, .png" style="display:none;">
+                </form>
+
+                <div class="profile-picture-container" onclick="document.getElementById('profileInput').click();">
+                    <img id="profilePic" src="<?php
+                                                echo isset($documents['profilePicture']) && !empty($documents['profilePicture'])
+                                                    ? '../../uploads/student_uploads/' . $studentID . '/' . $documents['profilePicture']
+                                                    : '../../../uploads/default.jpg';
+                                                ?>">
                     <div class="change-overlay">Change Profile</div>
-                    <input type="file" id="profileInput" accept="image/*" style="display:none;">
                 </div>
 
                 <div class="form-section-profile">
@@ -145,17 +151,26 @@ $documents = getStudentDocuments($conn, $studentID);
 
                         <div class="form-group-edit">
                             <label>Old Password</label>
-                            <input type="password" id="oldPassword" name="oldPassword" placeholder="Enter old password">
+                            <div class="input-wrapper">
+                                <input type="password" id="oldPassword" name="oldPassword" placeholder="Enter old password">
+                                <i class="toggle-pass" onclick="togglePassword('oldPassword', this)">👁</i>
+                            </div>
                         </div>
 
                         <div class="form-group-edit">
                             <label>New Password</label>
-                            <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password">
+                            <div class="input-wrapper">
+                                <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password">
+                                <i class="toggle-pass" onclick="togglePassword('newPassword', this)">👁</i>
+                            </div>
                         </div>
 
                         <div class="form-group-edit">
                             <label>Confirm New Password</label>
-                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
+                            <div class="input-wrapper">
+                                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
+                                <i class="toggle-pass" onclick="togglePassword('confirmPassword', this)">👁</i>
+                            </div>
                         </div>
 
                         <div class="form-group-edit">
@@ -222,51 +237,79 @@ $documents = getStudentDocuments($conn, $studentID);
 
             <!-- Tasks -->
             <section class="student-tasks" id="student-tasks">
-                <h2>Your Tasks</h2>
+                <h2 style="margin-bottom: 10px;">Your Tasks</h2>
 
                 <!-- Task list container -->
                 <div class="tasks-container">
 
-                    <!-- Example Task -->
                     <div class="task-card">
                         <div class="task-header">
-                            <h3>Complete Safety Training</h3>
+                            <h3>Learn Company ERP System</h3>
                             <span class="task-status in-progress">In Progress</span>
                         </div>
                         <div class="task-progress">
                             <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: 30%;"></div>
+                                <div class="progress-bar-fill" style="width: 40%;"></div>
                             </div>
-                            <span class="progress-text">3/10</span>
+                            <span class="progress-text">2/5 Modules</span>
                         </div>
                     </div>
 
+                    <!-- Daily Checklist Card -->
                     <div class="task-card">
                         <div class="task-header">
-                            <h3>Submit Weekly Report</h3>
+                            <h3>Daily Log Submission</h3>
                             <span class="task-status pending">Pending</span>
                         </div>
                         <div class="task-progress">
                             <div class="progress-bar-bg">
                                 <div class="progress-bar-fill" style="width: 0%;"></div>
                             </div>
-                            <span class="progress-text">0/5</span>
+                            <span class="progress-text">0/1 Completed</span>
                         </div>
                     </div>
 
+                    <!-- Upcoming Deadline Card -->
                     <div class="task-card">
                         <div class="task-header">
-                            <h3>Attend Orientation</h3>
+                            <h3>Weekly Report Submission</h3>
+                            <span class="task-status pending">Due Soon</span>
+                        </div>
+                        <div class="task-progress">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 0%;"></div>
+                            </div>
+                            <span class="progress-text">Due in 2 Days</span>
+                        </div>
+                    </div>
+
+                    <!-- Achievement Card -->
+                    <div class="task-card">
+                        <div class="task-header">
+                            <h3>Completed Safety Training</h3>
                             <span class="task-status completed">Completed</span>
                         </div>
                         <div class="task-progress">
                             <div class="progress-bar-bg">
                                 <div class="progress-bar-fill" style="width: 100%;"></div>
                             </div>
-                            <span class="progress-text">5/5</span>
+                            <span class="progress-text">5/5 Tasks</span>
                         </div>
                     </div>
 
+                    <!-- Orientation/Training Resource Card -->
+                    <div class="task-card">
+                        <div class="task-header">
+                            <h3>Orientation Video</h3>
+                            <span class="task-status in-progress">In Progress</span>
+                        </div>
+                        <div class="task-progress">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 60%;"></div>
+                            </div>
+                            <span class="progress-text">3/5 Sections</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 

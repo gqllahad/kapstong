@@ -60,7 +60,7 @@ function isEmailTaken($conn, $studentEmail)
 
 function getStudentDocuments($conn, $studentID)
 {
-    $stmt = $conn->prepare("SELECT idUpload, regFormUpload, status FROM student_documents WHERE studentID = ?");
+    $stmt = $conn->prepare("SELECT idUpload, regFormUpload, status, profilePicture FROM student_documents WHERE studentID = ?");
     $stmt->bind_param("s", $studentID);
     $stmt->execute();
     $result = $stmt->get_result();

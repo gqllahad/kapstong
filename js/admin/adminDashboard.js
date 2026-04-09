@@ -37,37 +37,67 @@ function getStatusColor(value) {
     return statusColors.danger;
 }
 
-function loadChart() {
+function loadBarChart() {
     fetch("../../php/admin/functions/getChartData.php")
         .then(res => res.json())
         .then(data => {
-            
-            // color
-            const colors = data.values.map(value => getStatusColor(value));
 
-            // bar chart
-            const barChartData = [{
-                x: data.labels,
-                y: data.values,
-                type: "bar",
-                marker: {
-                    color: colors
-                },
-                text: data.values,
-                textposition: "inside"
-            }];
+            const ctx = document.getElementById('barChart');
 
-            const barLayout = {
-                title: "Users per Role",
-                yaxis : {
-                    dtick : 1
+            //colors
+            const pieColors = data.labels.map(label => {
+                if (label === "ADMIN") {
+                    return "#5c77f0";
+                } else if (label === "student") {
+                    return "#4e69e0";
                 }
-                
-            };
+                return "#6c757d";
+            });
 
-            Plotly.newPlot("myPlot", barChartData, barLayout);
+            if (window.barChartInstance) {
+                window.barChartInstance.destroy();
+            }
+
+            window.barChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Users',
+                        data: data.values,
+                        borderColor: '#5c77f0',
+                        backgroundColor: 'rgba(92, 119, 240, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointHoverRadius: 6,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    tooltip: {
+                        enabled: true
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
         })
-        .catch(err => console.error(err));
+        .catch(err => console.error("Line chart error:", err));
 }
 
 // pie chart
@@ -122,7 +152,7 @@ function loadPieChart() {
 // setInterval(loadChart, 5000);
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadChart();   
+    loadBarChart();   
     loadPieChart();   
 });
 

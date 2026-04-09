@@ -27,7 +27,7 @@ if ($documents) {
         unlink($regPath);
     }
 
-    $stmt = $conn->prepare("DELETE FROM student_documents WHERE studentID=?");
+    $stmt = $conn->prepare("UPDATE student_documents SET idUpload = NULL, regFormUpload = NULL, status = 'NOT UPLOADED' WHERE studentID=?");
     $stmt->bind_param("s", $studentID);
 
     if ($stmt->execute()) {
@@ -35,8 +35,6 @@ if ($documents) {
     } else {
         $_SESSION['delete_error'] = "Deletion failed!";
     }
-
-
 
     $verifyStmt = $conn->prepare("UPDATE users SET isVerified='NOT VERIFIED' WHERE studentID=?");
     $verifyStmt->bind_param("s", $studentID);

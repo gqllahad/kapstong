@@ -63,3 +63,33 @@ if (isset($_POST['changePasswordStudent'])) {
     header("Location: $redirect");
     exit;
 };
+
+
+// profile picture change
+if (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] === 0) {
+    $file = $_FILES['profileImage'];
+    $fileType = mime_content_type($file['tmp_name']);
+
+    if ($fileType !== 'image/jpeg') {
+        header("Location: ../studentDashboard.php?error=Profile+must+be+jpg+or+jpeg!");
+        exit();
+    }
+
+    // Optional: file size limit
+    if ($file['size'] > 2 * 1024 * 1024) {
+        header("Location: ../studentDashboard.php?error=File+is+too+large.+Max+2MB.");
+        exit();
+    }
+
+    $newName = uniqid('profile_') . '.jpg';
+    $uploadDir = __DIR__ . '/uploads/';
+    $destination = $uploadDir . $newName;
+
+    if (move_uploaded_file($file['tmp_name'], $destination)) {
+        // Save $newName or full path in your DB for this student
+        // Example: $db->query("UPDATE students SET profile_pic='$newName' WHERE id='$studentId'");
+        echo "Upload successful!";
+    } else {
+        echo "Upload failed. Try again.";
+    }
+}

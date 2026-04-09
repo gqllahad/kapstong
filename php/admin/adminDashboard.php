@@ -68,70 +68,78 @@ if ($_SESSION['role'] !== "ADMIN") {
         <!-- MAIN -->
         <main class="content">
 
-            <section class="cards">
 
-                <div class="card unverified-student">
-                    <h3>UNVERIFIED STUDENTS</h3>
-                    <p>Students awaiting account verification.</p>
-                </div>
+            <section class="admin-dashboard">
+                <section class="cards">
 
-                <div class="card student">
-                    <h3>STUDENTS</h3>
-                    <p>Total number of verified and active students.</p>
-                </div>
+                    <div class="card unverified-student">
+                        <h3>UNVERIFIED STUDENTS</h3>
+                        <p>Students awaiting account verification.</p>
+                    </div>
 
-                <div class="card unverified-supervisor">
-                    <h3>UNVERIFIED SUPERVISORS</h3>
-                    <p>Supervisors pending approval and verification.</p>
-                </div>
+                    <div class="card student">
+                        <h3>STUDENTS</h3>
+                        <p>Total number of verified and active students.</p>
+                    </div>
 
-                <div class="card supervisor">
-                    <h3>SUPERVISORS</h3>
-                    <p>Total number of verified supervisors.</p>
-                </div>
+                    <div class="card unverified-supervisor">
+                        <h3>UNVERIFIED SUPERVISORS</h3>
+                        <p>Supervisors pending approval and verification.</p>
+                    </div>
 
+                    <div class="card supervisor">
+                        <h3>SUPERVISORS</h3>
+                        <p>Total number of verified supervisors.</p>
+                    </div>
+
+                </section>
+
+                <!-- dashboard -->
+                <section class="dashboard-layout">
+                    <section class="wrapper bar-chart">
+                        <h2>bar Chart (Users per Role)</h2>
+                        <canvas id="barChart"></canvas>
+                    </section>
+
+                    <section class="recent-logs-container">
+                        <p>Recent Logs</p>
+                        <div class="task-item">
+                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Tenetur excepturi iure velit laboriosam natus asperiores reiciendis ipsa? Temporibus aspernatur ducimus nihil in hic, sed fugit obcaecati ad nostrum, minima repellat.
+                        </div>
+                    </section>
+
+                    <section class="pie-charts full">
+                        <section class="wrapper-pie pie-chart-plain">
+                            <h2>Pie Chart (Users per Role)</h2>
+                            <canvas id="pieChart2"></canvas>
+                        </section>
+
+                        <section class="process-task">
+                            <h2>Process Tasks</h2>
+                            <div class="task-item">
+                                <p>Takss</p>
+                                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Illo voluptatem temporibus earum saepe voluptatibus. Perspiciatis tempore excepturi numquam nostrum id rerum culpa soluta a ducimus in nam cum, voluptates quae.</p>
+                            </div>
+                            <div class="task-item">
+                                <p>Takss</p>
+                                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Illo voluptatem temporibus earum saepe voluptatibus. Perspiciatis tempore excepturi numquam nostrum id rerum culpa soluta a ducimus in nam cum, voluptates quae.</p>
+                            </div>
+                        </section>
+                    </section>
+
+                    <section class="deadline-container">
+                        <p>attendance</p>
+                        <div class="task-item">
+                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum, tempore. Inventore dignissimos, a sed iusto odit officiis nihil aliquam, in molestiae reiciendis quae ducimus numquam expedita rem necessitatibus magni commodi?</p>
+                        </div>
+                    </section>
+
+                </section>
             </section>
 
-            <!-- dashboard -->
-            <section class="dashboard-layout">
-                <section class="wrapper bar-chart full">
-                    <h2>Bar graph</h2>
-                    <div id="myPlot">
-                    </div>
-                </section>
-
-                <section class="recent-logs-container">
-                    <p>Recent Logs</p>
-                    <div class="task-item">
-                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Tenetur excepturi iure velit laboriosam natus asperiores reiciendis ipsa? Temporibus aspernatur ducimus nihil in hic, sed fugit obcaecati ad nostrum, minima repellat.
-                    </div>
-                </section>
-
-                <section class="pie-charts full">
-                    <section class="wrapper-pie pie-chart-plain">
-                        <h2>Pie Chart (Users per Role)</h2>
-                        <canvas id="pieChart2"></canvas>
-                    </section>
-
-                    <section class="process-task">
-                        <h2>Process Tasks</h2>
-                        <div class="task-item">
-                            <p>Takss</p>
-                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Illo voluptatem temporibus earum saepe voluptatibus. Perspiciatis tempore excepturi numquam nostrum id rerum culpa soluta a ducimus in nam cum, voluptates quae.</p>
-                        </div>
-                        <div class="task-item">
-                            <p>Takss</p>
-                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Illo voluptatem temporibus earum saepe voluptatibus. Perspiciatis tempore excepturi numquam nostrum id rerum culpa soluta a ducimus in nam cum, voluptates quae.</p>
-                        </div>
-                    </section>
-                </section>
-
-                <section class="deadline-container">
-                    <p>attendance</p>
-                    <div class="task-item">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum, tempore. Inventore dignissimos, a sed iusto odit officiis nihil aliquam, in molestiae reiciendis quae ducimus numquam expedita rem necessitatibus magni commodi?</p>
-                    </div>
-                </section>
+            <!-- application approvals -->
+            <section class="admin-approval">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos aperiam eum earum ipsam voluptatibus a alias officiis quasi facilis optio inventore provident iusto, non quo asperiores laudantium exercitationem laborum animi!</p>
 
             </section>
 
