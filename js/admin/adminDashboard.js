@@ -49,14 +49,156 @@ const allStudentClose = document.getElementById("closeAllStudentModal");
 const allStudentBody = document.getElementById("allStudentBody");
 
 const studentApplicationView = document.getElementById("student-application-view");
-const studentApplicationViewBtn = document.getElementById("student-application-view-btn");
-const studentApplicationClose = document.getElementById("closeStudentViewModal");
+// const studentApplicationViewBtn = document.getElementById("student-application-view-btn");
+// const studentApplicationClose = document.getElementById("closeStudentViewModal");
 let previousModal = null;
 
-// const modal = document.getElementById("imagePreviewModal");
-// const img = document.getElementById("previewImg");
+const studentApplicationApprove = document.getElementById("student-application-approve");
+const studentApplicationApproveBtn = document.getElementById("student-application-approve-btn");
+const studentApplicationApproveClose = document.getElementById("closeStudentApproveModal");
+
+const superCreate = document.getElementById("supervisor-container");
+const superCreateBtn = document.getElementById("supervisor-btn");
+const superCloseBtn = document.getElementById("closeCreateSupervisorModal");
 
 // Functions 
+
+function viewUser(studentID, source) {
+
+    previousModal = source;
+
+    if (source === "allStudent") {
+        allStudent.classList.remove("show");
+    }
+    
+    overlay.classList.add("show");
+    studentApplicationView.classList.add("show");
+
+        studentApplicationView.innerHTML = '';
+
+    
+    fetch("functions/getStudentData.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "studentID=" + encodeURIComponent(studentID)
+    })
+    .then(res => res.text())
+    .then(data => {
+        studentApplicationView.innerHTML = data;
+    });
+};
+
+function approveUser(studentID) {
+    
+    overlay.classList.add("show");
+    studentApplicationApprove.classList.add("show");
+
+    studentApplicationApprove.innerHTML = '';
+    
+    fetch("functions/getStudentApproveData.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "studentID=" + encodeURIComponent(studentID)
+    })
+    .then(res => res.text())
+    .then(data => {
+        studentApplicationApprove.innerHTML = data;
+
+        const checkbox = document.getElementById("confirmApprove");
+        const btn = document.getElementById("approveBtn");
+
+        if (checkbox && btn) {
+            checkbox.addEventListener("change", () => {
+                btn.disabled = !checkbox.checked;
+            });
+        }
+    });
+};
+
+function approveStudent(studentID) {
+    if (!confirm("Are you sure you want to approve this student?")) return;
+
+    fetch("functions/approveStudent.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "studentID=" + encodeURIComponent(studentID)
+    })
+    .then(res => res.text())
+    .then(response => {
+        alert("Student approved successfully!");
+
+        closeApproveModal();
+        location.reload();
+    })
+    .catch(err => console.error(err));
+}
+
+function closeApproveModal() {
+
+    studentApplicationApprove.classList.remove("show");
+    overlay.classList.remove("show");
+    
+}
+
+
+function closeModal() {
+
+   studentApplicationView.classList.remove("show");
+
+    if (previousModal === "allStudent") {
+        allStudent.classList.add("show");
+        overlay.classList.add("show");
+    } else {
+        overlay.classList.remove("show");
+    }
+
+    previousModal = null;
+}
+
+function initSupervisorForm() {
+    const checkbox = document.getElementById("confirmCreateSupervisor");
+    const btn = document.getElementById("createSupervisorBtn");
+
+    if (!checkbox || !btn) return;
+
+    checkbox.addEventListener("change", () => {
+        btn.disabled = !checkbox.checked;
+    });
+}
+
+function previewImage(src) {
+    document.getElementById("previewImg").src = src;
+    document.getElementById("imagePreviewModal").style.display = "flex";
+}
+
+document.addEventListener("click", function (e) {
+
+    if (e.target.id === "closeImagePreview") {
+        document.getElementById("imagePreviewModal").style.display = "none";
+        document.getElementById("previewImg").src = "";
+    }
+
+    if (e.target.id === "imagePreviewModal") {
+        document.getElementById("imagePreviewModal").style.display = "none";
+        document.getElementById("previewImg").src = "";
+    }
+});
+
+function toggleSection(header) {
+    const card = header.parentElement;
+
+    document.querySelectorAll(".info-card").forEach(c => {
+        if (c !== card) c.classList.remove("active");
+    });
+
+    card.classList.toggle("active");
+}
 
 function getStatusColor(value) {
     if (value >= 1) return statusColors.good;
@@ -278,6 +420,8 @@ overlay.addEventListener('click', () => {
 
     allStudent.classList.remove("show");
     studentApplicationView.classList.remove("show");
+    studentApplicationApprove.classList.remove("show");
+    superCreate.classList.remove("show");
 });
 
 allStudentBtn.addEventListener("click", () => {
@@ -326,71 +470,38 @@ document.getElementById("allStudentSearch").addEventListener("keyup", function (
     }, 300);
 });
 
-studentApplicationClose.addEventListener("click", () => {
-    overlay.classList.remove("show");
-    studentApplicationView.classList.remove("show");
+// bugg
+// studentApplicationClose.addEventListener("click", () => {
+//     overlay.classList.remove("show");
+//     studentApplicationView.classList.remove("show");
+// });
+
+
+// studentApplicationApproveBtn.addEventListener("click", () => {
+//     overlay.classList.add("show");
+
+//     studentApplicationApprove.classList.add("show");
+// });
+
+
+
+
+// supervisor create
+superCreateBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+    superCreate.classList.add("show");
+
+    initSupervisorForm();
 });
 
-function viewUser(studentID, source) {
+superCloseBtn.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    superCreate.classList.remove("show");
+});
 
-    previousModal = source;
+ 
 
-    if (source === "allStudent") {
-        allStudent.classList.remove("show");
-    }
-    
-    overlay.classList.add("show");
-    studentApplicationView.classList.add("show");
 
-        studentApplicationView.innerHTML = '';
-
-    
-    fetch("functions/getStudentData.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "studentID=" + encodeURIComponent(studentID)
-    })
-    .then(res => res.text())
-    .then(data => {
-        studentApplicationView.innerHTML = data;
-    });
-};
-
-function closeModal() {
-
-   studentApplicationView.classList.remove("show");
-
-    if (previousModal === "allStudent") {
-        allStudent.classList.add("show");
-        overlay.classList.add("show");
-    } else {
-        overlay.classList.remove("show");
-    }
-
-    previousModal = null;
-}
-
-function previewImage(src) {
-    document.getElementById("previewImg").src = src;
-    document.getElementById("imagePreviewModal").style.display = "flex";
-}
-
-document.addEventListener("click", function (e) {
-
-    // CLOSE IMAGE MODAL
-    if (e.target.id === "closeImagePreview") {
-        document.getElementById("imagePreviewModal").style.display = "none";
-        document.getElementById("previewImg").src = "";
-    }
-
-    // OPTIONAL: click outside image closes modal
-    if (e.target.id === "imagePreviewModal") {
-        document.getElementById("imagePreviewModal").style.display = "none";
-        document.getElementById("previewImg").src = "";
-    }
-})
 
 
 

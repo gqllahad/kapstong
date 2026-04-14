@@ -158,7 +158,7 @@ function renderApprovalTable($conn, $type, $verifiedFilter, $search)
             if ($status !== 'VERIFIED') {
                 $output .= '
                              <button class="view-btn" onclick="viewUser(\'' . $row['studentID'] . '\', \'main\')">View</button>
-                            <button class="approve-btn" onclick="approveUser(' . $row['studentID'] . ')">Approve</button>
+                            <button class="approve-btn" onclick="approveUser(\'' . $row['studentID'] . '\')">Approve</button>
                             <button class="reject-btn" onclick="rejectUser(' . $row['studentID'] . ')">Reject</button>';
             } else {
                 $output .= '<span style="color:lime;">✔</span>';

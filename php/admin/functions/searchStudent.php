@@ -54,7 +54,7 @@ function renderApprovalTable($conn, $type, $search = '')
 
                 <td>
                     <button class="view-btn" onclick="viewUser(' . $row['studentID'] . ')">View</button>
-                    <button class="approve-btn" onclick="approveUser(' . $row['studentID'] . ')">Approve</button>
+                    <button class="approve-btn" onclick="approveUser(\'' . $row['studentID'] . '\')">Approve</button>
                     <button class="reject-btn" onclick="rejectUser(' . $row['studentID'] . ')">Reject</button>
                 </td>
             </tr>';

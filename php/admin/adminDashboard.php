@@ -112,7 +112,80 @@ if ($_SESSION['role'] !== "ADMIN") {
             <div class="student-application-view" id="student-application-view">
             </div>
 
+            <!-- approve application modal -->
+            <div class="student-application-approve" id="student-application-approve">
+            </div>
 
+            <!-- create supervisor modal -->
+            <div class="supervisor-container" id="supervisor-container">
+                <div class="modal-header">
+                    <h3>➕ Create Supervisor</h3>
+                    <button id="closeCreateSupervisorModal" class="modal-close">&times;</button>
+                </div>
+
+                <!-- BODY -->
+                <div class="supervisor-body">
+
+                    <p class="modal-subtitle">
+                        Add a new supervisor account. Fill in the details below.
+                    </p>
+
+                    <form id="createSupervisorForm">
+
+                        <!-- NAME -->
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            <input type="text" name="name" placeholder="Enter full name" required>
+                        </div>
+
+                        <!-- EMAIL -->
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" name="email" placeholder="Enter email address" required>
+                        </div>
+
+                        <!-- PHONE -->
+                        <div class="input-group">
+                            <label>Mobile Number</label>
+                            <input type="text" name="mobile" placeholder="09XXXXXXXXX" required>
+                        </div>
+
+                        <!-- DEPARTMENT -->
+                        <div class="input-group">
+                            <label>Department</label>
+                            <select name="department" required>
+                                <option value="">Select Department</option>
+                                <option value="IT">Information Technology</option>
+                                <option value="CS">Computer Science</option>
+                                <option value="BUSINESS">Business</option>
+                                <option value="ENGINEERING">Engineering</option>
+                            </select>
+                        </div>
+
+                        <!-- PASSWORD -->
+                        <div class="input-group">
+                            <label>Temporary Password</label>
+                            <input type="password" name="password" placeholder="Create temporary password" required>
+                        </div>
+
+                        <!-- CHECKBOX -->
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="confirmCreateSupervisor">
+                            <label for="confirmCreateSupervisor">
+                                I confirm that this supervisor will be added to the system.
+                            </label>
+                        </div>
+
+                        <!-- BUTTON -->
+                        <button type="submit" id="createSupervisorBtn" disabled class="primary-btn">
+                            Create Supervisor
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- dashboard -->
             <section class="admin-dashboard" id="admin-dashboard">
                 <section class="cards">
 
@@ -184,8 +257,6 @@ if ($_SESSION['role'] !== "ADMIN") {
             <!-- application approvals -->
             <section class="admin-approval" id="admin-approval">
 
-                <h2>Approval Dashboard</h2>
-
                 <div class="approval-grid">
 
                     <!-- Unverified Students -->
@@ -211,11 +282,20 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <div id="approvalTableContainer" style="margin-top:20px;">
                     <h3 class="table-title">Pending Application</h3>
 
-                    <div class="search-container">
-                        <form method="GET" action="" autocomplete="off">
-                            <input type="text" id="approvalSearch"
-                                placeholder="Search by ID, Name, OR Email">
-                        </form>
+                    <div class="top-bar">
+                        <div class="search-container">
+                            <form method="GET" action="" autocomplete="off">
+                                <input type="text" id="approvalSearch"
+                                    placeholder="Search by ID, Name, OR Email">
+                            </form>
+                        </div>
+
+                        <div class="create-supervisor-btn">
+                            <button class="supervisor-btn" id="supervisor-btn">
+                                <span class="icon">+</span>
+                                <span class="text">Create Supervisor</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="table-container">
