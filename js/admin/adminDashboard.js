@@ -36,6 +36,26 @@ const layout = {
     title: "World Wide Wine Production"
 };
 
+// search tables
+let searchTimer;
+const tableBody = document.getElementById("approvalTableBody");
+
+// modals
+const overlay = document.getElementById("overlay");
+
+const allStudent = document.getElementById("all-student-modal");
+const allStudentBtn = document.getElementById("viewAllStudentsBtn");
+const allStudentClose = document.getElementById("closeAllStudentModal");
+const allStudentBody = document.getElementById("allStudentBody");
+
+const studentApplicationView = document.getElementById("student-application-view");
+const studentApplicationViewBtn = document.getElementById("student-application-view-btn");
+const studentApplicationClose = document.getElementById("closeStudentViewModal");
+let previousModal = null;
+
+// const modal = document.getElementById("imagePreviewModal");
+// const img = document.getElementById("previewImg");
+
 // Functions 
 
 function getStatusColor(value) {
@@ -211,6 +231,166 @@ adminApprovalBtn.addEventListener("click", () => {
 
     adminDashboard.style.display = "none";
 });
+
+document.querySelector(".search-container form")
+.addEventListener("submit", function (e) {
+    e.preventDefault();
+});
+
+document.getElementById("approvalSearch").addEventListener("keyup", function () {
+    clearTimeout(searchTimer);
+
+    let value = this.value;
+
+    searchTimer = setTimeout(() => {
+
+        tableBody.classList.add("fade-out");
+
+        fetch("functions/searchStudent.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "search=" + encodeURIComponent(value)
+        })
+        .then(res => res.text())
+        .then(data => {
+            setTimeout(() => {
+                tableBody.innerHTML = data;
+
+                tableBody.classList.remove("fade-out");
+                tableBody.classList.add("fade-in");
+
+                setTimeout(() => {
+                    tableBody.classList.remove("fade-in");
+                }, 200);
+
+            }, 200);
+        });
+
+    }, 300);
+});
+
+
+// modals
+overlay.addEventListener('click', () => {
+    overlay.classList.remove('show');
+
+    allStudent.classList.remove("show");
+    studentApplicationView.classList.remove("show");
+});
+
+allStudentBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+
+    allStudent.classList.add("show");
+});
+
+allStudentClose.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    allStudent.classList.remove("show");
+
+});
+
+document.getElementById("allStudentSearch").addEventListener("keyup", function () {
+    clearTimeout(searchTimer);
+
+    let value = this.value;
+
+    searchTimer = setTimeout(() => {
+
+        allStudentBody.classList.add("fade-out");
+
+        fetch("functions/searchAllStudent.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "search=" + encodeURIComponent(value)
+        })
+        .then(res => res.text())
+        .then(data => {
+            setTimeout(() => {
+                allStudentBody.innerHTML = data;
+
+                allStudentBody.classList.remove("fade-out");
+                allStudentBody.classList.add("fade-in");
+
+                setTimeout(() => {
+                    allStudentBody.classList.remove("fade-in");
+                }, 200);
+
+            }, 200);
+        });
+
+    }, 300);
+});
+
+studentApplicationClose.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    studentApplicationView.classList.remove("show");
+});
+
+function viewUser(studentID, source) {
+
+    previousModal = source;
+
+    if (source === "allStudent") {
+        allStudent.classList.remove("show");
+    }
+    
+    overlay.classList.add("show");
+    studentApplicationView.classList.add("show");
+
+        studentApplicationView.innerHTML = '';
+
+    
+    fetch("functions/getStudentData.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "studentID=" + encodeURIComponent(studentID)
+    })
+    .then(res => res.text())
+    .then(data => {
+        studentApplicationView.innerHTML = data;
+    });
+};
+
+function closeModal() {
+
+   studentApplicationView.classList.remove("show");
+
+    if (previousModal === "allStudent") {
+        allStudent.classList.add("show");
+        overlay.classList.add("show");
+    } else {
+        overlay.classList.remove("show");
+    }
+
+    previousModal = null;
+}
+
+function previewImage(src) {
+    document.getElementById("previewImg").src = src;
+    document.getElementById("imagePreviewModal").style.display = "flex";
+}
+
+document.addEventListener("click", function (e) {
+
+    // CLOSE IMAGE MODAL
+    if (e.target.id === "closeImagePreview") {
+        document.getElementById("imagePreviewModal").style.display = "none";
+        document.getElementById("previewImg").src = "";
+    }
+
+    // OPTIONAL: click outside image closes modal
+    if (e.target.id === "imagePreviewModal") {
+        document.getElementById("imagePreviewModal").style.display = "none";
+        document.getElementById("previewImg").src = "";
+    }
+})
 
 
 

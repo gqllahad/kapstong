@@ -67,6 +67,50 @@ if ($_SESSION['role'] !== "ADMIN") {
 
         <!-- MAIN -->
         <main class="content">
+            <div id="overlay" class="overlay"></div>
+
+            <!-- student accounts -->
+            <div class="all-student-modal" id="all-student-modal">
+                <div class="modal-header">
+                    <h3>Students</h3>
+                    <button id="closeAllStudentModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="search-container">
+                    <form method="GET" action="" autocomplete="off">
+                        <input type="text" id="allStudentSearch"
+                            placeholder="Search by ID, Name, OR Email">
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Course</th>
+                                <th>Year</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="allStudentBody">
+                            <?php
+                            $search = $_GET['approval_search'] ?? '';
+                            echo renderStudentTable($conn, 'student', 'VERIFIED', $search);
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- student application modal -->
+            <div class="student-application-view" id="student-application-view">
+            </div>
 
 
             <section class="admin-dashboard" id="admin-dashboard">
@@ -147,28 +191,61 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <!-- Unverified Students -->
                     <div class="approval-card unverified-student">
                         <h3>Unverified Students</h3>
-                        <button class="approve-btn" id="viewAllUnverifiedStudents">View All Unverified Students</button>
+                        <button class="view-btn" id="viewAllUnverifiedStudentsBtn">View All Unverified Students</button>
                     </div>
 
                     <!-- All Students -->
                     <div class="approval-card student">
                         <h3>All Students</h3>
-                        <button class="approve-btn" id="viewAllStudents">View All Studens</button>
+                        <button class="view-btn" id="viewAllStudentsBtn">View All Students</button>
                     </div>
 
                     <!-- All Supervisors -->
                     <div class="approval-card supervisor">
                         <h3>All Supervisors</h3>
-                        <button class="approve-btn" id="viewAllSupervisor">View All Supervisors</button>
+                        <button class="view-btn" id="viewAllSupervisorBtn">View All Supervisors</button>
                     </div>
 
                 </div>
 
                 <div id="approvalTableContainer" style="margin-top:20px;">
-                    <?php
+                    <h3 class="table-title">Pending Application</h3>
 
-                    echo renderApprovalTable($conn, 'student', 'NOT VERIFIED');
-                    ?>
+                    <div class="search-container">
+                        <form method="GET" action="" autocomplete="off">
+                            <input type="text" id="approvalSearch"
+                                placeholder="Search by ID, Name, OR Email">
+                        </form>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Course</th>
+                                    <th>Year</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="approvalTableBody">
+                                <?php
+                                $search = $_GET['approval_search'] ?? '';
+                                echo renderApprovalTable($conn, 'student', 'NOT VERIFIED', $search);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- image preview -->
+                <div id="imagePreviewModal" class="image-modal">
+                    <span id="closeImagePreview">&times;</span>
+                    <img id="previewImg">
                 </div>
 
             </section>

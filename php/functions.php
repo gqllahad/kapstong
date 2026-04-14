@@ -102,9 +102,17 @@ function getStudentInfo($conn, $studentID)
     return null;
 }
 
-function renderApprovalTable($conn, $type, $verifiedFilter)
+function renderApprovalTable($conn, $type, $verifiedFilter, $search)
 {
     $where = "WHERE users.role = '$type'";
+
+    if (!empty($search)) {
+        $where .= " AND (
+        users.userID LIKE '%$search%' OR
+        users.name LIKE '%$search%' OR
+        users.email LIKE '%$search%'
+    )";
+    }
 
     $vf = strtoupper($verifiedFilter);
     if ($vf === 'NOT VERIFIED') {
@@ -114,7 +122,7 @@ function renderApprovalTable($conn, $type, $verifiedFilter)
     }
 
     $sql = "SELECT 
-        users.userID,
+        users.studentID,
         users.name,
         users.email,
         users.isVerified,
@@ -128,21 +136,7 @@ function renderApprovalTable($conn, $type, $verifiedFilter)
 
     $result = $conn->query($sql);
 
-    $output = '
-    <table class="approval-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Course</th>
-                <th>Year</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-    ';
+    $output = '';
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -151,7 +145,7 @@ function renderApprovalTable($conn, $type, $verifiedFilter)
 
             $output .= '
             <tr>
-                <td>' . $row['userID'] . '</td>
+                <td>' . $row['studentID'] . '</td>
                 <td>' . $row['name'] . '</td>
                 <td>' . $row['email'] . '</td>
                 <td>' . ($row['course'] ?? '-') . '</td>
@@ -162,12 +156,80 @@ function renderApprovalTable($conn, $type, $verifiedFilter)
                 <td>';
 
             if ($status !== 'VERIFIED') {
-                $output .= '<button class="approve-btn" onclick="approveUser(' . $row['userID'] . ')">Approve</button>';
+                $output .= '
+                             <button class="view-btn" onclick="viewUser(\'' . $row['studentID'] . '\', \'main\')">View</button>
+                            <button class="approve-btn" onclick="approveUser(' . $row['studentID'] . ')">Approve</button>
+                            <button class="reject-btn" onclick="rejectUser(' . $row['studentID'] . ')">Reject</button>';
             } else {
                 $output .= '<span style="color:lime;">✔</span>';
             }
+        }
+    } else {
+        $output .= '<tr><td colspan="7">No records found</td></tr>';
+    }
 
-            $output .= '</td></tr>';
+    $output .= '</tbody></table>';
+
+    return $output;
+}
+
+function renderStudentTable($conn, $type, $verifiedFilter, $search)
+{
+    $where = "WHERE users.role = '$type'";
+
+    if (!empty($search)) {
+        $where .= " AND (
+        users.userID LIKE '%$search%' OR
+        users.name LIKE '%$search%' OR
+        users.email LIKE '%$search%'
+    )";
+    }
+
+    $vf = strtoupper($verifiedFilter);
+    if ($vf === 'VERIFIED') {
+        $where .= " AND users.isVerified = 'VERIFIED'";
+    }
+
+    $sql = "SELECT 
+        users.studentID,
+        users.name,
+        users.email,
+        users.isVerified,
+        students.course,
+        students.yearLevel
+    FROM users users
+    LEFT JOIN ojtstudent AS students
+        ON users.studentID = students.studentID
+    $where
+    ORDER BY users.dateCreated DESC";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $status = $row['isVerified'];
+
+            $output .= '
+            <tr>
+                <td>' . $row['studentID'] . '</td>
+                <td>' . $row['name'] . '</td>
+                <td>' . $row['email'] . '</td>
+                <td>' . ($row['course'] ?? '-') . '</td>
+                <td>' . ($row['yearLevel'] ?? '-') . '</td>
+                <td>
+                    <span class="status ' . strtolower(str_replace(' ', '-', $status)) . '">' . $status . '</span>
+                </td>
+                <td>';
+
+            if ($status === 'VERIFIED') {
+                $output .= '
+                             <button class="view-btn" onclick="viewUser(' . $row['studentID'] . ', \'allStudent\')">View</button>';
+            } else {
+                $output .= '<span style="color:lime;">✔</span>';
+            }
         }
     } else {
         $output .= '<tr><td colspan="7">No records found</td></tr>';

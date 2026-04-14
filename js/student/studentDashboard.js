@@ -128,8 +128,7 @@ function handleFilePreview(inputElem, previewElem) {
         previewElem.innerHTML = '';
 
         if (!file) return;
-
-        // Only allow jpg/png
+        
         const allowedTypes = ['image/jpeg', 'image/png'];
         if (!allowedTypes.includes(file.type)) {
             alert('Only JPG or PNG files are allowed!');
