@@ -3,12 +3,25 @@ require_once("../../kapstongConnection.php");
 
 $studentID = $_POST['studentID'] ?? '';
 
+if (empty($studentID)) {
+    exit("Invalid student");
+}
+
 if (!empty($studentID)) {
 
-    $sql = "UPDATE users SET isVerified = 'VERIFIED' WHERE studentID = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $studentID);
-    $stmt->execute();
+    $userStmt = $conn->prepare("
+    UPDATE users 
+    SET isVerified = 'VERIFIED' 
+    WHERE studentID = ?
+");
+    $userStmt->bind_param("s", $studentID);
+    $userStmt->execute();
 
-    echo "success";
+    $docStmt = $conn->prepare("
+    UPDATE student_documents 
+    SET status = 'APPROVED' 
+    WHERE studentID = ?
+");
+    $docStmt->bind_param("s", $studentID);
+    $docStmt->execute();
 }

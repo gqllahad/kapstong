@@ -39,6 +39,9 @@ const layout = {
 // search tables
 let searchTimer;
 const tableBody = document.getElementById("approvalTableBody");
+const unTableBody = document.getElementById("unverifiedTableBody");
+const allStudentBody = document.getElementById("allStudentBody");
+const allSupervisorBody = document.getElementById("allSupervisorBody");
 
 // modals
 const overlay = document.getElementById("overlay");
@@ -46,7 +49,7 @@ const overlay = document.getElementById("overlay");
 const allStudent = document.getElementById("all-student-modal");
 const allStudentBtn = document.getElementById("viewAllStudentsBtn");
 const allStudentClose = document.getElementById("closeAllStudentModal");
-const allStudentBody = document.getElementById("allStudentBody");
+
 
 const studentApplicationView = document.getElementById("student-application-view");
 // const studentApplicationViewBtn = document.getElementById("student-application-view-btn");
@@ -54,8 +57,20 @@ const studentApplicationView = document.getElementById("student-application-view
 let previousModal = null;
 
 const studentApplicationApprove = document.getElementById("student-application-approve");
-const studentApplicationApproveBtn = document.getElementById("student-application-approve-btn");
-const studentApplicationApproveClose = document.getElementById("closeStudentApproveModal");
+// const studentApplicationApproveBtn = document.getElementById("student-application-approve-btn");
+// const studentApplicationApproveClose = document.getElementById("closeStudentApproveModal");
+
+const studentApplicationReject = document.getElementById("student-application-reject");
+// const studentApplicationRejectBtn = document.getElementById("student-application-reject-btn");
+// const studentApplicationRejectClose = document.getElementById("closeStudentRejectModal");
+
+const allUnverified = document.getElementById("all-unverified-modal");
+const allUnverifiedBtn = document.getElementById("viewAllUnverifiedBtn");
+const allUnverifiedClose = document.getElementById("closeAllUnverifiedModal");
+
+const allSupervisor = document.getElementById("all-supervisor-modal");
+const allSupervisorBtn = document.getElementById("viewAllSupervisorBtn");
+const allSupervisorClose = document.getElementById("closeAllSupervisorModal");
 
 const superCreate = document.getElementById("supervisor-container");
 const superCreateBtn = document.getElementById("supervisor-btn");
@@ -69,10 +84,17 @@ function viewUser(studentID, source) {
 
     if (source === "allStudent") {
         allStudent.classList.remove("show");
+        studentApplicationView.classList.add("show");
+    }
+    if(source === "UnverifiedStudent"){
+        allUnverified.classList.remove("show");
+        studentApplicationView.classList.add("show");
+    }
+    if(source === "main"){
+        studentApplicationView.classList.add("show");
     }
     
     overlay.classList.add("show");
-    studentApplicationView.classList.add("show");
 
         studentApplicationView.innerHTML = '';
 
@@ -139,6 +161,66 @@ function approveStudent(studentID) {
     .catch(err => console.error(err));
 }
 
+function rejectUser(studentID) {
+    
+    overlay.classList.add("show");
+    studentApplicationReject.classList.add("show");
+
+    studentApplicationReject.innerHTML = '';
+    
+    fetch("functions/getStudentRejectData.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "studentID=" + encodeURIComponent(studentID)
+    })
+    .then(res => res.text())
+    .then(data => {
+        studentApplicationReject.innerHTML = data;
+
+        const checkbox = document.getElementById("confirmReject");
+        const btn = document.getElementById("rejectBtn");
+
+        if (checkbox && btn) {
+            checkbox.addEventListener("change", () => {
+                btn.disabled = !checkbox.checked;
+            });
+        }
+    });
+};
+
+function rejectStudent(studentID) {
+
+    const reason = document.getElementById("rejectReason").value;
+    const note = document.getElementById("rejectNote").value;
+
+    if (!reason) {
+        alert("Please select a rejection reason");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to reject this student?")) return;
+
+    fetch("functions/rejectStudent.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "studentID=" + encodeURIComponent(studentID)
+    })
+    .then(res => res.text())
+    .then(response => {
+        alert("Student rejected successfully!");
+
+        closeRejectModal();
+        location.reload();
+    })
+    .catch(err => console.error(err));
+}
+
+
+
 function closeApproveModal() {
 
     studentApplicationApprove.classList.remove("show");
@@ -146,6 +228,12 @@ function closeApproveModal() {
     
 }
 
+function closeRejectModal() {
+
+    studentApplicationReject.classList.remove("show");
+    overlay.classList.remove("show");
+    
+}
 
 function closeModal() {
 
@@ -154,7 +242,10 @@ function closeModal() {
     if (previousModal === "allStudent") {
         allStudent.classList.add("show");
         overlay.classList.add("show");
-    } else {
+    } else if(previousModal === "UnverifiedStudent") {
+        allUnverified.classList.add("show");
+        overlay.classList.add("show");
+    }else{
         overlay.classList.remove("show");
     }
 
@@ -374,11 +465,6 @@ adminApprovalBtn.addEventListener("click", () => {
     adminDashboard.style.display = "none";
 });
 
-document.querySelector(".search-container form")
-.addEventListener("submit", function (e) {
-    e.preventDefault();
-});
-
 document.getElementById("approvalSearch").addEventListener("keyup", function () {
     clearTimeout(searchTimer);
 
@@ -413,7 +499,6 @@ document.getElementById("approvalSearch").addEventListener("keyup", function () 
     }, 300);
 });
 
-
 // modals
 overlay.addEventListener('click', () => {
     overlay.classList.remove('show');
@@ -422,6 +507,9 @@ overlay.addEventListener('click', () => {
     studentApplicationView.classList.remove("show");
     studentApplicationApprove.classList.remove("show");
     superCreate.classList.remove("show");
+    studentApplicationReject.classList.remove("show");
+     allSupervisor.classList.remove("show");
+      allUnverified.classList.remove("show");
 });
 
 allStudentBtn.addEventListener("click", () => {
@@ -435,6 +523,30 @@ allStudentClose.addEventListener("click", () => {
     allStudent.classList.remove("show");
 
 });
+
+allUnverifiedBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+
+    allUnverified.classList.add("show");
+});
+
+allUnverifiedClose.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    allUnverified.classList.remove("show");
+});
+
+allSupervisorBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+
+    allSupervisor.classList.add("show");
+});
+
+allSupervisorClose.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    allSupervisor.classList.remove("show");
+});
+
+
 
 document.getElementById("allStudentSearch").addEventListener("keyup", function () {
     clearTimeout(searchTimer);
@@ -450,7 +562,7 @@ document.getElementById("allStudentSearch").addEventListener("keyup", function (
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "search=" + encodeURIComponent(value)
+            body: "search=" + encodeURIComponent(value)+"&status=VERIFIED"
         })
         .then(res => res.text())
         .then(data => {
@@ -462,6 +574,74 @@ document.getElementById("allStudentSearch").addEventListener("keyup", function (
 
                 setTimeout(() => {
                     allStudentBody.classList.remove("fade-in");
+                }, 200);
+
+            }, 200);
+        });
+
+    }, 300);
+});
+
+document.getElementById("allSupervisorSearch").addEventListener("keyup", function () {
+    clearTimeout(searchTimer);
+
+    let value = this.value;
+
+    searchTimer = setTimeout(() => {
+
+        allSupervisorBody.classList.add("fade-out");
+
+        fetch("functions/searchAllStudent.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "search=" + encodeURIComponent(value)+"&status=VERIFIED"
+        })
+        .then(res => res.text())
+        .then(data => {
+            setTimeout(() => {
+                allSupervisorBody.innerHTML = data;
+
+                allSupervisorBody.classList.remove("fade-out");
+                allSupervisorBody.classList.add("fade-in");
+
+                setTimeout(() => {
+                    allSupervisorBody.classList.remove("fade-in");
+                }, 200);
+
+            }, 200);
+        });
+
+    }, 300);
+});
+
+document.getElementById("allUnverifiedSearch").addEventListener("keyup", function () {
+    clearTimeout(searchTimer);
+
+    let value = this.value;
+
+    searchTimer = setTimeout(() => {
+
+        unTableBody.classList.add("fade-out");
+
+        fetch("functions/searchAllStudent.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "search=" + encodeURIComponent(value)+"&status=NOTVERIFIED"
+        })
+        .then(res => res.text())
+        .then(data => {
+            setTimeout(() => {
+                unTableBody.innerHTML = data;
+
+                unTableBody.classList.remove("fade-out");
+                unTableBody.classList.add("fade-in");
+
+                setTimeout(() => {
+                    unTableBody.classList.remove("fade-in");
                 }, 200);
 
             }, 200);

@@ -115,10 +115,10 @@ function renderApprovalTable($conn, $type, $verifiedFilter, $search)
     }
 
     $vf = strtoupper($verifiedFilter);
-    if ($vf === 'NOT VERIFIED') {
-        $where .= " AND users.isVerified != 'VERIFIED'";
-    } elseif ($vf === 'VERIFIED') {
-        $where .= " AND users.isVerified = 'VERIFIED'";
+    if ($vf === 'PENDING') {
+        $where .= " AND users.isVerified = 'PENDING'";
+    } elseif ($vf === 'NOT VERIFIED') {
+        $where .= " AND users.isVerified = 'NOT VERIFIED'";
     }
 
     $sql = "SELECT 
@@ -159,13 +159,13 @@ function renderApprovalTable($conn, $type, $verifiedFilter, $search)
                 $output .= '
                              <button class="view-btn" onclick="viewUser(\'' . $row['studentID'] . '\', \'main\')">View</button>
                             <button class="approve-btn" onclick="approveUser(\'' . $row['studentID'] . '\')">Approve</button>
-                            <button class="reject-btn" onclick="rejectUser(' . $row['studentID'] . ')">Reject</button>';
+                            <button class="reject-btn" onclick="rejectUser(\'' . $row['studentID'] . '\')">Reject</button>';
             } else {
                 $output .= '<span style="color:lime;">✔</span>';
             }
         }
     } else {
-        $output .= '<tr><td colspan="7">No records found</td></tr>';
+        $output .= '<tr><td colspan="7" style="text-align:center;padding:15px;font-weight:500;">No records found</td></tr>';
     }
 
     $output .= '</tbody></table>';
@@ -188,6 +188,8 @@ function renderStudentTable($conn, $type, $verifiedFilter, $search)
     $vf = strtoupper($verifiedFilter);
     if ($vf === 'VERIFIED') {
         $where .= " AND users.isVerified = 'VERIFIED'";
+    } elseif ($vf === 'NOT VERIFIED' || $vf === 'NOTVERIFIED') {
+        $where .= " AND users.isVerified = 'NOT VERIFIED'";
     }
 
     $sql = "SELECT 
@@ -228,14 +230,104 @@ function renderStudentTable($conn, $type, $verifiedFilter, $search)
                 $output .= '
                              <button class="view-btn" onclick="viewUser(' . $row['studentID'] . ', \'allStudent\')">View</button>';
             } else {
-                $output .= '<span style="color:lime;">✔</span>';
+                $output .= '<button class="view-btn" onclick="viewUser(' . $row['studentID'] . ', \'UnverifiedStudent\')">View</button>';
             }
         }
     } else {
-        $output .= '<tr><td colspan="7">No records found</td></tr>';
+        $output .= '<tr><td colspan="7" style="text-align:center;padding:15px;font-weight:500;">No records found</td></tr>';
     }
 
     $output .= '</tbody></table>';
 
     return $output;
+}
+
+
+// admin daashboard cards
+function countStudents($conn)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total 
+        FROM users 
+        WHERE role = 'student' AND isVerified = 'VERIFIED'
+    ");
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['total'];
+}
+
+function countUnverifiedStudents($conn)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total 
+        FROM users 
+        WHERE role = 'student' AND isVerified = 'NOT VERIFIED'
+    ");
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['total'];
+}
+
+function countPendingStudents($conn)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total 
+        FROM users 
+        WHERE role = 'student' AND isVerified = 'PENDING'
+    ");
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['total'];
+}
+
+function countSupervisors($conn)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total 
+        FROM users 
+        WHERE role = 'supervisor'
+    ");
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['total'];
+}
+
+// trend takings
+function getTrend($conn, $role, $status)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total 
+        FROM users 
+        WHERE role = ? 
+        AND isVerified = ?
+        AND dateCreated >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    ");
+
+    $stmt->bind_param("ss", $role, $status);
+    $stmt->execute();
+
+    $recent = $stmt->get_result()->fetch_assoc()['total'];
+
+    $stmt2 = $conn->prepare("
+        SELECT COUNT(*) AS total 
+        FROM users 
+        WHERE role = ? 
+        AND isVerified = ?
+    ");
+
+    $stmt2->bind_param("ss", $role, $status);
+    $stmt2->execute();
+
+    $total = $stmt2->get_result()->fetch_assoc()['total'];
+
+    if ($total == 0) return "0%";
+
+    $percent = ($recent / $total) * 100;
+
+    return round($percent, 1) . "%";
+}
+
+
+// badges
+function getBadge($count)
+{
+    if ($count >= 20) return "Hot";
+    if ($count >= 5) return "New";
+    return "Stable";
 }

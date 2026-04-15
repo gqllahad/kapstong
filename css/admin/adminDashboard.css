@@ -245,18 +245,64 @@ margin-bottom:30px;
 }
 
 .card{
-background:white;
 padding:20px;
 border-radius:8px;
 box-shadow:0 2px 8px rgba(0,0,0,0.1);
 flex:1;
 cursor: pointer;
+position: relative;
 }
+
 
 .card:hover{
     transform: translateY(-4px);
     box-shadow: 
         0 10px 25px rgba(37, 99, 235, 0.15);
+}
+
+.card-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: #3b82f6;
+    color: #fff;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-content h3 {
+    font-size: 14px !important;
+    margin: 0;
+    font-weight: 600;
+}
+
+.card-content p {
+    font-size: 12px;
+    margin: 4px 0 0;
+    color: #6b7280;
+}
+
+.card-content h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.trend {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #16a34a;
+    font-weight: 500;
 }
 
 .card.unverified-student{
@@ -342,9 +388,33 @@ cursor: pointer;
     margin-bottom: 5px;
     font-size: 1rem;
 }
+
+.white-h2{
+    color : rgb(224, 226, 253)
+}
+
 .supervisor p {
     color: var(--card--supervisor-p);
     font-size: 0.75rem;
+}
+
+.trend-indicator {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 20px;
+}
+
+.trend-indicator.up {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+}
+
+.trend-indicator.down {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
 }
 
 /* FOOTER */
@@ -913,7 +983,7 @@ tbody tr {
      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
-#approvalTableBody {
+#approvalTableBody, #unverifiedTableBody, #allStudentBody, #allSupervisorBody {
     transition: opacity 0.3s ease;
 }
 
@@ -973,7 +1043,8 @@ tbody tr {
     color: #ff4d4f;
 }
 
-.all-student-modal, .student-application-view, .student-application-approve, .supervisor-container{
+.all-student-modal, .student-application-view, .student-application-approve, .student-application-reject, .supervisor-container
+,.all-supervisor-modal, .all-unverified-modal{
     position: fixed;
     top: 50%;
     left: 50%;
@@ -990,18 +1061,15 @@ tbody tr {
     transition: all 0.3s ease-in-out;
 }
 
-.all-student-modal.show, .student-application-view.show, .student-application-approve.show, .supervisor-container.show {
+.all-student-modal.show, .student-application-view.show, .student-application-approve.show, .student-application-reject.show, .supervisor-container.show 
+,.all-supervisor-modal.show, .all-unverified-modal.show{
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
 }
 
-#allStudentBody {
-    transition: opacity 0.3s ease;
-}
-
 /* approval options */
-.approval-section {
+.approval-section, .reject-section {
     margin-top: 20px;
     padding: 16px;
     border-top: 1px solid #e5e7eb;
@@ -1011,7 +1079,7 @@ tbody tr {
     gap: 12px;
 }
 
-.approve-checkbox {
+.approve-checkbox, .reject-checkbox {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1019,7 +1087,7 @@ tbody tr {
     color: #374151;
 }
 
-.approve-checkbox input {
+.approve-checkbox input, .reject-checkbox input {
     width: 16px;
     height: 16px;
     cursor: pointer;
@@ -1053,6 +1121,63 @@ tbody tr {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 }
+
+.btn-reject {
+    align-self: flex-end;
+
+    background: linear-gradient(135deg, #dc2626, #b91c1c); 
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.btn-reject:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn-reject:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.reject-reason-section {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.reject-select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+}
+
+.reject-textarea {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    resize: none;
+}
+
+.form-label{
+    font-size: 16px;
+    font-weight: 600;
+}
+
 
 /* student view */
 .student-modal-content {

@@ -69,6 +69,78 @@ if ($_SESSION['role'] !== "ADMIN") {
         <main class="content">
             <div id="overlay" class="overlay"></div>
 
+            <!-- unverified accounts -->
+            <div class="all-unverified-modal" id="all-unverified-modal">
+                <div class="modal-header">
+                    <h3>Unverified Students</h3>
+                    <button id="closeAllUnverifiedModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="search-container">
+                    <input type="text" id="allUnverifiedSearch"
+                        placeholder="Search by ID, Name, OR Email">
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Course</th>
+                                <th>Year</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="unverifiedTableBody">
+                            <?php
+                            $search = $_POST['search'] ?? '';
+                            echo renderStudentTable($conn, 'student', 'NOT VERIFIED', $search);
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- supervisor accounts -->
+            <div class="all-supervisor-modal" id="all-supervisor-modal">
+                <div class="modal-header">
+                    <h3>Supervisors</h3>
+                    <button id="closeAllSupervisorModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="search-container">
+                    <input type="text" id="allSupervisorSearch"
+                        placeholder="Search by ID, Name, OR Email">
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Course</th>
+                                <th>Year</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="allSupervisorBody">
+                            <?php
+                            $search = $_POST['search'] ?? '';
+                            echo renderStudentTable($conn, 'student', 'VERIFIED', $search);
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- student accounts -->
             <div class="all-student-modal" id="all-student-modal">
                 <div class="modal-header">
@@ -77,10 +149,8 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
                 <div class="search-container">
-                    <form method="GET" action="" autocomplete="off">
-                        <input type="text" id="allStudentSearch"
-                            placeholder="Search by ID, Name, OR Email">
-                    </form>
+                    <input type="text" id="allStudentSearch"
+                        placeholder="Search by ID, Name, OR Email">
                 </div>
 
                 <div class="table-container">
@@ -116,6 +186,10 @@ if ($_SESSION['role'] !== "ADMIN") {
             <div class="student-application-approve" id="student-application-approve">
             </div>
 
+            <!-- reject application modal -->
+            <div class="student-application-reject" id="student-application-reject">
+            </div>
+
             <!-- create supervisor modal -->
             <div class="supervisor-container" id="supervisor-container">
                 <div class="modal-header">
@@ -123,7 +197,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <button id="closeCreateSupervisorModal" class="modal-close">&times;</button>
                 </div>
 
-                <!-- BODY -->
                 <div class="supervisor-body">
 
                     <p class="modal-subtitle">
@@ -132,25 +205,21 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                     <form id="createSupervisorForm">
 
-                        <!-- NAME -->
                         <div class="input-group">
                             <label>Full Name</label>
                             <input type="text" name="name" placeholder="Enter full name" required>
                         </div>
 
-                        <!-- EMAIL -->
                         <div class="input-group">
                             <label>Email Address</label>
                             <input type="email" name="email" placeholder="Enter email address" required>
                         </div>
 
-                        <!-- PHONE -->
                         <div class="input-group">
                             <label>Mobile Number</label>
                             <input type="text" name="mobile" placeholder="09XXXXXXXXX" required>
                         </div>
 
-                        <!-- DEPARTMENT -->
                         <div class="input-group">
                             <label>Department</label>
                             <select name="department" required>
@@ -162,13 +231,11 @@ if ($_SESSION['role'] !== "ADMIN") {
                             </select>
                         </div>
 
-                        <!-- PASSWORD -->
                         <div class="input-group">
                             <label>Temporary Password</label>
                             <input type="password" name="password" placeholder="Create temporary password" required>
                         </div>
 
-                        <!-- CHECKBOX -->
                         <div class="checkbox-group">
                             <input type="checkbox" id="confirmCreateSupervisor">
                             <label for="confirmCreateSupervisor">
@@ -176,7 +243,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                             </label>
                         </div>
 
-                        <!-- BUTTON -->
                         <button type="submit" id="createSupervisorBtn" disabled class="primary-btn">
                             Create Supervisor
                         </button>
@@ -190,28 +256,103 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <section class="cards">
 
                     <div class="card unverified-student">
-                        <h3>UNVERIFIED STUDENTS</h3>
-                        <p>Students awaiting account verification.</p>
+
+                        <?php
+                        $unverifiedStudents = countUnverifiedStudents($conn);
+                        $unTrend = getTrend($conn, 'student', 'NOT VERIFIED');
+                        $unBadge = getBadge($unverifiedStudents);
+                        ?>
+
+                        <span class="card-badge"><?= $unBadge ?></span>
+
+                        <div class="card-content">
+                            <div>
+                                <h3>UNVERIFIED STUDENT</h3>
+                                <p>Awaiting verification</p>
+
+                                <span class="trend">
+                                    ▲ <?= $unTrend ?> this week
+                                </span>
+                            </div>
+
+                            <h2><?= $unverifiedStudents ?></h2>
+                        </div>
                     </div>
 
                     <div class="card student">
-                        <h3>STUDENTS</h3>
-                        <p>Total number of verified and active students.</p>
+
+                        <?php
+                        $pendingStudents = countPendingStudents($conn);
+                        $pendingTrend = getTrend($conn, 'student', 'PENDING');
+                        $pendingBadge = getBadge($pendingStudents);
+                        ?>
+
+                        <span class="card-badge"><?= $pendingBadge ?></span>
+
+                        <div class="card-content">
+                            <div>
+                                <h3>FOR REVIEW</h3>
+                                <p>Students awaiting approval and verification.</p>
+
+                                <span class="trend">
+                                    ▲ <?= $pendingTrend ?> this week
+                                </span>
+                            </div>
+
+                            <h2 class="white-h2"><?= $pendingStudents ?></h2>
+                        </div>
                     </div>
 
                     <div class="card unverified-supervisor">
-                        <h3>UNVERIFIED SUPERVISORS</h3>
-                        <p>Supervisors pending approval and verification.</p>
+
+                        <?php
+                        $students = countStudents($conn);
+                        $trend = getTrend($conn, 'student', 'PENDING');
+                        $badge = getBadge($students);
+                        ?>
+
+                        <span class="card-badge"><?= $badge ?></span>
+
+                        <div class="card-content">
+                            <div>
+                                <h3>STUDENTS</h3>
+                                <p>Total number of verified and active students.</p>
+
+                                <span class="trend">
+                                    ▲ <?= $trend ?> this week
+                                </span>
+                            </div>
+
+                            <h2><?= $students ?></h2>
+                        </div>
+
                     </div>
 
                     <div class="card supervisor">
-                        <h3>SUPERVISORS</h3>
-                        <p>Total number of verified supervisors.</p>
+                        <?php
+                        $supervisor = countSupervisors($conn);
+                        $superTrend = getTrend($conn, 'supervisor', 'PENDING');
+                        $superBadge = getBadge($supervisor);
+                        ?>
+
+                        <span class="card-badge"><?= $superBadge ?></span>
+
+                        <div class="card-content">
+                            <div>
+                                <h3>SUPERVISORS</h3>
+                                <p>Total number of verified supervisors.</p>
+
+                                <span class="trend">
+                                    ▲ <?= $superTrend ?> this week
+                                </span>
+                            </div>
+
+                            <h2 class="white-h2"><?= $supervisor ?></h2>
+                        </div>
                     </div>
 
                 </section>
 
-                <!-- dashboard -->
                 <section class="dashboard-layout">
                     <section class="wrapper bar-chart">
                         <h2>bar Chart (Users per Role)</h2>
@@ -262,7 +403,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <!-- Unverified Students -->
                     <div class="approval-card unverified-student">
                         <h3>Unverified Students</h3>
-                        <button class="view-btn" id="viewAllUnverifiedStudentsBtn">View All Unverified Students</button>
+                        <button class="view-btn" id="viewAllUnverifiedBtn">View All Unverified Students</button>
                     </div>
 
                     <!-- All Students -->
@@ -279,15 +420,14 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 </div>
 
+                <!-- pendings -->
                 <div id="approvalTableContainer" style="margin-top:20px;">
                     <h3 class="table-title">Pending Application</h3>
 
                     <div class="top-bar">
                         <div class="search-container">
-                            <form method="GET" action="" autocomplete="off">
-                                <input type="text" id="approvalSearch"
-                                    placeholder="Search by ID, Name, OR Email">
-                            </form>
+                            <input type="text" id="approvalSearch"
+                                placeholder="Search by ID, Name, OR Email">
                         </div>
 
                         <div class="create-supervisor-btn">
@@ -314,8 +454,8 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                             <tbody id="approvalTableBody">
                                 <?php
-                                $search = $_GET['approval_search'] ?? '';
-                                echo renderApprovalTable($conn, 'student', 'NOT VERIFIED', $search);
+                                $search = $_POST['search'] ?? '';
+                                echo renderApprovalTable($conn, 'student', 'PENDING', $search);
                                 ?>
                             </tbody>
                         </table>
@@ -344,7 +484,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../../js/admin/adminDashboard.js"></script>
 
