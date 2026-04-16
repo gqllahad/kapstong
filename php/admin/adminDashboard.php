@@ -58,7 +58,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             <ul class="menu">
                 <li><button id="admin-dashboard-btn"><i class="bi bi-house"></i> Home</button></li>
-                <li><button><i class="bi bi-journal-text"></i> Preparations</button></li>
+                <li><button id="admin-preparation-btn"><i class="bi bi-journal-text"></i> Preparations</button></li>
                 <li><button id="admin-approval-btn"><i class="bi bi-file-earmark-text"></i>Students</button></li>
             </ul>
 
@@ -134,7 +134,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <tbody id="allSupervisorBody">
                             <?php
                             $search = $_POST['search'] ?? '';
-                            echo renderStudentTable($conn, 'student', 'VERIFIED', $search);
+                            echo renderStudentTable($conn, 'supervisor', 'VERIFIED', $search);
                             ?>
                         </tbody>
                     </table>
@@ -203,7 +203,8 @@ if ($_SESSION['role'] !== "ADMIN") {
                         Add a new supervisor account. Fill in the details below.
                     </p>
 
-                    <form id="createSupervisorForm">
+                    <div id="formMessage" style="margin-bottom:10px; font-weight:bold;"></div>
+                    <form id="createSupervisorForm" method="POST">
 
                         <div class="input-group">
                             <label>Full Name</label>
@@ -243,7 +244,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                             </label>
                         </div>
 
-                        <button type="submit" id="createSupervisorBtn" disabled class="primary-btn">
+                        <button type="submit" name="createSupervisor" id="createSupervisorBtn" disabled class="primary-btn">
                             Create Supervisor
                         </button>
 
@@ -253,8 +254,9 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             <!-- dashboard -->
             <section class="admin-dashboard" id="admin-dashboard">
-                <section class="cards">
 
+
+                <section class="cards">
                     <div class="card unverified-student">
 
                         <?php
@@ -353,43 +355,34 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 </section>
 
+                <div class="title-block-bot">
+                    <h2>Dashboard</h2>
+                    <p>Manage supervisors and user accounts in the system</p>
+                </div>
+
                 <section class="dashboard-layout">
+
+
                     <section class="wrapper bar-chart">
-                        <h2>bar Chart (Users per Role)</h2>
+                        <h2>Bar Chart</h2>
                         <canvas id="barChart"></canvas>
                     </section>
 
-                    <section class="recent-logs-container">
-                        <p>Recent Logs</p>
-                        <div class="task-item">
-                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Tenetur excepturi iure velit laboriosam natus asperiores reiciendis ipsa? Temporibus aspernatur ducimus nihil in hic, sed fugit obcaecati ad nostrum, minima repellat.
-                        </div>
-                    </section>
-
-                    <section class="pie-charts full">
-                        <section class="wrapper-pie pie-chart-plain">
-                            <h2>Pie Chart (Users per Role)</h2>
-                            <canvas id="pieChart2"></canvas>
-                        </section>
-
-                        <section class="process-task">
-                            <h2>Process Tasks</h2>
-                            <div class="task-item">
-                                <p>Takss</p>
-                                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Illo voluptatem temporibus earum saepe voluptatibus. Perspiciatis tempore excepturi numquam nostrum id rerum culpa soluta a ducimus in nam cum, voluptates quae.</p>
-                            </div>
-                            <div class="task-item">
-                                <p>Takss</p>
-                                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Illo voluptatem temporibus earum saepe voluptatibus. Perspiciatis tempore excepturi numquam nostrum id rerum culpa soluta a ducimus in nam cum, voluptates quae.</p>
-                            </div>
-                        </section>
-                    </section>
-
                     <section class="deadline-container">
-                        <p>attendance</p>
+                        <p>Deadlines</p>
                         <div class="task-item">
                             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum, tempore. Inventore dignissimos, a sed iusto odit officiis nihil aliquam, in molestiae reiciendis quae ducimus numquam expedita rem necessitatibus magni commodi?</p>
                         </div>
+                    </section>
+
+                    <section class="wrapper line-chart">
+                        <h2>Line Chart</h2>
+                        <canvas id="lineChart"></canvas>
+                    </section>
+
+                    <section class="wrapper-pie pie-chart">
+                        <h2>Pie Chart </h2>
+                        <canvas id="pieChart"></canvas>
                     </section>
 
                 </section>
@@ -397,6 +390,20 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             <!-- application approvals -->
             <section class="admin-approval" id="admin-approval">
+
+                <div class="user-management">
+                    <div class="title-block">
+                        <h2>User Management</h2>
+                        <p>Manage supervisors and user accounts in the system</p>
+                    </div>
+                    <div class="create-supervisor-btn">
+                        <button class="supervisor-btn" id="supervisor-btn">
+                            <span class="icon">+</span>
+                            <span class="text">Create Supervisor</span>
+                        </button>
+                    </div>
+                </div>
+
 
                 <div class="approval-grid">
 
@@ -422,20 +429,29 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 <!-- pendings -->
                 <div id="approvalTableContainer" style="margin-top:20px;">
-                    <h3 class="table-title">Pending Application</h3>
 
                     <div class="top-bar">
-                        <div class="search-container">
-                            <input type="text" id="approvalSearch"
-                                placeholder="Search by ID, Name, OR Email">
+
+                        <div class="top-header">
+                            <h3 class="table-title">Pending Student Applications</h3>
+                            <p>Search and review students waiting for approval.</p>
                         </div>
 
-                        <div class="create-supervisor-btn">
-                            <button class="supervisor-btn" id="supervisor-btn">
-                                <span class="icon">+</span>
-                                <span class="text">Create Supervisor</span>
-                            </button>
+                        <div class="search-filter">
+                            <div class="search-container">
+                                <i class="bi bi-search search-icon"></i>
+                                <input type="text" id="approvalSearch"
+                                    placeholder="Search by ID, Name, OR Email">
+                            </div>
+
+
+
+                            <!-- <div class="search-container">
+                                <input type="text" id="approvalSearch"
+                                    placeholder="Search by ID, Name, OR Email">
+                            </div> -->
                         </div>
+
                     </div>
 
                     <div class="table-container">
@@ -466,6 +482,38 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <div id="imagePreviewModal" class="image-modal">
                     <span id="closeImagePreview">&times;</span>
                     <img id="previewImg">
+                </div>
+
+            </section>
+
+            <!-- preparations -->
+            <section class="admin-preparation" id="admin-preparation">
+                <div class="title-block-bot">
+                    <h2>Preparations</h2>
+                    <p>Manage supervisors and user accounts in the system</p>
+                </div>
+                <div class="preparation-grid">
+                    <div class="create-section-container">
+                        <button class="create-btn">
+                            <span class="icon">+</span>
+                            <span class="text">Create Supervisor</span>
+                        </button>
+                    </div>
+
+                    <div class="create-section-container">
+                        <button class="create-btn">
+                            <span class="icon">+</span>
+                            <span class="text">Create Supervisor</span>
+                        </button>
+                    </div>
+
+                    <div class="create-section-container">
+                        <button class="create-btn">
+                            <span class="icon">+</span>
+                            <span class="text">Create Supervisor</span>
+                        </button>
+                    </div>
+
                 </div>
 
             </section>

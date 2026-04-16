@@ -31,6 +31,10 @@ switch ($role) {
         header("Location: student/studentDashboard.php");
         exit();
 
+    case "supervisor":
+        header("Location: supervisor/supervisorDashboard.php");
+        exit();
+
     default:
         header("Location: loginPhase.php");
         exit();

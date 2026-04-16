@@ -11,9 +11,11 @@ const menuItems = document.querySelectorAll('.menu li');
 // layouts
 const adminDashboardBtn = document.getElementById('admin-dashboard-btn');
 const adminApprovalBtn = document.getElementById('admin-approval-btn');
+const adminPreparationBtn = document.getElementById('admin-preparation-btn');
 
 const adminDashboard = document.getElementById('admin-dashboard');
 const adminApproval = document.getElementById('admin-approval');
+const adminPreparation = document.getElementById('admin-preparation');
 
 // colors
 const statusColors = {
@@ -75,6 +77,11 @@ const allSupervisorClose = document.getElementById("closeAllSupervisorModal");
 const superCreate = document.getElementById("supervisor-container");
 const superCreateBtn = document.getElementById("supervisor-btn");
 const superCloseBtn = document.getElementById("closeCreateSupervisorModal");
+
+// form
+const supervisorForm = document.getElementById("createSupervisorForm");
+const messageBox = document.getElementById("formMessage");
+
 
 // Functions 
 
@@ -361,13 +368,78 @@ function loadBarChart() {
         .catch(err => console.error("Line chart error:", err));
 }
 
+// line chart
+function loadLineChart() {
+    fetch("../../php/admin/functions/getChartData.php")
+        .then(res => res.json())
+        .then(data => {
+
+            const ctx = document.getElementById('lineChart');
+
+            //colors
+            const pieColors = data.labels.map(label => {
+                if (label === "ADMIN") {
+                    return "#5c77f0";
+                } else if (label === "student") {
+                    return "#4e69e0";
+                }
+                return "#6c757d";
+            });
+
+            if (window.lineChartInstance) {
+                window.lineChartInstance.destroy();
+            }
+
+            window.lineChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Users',
+                        data: data.values,
+                        borderColor: '#5c77f0',
+                        backgroundColor: 'rgba(92, 119, 240, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointHoverRadius: 6,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    tooltip: {
+                        enabled: true
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+        })
+        .catch(err => console.error("Line chart error:", err));
+}
+
+
 // pie chart
 function loadPieChart() {
     fetch("../../php/admin/functions/getChartData.php")
         .then(res => res.json())
         .then(data => {
 
-            const ctx = document.getElementById('pieChart2');
+            const ctx = document.getElementById('pieChart');
 
             //colors
             const pieColors = data.labels.map(label => {
@@ -379,7 +451,6 @@ function loadPieChart() {
                 return "#6c757d"; 
             });
 
-            // Destroy previous chart
             if (window.pieChartInstance) {
                 window.pieChartInstance.destroy();
             }
@@ -415,6 +486,7 @@ function loadPieChart() {
 document.addEventListener("DOMContentLoaded", () => {
     loadBarChart();   
     loadPieChart();   
+    loadLineChart();
 });
 
 // menu (Upper) 
@@ -456,6 +528,7 @@ adminDashboardBtn.addEventListener("click", () => {
     adminDashboard.style.display = "block";
 
     adminApproval.style.display = "none";
+    adminPreparation.style.display = "none";
 });
 
 adminApprovalBtn.addEventListener("click", () => {
@@ -463,6 +536,16 @@ adminApprovalBtn.addEventListener("click", () => {
     adminApproval.style.display = "block";
 
     adminDashboard.style.display = "none";
+    adminPreparation.style.display = "none";
+});
+
+adminPreparationBtn.addEventListener("click", () => {
+
+    adminPreparation.style.display = "block";
+
+    adminDashboard.style.display = "none";
+    adminApproval.style.display = "none";
+
 });
 
 document.getElementById("approvalSearch").addEventListener("keyup", function () {
@@ -677,6 +760,36 @@ superCreateBtn.addEventListener("click", () => {
 superCloseBtn.addEventListener("click", () => {
     overlay.classList.remove("show");
     superCreate.classList.remove("show");
+});
+
+supervisorForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(supervisorForm);
+
+    fetch("functions/createSupervisor.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        messageBox.textContent = data.message;
+
+        if (data.status === "success") {
+            messageBox.style.color = "green";
+
+            supervisorForm.reset();
+            document.getElementById("createSupervisorBtn").disabled = true;
+
+        } else {
+            messageBox.style.color = "red";
+        }
+    })
+    .catch(err => {
+        messageBox.textContent = "Something went wrong.";
+        messageBox.style.color = "red";
+    });
 });
 
  
