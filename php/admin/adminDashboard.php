@@ -58,8 +58,8 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             <ul class="menu">
                 <li><button id="admin-dashboard-btn"><i class="bi bi-house"></i> Home</button></li>
-                <li><button id="admin-preparation-btn"><i class="bi bi-journal-text"></i> Preparations</button></li>
-                <li><button id="admin-approval-btn"><i class="bi bi-file-earmark-text"></i>Students</button></li>
+                <li><button id="admin-preparation-btn"><i class="bi bi-journal-text"></i> System Configuration</button></li>
+                <li><button id="admin-approval-btn"><i class="bi bi-file-earmark-text"></i>User Management</button></li>
             </ul>
 
         </aside>
@@ -77,6 +77,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
                 <div class="search-container">
+                    <i class="bi bi-search search-icon"></i>
                     <input type="text" id="allUnverifiedSearch"
                         placeholder="Search by ID, Name, OR Email">
                 </div>
@@ -113,6 +114,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
                 <div class="search-container">
+                    <i class="bi bi-search search-icon"></i>
                     <input type="text" id="allSupervisorSearch"
                         placeholder="Search by ID, Name, OR Email">
                 </div>
@@ -149,6 +151,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
                 <div class="search-container">
+                    <i class="bi bi-search search-icon"></i>
                     <input type="text" id="allStudentSearch"
                         placeholder="Search by ID, Name, OR Email">
                 </div>
@@ -396,7 +399,13 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <h2>User Management</h2>
                         <p>Manage supervisors and user accounts in the system</p>
                     </div>
-                    <div class="create-supervisor-btn">
+
+                    <div class="user-action-btn">
+                        <button class="assign-student-btn" id="assign-student-btn">
+                            <span class="icon">→</span>
+                            <span class="text">Assign Student to Supervisor</span>
+                        </button>
+
                         <button class="supervisor-btn" id="supervisor-btn">
                             <span class="icon">+</span>
                             <span class="text">Create Supervisor</span>
@@ -443,13 +452,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                                 <input type="text" id="approvalSearch"
                                     placeholder="Search by ID, Name, OR Email">
                             </div>
-
-
-
-                            <!-- <div class="search-container">
-                                <input type="text" id="approvalSearch"
-                                    placeholder="Search by ID, Name, OR Email">
-                            </div> -->
                         </div>
 
                     </div>
@@ -486,31 +488,32 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             </section>
 
-            <!-- preparations -->
+            <!-- System Configuration -->
             <section class="admin-preparation" id="admin-preparation">
                 <div class="title-block-bot">
-                    <h2>Preparations</h2>
-                    <p>Manage supervisors and user accounts in the system</p>
+                    <h2>System Configuration</h2>
+                    <p>Manage system settings, courses, batches, and rules</p>
+
                 </div>
                 <div class="preparation-grid">
                     <div class="create-section-container">
                         <button class="create-btn">
-                            <span class="icon">+</span>
-                            <span class="text">Create Supervisor</span>
+                            <span class="icon">📅</span>
+                            <span class="text">OJT Batch Setup</span>
+                        </button>
+                    </div>
+
+                    <div class="create-section-container">
+                        <button class="create-btn">
+                            <span class="icon">🏫</span>
+                            <span class="text">Course Management</span>
                         </button>
                     </div>
 
                     <div class="create-section-container">
                         <button class="create-btn">
                             <span class="icon">+</span>
-                            <span class="text">Create Supervisor</span>
-                        </button>
-                    </div>
-
-                    <div class="create-section-container">
-                        <button class="create-btn">
-                            <span class="icon">+</span>
-                            <span class="text">Create Supervisor</span>
+                            <span class="text">RFID Setup</span>
                         </button>
                     </div>
 

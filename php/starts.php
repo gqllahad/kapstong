@@ -1,5 +1,6 @@
 <?php
-include "kapstongConnection.php";
+require_once("kapstongConnection.php");
+require_once("functions.php");
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -44,6 +45,35 @@ if (isset($_POST['login-submit'])) {
             if ($_SESSION['role'] === "student") {
                 $_SESSION['studentID'] = $row["studentID"];
             }
+
+            $ip = getUserIP();
+
+            $stmt = $conn->prepare("
+        INSERT INTO activity_log 
+        (userID, role, action, module, description, target_type, target_id, ip_address)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+
+            $action = "User Login";
+            $module = "authentication";
+            $description = "User successfully logged in";
+
+            $target_type = "user";
+            $target_id = $row['userID'];
+
+            $stmt->bind_param(
+                "isssssss",
+                $row['userID'],
+                $row['role'],
+                $action,
+                $module,
+                $description,
+                $target_type,
+                $target_id,
+                $ip
+            );
+
+            $stmt->execute();
 
             header("Location: trackerMain.php?login=Logging In..");
             exit();

@@ -84,6 +84,35 @@ if (isset($_POST['submitDocuments'])) {
 
     $_SESSION['isVerified'] = 'PENDING';
 
+    $ip = getUserIP();
+
+    $act_log = $conn->prepare("
+        INSERT INTO activity_log 
+        (userID, role, action, module, description, target_type, target_id, ip_address)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    $action = "Upload Document";
+    $module = "document";
+    $description = "Student uploaded ID and registration form for verification";
+
+    $target_type = "student";
+    $target_id = $row['studentID'];
+
+    $act_log->bind_param(
+        "isssssss",
+        $row['studentID'],
+        $row['role'],
+        $action,
+        $module,
+        $description,
+        $target_type,
+        $target_id,
+        $ip
+    );
+
+    $act_log->execute();
+
     header("Location: pendingStudentDashboard.php");
     exit();
 }
