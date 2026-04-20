@@ -10,6 +10,7 @@ if (!isset($_SESSION['studentID'])) {
 }
 
 $studentID = $_SESSION['studentID'];
+$role = $_SESSION['role'];
 
 if (isset($_POST['submitDocuments'])) {
 
@@ -92,17 +93,19 @@ if (isset($_POST['submitDocuments'])) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
+    $userID = $_SESSION['userID'];
+
     $action = "Upload Document";
     $module = "document";
     $description = "Student uploaded ID and registration form for verification";
 
     $target_type = "student";
-    $target_id = $row['studentID'];
+    $target_id = $studentID;
 
     $act_log->bind_param(
         "isssssss",
-        $row['studentID'],
-        $row['role'],
+        $userID,
+        $role,
         $action,
         $module,
         $description,

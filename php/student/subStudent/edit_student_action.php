@@ -8,6 +8,7 @@ if (!isset($_POST['editInfoStudent'])) {
 }
 
 $studentID = $_SESSION['studentID'];
+$role = $_SESSION['role'];
 
 $fields = [];
 $params = [];
@@ -102,8 +103,8 @@ if (!empty($fields)) {
 
     $act_log->bind_param(
         "isssssss",
-        $row['studentID'],
-        $row['role'],
+        $userID,
+        $role,
         $action,
         $module,
         $description,

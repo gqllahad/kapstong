@@ -9,6 +9,7 @@ if (!isset($_SESSION['studentID'])) {
 }
 
 $studentID = $_SESSION['studentID'];
+$role = $_SESSION['role'];
 
 $documents = getStudentDocuments($conn, $studentID);
 
@@ -59,8 +60,8 @@ if ($documents) {
 
     $act_log->bind_param(
         "isssssss",
-        $row['studentID'],
-        $row['role'],
+        $userID,
+        $role,
         $action,
         $module,
         $description,

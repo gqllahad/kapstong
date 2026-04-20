@@ -254,6 +254,70 @@ function renderStudentTable($conn, $type, $verifiedFilter, $search)
     return $output;
 }
 
+// admin activity_log view
+function renderActivityLogTable($conn, $search = '')
+{
+    $where = "";
+
+    if (!empty($search)) {
+        $where = "WHERE (
+            users.name LIKE '%$search%' OR
+            users.email LIKE '%$search%' OR
+            activity_log.action LIKE '%$search%' OR
+            activity_log.module LIKE '%$search%' OR
+            activity_log.target_id LIKE '%$search%'
+        )";
+    }
+
+    $sql = "SELECT 
+                activity_log.logID,
+                activity_log.role,
+                activity_log.action,
+                activity_log.module,
+                activity_log.description,
+                activity_log.target_type,
+                activity_log.target_id,
+                activity_log.ip_address,
+                activity_log.created_at,
+                users.name,
+                users.email
+            FROM activity_log
+            LEFT JOIN users 
+                ON activity_log.userID = users.userID
+            $where
+            ORDER BY activity_log.created_at DESC";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $output .= '
+            <tr>
+                <td>' . $row['name'] . '</td>
+                <td>' . strtoupper($row['role']) . '</td>
+                <td>' . $row['action'] . '</td>
+                <td>' . $row['module'] . '</td>
+                <td>' . $row['target_type'] . '</td>
+                <td>' . $row['target_id'] . '</td>
+                <td>' . $row['ip_address'] . '</td>
+                <td>' . date("M d, Y h:i A", strtotime($row['created_at'])) . '</td>
+            </tr>';
+        }
+    } else {
+        $output .= '
+        <tr>
+            <td colspan="8" style="text-align:center; padding:15px; font-weight:500;">
+                No activity logs found
+            </td>
+        </tr>';
+    }
+
+    return $output;
+}
+
 
 // admin daashboard cards
 function countStudents($conn)

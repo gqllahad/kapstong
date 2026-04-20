@@ -44,6 +44,7 @@ const tableBody = document.getElementById("approvalTableBody");
 const unTableBody = document.getElementById("unverifiedTableBody");
 const allStudentBody = document.getElementById("allStudentBody");
 const allSupervisorBody = document.getElementById("allSupervisorBody");
+const activityLogBody = document.getElementById("activityLogTableBody");
 
 // modals
 const overlay = document.getElementById("overlay");
@@ -81,6 +82,8 @@ const superCloseBtn = document.getElementById("closeCreateSupervisorModal");
 // form
 const supervisorForm = document.getElementById("createSupervisorForm");
 const messageBox = document.getElementById("formMessage");
+
+let activitySearchTimer;
 
 
 // Functions 
@@ -728,6 +731,43 @@ document.getElementById("allUnverifiedSearch").addEventListener("keyup", functio
                 }, 200);
 
             }, 200);
+        });
+
+    }, 300);
+});
+
+document.getElementById("activityLogSearch").addEventListener("keyup", function () {
+
+    clearTimeout(activitySearchTimer);
+
+    let value = this.value;
+
+    activitySearchTimer = setTimeout(() => {
+
+        activityLogBody.classList.add("fade-out");
+
+        fetch("functions/searchActivityLog.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "search=" + encodeURIComponent(value)
+        })
+        .then(res => res.text())
+        .then(data => {
+
+            setTimeout(() => {
+                activityLogBody.innerHTML = data;
+
+                activityLogBody.classList.remove("fade-out");
+                activityLogBody.classList.add("fade-in");
+
+                setTimeout(() => {
+                    activityLogBody.classList.remove("fade-in");
+                }, 200);
+
+            }, 200);
+
         });
 
     }, 300);

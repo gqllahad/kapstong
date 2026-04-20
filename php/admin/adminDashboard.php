@@ -519,6 +519,51 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 </div>
 
+                <div class="top-bar">
+
+                    <div class="top-header">
+                        <h3 class="table-title">Activity Logs</h3>
+                        <p>Monitor system actions and user activities.</p>
+                    </div>
+
+                    <div class="search-filter">
+                        <div class="search-container">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" id="activityLogSearch"
+                                placeholder="Search by user, action, module, or target">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="activity-log-container">
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Action</th>
+                                    <th>Module</th>
+                                    <th>Target Type</th>
+                                    <th>Target ID</th>
+                                    <th>IP Address</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="activityLogTableBody">
+                                <?php
+                                $search = $_POST['search'] ?? '';
+                                echo renderActivityLogTable($conn, $search);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
             </section>
 
         </main>
