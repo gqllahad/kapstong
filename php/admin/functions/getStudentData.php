@@ -9,6 +9,7 @@ $sql = "SELECT
             students.yearLevel,
             students.address,
             students.semester,
+            students.schoolYear,
             docs.idUpload,
             docs.regFormUpload,
             docs.profilePicture,

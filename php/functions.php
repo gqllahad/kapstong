@@ -254,6 +254,227 @@ function renderStudentTable($conn, $type, $verifiedFilter, $search)
     return $output;
 }
 
+// supervisor table
+function renderSupervisorTable($conn, $search = '')
+{
+    $where = "WHERE 1=1";
+
+    if (!empty($search)) {
+        $where .= " AND (
+            supervisor.superID LIKE '%$search%' OR
+            supervisor.name LIKE '%$search%' OR
+            supervisor.email LIKE '%$search%' OR
+            supervisor.department LIKE '%$search%'
+        )";
+    }
+
+    $sql = "SELECT 
+                supervisor.superID,
+                supervisor.name,
+                supervisor.email,
+                supervisor.number,
+                supervisor.department,
+                supervisor.date_created
+            FROM supervisor
+            $where
+            ORDER BY supervisor.date_created DESC";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $output .= '
+            <tr>
+                <td>' . $row['superID'] . '</td>
+                <td>' . $row['name'] . '</td>
+                <td>' . $row['email'] . '</td>
+                <td>' . $row['number'] . '</td>
+                <td>' . $row['department'] . '</td>
+                <td>' . date("M d, Y h:i A", strtotime($row['date_created'])) . '</td>
+                <td>
+                    <button class="view-btn" onclick="viewSupervisor(' . $row['superID'] . ')">View</button>
+                </td>
+            </tr>';
+        }
+    } else {
+        $output .= '
+        <tr>
+            <td colspan="8" style="text-align:center;padding:15px;font-weight:500;">
+                No supervisors found
+            </td>
+        </tr>';
+    }
+
+    $output .= '</tbody></table>';
+
+    return $output;
+}
+
+function renderSupervisorAssignedStudents($conn, $superID)
+{
+    $stmt = $conn->prepare("
+        SELECT 
+            ojtstudent.studentID,
+            ojtstudent.name,
+            ojtstudent.course,
+            ojtstudent.yearLevel
+        FROM student_supervisor
+        INNER JOIN ojtstudent 
+            ON student_supervisor.studentID = ojtstudent.studentID
+        WHERE student_supervisor.superID = ?
+        AND student_supervisor.status = 'ACTIVE'
+        ORDER BY ojtstudent.name ASC
+    ");
+
+    $stmt->bind_param("i", $superID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+
+        $output .= "<div style='padding:10px;'>";
+
+        while ($row = $result->fetch_assoc()) {
+            $output .= '
+                    <div class="assigned-student-row">
+                        
+                        <div class="student-info">
+                            <strong>' . $row['name'] . '</strong><br>
+                            <small>
+                                ' . $row['studentID'] . ' • 
+                                ' . $row['course'] . ' • 
+                                ' . $row['yearLevel'] . '
+                            </small>
+                        </div>
+
+                        <div class="student-action">
+                            <button class="view-btn" onclick="viewUser(\'' . $row['studentID'] . '\', \'supervisorView\')">
+                                View
+                            </button>
+                        </div>
+
+                    </div>';
+        }
+
+
+
+        $output .= "</div>";
+    } else {
+        $output = "<p style='padding:10px;color:#6b7280;'>No assigned students yet.</p>";
+    }
+
+    return $output;
+}
+
+// assign student-supervisor
+function renderAssignStudentList($conn, $search = '')
+{
+    $where = "WHERE users.role = 'student'
+              AND users.isVerified = 'VERIFIED'
+              AND ss.studentID IS NULL";
+
+    if (!empty($search)) {
+        $where .= " AND (
+            users.studentID LIKE '%$search%' OR
+            users.name LIKE '%$search%' OR
+            users.email LIKE '%$search%'
+        )";
+    }
+
+    $sql = "SELECT 
+        users.userID,
+        users.studentID,
+        users.name,
+        users.email,
+        students.course,
+        students.yearLevel
+    FROM users
+    LEFT JOIN ojtstudent AS students
+        ON users.studentID = students.studentID
+
+        LEFT JOIN student_supervisor ss
+        ON users.studentID = ss.studentID
+        AND ss.status = 'ACTIVE'
+    $where
+    ORDER BY users.dateCreated DESC";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $output .= '
+            <div class="list-item student-item"
+                data-id="' . $row['studentID'] . '"
+                data-user="' . $row['userID'] . '">
+
+                <strong>' . $row['name'] . '</strong>
+                <span>' . $row['studentID'] . ' • ' . ($row['course'] ?? '-') . ' • ' . ($row['yearLevel'] ?? '-') . '</span>
+                <small>' . $row['email'] . '</small>
+
+            </div>';
+        }
+    } else {
+        $output .= '<div class="list-item">No students found</div>';
+    }
+
+    return $output;
+}
+
+function renderAssignSupervisorList($conn, $search = '')
+{
+    $where = "WHERE 1=1";
+
+    if (!empty($search)) {
+        $where .= " AND (
+            supervisor.superID LIKE '%$search%' OR
+            supervisor.name LIKE '%$search%' OR
+            supervisor.email LIKE '%$search%' OR
+            supervisor.department LIKE '%$search%'
+        )";
+    }
+
+    $sql = "SELECT 
+                supervisor.superID,
+                supervisor.name,
+                supervisor.email,
+                supervisor.number,
+                supervisor.department
+            FROM supervisor
+            $where
+            ORDER BY supervisor.date_created DESC";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $output .= '
+            <div class="list-item supervisor-item"
+                data-id="' . $row['superID'] . '">
+
+                <strong>' . $row['name'] . '</strong>
+                <span>' . $row['superID'] . ' • ' . $row['department'] . '</span>
+                <small>' . $row['email'] . '</small>
+
+            </div>';
+        }
+    } else {
+        $output .= '<div class="list-item">No supervisors found</div>';
+    }
+
+    return $output;
+}
+
 // admin activity_log view
 function renderActivityLogTable($conn, $search = '')
 {
@@ -294,10 +515,26 @@ function renderActivityLogTable($conn, $search = '')
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
 
+            $role = strtoupper($row['role']);
+
+            switch ($role) {
+                case 'STUDENT':
+                    $roleColor = '#3B82F6';
+                    break;
+                case 'SUPERVISOR':
+                    $roleColor = '#F59E0B';
+                    break;
+                case 'ADMIN':
+                    $roleColor = '#374151';
+                    break;
+                default:
+                    $roleColor = '#9CA3AF';
+            }
+
             $output .= '
             <tr>
                 <td>' . $row['name'] . '</td>
-                <td>' . strtoupper($row['role']) . '</td>
+                <td style="color: ' . $roleColor . '; font-weight:600;"> ' . $role . '</td>
                 <td>' . $row['action'] . '</td>
                 <td>' . $row['module'] . '</td>
                 <td>' . $row['target_type'] . '</td>

@@ -2,6 +2,7 @@
 
 session_start();
 require_once("../../kapstongConnection.php");
+require_once("../../functions.php");
 
 header('Content-Type: application/json');
 
@@ -57,6 +58,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmtSupervisor->bind_param("ssss", $name, $email, $mobile, $department);
         $stmtSupervisor->execute();
+
+        $superID = $conn->insert_id;
+
+        $assigned_by = $_SESSION['user_id'];
+        $ip = getUserIP();
+
+        $log = $conn->prepare("
+            INSERT INTO activity_log
+            (
+                userID,
+                role,
+                action,
+                module,
+                description,
+                target_type,
+                target_id,
+                ip_address
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+        $role = "ADMIN";
+        $action = "Create Supervisor";
+        $module = "user_management";
+        $description = "Admin created supervisor: $name (Supervisor ID: $superID)";
+        $target_type = "supervisor";
+        $target_id = $superID;
+
+        $log->bind_param(
+            "isssssss",
+            $assigned_by,
+            $role,
+            $action,
+            $module,
+            $description,
+            $target_type,
+            $target_id,
+            $ip
+        );
+
+        $log->execute();
 
         $conn->commit();
 

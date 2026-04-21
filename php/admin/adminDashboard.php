@@ -123,12 +123,12 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <table>
                         <thead>
                             <tr>
-                                <th>Student ID</th>
+                                <th>Supervisor ID</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Course</th>
-                                <th>Year</th>
-                                <th>Status</th>
+                                <th>Mobile Number</th>
+                                <th>Department</th>
+                                <th>Date Joined</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -136,7 +136,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <tbody id="allSupervisorBody">
                             <?php
                             $search = $_POST['search'] ?? '';
-                            echo renderStudentTable($conn, 'supervisor', 'VERIFIED', $search);
+                            echo renderSupervisorTable($conn, $search);
                             ?>
                         </tbody>
                     </table>
@@ -255,6 +255,43 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
             </div>
 
+            <!-- supervisor view -->
+            <div class="supervisor-view" id="supervisor-view">
+            </div>
+
+            <!-- assign student-supervisor -->
+            <div class="assign-student-container" id="assign-student-container">
+                <div class="modal-header">
+                    <h3>👥 Student–Supervisor Assignment</h3>
+                    <button id="closeAssignModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="assign-body">
+
+                    <div class="assign-column">
+                        <h4>Students</h4>
+                        <input type="text" id="studentAssignSearch" placeholder="Search student...">
+                        <div class="list-box" id="studentList">
+                            <?php echo renderAssignStudentList($conn); ?>
+                        </div>
+                    </div>
+
+                    <div class="assign-column">
+                        <h4>Supervisors</h4>
+                        <input type="text" id="supervisorAssignSearch" placeholder="Search supervisor...">
+                        <div class="list-box" id="supervisorList">
+                            <?php echo renderAssignSupervisorList($conn); ?>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="assign-footer">
+                    <button class="assign-btn" id="assign-btn">Assign Student</button>
+                </div>
+
+            </div>
+
             <!-- dashboard -->
             <section class="admin-dashboard" id="admin-dashboard">
 
@@ -312,7 +349,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                         <?php
                         $students = countStudents($conn);
-                        $trend = getTrend($conn, 'student', 'PENDING');
+                        $trend = getTrend($conn, 'student', 'VERIFIED');
                         $badge = getBadge($students);
                         ?>
 
@@ -336,7 +373,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <div class="card supervisor">
                         <?php
                         $supervisor = countSupervisors($conn);
-                        $superTrend = getTrend($conn, 'supervisor', 'PENDING');
+                        $superTrend = getTrend($conn, 'supervisor', 'VERIFIED');
                         $superBadge = getBadge($supervisor);
                         ?>
 

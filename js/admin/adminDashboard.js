@@ -79,11 +79,27 @@ const superCreate = document.getElementById("supervisor-container");
 const superCreateBtn = document.getElementById("supervisor-btn");
 const superCloseBtn = document.getElementById("closeCreateSupervisorModal");
 
+const superView = document.getElementById("supervisor-view");
+// const superAssignView = document.getElementById("supervisor-assigned-view");
+
+const AssignStudent = document.getElementById("assign-student-container");
+const AssignStudentBtn = document.getElementById("assign-student-btn");
+const AssignCloseBtn = document.getElementById("closeAssignModal");
+
+let selectedStudentIDs = [];
+let selectedSupervisorID = null;
+
 // form
 const supervisorForm = document.getElementById("createSupervisorForm");
+
 const messageBox = document.getElementById("formMessage");
 
+const assignForm = document.getElementById("assignStudentSupervisorForm");
+const studentList = document.getElementById("studentList");
+const supervisorList = document.getElementById("supervisorList");
+
 let activitySearchTimer;
+let assignSearchTimer;
 
 
 // Functions 
@@ -98,6 +114,10 @@ function viewUser(studentID, source) {
     }
     if(source === "UnverifiedStudent"){
         allUnverified.classList.remove("show");
+        studentApplicationView.classList.add("show");
+    }
+    if(source === "supervisorView"){
+        superView.classList.remove("show");
         studentApplicationView.classList.add("show");
     }
     if(source === "main"){
@@ -121,6 +141,27 @@ function viewUser(studentID, source) {
         studentApplicationView.innerHTML = data;
     });
 };
+
+function viewSupervisor(superID) {
+    
+    allSupervisor.classList.remove("show");
+    superView.classList.add("show");
+    overlay.classList.add("show");
+
+    superView.innerHTML = '';
+
+    fetch("functions/getSupervisorData.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "superID=" + encodeURIComponent(superID)
+    })
+    .then(res => res.text())
+    .then(data => {
+        superView.innerHTML = data;
+    });
+}
 
 function approveUser(studentID) {
     
@@ -229,7 +270,14 @@ function rejectStudent(studentID) {
     .catch(err => console.error(err));
 }
 
+function closeSuperViewModal() {
 
+    superView.classList.remove("show");
+     allSupervisor.classList.add("show");
+
+    overlay.classList.add("show");
+    
+}
 
 function closeApproveModal() {
 
@@ -255,6 +303,10 @@ function closeModal() {
     } else if(previousModal === "UnverifiedStudent") {
         allUnverified.classList.add("show");
         overlay.classList.add("show");
+    }else if(previousModal === "supervisorView"){
+        superView.classList.add("show");
+        overlay.classList.add("show");
+
     }else{
         overlay.classList.remove("show");
     }
@@ -596,6 +648,8 @@ overlay.addEventListener('click', () => {
     studentApplicationReject.classList.remove("show");
      allSupervisor.classList.remove("show");
       allUnverified.classList.remove("show");
+      AssignStudent.classList.remove("show");
+      superView.classList.remove("show");
 });
 
 allStudentBtn.addEventListener("click", () => {
@@ -677,7 +731,7 @@ document.getElementById("allSupervisorSearch").addEventListener("keyup", functio
 
         allSupervisorBody.classList.add("fade-out");
 
-        fetch("functions/searchAllStudent.php", {
+        fetch("functions/searchAllSupervisor.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -830,6 +884,179 @@ supervisorForm.addEventListener("submit", function (e) {
         messageBox.textContent = "Something went wrong.";
         messageBox.style.color = "red";
     });
+});
+
+// assign student-supervisor btn
+AssignStudentBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+    AssignStudent.classList.add("show");
+
+});
+
+AssignCloseBtn.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    AssignStudent.classList.remove("show");
+});
+
+document.getElementById("studentList").addEventListener("click", function (e) {
+
+    const item = e.target.closest(".student-item");
+
+    if (!item) return;
+
+    item.classList.toggle("selected-student");
+
+    let id = item.dataset.id;
+
+    if (selectedStudentIDs.includes(id)) {
+        selectedStudentIDs = selectedStudentIDs.filter(i => i !== id);
+    } else {
+        selectedStudentIDs.push(id);
+    }
+
+});
+
+document.getElementById("supervisorList").addEventListener("click", function (e) {
+
+    const item = e.target.closest(".supervisor-item");
+
+    if (!item) return;
+
+    // document.querySelectorAll(".supervisor-item")
+    //     .forEach(i => i.classList.remove("selected-supervisor"));
+
+    // item.classList.toggle("selected-supervisor");
+
+    // selectedSupervisorID = item.dataset.id;
+
+    const alreadySelected = item.classList.contains("selected-supervisor");
+
+    document.querySelectorAll(".supervisor-item")
+        .forEach(i => i.classList.remove("selected-supervisor"));
+
+    if (!alreadySelected) {
+        item.classList.add("selected-supervisor");
+        selectedSupervisorID = item.dataset.id;
+    } else {
+    
+        selectedSupervisorID = null;
+    }
+
+});
+
+// search assigns
+document.getElementById("studentAssignSearch").addEventListener("keyup", function () {
+    clearTimeout(assignSearchTimer);
+
+    let value = this.value;
+
+    assignSearchTimer = setTimeout(() => {
+
+        studentList.classList.add("fade-out");
+
+        fetch("functions/searchAssignStudent.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "search=" + encodeURIComponent(value)
+        })
+        .then(res => res.text())
+        .then(data => {
+
+            setTimeout(() => {
+                studentList.innerHTML = data;
+
+                studentList.classList.remove("fade-out");
+                studentList.classList.add("fade-in");
+
+                setTimeout(() => {
+                    studentList.classList.remove("fade-in");
+                }, 200);
+
+            }, 200);
+
+        });
+
+    }, 300);
+});
+
+document.getElementById("supervisorAssignSearch").addEventListener("keyup", function () {
+    clearTimeout(assignSearchTimer);
+
+    let value = this.value;
+
+    assignSearchTimer = setTimeout(() => {
+
+        supervisorList.classList.add("fade-out");
+
+        fetch("functions/searchAssignSupervisor.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "search=" + encodeURIComponent(value)
+        })
+        .then(res => res.text())
+        .then(data => {
+
+            setTimeout(() => {
+                supervisorList.innerHTML = data;
+
+                supervisorList.classList.remove("fade-out");
+                supervisorList.classList.add("fade-in");
+
+                setTimeout(() => {
+                    supervisorList.classList.remove("fade-in");
+                }, 200);
+
+            }, 200);
+
+        });
+
+    }, 300);
+});
+
+// assign submit
+
+document.getElementById("assign-btn").addEventListener("click", function () {
+
+    if (selectedStudentIDs.length === 0) {
+        alert("Please select at least one student.");
+        return;
+    }
+
+    if (!selectedSupervisorID) {
+        alert("Please select a supervisor.");
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("superID", selectedSupervisorID);
+
+    selectedStudentIDs.forEach(studentID => {
+        formData.append("studentIDs[]", studentID);
+    });
+
+    fetch("functions/assignStudentSupervisor.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        alert(data.message);
+
+        if (data.status === "success") {
+            location.reload();
+        }
+    })
+    .catch(err => {
+        alert("Something went wrong.");
+        console.log(err);
+    });
+
 });
 
  
