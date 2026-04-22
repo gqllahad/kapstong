@@ -371,6 +371,76 @@ function renderSupervisorAssignedStudents($conn, $superID)
     return $output;
 }
 
+// pending approval reports(student)
+function renderApprovalReportList($conn, $superID, $search = '')
+{
+    $where = "
+        WHERE 
+            student_tasks.superID = '$superID'
+            AND student_tasks.status = 'SUBMITTED'
+    ";
+
+    if (!empty($search)) {
+        $where .= " AND (
+            student_tasks.studentID LIKE '%$search%' OR
+            ojtstudent.name LIKE '%$search%' OR
+            student_tasks.title LIKE '%$search%'
+        )";
+    }
+
+    $sql = "
+        SELECT 
+            student_tasks.taskID,
+            student_tasks.studentID,
+            ojtstudent.name,
+            student_tasks.title,
+            student_tasks.status,
+            student_tasks.date_created
+        FROM student_tasks
+        INNER JOIN ojtstudent 
+            ON student_tasks.studentID = ojtstudent.studentID
+        $where
+        ORDER BY student_tasks.date_created DESC
+    ";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $output .= '
+            <tr>
+                <td>' . $row['studentID'] . '</td>
+                <td>' . $row['name'] . '</td>
+                <td>' . $row['title'] . '</td>
+                <td>' . $row['status'] . '</td>
+                <td>' . date("M d, Y h:i A", strtotime($row['date_created'])) . '</td>
+                <td>
+                    <button 
+                        class="view-btn" 
+                        onclick="viewTask(' . $row['taskID'] . ')">
+                        Review
+                    </button>
+                </td>
+            </tr>';
+        }
+    } else {
+        $output .= '
+        <tr>
+            <td colspan="6" style="text-align:center;padding:15px;font-weight:500;">
+                No pending approval reports found
+            </td>
+        </tr>';
+    }
+
+    $output .= '</tbody></table>';
+
+    return $output;
+}
+
+
 // assign student-supervisor
 function renderAssignStudentList($conn, $search = '')
 {
@@ -636,11 +706,104 @@ function getTrend($conn, $role, $status)
     return round($percent, 1) . "%";
 }
 
-
 // badges
 function getBadge($count)
 {
     if ($count >= 20) return "Hot";
     if ($count >= 5) return "New";
     return "Stable";
+}
+
+// supervisor cards
+
+// getting superID
+function getSupervisorIDByUserID($conn, $userID)
+{
+    $stmt = $conn->prepare("
+        SELECT superID 
+        FROM supervisor 
+        WHERE email = (
+            SELECT email FROM users WHERE userID = ?
+        )
+        LIMIT 1
+    ");
+
+    $stmt->bind_param("i", $userID);
+    $stmt->execute();
+
+    return $stmt->get_result()->fetch_assoc()['superID'] ?? null;
+}
+
+function countTotalAssignedStudents($conn, $superID)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total FROM student_supervisor WHERE superID = ?;
+    ");
+    $stmt->bind_param("i", $superID);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['total'];
+}
+
+function countTotalActiveStudents($conn, $superID)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total FROM student_supervisor WHERE superID = ? AND status = 'ACTIVE';
+    ");
+    $stmt->bind_param("i", $superID);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['total'];
+}
+
+function countTotalCompletedStudents($conn, $superID)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total FROM student_supervisor WHERE superID = ? AND status = 'COMPLETED';
+    ");
+    $stmt->bind_param("i", $superID);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['total'];
+}
+
+function countPendingTasks($conn, $superID)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total
+        FROM student_tasks
+        WHERE superID = ?
+        AND status = 'SUBMITTED'
+    ");
+
+    $stmt->bind_param("i", $superID);
+    $stmt->execute();
+
+    return $stmt->get_result()->fetch_assoc()['total'];
+}
+
+// super trend
+function getSupervisorTrend($conn, $table, $column, $value, $dateColumn)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total
+        FROM $table
+        WHERE $column = ?
+        AND $dateColumn >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    ");
+
+    $stmt->bind_param("s", $value);
+    $stmt->execute();
+    $recent = $stmt->get_result()->fetch_assoc()['total'];
+
+    $stmt2 = $conn->prepare("
+        SELECT COUNT(*) AS total
+        FROM $table
+        WHERE $column = ?
+    ");
+
+    $stmt2->bind_param("s", $value);
+    $stmt2->execute();
+    $total = $stmt2->get_result()->fetch_assoc()['total'];
+
+    if ($total == 0) return "0%";
+
+    return round(($recent / $total) * 100, 1) . "%";
 }

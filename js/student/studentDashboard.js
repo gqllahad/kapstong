@@ -82,6 +82,11 @@ const previewFilesBtn = document.getElementById('btn-preview');
 const previewFilesModal = document.getElementById('previewFilesModal');
 const closePreviewModalBtn = document.getElementById('closePreviewModal');
 
+// tasks
+const submitTaskModal = document.getElementById("submit-task-modal");
+const submitTaskBtn = document.getElementById("submit-task-btn");
+const closeSubmitTaskBtn = document.getElementById("closeSubmitModal");
+
 // edit info
 const editInfo = document.getElementById("btn-edit");
 const editModal = document.getElementById('editModal');
@@ -197,8 +202,7 @@ function loadPieChart() {
                 }
                 return "#6c757d";
             });
-
-            // Destroy previous chart
+            
             if (window.pieChartInstance) {
                 window.pieChartInstance.destroy();
             }
@@ -650,6 +654,19 @@ if(verifiedPreview){
     });
 }
 
+// tasks
+if(submitTaskBtn){
+    submitTaskBtn.addEventListener("click", () => {
+        submitTaskModal.classList.add("show");
+        overlay.classList.add("show");
+    });
+
+    closeSubmitTaskBtn.addEventListener("click", () => {
+        submitTaskModal.classList.remove("show");
+        overlay.classList.remove("show");
+    });
+}
+
 
 if(overlay){
 overlay.addEventListener('click', () => {
@@ -663,6 +680,8 @@ overlay.addEventListener('click', () => {
     accountSettings?.classList.remove("show");
     changePasswordModal?.classList.remove('show');
     forgotPinModal?.classList.remove('show');
+
+    submitTaskModal?.classList.remove("show");
 
     if (editForm) editForm.reset();
 });
@@ -692,3 +711,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 };
+
+

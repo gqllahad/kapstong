@@ -199,9 +199,45 @@ $documents = getStudentDocuments($conn, $studentID);
                 </div>
             </div>
 
+            <!-- submit task modal -->
+            <div class="submit-task-modal" id="submit-task-modal">
+                <div class="modal-header">
+                    <h3>Submit Task</h3>
+                    <button id="closeSubmitModal" class="modal-close-profile">&times;</button>
+                </div>
+
+                <form id="submitTaskForm" enctype="multipart/form-data">
+
+                    <!-- Task Selection -->
+                    <div class="form-group">
+                        <label>Select Task</label>
+                        <select name="taskID" required>
+                            <!-- dynamically load assigned tasks -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes (Optional)</label>
+                        <textarea name="student_note" placeholder="Explain your submission..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload File</label>
+                        <input type="file" name="submission_file" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="primary-btn">Submit Task</button>
+                    </div>
+
+                </form>
+
+            </div>
+
+
             <!-- dashboard -->
             <section class="student-dashboard" id="student-dashboard">
-                <section class="page-header">
+                <section class="title-header">
                     <h2>Welcome, <?php echo htmlspecialchars($studentName); ?>!</h2>
                     <p>Here's your OJT progress and tasks.</p>
                 </section>
@@ -237,9 +273,68 @@ $documents = getStudentDocuments($conn, $studentID);
 
             <!-- Tasks -->
             <section class="student-tasks" id="student-tasks">
-                <h2 style="margin-bottom: 10px;">Your Tasks</h2>
 
-                <!-- Task list container -->
+                <div class="task-header">
+                    <div class="title-header">
+                        <h2>Your Tasks</h2>
+                        <p>Submit your work and track approval status</p>
+                    </div>
+
+                    <div class="create-btn">
+                        <button class="add-task-btn" id="submit-task-btn">
+                            + Submit Task
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="task-filters">
+                    <button class="active">All</button>
+                    <button>In Progress</button>
+                    <button>Pending</button>
+                    <button>Approved</button>
+                    <button>Rejected</button>
+                </div>
+
+                <div class="tasks-container" id="taskList">
+                    <div class="task-card">
+                        <div class="task-top">
+                            <h3>Learn Company ERP System</h3>
+                            <span class="task-status in-progress">In Progress</span>
+                        </div>
+
+                        <div class="task-body">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <small>2/5 Modules Completed</small>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- <div class="task-card">
+
+                    <div class="task-top">
+                        <h3>Learn ERP System</h3>
+                        <span class="task-status">PENDING</span>
+                    </div>
+
+                    <p class="task-desc">
+                        Completed modules 1-3 of ERP training.
+                    </p>
+
+                    <div class="task-footer">
+                        <small>Submitted: Apr 21, 2026</small>
+                    </div>
+
+                    <div class="task-actions">
+                        <button class="view-btn">View File</button>
+                    </div>
+
+                </div> -->
+
+                <!-- <h2 style="margin-bottom: 10px;">Your Tasks</h2>
                 <div class="tasks-container">
 
                     <div class="task-card">
@@ -255,7 +350,6 @@ $documents = getStudentDocuments($conn, $studentID);
                         </div>
                     </div>
 
-                    <!-- Daily Checklist Card -->
                     <div class="task-card">
                         <div class="task-header">
                             <h3>Daily Log Submission</h3>
@@ -269,7 +363,6 @@ $documents = getStudentDocuments($conn, $studentID);
                         </div>
                     </div>
 
-                    <!-- Upcoming Deadline Card -->
                     <div class="task-card">
                         <div class="task-header">
                             <h3>Weekly Report Submission</h3>
@@ -283,7 +376,7 @@ $documents = getStudentDocuments($conn, $studentID);
                         </div>
                     </div>
 
-                    <!-- Achievement Card -->
+             
                     <div class="task-card">
                         <div class="task-header">
                             <h3>Completed Safety Training</h3>
@@ -297,7 +390,6 @@ $documents = getStudentDocuments($conn, $studentID);
                         </div>
                     </div>
 
-                    <!-- Orientation/Training Resource Card -->
                     <div class="task-card">
                         <div class="task-header">
                             <h3>Orientation Video</h3>
@@ -310,7 +402,7 @@ $documents = getStudentDocuments($conn, $studentID);
                             <span class="progress-text">3/5 Sections</span>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </section>
 
             <!-- student documents -->

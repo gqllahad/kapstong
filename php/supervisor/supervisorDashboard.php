@@ -12,6 +12,10 @@ if ($_SESSION['role'] !== "supervisor") {
     header("Location: ../trackerMain.php");
     exit();
 }
+
+$userID = $_SESSION['user_id'];
+$superID = getSupervisorIDByUserID($conn, $userID);
+
 ?>
 
 
@@ -67,66 +71,158 @@ if ($_SESSION['role'] !== "supervisor") {
                 <p>Monitor student OJT progress and pending tasks</p>
             </div>
 
-            <!-- STATS -->
-            <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px;">
+            <!-- cards -->
+            <section class="cards">
+                <div class="card total-student">
 
-                <div style="flex:1; min-width:200px; background:white; padding:20px; border-radius:12px;">
-                    <h4>Total Interns</h4>
-                    <p style="font-size:28px; font-weight:bold;">0</p>
+                    <?php
+                    $totalAssignedStudents = countTotalAssignedStudents($conn, $superID);
+                    $totalAssignedTrend = getSupervisorTrend($conn, 'student_supervisor', 'superID', $superID, 'date_assigned');
+                    $totalAssignedBadge = getBadge($totalAssignedStudents);
+                    ?>
+
+                    <span class="card-badge"><?= $totalAssignedBadge ?></span>
+
+                    <div class="card-content">
+                        <div>
+                            <h3>Total Assigned Students</h3>
+                            <p>Students currently handled by this supervisor</p>
+
+                            <span class="trend">
+                                ▲ <?= $totalAssignedTrend ?> this week
+                            </span>
+                        </div>
+
+                        <h2><?= $totalAssignedStudents ?></h2>
+                    </div>
                 </div>
 
-                <div style="flex:1; min-width:200px; background:white; padding:20px; border-radius:12px;">
-                    <h4>Active Interns</h4>
-                    <p style="font-size:28px; font-weight:bold;">0</p>
+                <div class="card active-student">
+
+                    <?php
+                    $totalActiveStudents = countTotalActiveStudents($conn, $superID);
+                    $activeTrend = getSupervisorTrend($conn, 'student_supervisor', 'superID', $superID, 'date_assigned');
+                    $activeBadge = getBadge($totalActiveStudents);
+                    ?>
+
+                    <span class="card-badge"> <?= $activeBadge ?></span>
+
+                    <div class="card-content">
+                        <div>
+                            <h3>Active Students</h3>
+                            <p>Students with ongoing supervision and tasks</p>
+
+                            <span class="trend">
+                                ▲ <?= $activeTrend ?> this week
+                            </span>
+                        </div>
+
+                        <h2 class="white-h2"><?= $totalActiveStudents ?></h2>
+                    </div>
                 </div>
 
-                <div style="flex:1; min-width:200px; background:white; padding:20px; border-radius:12px;">
-                    <h4>Completed</h4>
-                    <p style="font-size:28px; font-weight:bold;">0</p>
+                <div class="card completed-student">
+
+                    <?php
+                    $totalCompletedStudents = countTotalCompletedStudents($conn, $superID);
+                    $completedTrend = getSupervisorTrend($conn, 'student_tasks', 'status', 'APPROVED', 'date_updated');
+                    $completedBadge = getBadge($totalCompletedStudents);
+                    ?>
+
+                    <span class="card-badge"><?= $completedBadge ?></span>
+
+                    <div class="card-content">
+                        <div>
+                            <h3>Completed Students</h3>
+                            <p>Students who have finished required OJT tasks</p>
+
+                            <span class="trend">
+                                ▲ <?= $completedTrend ?> this week
+                            </span>
+                        </div>
+
+                        <h2><?= $totalCompletedStudents ?></h2>
+                    </div>
+
                 </div>
 
-                <div style="flex:1; min-width:200px; background:white; padding:20px; border-radius:12px;">
-                    <h4>Pending Approvals</h4>
-                    <p style="font-size:28px; font-weight:bold;">0</p>
+                <div class="card pending-task">
+                    <?php
+                    $pendingReports = countPendingTasks($conn, $superID);
+                    $pendingTrend = getSupervisorTrend($conn, 'student_tasks', 'status', 'SUBMITTED', 'date_created');
+                    $pendingBadge = getBadge($pendingReports);
+                    ?>
+
+                    <span class="card-badge"><?= $pendingBadge ?></span>
+
+                    <div class="card-content">
+                        <div>
+                            <h3>Pending Task Approvals</h3>
+                            <p>Submitted tasks waiting for supervisor review</p>
+
+                            <span class="trend">
+                                ▲ <?= $pendingTrend ?> this week
+                            </span>
+                        </div>
+
+                        <h2 class="white-h2"><?= $pendingReports ?></h2>
+                    </div>
                 </div>
 
-            </div>
+            </section>
+
+            <section class="dashboard-charts">
+                <section class="wrapper line-chart">
+                    <h2>Line Chart (Users per Role)</h2>
+                    <canvas id="lineChart"></canvas>
+                </section>
+
+                <section class="wrapper pie-chart">
+                    <h2>Attendance Evaluation</h2>
+                    <canvas id="pieChart"></canvas>
+                </section>
+            </section>
 
             <!-- PENDING APPROVALS -->
             <div style="background:white; padding:20px; border-radius:12px; margin-bottom:30px;">
-                <h3 style="margin-bottom:15px;">Pending Approvals</h3>
+                <div class="top-bar">
 
-                <table style="width:100%; border-collapse:collapse;">
-                    <thead>
-                        <tr style="background:#f1f5f9;">
-                            <th style="padding:12px; text-align:left;">Student</th>
-                            <th style="padding:12px; text-align:left;">Type</th>
-                            <th style="padding:12px; text-align:left;">Date</th>
-                            <th style="padding:12px;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    <div class="top-header">
+                        <h3 class="table-title">Pending Report Approval</h3>
+                        <p>Search and review students waiting for approval.</p>
+                    </div>
 
-                        <!-- SAMPLE -->
-                        <tr>
-                            <td style="padding:12px;">Juan Dela Cruz</td>
-                            <td style="padding:12px;">Daily Log</td>
-                            <td style="padding:12px;">April 15</td>
-                            <td style="padding:12px;">
-                                <button style="background:#22c55e; color:white; border:none; padding:6px 10px; border-radius:6px;">Approve</button>
-                                <button style="background:#ef4444; color:white; border:none; padding:6px 10px; border-radius:6px;">Reject</button>
-                            </td>
-                        </tr>
+                    <div class="search-filter">
+                        <div class="search-container">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" id="reportApprovalSearch"
+                                placeholder="Search by ID, Name, OR Email">
+                        </div>
+                    </div>
 
-                        <!-- EMPTY STATE -->
-                        <!--
-                <tr>
-                    <td colspan="4" style="text-align:center; padding:20px;">No pending approvals</td>
-                </tr>
-                -->
+                </div>
 
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Date Created</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="approvalReportBody">
+                            <?php
+                            $search = $_POST['search'] ?? '';
+                            echo renderApprovalReportList($conn, $superID, $search);
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- STUDENT PROGRESS -->
@@ -192,6 +288,7 @@ if ($_SESSION['role'] !== "supervisor") {
     </div>
 
 </body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../../js/supervisor/supervisorDashboard.js"></script>
 
 </html>
