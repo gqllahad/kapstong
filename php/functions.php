@@ -440,6 +440,191 @@ function renderApprovalReportList($conn, $superID, $search = '')
     return $output;
 }
 
+// task management (supervisor)
+function renderTaskManagementList($conn, $superID, $search = '')
+{
+    $where = "
+        WHERE student_tasks.superID = '$superID'
+    ";
+
+    if (!empty($search)) {
+        $where .= " AND (
+            student_tasks.studentID LIKE '%$search%' OR
+            ojtstudent.name LIKE '%$search%' OR
+            student_tasks.title LIKE '%$search%' OR
+            student_tasks.status LIKE '%$search%'
+        )";
+    }
+
+    $sql = "
+        SELECT 
+            student_tasks.taskID,
+            student_tasks.studentID,
+            ojtstudent.name,
+            student_tasks.title,
+            student_tasks.due_date,
+            student_tasks.status,
+            student_tasks.date_created
+        FROM student_tasks
+        INNER JOIN ojtstudent 
+            ON student_tasks.studentID = ojtstudent.studentID
+        $where
+        ORDER BY student_tasks.date_created DESC
+    ";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $status = $row['status'];
+
+            switch ($status) {
+                case 'NOT STARTED':
+                    $color = '#6B7280';
+                    break;
+                case 'IN PROGRESS':
+                    $color = '#2563EB';
+                    break;
+                case 'SUBMITTED':
+                    $color = '#F59E0B';
+                    break;
+                case 'APPROVED':
+                    $color = '#059669';
+                    break;
+                case 'REJECTED':
+                    $color = '#DC2626';
+                    break;
+                default:
+                    $color = '#9CA3AF';
+            }
+
+            $output .= '
+            <tr>
+                <td style="font-weight:600;">' . $row['title'] . '</td>
+                <td>' . $row['name'] . '</td>
+                <td>' . date("M d, Y", strtotime($row['due_date'])) . '</td>
+                <td style="color:' . $color . '; font-weight:600;">
+                    ' . $status . '
+                </td>
+                <td>
+                    <button class="view-btn" onclick="viewTask(' . $row['taskID'] . ')">
+                        View
+                    </button>
+
+                    <button class="view-btn" onclick="editTask(' . $row['taskID'] . ')">
+                        Edit
+                    </button>
+
+                    <button class="view-btn" onclick="deleteTask(' . $row['taskID'] . ')">
+                        Delete
+                    </button>
+                </td>
+            </tr>';
+        }
+    } else {
+        $output .= '
+        <tr>
+            <td colspan="5" style="text-align:center;padding:15px;font-weight:500;">
+                No tasks found
+            </td>
+        </tr>';
+    }
+
+    return $output;
+}
+
+// student process(supervisor)
+function renderStudentProgressList($conn, $superID, $search = '')
+{
+    $where = "
+        WHERE 
+            student_supervisor.superID = '$superID'
+            AND student_supervisor.status = 'ACTIVE'
+    ";
+
+    if (!empty($search)) {
+        $where .= " AND (
+            student_supervisor.studentID LIKE '%$search%' OR
+            ojtstudent.name LIKE '%$search%'
+        )";
+    }
+
+    $sql = "
+        SELECT 
+            student_supervisor.assignmentID,
+            student_supervisor.studentID,
+            ojtstudent.name,
+            student_progress.completed_hours,
+            student_progress.required_hours,
+            student_progress.remaining_hours,
+            student_progress.completion_status,
+            student_progress.last_updated
+        FROM student_supervisor
+
+        INNER JOIN ojtstudent 
+            ON student_supervisor.studentID = ojtstudent.studentID
+
+        LEFT JOIN student_progress 
+            ON student_supervisor.studentID = student_progress.studentID
+
+        $where
+
+        ORDER BY ojtstudent.name ASC
+    ";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $completedHours = $row['completed_hours'] ?? 0;
+            $requiredHours = $row['required_hours'] ?? 500;
+            $remainingHours = $row['remaining_hours'] ?? ($requiredHours - $completedHours);
+            $status = $row['completion_status'] ?? 'ONGOING';
+
+            switch ($status) {
+                case 'ONGOING':
+                    $statusColor = '#2563EB';
+                    break;
+                case 'COMPLETED':
+                    $statusColor = '#059669';
+                    break;
+                default:
+                    $statusColor = '#9CA3AF';
+            }
+
+            $output .= '
+            <tr>
+                <td>' .  $row['name'] . '</td>
+                <td>' . $completedHours . '</td>
+                <td>' . $requiredHours . '</td> 
+                <td>' . $remainingHours . '</td>
+                <td style="color: ' . $statusColor . '; font-weight:600;"> ' . $status . '</td>
+                <td>
+                    <button 
+                        class="view-btn" 
+                        onclick="viewStudentProgress(\'' . $row['studentID'] . '\')">
+                        View
+                    </button>
+                </td>
+            </tr>';
+        }
+    } else {
+        $output .= '
+        <tr>
+            <td colspan="6" style="text-align:center;padding:15px;font-weight:500;">
+                No assigned students found
+            </td>
+        </tr>';
+    }
+
+    return $output;
+}
 
 // assign student-supervisor
 function renderAssignStudentList($conn, $search = '')
@@ -487,12 +672,78 @@ function renderAssignStudentList($conn, $search = '')
 
                 <strong>' . $row['name'] . '</strong>
                 <span>' . $row['studentID'] . ' • ' . ($row['course'] ?? '-') . ' • ' . ($row['yearLevel'] ?? '-') . '</span>
-                <small>' . $row['email'] . '</small>
 
             </div>';
         }
     } else {
         $output .= '<div class="list-item">No students found</div>';
+    }
+
+    return $output;
+}
+
+// assigning task to student (supervisor)
+function renderTaskAssignStudentList($conn, $search = '')
+{
+    $where = "
+        WHERE users.role = 'student'
+        AND users.isVerified = 'VERIFIED'
+    ";
+
+    if (!empty($search)) {
+        $where .= " AND (
+            users.studentID LIKE '%$search%' OR
+            users.name LIKE '%$search%' OR ojtstudent.course LIKE '%$search%'
+            OR ojtstudent.yearLevel LIKE '%$search%'
+        )";
+    }
+
+    $sql = "
+        SELECT 
+            users.studentID,
+            users.name,
+            users.email,
+            ojtstudent.course,
+            ojtstudent.yearLevel
+        FROM users
+
+        LEFT JOIN ojtstudent
+            ON users.studentID = ojtstudent.studentID
+
+        $where
+
+        ORDER BY users.name ASC
+    ";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $course = $row['course'] ?? 'No Course';
+            $yearLevel = $row['yearLevel'] ?? '-';
+
+            $output .= '
+            <div class="task-student-item"
+                data-id="' . $row['studentID'] . '">
+
+                <div class="student-name">
+                    ' . $row['name'] . '
+                </div>
+
+                <div class="student-details">
+                    ' . $row['studentID'] . ' • ' . $course . ' • ' . $yearLevel . '
+                </div>
+
+            </div>';
+        }
+    } else {
+        $output .= '
+        <div class="empty-state">
+            No students found
+        </div>';
     }
 
     return $output;
@@ -534,7 +785,6 @@ function renderAssignSupervisorList($conn, $search = '')
 
                 <strong>' . $row['name'] . '</strong>
                 <span>' . $row['superID'] . ' • ' . $row['department'] . '</span>
-                <small>' . $row['email'] . '</small>
 
             </div>';
         }
@@ -709,8 +959,8 @@ function getTrend($conn, $role, $status)
 // badges
 function getBadge($count)
 {
-    if ($count >= 20) return "Hot";
-    if ($count >= 5) return "New";
+    if ($count >= 10) return "Hot";
+    if ($count >= 3) return "New";
     return "Stable";
 }
 
