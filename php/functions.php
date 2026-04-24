@@ -509,16 +509,13 @@ function renderTaskManagementList($conn, $superID, $search = '')
                 <td style="color:' . $color . '; font-weight:600;">
                     ' . $status . '
                 </td>
-                <td>
-                    <button class="view-btn" onclick="viewTask(' . $row['taskID'] . ')">
-                        View
-                    </button>
+                <td style="display:flex;flex-direction:row;gap:10px;">
 
-                    <button class="view-btn" onclick="editTask(' . $row['taskID'] . ')">
+                    <button class="edit-btn" onclick="editTask(' . $row['taskID'] . ')">
                         Edit
                     </button>
 
-                    <button class="view-btn" onclick="deleteTask(' . $row['taskID'] . ')">
+                    <button class="delete-btn" onclick="deleteTask(' . $row['taskID'] . ')">
                         Delete
                     </button>
                 </td>
@@ -619,6 +616,166 @@ function renderStudentProgressList($conn, $superID, $search = '')
         <tr>
             <td colspan="6" style="text-align:center;padding:15px;font-weight:500;">
                 No assigned students found
+            </td>
+        </tr>';
+    }
+
+    return $output;
+}
+
+// evaluations (sueprvisor)
+function renderEvaluationList($conn, $superID, $search = '')
+{
+    $where = "
+        WHERE ss.superID = '$superID'
+        AND ss.status = 'ACTIVE'
+    ";
+
+    if (!empty($search)) {
+        $where .= " AND (
+            u.studentID LIKE '%$search%' OR
+            u.name LIKE '%$search%'
+        )";
+    }
+
+    $sql = "
+        SELECT 
+            u.studentID,
+            u.name
+        FROM student_supervisor ss
+        INNER JOIN users u 
+            ON ss.studentID = u.studentID
+        $where
+        ORDER BY u.name ASC
+    ";
+
+    $result = $conn->query($sql);
+
+    if (!$result) {
+        return "<tr><td colspan='8'>SQL Error: " . $conn->error . "</td></tr>";
+    }
+
+    $output = '';
+
+    while ($row = $result->fetch_assoc()) {
+
+        $studentID = $row['studentID'];
+
+        $att = $conn->query("
+            SELECT 
+                COUNT(*) as total,
+                SUM(status='present') as present
+            FROM attendance_logs
+            WHERE studentID = '$studentID'
+        ")->fetch_assoc();
+
+        $attendanceScore = ($att['total'] > 0)
+            ? ($att['present'] / $att['total']) * 100
+            : 0;
+
+        $prog = $conn->query("
+            SELECT completed_hours, required_hours
+            FROM student_progress
+            WHERE studentID = '$studentID'
+            LIMIT 1
+        ")->fetch_assoc();
+
+        $progressScore = 0;
+
+        if ($prog && $prog['required_hours'] > 0) {
+            $progressScore = ($prog['completed_hours'] / $prog['required_hours']) * 100;
+        }
+
+        $taskResult = $conn->query("
+            SELECT status
+            FROM student_tasks
+            WHERE studentID = '$studentID'
+        ");
+
+        $taskTotal = 0;
+        $taskSum = 0;
+
+        while ($t = $taskResult->fetch_assoc()) {
+            $taskTotal++;
+
+            switch ($t['status']) {
+                case 'APPROVED':
+                    $taskSum += 100;
+                    break;
+                case 'SUBMITTED':
+                    $taskSum += 75;
+                    break;
+                case 'IN PROGRESS':
+                    $taskSum += 50;
+                    break;
+                default:
+                    $taskSum += 0;
+            }
+        }
+
+        $taskScore = ($taskTotal > 0) ? ($taskSum / $taskTotal) : 0;
+
+        $finalGrade =
+            ($attendanceScore * 0.30) +
+            ($progressScore * 0.40) +
+            ($taskScore * 0.30);
+
+        $remarkColor = '#DC2626';
+
+        if ($finalGrade >= 90) {
+            $remarks = "EXCELLENT";
+            $remarkColor = "#059669";
+        } else if ($finalGrade >= 80) {
+            $remarks = "VERY GOOD";
+            $remarkColor = "#2563EB";
+        } else if ($finalGrade >= 70) {
+            $remarks = "SATISFACTORY";
+            $remarkColor = "#F59E0B";
+        } else if ($finalGrade >= 60) {
+            $remarks = "NEEDS IMPROVEMENT";
+            $remarkColor = "#F97316";
+        } else {
+            $remarks = "FAILED";
+            $remarkColor = '#DC2626';
+        }
+
+
+        $gradeColor = '#DC2626';
+
+        if ($finalGrade >= 90) $gradeColor = '#059669';
+        else if ($finalGrade >= 80) $gradeColor = '#2563EB';
+        else if ($finalGrade >= 70) $gradeColor = '#F59E0B';
+
+        $output .= '
+        <tr>
+            <td>' . $row['name'] . '</td>
+
+            <td>' . round($attendanceScore, 2) . '%</td>
+            <td>' . round($progressScore, 2) . '%</td>
+            <td>' . round($taskScore, 2) . '%</td>
+
+            <td style="color:' . $gradeColor . '; font-weight:600;">
+                ' . round($finalGrade, 2) . '%
+            </td>
+
+            <td style="color: ' . $remarkColor . '; font-weight:600;">' . $remarks . '</td>
+
+            <td>' . date("M d, Y") . '</td>
+
+            <td>
+                <button class="view-btn"
+                    onclick="viewEvaluationBreakdown(\'' . $studentID . '\')">
+                    View
+                </button>
+            </td>
+        </tr>';
+    }
+
+    if ($output === '') {
+        $output = '
+        <tr>
+            <td colspan="8" style="text-align:center;padding:15px;">
+                No students found
             </td>
         </tr>';
     }

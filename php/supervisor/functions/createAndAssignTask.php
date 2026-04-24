@@ -1,6 +1,9 @@
 <?php
 header('Content-Type: application/json');
 
+session_start();
+
+
 require_once("../../kapstongConnection.php");
 require_once("../../functions.php");
 

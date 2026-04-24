@@ -96,6 +96,10 @@ const editForm = document.querySelector('#editModal form');
 const cancelEditModalBtn = document.getElementById('cancelEditModal');
 const closeEditModalBtn = document.getElementById('closeEditModal');
 
+// tasks
+const viewTaskDetails = document.getElementById("view-task-container");
+const closeViewTaskDetails = document.getElementById("closeTaskViewModal");
+
 // unverified
 
 // functions
@@ -167,6 +171,118 @@ function showResponseModal(message, type = 'success') {
         closeResponseModal();
     }, 2000);
 }
+
+// task modal
+
+function getStatusClass(status) {
+    switch (status) {
+        case "NOT STARTED":
+            return "not-started";
+        case "IN PROGRESS":
+            return "in-progress";
+        case "SUBMITTED":
+            return "submitted";
+        case "APPROVED":
+            return "approved";
+        case "REJECTED":
+            return "rejected";
+        default:
+            return "";
+    }
+}
+
+function getProgressText(status) {
+    switch (status) {
+        case "NOT STARTED":
+            return "0% started";
+        case "IN PROGRESS":
+            return "Work in progress";
+        case "SUBMITTED":
+            return "Waiting for approval";
+        case "APPROVED":
+            return "Completed ✔";
+        case "REJECTED":
+            return "Needs revision";
+        default:
+            return "";
+    }
+}
+
+function getProgress(status) {
+    const map = {
+        "NOT STARTED": 0,
+        "IN PROGRESS": 30,
+        "SUBMITTED": 70,
+        "APPROVED": 100,
+        "REJECTED": 0
+    };
+
+    return map[status] ?? 0;
+}
+
+function openTaskDetails(taskID) {
+    overlay.classList.add("show");
+    viewTaskDetails.classList.add("show");
+
+    fetch("student_functions/getTaskDetails.php?taskID=" + taskID)
+        .then(res => res.json())
+        .then(data => {
+
+            document.getElementById("modalTaskTitle").innerText = data.title;
+            document.getElementById("modalTaskDesc").innerText = data.description;
+            document.getElementById("modalTaskStatus").innerText = data.status;
+            document.getElementById("modalTaskDue").innerText = data.due_date;
+            document.getElementById("modalTaskProgress").innerText = data.progress + "%";
+
+            document.getElementById("submitTaskBtn").dataset.taskid = taskID;
+
+        });
+}
+
+
+
+function loadTasks() {
+    fetch("student_functions/getStudentTasks.php")
+        .then(res => res.json())
+        .then(tasks => {
+
+            const container = document.getElementById("taskList");
+            container.innerHTML = "";
+
+            tasks.forEach(task => {
+                
+                const progress = getProgress(task.status);
+
+                task.progressText = getProgressText(task.status);
+                task.statusClass = getStatusClass(task.status);
+
+                container.innerHTML += `
+                    <div class="task-card" data-taskid="${task.taskID}"
+     onclick="openTaskDetails(${task.taskID})">
+
+    <div class="task-top">
+        <h3>${task.title}</h3>
+        <span class="task-status ${task.statusClass}">
+            ${task.status}
+        </span>
+    </div>
+
+    <div class="task-body">
+
+        <div class="progress-bar">
+            <div class="progress-fill" style="width:${progress}%%"></div>
+        </div>
+
+        <small>${progress}% Complete</small>
+
+    </div>
+
+</div>
+                `;
+            });
+        });
+}
+
 
 function closeResponseModal() {
     const modal = document.getElementById("responseModal");
@@ -635,6 +751,48 @@ if(studentTasksBtn){
         studentTasks.style.display = "block";
         
     });
+
+    document.getElementById("taskList").addEventListener("click", function (e) {
+        const card = e.target.closest(".task-card");
+
+        if (!card) return;
+
+        const taskID = card.dataset.taskid;
+
+        openTaskDetails(taskID);
+    });
+
+    document.getElementById("submitTaskBtn").addEventListener("click", function () {
+        const taskID = this.dataset.taskid;
+        
+        viewTaskDetails.classList.remove("show");
+        submitTaskModal.classList.add("show");
+
+        document.getElementById("submitTaskID").value = taskID;
+       
+    });
+
+    document.getElementById("submitTaskForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch("student_functions/submitTask.php", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+        });
+    });
+
+    closeSubmitTaskBtn.addEventListener("click", () => {
+        submitTaskModal.classList.remove("show");
+         viewTaskDetails.classList.add("show");
+        
+
+    });
 }
 
 if(studentDocumentsBtn){
@@ -655,18 +813,21 @@ if(verifiedPreview){
 }
 
 // tasks
-if(submitTaskBtn){
-    submitTaskBtn.addEventListener("click", () => {
-        submitTaskModal.classList.add("show");
-        overlay.classList.add("show");
-    });
+// if(submitTaskBtn){
+//     submitTaskBtn.addEventListener("click", () => {
+//         submitTaskModal.classList.add("show");
+//         overlay.classList.add("show");
+//     });
 
-    closeSubmitTaskBtn.addEventListener("click", () => {
-        submitTaskModal.classList.remove("show");
-        overlay.classList.remove("show");
-    });
+
+// }
+
+if(viewTaskDetails){
+closeViewTaskDetails.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    viewTaskDetails.classList.remove("show");
+});
 }
-
 
 if(overlay){
 overlay.addEventListener('click', () => {
@@ -682,6 +843,7 @@ overlay.addEventListener('click', () => {
     forgotPinModal?.classList.remove('show');
 
     submitTaskModal?.classList.remove("show");
+    viewTaskDetails?.classList.remove("show");
 
     if (editForm) editForm.reset();
 });
@@ -711,5 +873,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 };
+
+if(studentTasksBtn){
+    window.addEventListener("DOMContentLoaded", () => {
+    loadTasks();
+});
+}
 
 

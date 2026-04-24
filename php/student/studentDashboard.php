@@ -208,13 +208,7 @@ $documents = getStudentDocuments($conn, $studentID);
 
                 <form id="submitTaskForm" enctype="multipart/form-data">
 
-                    <!-- Task Selection -->
-                    <div class="form-group">
-                        <label>Select Task</label>
-                        <select name="taskID" required>
-                            <!-- dynamically load assigned tasks -->
-                        </select>
-                    </div>
+                    <input type="hidden" id="submitTaskID" name="taskID">
 
                     <div class="form-group">
                         <label>Notes (Optional)</label>
@@ -232,6 +226,58 @@ $documents = getStudentDocuments($conn, $studentID);
 
                 </form>
 
+            </div>
+
+            <!-- task modal card view -->
+            <div class="view-task-container" id="view-task-container">
+
+                <div class="modal-header">
+                    <h3>Task Details</h3>
+                    <button id="closeTaskViewModal" class="modal-close-profile">&times;</button>
+                </div>
+                <div class="task-modal-content">
+
+
+                    <div class="task-modal-body">
+
+                        <div class="task-info-grid">
+
+                            <div class="info-item">
+                                <label>Title</label>
+                                <p id="modalTaskTitle"></p>
+                            </div>
+
+                            <div class="info-item">
+                                <label>Description</label>
+                                <p id="modalTaskDesc"></p>
+                            </div>
+
+                            <div class="info-item">
+                                <label>Status</label>
+                                <span id="modalTaskStatus" class="status-badge"></span>
+                            </div>
+
+                            <div class="info-item">
+                                <label>Due Date</label>
+                                <p id="modalTaskDue"></p>
+                            </div>
+
+                            <div class="info-item">
+                                <label>Progress</label>
+                                <p id="modalTaskProgress"></p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="task-modal-actions">
+                        <button id="submitTaskBtn" class="submit-task-btn">
+                            Submit Task
+                        </button>
+                    </div>
+
+                </div>
             </div>
 
 
@@ -297,112 +343,25 @@ $documents = getStudentDocuments($conn, $studentID);
                 </div>
 
                 <div class="tasks-container" id="taskList">
-                    <div class="task-card">
-                        <div class="task-top">
+
+                    <div class="task-card" data-taskid="1">
+
+                        <!-- <div class="task-top">
                             <h3>Learn Company ERP System</h3>
                             <span class="task-status in-progress">In Progress</span>
                         </div>
 
                         <div class="task-body">
                             <div class="progress-bar">
-                                <div class="progress-fill"></div>
+                                <div class="progress-fill" style="width:40%"></div>
                             </div>
                             <small>2/5 Modules Completed</small>
-                        </div>
+                        </div> -->
+
                     </div>
 
                 </div>
 
-                <!-- <div class="task-card">
-
-                    <div class="task-top">
-                        <h3>Learn ERP System</h3>
-                        <span class="task-status">PENDING</span>
-                    </div>
-
-                    <p class="task-desc">
-                        Completed modules 1-3 of ERP training.
-                    </p>
-
-                    <div class="task-footer">
-                        <small>Submitted: Apr 21, 2026</small>
-                    </div>
-
-                    <div class="task-actions">
-                        <button class="view-btn">View File</button>
-                    </div>
-
-                </div> -->
-
-                <!-- <h2 style="margin-bottom: 10px;">Your Tasks</h2>
-                <div class="tasks-container">
-
-                    <div class="task-card">
-                        <div class="task-header">
-                            <h3>Learn Company ERP System</h3>
-                            <span class="task-status in-progress">In Progress</span>
-                        </div>
-                        <div class="task-progress">
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: 40%;"></div>
-                            </div>
-                            <span class="progress-text">2/5 Modules</span>
-                        </div>
-                    </div>
-
-                    <div class="task-card">
-                        <div class="task-header">
-                            <h3>Daily Log Submission</h3>
-                            <span class="task-status pending">Pending</span>
-                        </div>
-                        <div class="task-progress">
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: 0%;"></div>
-                            </div>
-                            <span class="progress-text">0/1 Completed</span>
-                        </div>
-                    </div>
-
-                    <div class="task-card">
-                        <div class="task-header">
-                            <h3>Weekly Report Submission</h3>
-                            <span class="task-status pending">Due Soon</span>
-                        </div>
-                        <div class="task-progress">
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: 0%;"></div>
-                            </div>
-                            <span class="progress-text">Due in 2 Days</span>
-                        </div>
-                    </div>
-
-             
-                    <div class="task-card">
-                        <div class="task-header">
-                            <h3>Completed Safety Training</h3>
-                            <span class="task-status completed">Completed</span>
-                        </div>
-                        <div class="task-progress">
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: 100%;"></div>
-                            </div>
-                            <span class="progress-text">5/5 Tasks</span>
-                        </div>
-                    </div>
-
-                    <div class="task-card">
-                        <div class="task-header">
-                            <h3>Orientation Video</h3>
-                            <span class="task-status in-progress">In Progress</span>
-                        </div>
-                        <div class="task-progress">
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: 60%;"></div>
-                            </div>
-                            <span class="progress-text">3/5 Sections</span>
-                        </div>
-                    </div>
-                </div> -->
             </section>
 
             <!-- student documents -->

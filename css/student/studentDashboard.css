@@ -480,7 +480,7 @@ flex:1;
 }
 
 /* Account settings */
-.account-settings-modal, .submit-task-modal{
+.account-settings-modal, .submit-task-modal,  .view-task-container{
     position: fixed;
     top: 50%;
     left: 50%;
@@ -497,7 +497,7 @@ flex:1;
     transition: all 0.3s ease-in-out;
 }
 
-.account-settings-modal.show, .submit-task-modal.show {
+.account-settings-modal.show, .submit-task-modal.show, .view-task-container.show {
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
@@ -572,66 +572,6 @@ flex:1;
     border: 1px solid #e0e0e0;
     
 }
-
-/*
-.task-card {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding: 15px;
-    transition: transform 0.3s ease;
-}
-
-.task-card:hover {
-    transform: translateY(-3px);
-}
-
-.task-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-} */
-
-/* .task-status {
-    padding: 3px 8px;
-    border-radius: 5px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: #fff;
-}
-
-.task-status.pending { background-color: #e67e22; }
-.task-status.in-progress { background-color: #3498db; }
-.task-status.completed { background-color: #2ecc71; } */
-
-/* .task-progress {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.progress-bar-bg {
-    flex: 1;
-    height: 12px;
-    background-color: #eee;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    background-color: #3498db;
-    width: 0%;
-    border-radius: 6px;
-    transition: width 1s ease-in-out;
-}
-
-.progress-text {
-    font-size: 12px;
-    font-weight: 600;
-} */
 
 .task-header {
     display: flex;
@@ -716,13 +656,29 @@ flex:1;
     border-radius: 14px;
     padding: 15px;
     border: 1px solid #e5e7eb;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    transition: 0.2s ease;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        0 1px 1px rgba(0, 0, 0, 0.03);
+    transition: 0.25s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .task-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+
+    border-color: #bfdbfe; 
+
+    box-shadow:
+        0 10px 22px rgba(37, 99, 235, 0.10),
+        0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.task-card {
+    cursor: pointer;
+}
+.task-card:active {
+    transform: scale(0.98);
 }
 
 .task-top {
@@ -737,7 +693,7 @@ flex:1;
     font-weight: 600;
 }
 
-.task-status {
+/* .task-status {
     font-size: 11px;
     padding: 4px 10px;
     border-radius: 20px;
@@ -757,25 +713,27 @@ flex:1;
 .task-status.completed {
     background: #dcfce7;
     color: #15803d;
-}
+} */
 
 .task-body {
     margin-top: 12px;
 }
 
 .progress-bar {
+    width: 100%;
     height: 8px;
-    background: #f3f4f6;
+    background: #e5e7eb;
     border-radius: 50px;
     overflow: hidden;
+    position: relative;
 }
 
 .progress-fill {
     height: 100%;
-    width: 40%;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    width: 0%;
     border-radius: 50px;
-    transition: width 0.3s ease;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    transition: width 0.6s ease-in-out;
 }
 
 .task-body small {
@@ -786,10 +744,39 @@ flex:1;
 }
 
 .task-status {
-    padding: 4px 10px;
-    border-radius: 20px;
     font-size: 11px;
     font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px; 
+    display: inline-block;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.task-status.not-started {
+    background: #e5e7eb; 
+    color: #374151;
+    
+}
+
+.task-status.in-progress {
+    background: #dbeafe; 
+    color: #1d4ed8;
+}
+
+.task-status.submitted {
+    background: #fef3c7; 
+    color: #92400e;
+}
+
+.task-status.approved {
+    background: #dcfce7; 
+    color: #166534;
+}
+
+.task-status.rejected {
+    background: #fee2e2; 
+    color: #991b1b;
 }
 
 .task-desc {
@@ -832,6 +819,130 @@ flex:1;
     cursor: pointer;
     font-size: 12px;
 }
+
+.task-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.task-modal-content {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.task-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.task-modal-header h3 {
+    margin: 0 0 15px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.task-info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.task-modal-header button {
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    cursor: pointer;
+    color: #64748b;
+}
+
+.task-modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.submit-task-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.submit-task-btn:hover {
+    background: #1d4ed8;
+}
+
+.info-item {
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+
+.info-item label {
+    font-size: 12px;
+    color: #64748b;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.info-item p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #0f172a;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge.in-progress {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.status-badge.not-started {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.status-badge.submitted {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.status-badge.approved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-badge.rejected {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
 
 
 /* student documents */

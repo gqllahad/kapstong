@@ -57,8 +57,9 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
             <ul class="menu">
                 <li><button id="supervisor-dashboard-btn"><i class="bi bi-house"></i> Home </button></li>
-                <li><button id="supervisor-oversight-btn"><i class="bi bi-journal-text"></i> Oversight</button></li>
+                <li><button id="supervisor-oversight-btn"><i class="bi bi-journal-text"></i> Task Reviews</button></li>
                 <li><button id="supervisor-students-btn"><i class="bi bi-file-earmark-text"></i>Students</button></li>
+                <li><button id="supervisor-evaluation-btn"><i class="bi bi-bar-chart-line"></i> Reports / Evaluation</button></li>
             </ul>
 
         </aside>
@@ -69,15 +70,91 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
             <!-- modals -->
 
+            <!-- view Evaluation breakdown -->
+            <div class="student-breakdown-container" id="student-breakdown-container">
+                <div class="modal-header">
+                    <h3>Student Evaluation Breakdown</h3>
+                    <button id="closeStudentBreakdown" class="modal-close">&times;</button>
+                </div>
+
+                <div id="reportSummary"></div>
+            </div>
+
+
+
             <!-- view student charts -->
             <div id="student-progress-container" class="student-progress-container">
                 <div class="modal-header">
                     <h3>Student Progression</h3>
                     <button id="closeStudentProgress" class="modal-close">&times;</button>
                 </div>
-                <div style="height:300px;">
-                    <canvas id="progressChart"></canvas>
+
+                <div class="chart-toggle-buttons">
+                    <button class="view-student-btn active" data-view="hours">Completed Hours</button>
+                    <button class="view-student-btn" data-view="attendance">Attendance</button>
+                    <button class="view-student-btn" data-view="tasks">Tasks</button>
                 </div>
+
+                <div class="chart-content-wrapper">
+                    <div id="hoursView" class="view-section">
+                        <div style="height:300px;">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="attendanceView" class="view-section" style="display:none;">
+
+                        <!-- 🍩 CHART SECTION -->
+                        <div class="chart-container">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+
+                        <div class="table-container-attendance" style="max-height: 175px; overflow-y: auto; margin-top: 15px;">
+
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Date</th>
+                                        <th>Time In</th>
+                                        <th>Time Out</th>
+                                        <th>Status</th>
+                                        <th>Total Hours</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="attendanceReportBody">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                    <div id="tasksView" class="view-section" style="display:none;">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Task Title</th>
+                                        <th>Description</th>
+                                        <th>Deadline</th>
+                                        <th>Status</th>
+                                        <th>Date Created</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="assignedStudentTaskBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
 
             <!-- create task -->
@@ -176,6 +253,50 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                     <button type="submit" class="submit-btn">
                         Create Task & Assign
+                    </button>
+
+                </form>
+            </div>
+
+            <!-- Edit  -->
+            <div class="task-edit-container" id="task-edit-container">
+                <div class="modal-header">
+                    <h3><i class="bi bi-pencil-square"></i> Edit Task</h3>
+                    <button id="closeEditTaskModal" class="modal-close">&times;</button>
+                </div>
+
+                <form id="editTaskForm">
+
+                    <input type="hidden" id="editTaskID" name="taskID">
+
+                    <div class="form-group">
+                        <label>Task Title</label>
+                        <input type="text" id="editTitle" name="title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="editDescription" name="description"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <input type="date" id="editDueDate" name="due_date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="editStatus" name="status" required>
+                            <option value="NOT STARTED">NOT STARTED</option>
+                            <option value="IN PROGRESS">IN PROGRESS</option>
+                            <option value="SUBMITTED">SUBMITTED</option>
+                            <option value="APPROVED">APPROVED</option>
+                            <option value="REJECTED">REJECTED</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        Update Task
                     </button>
 
                 </form>
@@ -469,6 +590,38 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 </div>
             </section>
 
+            <!-- reports evaluation -->
+            <section class="supervisor-evaluation" id="supervisor-evaluation">
+                <div class="title-block-bot">
+                    <h2>Reports & Evaluation</h2>
+                    <p>Monitor Students performance and attendance.</p>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Attendance</th>
+                                <th>Progress</th>
+                                <th>Tasks</th>
+                                <th>Final Grade</th>
+                                <th>Remarks</th>
+                                <th>Date Generated</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="evaluationBody">
+                            <?php
+                            echo renderEvaluationList($conn, $superID);
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+
             <hr>
 
             <!-- FOOTER -->
@@ -477,7 +630,6 @@ $superID = getSupervisorIDByUserID($conn, $userID);
             </footer>
 
         </main>
-
 
     </div>
 
