@@ -100,6 +100,9 @@ const closeEditModalBtn = document.getElementById('closeEditModal');
 const viewTaskDetails = document.getElementById("view-task-container");
 const closeViewTaskDetails = document.getElementById("closeTaskViewModal");
 
+// task array
+let allTasks = [];
+
 // unverified
 
 // functions
@@ -174,8 +177,13 @@ function showResponseModal(message, type = 'success') {
 
 // task modal
 
+
+function normalize(str) {
+    return (str || "").toUpperCase().trim();
+}
+
 function getStatusClass(status) {
-    switch (status) {
+    switch (normalize(status)) {
         case "NOT STARTED":
             return "not-started";
         case "IN PROGRESS":
@@ -192,7 +200,7 @@ function getStatusClass(status) {
 }
 
 function getProgressText(status) {
-    switch (status) {
+    switch (normalize(status)) {
         case "NOT STARTED":
             return "0% started";
         case "IN PROGRESS":
@@ -209,6 +217,8 @@ function getProgressText(status) {
 }
 
 function getProgress(status) {
+     const normalized = normalize(status);
+
     const map = {
         "NOT STARTED": 0,
         "IN PROGRESS": 30,
@@ -217,7 +227,12 @@ function getProgress(status) {
         "REJECTED": 0
     };
 
-    return map[status] ?? 0;
+    return map[normalized] ?? 0;
+}
+
+function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
 }
 
 function openTaskDetails(taskID) {
@@ -232,55 +247,159 @@ function openTaskDetails(taskID) {
             document.getElementById("modalTaskDesc").innerText = data.description;
             document.getElementById("modalTaskStatus").innerText = data.status;
             document.getElementById("modalTaskDue").innerText = data.due_date;
+            document.getElementById("modalTaskCompleted").innerText =
+             data.completed_at ? data.completed_at : "Not completed yet";
             document.getElementById("modalTaskProgress").innerText = data.progress + "%";
 
-            document.getElementById("submitTaskBtn").dataset.taskid = taskID;
+           const submitBtn = document.getElementById("submitTaskBtn");
+            submitBtn.dataset.taskid = taskID;
+
+            const status = (data.status || "").toUpperCase().trim();
+
+            if (status === "APPROVED" || status === "SUBMITTED") {
+                submitBtn.style.display = "none";
+            } else {
+                submitBtn.style.display = "inline-block";
+            }
 
         });
 }
 
+function renderTasks(filter) {
+    const container = document.getElementById("taskList");
+    container.innerHTML = "";
 
+    let filtered = allTasks;
+
+    if (filter !== "All") {
+        filtered = allTasks.filter(task =>
+            normalize(task.status) === normalize(filter)
+        );
+    }
+
+    if (filtered.length === 0) {
+
+        let message = "No tasks found";
+
+        switch (normalize(filter)) {
+            case "IN PROGRESS":
+                message = "No In-Progress tasks yet.";
+                break;
+
+            case "APPROVED":
+                message = "No Approved tasks yet.";
+                break;
+
+            case "REJECTED":
+                message = "No Rejected tasks yet.";
+                break;
+
+            case "NOT STARTED":
+                message = "No Not Started tasks yet.";
+                break;
+
+            default:
+                message = "No Tasks Available.";
+        }
+
+        container.innerHTML = `
+            <div class="empty-state">
+                <p>${message}</p>
+            </div>
+        `;
+        return;
+    }
+
+    filtered.forEach(task => {
+         const status = normalize(task.status);
+        const progress = getProgress(task.status);
+        task.statusClass = getStatusClass(task.status);
+
+        let dueDateDisplay = `Due: ${formatDate(task.due_date)}`;
+
+        if (status === "APPROVED") {
+            dueDateDisplay = `Completed: ${formatDate(task.completed_at)}`;
+        }   
+
+        container.innerHTML += `
+            <div class="task-card" data-taskid="${task.taskID}">
+
+                <div class="task-top">
+                    <h3>
+                        <i class="bi bi-list-check task-icon"></i>
+                        ${task.title}
+                    </h3>
+
+                    <span class="task-status ${task.statusClass}">
+                        ${task.status}
+                    </span>
+                </div>
+
+                <small class="task-due-date">
+                    ${dueDateDisplay}
+                </small>
+
+                <div class="task-body">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:${progress}%"></div>
+                    </div>
+
+                    <small>${progress}% Complete</small>
+                </div>
+
+            </div>
+        `;
+    });
+}
 
 function loadTasks() {
     fetch("student_functions/getStudentTasks.php")
         .then(res => res.json())
         .then(tasks => {
 
-            const container = document.getElementById("taskList");
-            container.innerHTML = "";
+            allTasks = tasks; 
+            renderTasks("All");
 
-            tasks.forEach(task => {
+//             const container = document.getElementById("taskList");
+//             container.innerHTML = "";
+
+//             tasks.forEach(task => {
                 
-                const progress = getProgress(task.status);
+//                 const progress = getProgress(task.status);
 
-                task.progressText = getProgressText(task.status);
-                task.statusClass = getStatusClass(task.status);
+//                 task.progressText = getProgressText(task.status);
+//                 task.statusClass = getStatusClass(task.status);
 
-                container.innerHTML += `
-                    <div class="task-card" data-taskid="${task.taskID}"
-     onclick="openTaskDetails(${task.taskID})">
+//                 container.innerHTML += `
+//                     <div class="task-card" data-taskid="${task.taskID}"
+//      onclick="openTaskDetails(${task.taskID})">
 
-    <div class="task-top">
-        <h3>${task.title}</h3>
-        <span class="task-status ${task.statusClass}">
-            ${task.status}
-        </span>
-    </div>
+//     <div class="task-top">
+//         <h3> <i class="bi bi-list-check task-icon"></i>
+//         ${task.title}</h3>
+//         <span class="task-status ${task.statusClass}">
+//             ${task.status}
+//         </span>
+//     </div>
 
-    <div class="task-body">
+//     <small class="task-due-date">
+//     Due: ${formatDate(task.due_date)}
+// </small>
 
-        <div class="progress-bar">
-            <div class="progress-fill" style="width:${progress}%%"></div>
-        </div>
+//     <div class="task-body">
 
-        <small>${progress}% Complete</small>
+//         <div class="progress-bar">
+//             <div class="progress-fill" style="width:${progress}%%"></div>
+//         </div>
 
-    </div>
+//         <small>${progress}% Complete</small>
 
-</div>
-                `;
+//     </div>
+
+// </div>
+//                 `;
             });
-        });
+        // });
 }
 
 
@@ -876,7 +995,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 if(studentTasksBtn){
     window.addEventListener("DOMContentLoaded", () => {
-    loadTasks();
+        loadTasks();
+    });
+
+    document.querySelectorAll(".task-filters button").forEach(btn => {
+    btn.addEventListener("click", function () {
+
+        document.querySelectorAll(".task-filters button")
+            .forEach(b => b.classList.remove("active"));
+
+        this.classList.add("active");
+
+        renderTasks(this.dataset.filter);
+    });
 });
 }
 

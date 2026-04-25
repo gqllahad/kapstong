@@ -54,5 +54,6 @@ echo json_encode([
     "due_date" => date("M d, Y", strtotime($row['due_date'])),
     "progress" => $progress,
     "student_note" => $row['student_note'],
-    "supervisor_feedback" => $row['supervisor_feedback']
+    "supervisor_feedback" => $row['supervisor_feedback'],
+    "completed_at" => $row['completed_at'] ? date("M d, Y", strtotime($row['completed_at'])) : null
 ]);

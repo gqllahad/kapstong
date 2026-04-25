@@ -670,7 +670,7 @@ flex:1;
     border-color: #bfdbfe; 
 
     box-shadow:
-        0 10px 22px rgba(37, 99, 235, 0.10),
+        0 10px 22px rgba(37, 99, 235, 0.40),
         0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
@@ -691,29 +691,16 @@ flex:1;
     font-size: 15px;
     margin: 0;
     font-weight: 600;
+    color: #1f2937
 }
 
-/* .task-status {
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 600;
+.task-icon {
+    font-size: 20px;
+    color: #2563eb;
+    background: #eff6ff;
+    padding: 6px;
+    border-radius: 6px;
 }
-
-.task-status.in-progress {
-    background: #e0f2fe;
-    color: #0284c7;
-}
-
-.task-status.pending {
-    background: #fef3c7;
-    color: #b45309;
-}
-
-.task-status.completed {
-    background: #dcfce7;
-    color: #15803d;
-} */
 
 .task-body {
     margin-top: 12px;
@@ -849,7 +836,7 @@ flex:1;
     margin: 0 0 15px;
     font-size: 18px;
     font-weight: 700;
-    color: #1e293b;
+    color: #183e7a;
 }
 
 .task-info-grid {
@@ -870,6 +857,16 @@ flex:1;
     margin-top: 20px;
     display: flex;
     justify-content: flex-end;
+}
+
+.task-due-date {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 3px 8px;
+    border-radius: 6px;
 }
 
 .submit-task-btn {
@@ -941,6 +938,15 @@ flex:1;
 .status-badge.rejected {
     background: #fee2e2;
     color: #dc2626;
+}
+
+.empty-state {
+    width: 100%;
+    text-align: center;
+    padding: 30px;
+    color: #6b7280;
+    font-size: 18px;
+   
 }
 
 

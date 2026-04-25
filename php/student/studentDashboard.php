@@ -263,6 +263,11 @@ $documents = getStudentDocuments($conn, $studentID);
                             </div>
 
                             <div class="info-item">
+                                <label>Completed Date</label>
+                                <p id="modalTaskCompleted"></p>
+                            </div>
+
+                            <div class="info-item">
                                 <label>Progress</label>
                                 <p id="modalTaskProgress"></p>
                             </div>
@@ -279,7 +284,6 @@ $documents = getStudentDocuments($conn, $studentID);
 
                 </div>
             </div>
-
 
             <!-- dashboard -->
             <section class="student-dashboard" id="student-dashboard">
@@ -326,37 +330,25 @@ $documents = getStudentDocuments($conn, $studentID);
                         <p>Submit your work and track approval status</p>
                     </div>
 
-                    <div class="create-btn">
+                    <!-- <div class="create-btn">
                         <button class="add-task-btn" id="submit-task-btn">
                             + Submit Task
                         </button>
-                    </div>
+                    </div> -->
 
                 </div>
 
                 <div class="task-filters">
-                    <button class="active">All</button>
-                    <button>In Progress</button>
-                    <button>Pending</button>
-                    <button>Approved</button>
-                    <button>Rejected</button>
+                    <button class="active" data-filter="All">All</button>
+                    <button data-filter="NOT STARTED">Not Started</button>
+                    <button data-filter="IN PROGRESS">In Progress</button>
+                    <button data-filter="APPROVED">Approved</button>
+                    <button data-filter="REJECTED">Rejected</button>
                 </div>
 
                 <div class="tasks-container" id="taskList">
 
                     <div class="task-card" data-taskid="1">
-
-                        <!-- <div class="task-top">
-                            <h3>Learn Company ERP System</h3>
-                            <span class="task-status in-progress">In Progress</span>
-                        </div>
-
-                        <div class="task-body">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width:40%"></div>
-                            </div>
-                            <small>2/5 Modules Completed</small>
-                        </div> -->
 
                     </div>
 
