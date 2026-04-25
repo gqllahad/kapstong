@@ -87,6 +87,9 @@ const submitTaskModal = document.getElementById("submit-task-modal");
 const submitTaskBtn = document.getElementById("submit-task-btn");
 const closeSubmitTaskBtn = document.getElementById("closeSubmitModal");
 
+const fileInput = document.getElementById("submission_file");
+const filePreviewContainer = document.getElementById("filePreviewContainer");
+
 // edit info
 const editInfo = document.getElementById("btn-edit");
 const editModal = document.getElementById('editModal');
@@ -102,6 +105,8 @@ const closeViewTaskDetails = document.getElementById("closeTaskViewModal");
 
 // task array
 let allTasks = [];
+
+let selectedFiles = [];
 
 // unverified
 
@@ -419,6 +424,26 @@ function togglePassword(inputId, icon) {
         icon.textContent = "Hide";
     }
 };
+
+function renderFilePreview() {
+    filePreviewContainer.innerHTML = "";
+
+    selectedFiles.forEach((file, index) => {
+        filePreviewContainer.innerHTML += `
+            <div class="file-chip">
+                <span>${file.name}</span>
+                <button type="button" onclick="removeFile(${index})">
+                    &times;
+                </button>
+            </div>
+        `;
+    });
+}
+
+function removeFile(index) {
+    selectedFiles.splice(index, 1);
+    renderFilePreview();
+}
 
 // Chartss
 function loadPieChart() {
@@ -892,19 +917,54 @@ if(studentTasksBtn){
     });
 
     document.getElementById("submitTaskForm").addEventListener("submit", function (e) {
-        e.preventDefault();
+    e.preventDefault();
 
-        const formData = new FormData(this);
+    const formData = new FormData(this);
 
-        fetch("student_functions/submitTask.php", {
-            method: "POST",
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-        });
+    selectedFiles.forEach(file => {
+        formData.append("submission_file[]", file);
     });
+
+    fetch("student_functions/submitTask.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+
+        if (data.status === "success") {
+            alert(data.message);
+
+            selectedFiles = [];
+            renderFilePreview();
+            this.reset();
+
+            submitTaskModal.classList.remove("show");
+            viewTaskDetails.classList.remove("show");
+            overlay.classList.remove("show");
+
+            loadTasks();
+        } else {
+            alert(data.message);
+        }
+    });
+});
+
+    // document.getElementById("submitTaskForm").addEventListener("submit", function (e) {
+    //     e.preventDefault();
+
+    //     const formData = new FormData(this);
+
+    //     fetch("student_functions/submitTask.php", {
+    //         method: "POST",
+    //         body: formData
+    //     })
+    //     .then(res => res.json())
+    //     .then(data => {
+    //         console.log(data);
+    //     });
+    // });
 
     closeSubmitTaskBtn.addEventListener("click", () => {
         submitTaskModal.classList.remove("show");
@@ -912,6 +972,18 @@ if(studentTasksBtn){
         
 
     });
+
+    fileInput.addEventListener("change", function () {
+    const newFiles = Array.from(this.files);
+
+    newFiles.forEach(file => {
+        selectedFiles.push(file);
+    });
+
+    renderFilePreview();
+
+    fileInput.value = "";
+});
 }
 
 if(studentDocumentsBtn){
@@ -930,16 +1002,6 @@ if(verifiedPreview){
         document.getElementById("imagePreviewModal").style.display = "none";
     });
 }
-
-// tasks
-// if(submitTaskBtn){
-//     submitTaskBtn.addEventListener("click", () => {
-//         submitTaskModal.classList.add("show");
-//         overlay.classList.add("show");
-//     });
-
-
-// }
 
 if(viewTaskDetails){
 closeViewTaskDetails.addEventListener("click", () => {

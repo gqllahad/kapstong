@@ -80,7 +80,9 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 <div id="reportSummary"></div>
             </div>
 
-
+            <!-- view approval tasks -->
+            <div class="student-application-approve" id="student-application-approve">
+            </div>
 
             <!-- view student charts -->
             <div id="student-progress-container" class="student-progress-container">
@@ -104,7 +106,6 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                     <div id="attendanceView" class="view-section" style="display:none;">
 
-                        <!-- 🍩 CHART SECTION -->
                         <div class="chart-container">
                             <canvas id="attendanceChart"></canvas>
                         </div>
@@ -621,6 +622,11 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 </div>
 
             </section>
+
+            <div id="imagePreviewModal" class="image-modal">
+                <span id="closeImagePreview">&times;</span>
+                <img id="previewImg">
+            </div>
 
             <hr>
 

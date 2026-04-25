@@ -206,22 +206,52 @@ $documents = getStudentDocuments($conn, $studentID);
                     <button id="closeSubmitModal" class="modal-close-profile">&times;</button>
                 </div>
 
-                <form id="submitTaskForm" enctype="multipart/form-data">
+                <form id="submitTaskForm" enctype="multipart/form-data" class="submit-task-form">
 
                     <input type="hidden" id="submitTaskID" name="taskID">
 
-                    <div class="form-group">
-                        <label>Notes (Optional)</label>
-                        <textarea name="student_note" placeholder="Explain your submission..."></textarea>
+                    <div class="form-group-task">
+                        <label for="student_note">
+                            <i class="bi bi-pencil-square"></i>
+                            Submission Notes
+                        </label>
+
+                        <textarea
+                            id="student_note"
+                            name="student_note"
+                            placeholder="Add a short explanation about your submission..."></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label>Upload File</label>
-                        <input type="file" name="submission_file" required>
+                    <div class="form-group-task">
+                        <label for="submission_file">
+                            <i class="bi bi-cloud-upload"></i>
+                            Upload Files
+                        </label>
+
+                        <input
+                            type="file"
+                            id="submission_file"
+                            name="submission_file[]"
+                            multiple
+                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                            hidden>
+
+                        <button type="button" class="upload-trigger-btn" onclick="document.getElementById('submission_file').click()">
+                            + Choose Files
+                        </button>
+
+                        <div id="filePreviewContainer" class="file-preview-container"></div>
+
+                        <small class="upload-hint">
+                            Accepted files: PDF, DOCX, JPG, PNG
+                        </small>
                     </div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="primary-btn">Submit Task</button>
+                    <div class="form-actions-task">
+                        <button type="submit" class="form-task-btn">
+                            <i class="bi bi-send-check"></i>
+                            Submit Task
+                        </button>
                     </div>
 
                 </form>
@@ -341,7 +371,7 @@ $documents = getStudentDocuments($conn, $studentID);
                 <div class="task-filters">
                     <button class="active" data-filter="All">All</button>
                     <button data-filter="NOT STARTED">Not Started</button>
-                    <button data-filter="IN PROGRESS">In Progress</button>
+                    <button data-filter="SUBMITTED">In Progress</button>
                     <button data-filter="APPROVED">Approved</button>
                     <button data-filter="REJECTED">Rejected</button>
                 </div>

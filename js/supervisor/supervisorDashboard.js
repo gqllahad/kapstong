@@ -25,6 +25,8 @@ const closeCreateTask = document.getElementById("closeCreateTaskModal");
 const editTaskContainer = document.getElementById("task-edit-container");
 const closeEditTask = document.getElementById("closeEditTaskModal");
 
+const studentApplicationApprove = document.getElementById("student-application-approve");
+
 const buttons = document.querySelectorAll(".view-student-btn");
 const views = {
     hours: document.getElementById("hoursView"),
@@ -392,6 +394,68 @@ function viewEvaluationReport(studentID) {
         });
 }
 
+function previewTask(taskID) {
+
+    overlay.classList.add("show");
+    studentApplicationApprove.classList.add("show");
+
+    studentApplicationApprove.innerHTML = '';
+
+    fetch("functions/getTaskApproveData.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "taskID=" + encodeURIComponent(taskID)
+    })
+    .then(res => res.text())
+    .then(data => {
+        studentApplicationApprove.innerHTML = data;
+    });
+}
+
+function updateTaskStatus(taskID, status) {
+
+    if (!confirm("Are you sure?")) return;
+
+    const feedback = document.getElementById("supervisorFeedback")?.value || "";
+    const rating = document.getElementById("supervisorRating").value;
+
+    fetch("functions/updateTaskStatus.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "taskID=" + encodeURIComponent(taskID) +
+              "&status=" + encodeURIComponent(status) +
+              "&supervisor_feedback=" + encodeURIComponent(feedback) +
+              "&rating=" + encodeURIComponent(rating)
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+
+        if (data.status === "success") {
+            overlay.classList.remove("show");
+            studentApplicationApprove.classList.remove("show");
+            location.reload();
+        }
+    });
+}
+
+function previewImage(src) {
+
+    const modal = document.getElementById("imagePreviewModal");
+    const img = document.getElementById("previewImg");
+
+    const files = src.split(",");
+
+    const cleanSrc = files[0].trim();
+
+    img.src = cleanSrc;
+    modal.style.display = "flex";
+}
+
 // edit tasks
 function editTask(taskID) {
 
@@ -433,6 +497,25 @@ function deleteTask(taskID) {
         }
     });
 }
+
+function closeTaskModal(){
+    studentApplicationApprove.classList.remove("show");
+    overlay.classList.remove("show");
+}
+
+// task approvals
+
+
+
+document.getElementById("closeImagePreview").addEventListener("click", function () {
+    document.getElementById("imagePreviewModal").style.display = "none";
+});
+
+document.getElementById("imagePreviewModal").addEventListener("click", function (e) {
+    if (e.target.id === "imagePreviewModal") {
+        this.style.display = "none";
+    }
+});
 
 
 // profile menu
@@ -606,6 +689,7 @@ overlay.addEventListener("click", () => {
     studentChart.classList.remove("show");
     studentBreakdown.classList.remove("show");
     editTaskContainer.classList.remove("show");
+    studentApplicationApprove.classList.remove("show");
 });
 
 

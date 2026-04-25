@@ -420,8 +420,8 @@ function renderApprovalReportList($conn, $superID, $search = '')
                 <td>
                     <button 
                         class="view-btn" 
-                        onclick="viewTask(' . $row['taskID'] . ')">
-                        Review
+                        onclick="previewTask(' . $row['taskID'] . ')">
+                        Preview
                     </button>
                 </td>
             </tr>';
@@ -501,6 +501,28 @@ function renderTaskManagementList($conn, $superID, $search = '')
                     $color = '#9CA3AF';
             }
 
+            $actionButtons = '';
+
+            if ($status === 'APPROVED') {
+
+                $actionButtons = '
+                <button class="view-btn" onclick="viewTask(' . $row['taskID'] . ')">
+                    View
+                </button>
+            ';
+            } else {
+
+                $actionButtons = '
+                <button class="edit-btn" onclick="editTask(' . $row['taskID'] . ')">
+                    Edit
+                </button>
+
+                <button class="delete-btn" onclick="deleteTask(' . $row['taskID'] . ')">
+                    Delete
+                </button>
+            ';
+            }
+
             $output .= '
             <tr>
                 <td style="font-weight:600;">' . $row['title'] . '</td>
@@ -510,14 +532,8 @@ function renderTaskManagementList($conn, $superID, $search = '')
                     ' . $status . '
                 </td>
                 <td style="display:flex;flex-direction:row;gap:10px;">
-
-                    <button class="edit-btn" onclick="editTask(' . $row['taskID'] . ')">
-                        Edit
-                    </button>
-
-                    <button class="delete-btn" onclick="deleteTask(' . $row['taskID'] . ')">
-                        Delete
-                    </button>
+                    
+               ' . $actionButtons . '
                 </td>
             </tr>';
         }
