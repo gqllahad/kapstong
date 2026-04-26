@@ -253,20 +253,43 @@ function openTaskDetails(taskID) {
             document.getElementById("modalTaskStatus").innerText = data.status;
             document.getElementById("modalTaskDue").innerText = data.due_date;
             document.getElementById("modalTaskCompleted").innerText =
-             data.completed_at ? data.completed_at : "Not completed yet";
-            document.getElementById("modalTaskProgress").innerText = data.progress + "%";
+                data.completed_at ? data.completed_at : "Not completed yet";
+            document.getElementById("modalTaskProgress").innerText =
+                data.progress + "%";
 
-           const submitBtn = document.getElementById("submitTaskBtn");
+            const submitBtn = document.getElementById("submitTaskBtn");
             submitBtn.dataset.taskid = taskID;
 
             const status = (data.status || "").toUpperCase().trim();
 
-            if (status === "APPROVED" || status === "SUBMITTED") {
+            if (status === "APPROVED" || status === "SUBMITTED" || status === "REJECTED") {
                 submitBtn.style.display = "none";
             } else {
                 submitBtn.style.display = "inline-block";
             }
 
+            const studentNoteSection = document.getElementById("studentNoteSection");
+            const supervisorFeedbackSection = document.getElementById("supervisorFeedbackSection");
+            const ratingSection = document.getElementById("ratingSection");
+
+            document.getElementById("modalStudentNote").innerText =
+                data.student_note ? data.student_note : "No student note provided";
+
+            document.getElementById("modalSupervisorFeedback").innerText =
+                data.supervisor_feedback ? data.supervisor_feedback : "No supervisor feedback";
+
+            document.getElementById("modalSupervisorRating").innerText =
+                data.rating ? data.rating : "No rating provided";
+
+            if (status === "APPROVED" || status === "REJECTED") {
+                studentNoteSection.style.display = "block";
+                supervisorFeedbackSection.style.display = "block";
+                ratingSection.style.display = "block";
+            } else {
+                studentNoteSection.style.display = "none";
+                supervisorFeedbackSection.style.display = "none";
+                ratingSection.style.display = "none";
+            }
         });
 }
 
@@ -423,6 +446,16 @@ function togglePassword(inputId, icon) {
         input.type = "password";
         icon.textContent = "Hide";
     }
+};
+
+function toggleSection(header) {
+    const card = header.parentElement;
+
+    document.querySelectorAll(".info-card").forEach(c => {
+        if (c !== card) c.classList.remove("active");
+    });
+
+    card.classList.toggle("active");
 };
 
 function renderFilePreview() {

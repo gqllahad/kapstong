@@ -416,10 +416,20 @@ function previewTask(taskID) {
 
 function updateTaskStatus(taskID, status) {
 
-    if (!confirm("Are you sure?")) return;
+    const feedback = document.getElementById("supervisorFeedback")?.value.trim() || "";
+    const rating = document.getElementById("supervisorRating")?.value || "";
+    
+    if (status === "REJECTED" && !feedback) {
+        alert("Please provide supervisor feedback before rejecting the task.");
+        return;
+    }
 
-    const feedback = document.getElementById("supervisorFeedback")?.value || "";
-    const rating = document.getElementById("supervisorRating").value;
+    if (status === "APPROVED" && !rating) {
+        alert("Please select a rating first.");
+        return;
+    }
+
+    if (!confirm("Are you sure?")) return;
 
     fetch("functions/updateTaskStatus.php", {
         method: "POST",

@@ -364,7 +364,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                         <?php
                         $totalCompletedStudents = countTotalCompletedStudents($conn, $superID);
-                        $completedTrend = getSupervisorTrend($conn, 'student_tasks', 'status', 'APPROVED', 'date_updated');
+                        $completedTrend = getSupervisorTrend($conn, 'student_progress', 'completion_status', 'COMPLETED', 'last_updated');
                         $completedBadge = getBadge($totalCompletedStudents);
                         ?>
 
@@ -512,7 +512,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             <div class="search-container">
                                 <i class="bi bi-search search-icon"></i>
                                 <input type="text" id="assignedTaskSearch"
-                                    placeholder="Search by ID, Name, OR Email">
+                                    placeholder="Search by Title, Status, ID or Name...">
                             </div>
                         </div>
 

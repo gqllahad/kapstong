@@ -277,29 +277,75 @@ $documents = getStudentDocuments($conn, $studentID);
                                 <p id="modalTaskTitle"></p>
                             </div>
 
-                            <div class="info-item">
-                                <label>Description</label>
-                                <p id="modalTaskDesc"></p>
+                            <div class="info-card">
+
+                                <div class="card-header" onclick="toggleSection(this)">
+                                    <h4>Descriptions </h4>
+                                    <span class="arrow">▼</span>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="info-item">
+                                        <label>Description</label>
+                                        <p id="modalTaskDesc"></p>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="info-item">
-                                <label>Status</label>
-                                <span id="modalTaskStatus" class="status-badge"></span>
+                            <div class="info-card">
+
+                                <div class="card-header" onclick="toggleSection(this)">
+                                    <h4>Progress </h4>
+                                    <span class="arrow">▼</span>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="info-item">
+                                        <label>Status</label>
+                                        <span id="modalTaskStatus" class="status-badge"></span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>Due Date</label>
+                                        <p id="modalTaskDue"></p>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>Completed Date</label>
+                                        <p id="modalTaskCompleted"></p>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>Progress</label>
+                                        <p id="modalTaskProgress"></p>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="info-item">
-                                <label>Due Date</label>
-                                <p id="modalTaskDue"></p>
-                            </div>
 
-                            <div class="info-item">
-                                <label>Completed Date</label>
-                                <p id="modalTaskCompleted"></p>
-                            </div>
+                            <div class="info-card">
 
-                            <div class="info-item">
-                                <label>Progress</label>
-                                <p id="modalTaskProgress"></p>
+                                <div class="card-header" onclick="toggleSection(this)">
+                                    <h4>Notes </h4>
+                                    <span class="arrow">▼</span>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="info-item" id="studentNoteSection" style="display:none;">
+                                        <label>Student Note</label>
+                                        <p id="modalStudentNote"></p>
+                                    </div>
+
+                                    <div class="info-item" id="supervisorFeedbackSection" style="display:none;">
+                                        <label>Supervisor Feedback</label>
+                                        <p id="modalSupervisorFeedback"></p>
+                                    </div>
+
+                                    <div class="info-item" id="ratingSection" style="display:none;">
+                                        <label>Supervisor Rating</label>
+                                        <p id="modalSupervisorRating"></p>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>

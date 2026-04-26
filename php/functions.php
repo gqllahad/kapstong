@@ -503,7 +503,7 @@ function renderTaskManagementList($conn, $superID, $search = '')
 
             $actionButtons = '';
 
-            if ($status === 'APPROVED') {
+            if ($status === 'APPROVED' || $status === 'REJECTED') {
 
                 $actionButtons = '
                 <button class="view-btn" onclick="viewTask(' . $row['taskID'] . ')">

@@ -10,14 +10,17 @@ if (empty($taskID)) {
     exit;
 }
 
-$sql = "
-    SELECT * 
+$stmt = $conn->prepare("
+    SELECT *
     FROM student_tasks
-    WHERE taskID = '$taskID'
+    WHERE taskID = ?
     LIMIT 1
-";
+");
 
-$result = $conn->query($sql);
+$stmt->bind_param("i", $taskID);
+$stmt->execute();
+
+$result = $stmt->get_result();
 
 if (!$result || $result->num_rows === 0) {
     echo json_encode(["error" => "Task not found"]);
@@ -55,5 +58,8 @@ echo json_encode([
     "progress" => $progress,
     "student_note" => $row['student_note'],
     "supervisor_feedback" => $row['supervisor_feedback'],
-    "completed_at" => $row['completed_at'] ? date("M d, Y", strtotime($row['completed_at'])) : null
+    "rating" => $row['rating'] ?? null,
+    "completed_at" => $row['completed_at']
+        ? date("M d, Y", strtotime($row['completed_at']))
+        : null
 ]);
