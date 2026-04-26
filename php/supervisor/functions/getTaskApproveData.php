@@ -153,16 +153,17 @@ if ($row = $result->fetch_assoc()) {
         <div class="divider"></div>
 
         <div class="task-action-buttons">
-            <button
-                class="approve-btn"
-                onclick="updateTaskStatus(<?= $row['taskID'] ?>, 'APPROVED')">
-                Approve
-            </button>
 
             <button
                 class="reject-btn"
                 onclick="updateTaskStatus(<?= $row['taskID'] ?>, 'REJECTED')">
                 Reject
+            </button>
+
+            <button
+                class="approve-btn"
+                onclick="updateTaskStatus(<?= $row['taskID'] ?>, 'APPROVED')">
+                Approve
             </button>
         </div>
 

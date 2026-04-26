@@ -292,6 +292,302 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             </div>
 
+            <!-- systemconfig modals -->
+            <!-- ojt setup -->
+            <div class="ojt-program-container" id="ojt-program-container">
+                <div class="modal-header">
+                    <h3>OJT Program Setup</h3>
+                    <button id="closeOjtProgramModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="ojt-program-body">
+
+                    <div class="form-group">
+                        <label>Academic Year</label>
+                        <input type="text" placeholder="e.g. 2026 - 2027">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Required OJT Hours</label>
+                        <input type="number" placeholder="e.g. 600">
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date">
+                        </div>
+
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date">
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select>
+                            <option value="ACTIVE">Active</option>
+                            <option value="INACTIVE">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="ojt-actions">
+                        <button class="cancel-btn">Cancel</button>
+                        <button class="save-btn">Save Setup</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- deparment management -->
+            <div class="department-management-container" id="department-management-container">
+                <div class="modal-header">
+                    <h3>Department Management</h3>
+                    <button id="closeDepartmentManagementModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="department-body">
+
+                    <div class="form-group">
+                        <label>Department Name</label>
+                        <input type="text" placeholder="e.g. College of Computer Studies">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Department Code</label>
+                        <input type="text" placeholder="e.g. CCS">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Department Head</label>
+                        <input type="text" placeholder="e.g. Dr. Juan Dela Cruz">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Assigned Programs</label>
+                        <select multiple>
+                            <option>BSIT</option>
+                            <option>BSCS</option>
+                            <option>BSEMC</option>
+                            <option>BSIS</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select>
+                            <option value="ACTIVE">Active</option>
+                            <option value="INACTIVE">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="department-actions">
+                        <button class="save-btn">Save Department</button>
+                        <button class="cancel-btn">Cancel</button>
+                    </div>
+
+                </div>
+                <!-- Dept	Code	Head	Programs	Status	Action -->
+            </div>
+
+            <!-- rfid attendance -->
+            <div class="rfid-attendance-container" id="rfid-attendance-container">
+                <div class="modal-header">
+                    <h3>RFID Attendance</h3>
+                    <button id="closeRfidAttendanceModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="rfid-body">
+
+                    <div class="form-group">
+                        <label>Enable RFID Attendance</label>
+                        <select>
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Morning Time In</label>
+                        <input type="time">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cut-off Time (Late Threshold)</label>
+                        <input type="time">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Time Out</label>
+                        <input type="time">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Allowed Late Minutes</label>
+                        <input type="number" placeholder="e.g. 15">
+                    </div>
+
+                    <div class="form-group">
+                        <label>RFID Device Mode</label>
+                        <select>
+                            <option value="AUTO">Auto Scan</option>
+                            <option value="MANUAL">Manual Approval</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Allow Multiple Scans per Day</label>
+                        <select>
+                            <option value="NO">No</option>
+                            <option value="YES">Yes</option>
+                        </select>
+                    </div>
+
+                    <div class="rfid-actions">
+                        <button class="save-btn">Save Settings</button>
+                        <button class="cancel-btn">Cancel</button>
+                    </div>
+
+                </div>
+
+                <!-- | Device ID | Location | Status | Last Sync | -->
+            </div>
+
+            <!-- evaluation  -->
+            <div class="evaluation-settings-container" id="evaluation-settings-container">
+                <div class="modal-header">
+                    <h3>Evaluation Settings</h3>
+                    <button id="closeEvaluationSettingsModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="evaluation-body">
+
+                    <div class="form-group">
+                        <label>Rating System</label>
+                        <select>
+                            <option value="LETTER">Letter Grade (A+, A, B+)</option>
+                            <option value="NUMERIC">Numeric (1 - 100)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Passing Grade / Rating</label>
+                        <select>
+                            <option value="A+">A+</option>
+                            <option value="A">A</option>
+                            <option value="B+">B+</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Evaluation Criteria</label>
+
+                        <div class="criteria-box">
+
+                            <label>Attendance (%)</label>
+                            <input type="number" placeholder="e.g. 30">
+
+                            <label>Performance (%)</label>
+                            <input type="number" placeholder="e.g. 40">
+
+                            <label>Task Completion (%)</label>
+                            <input type="number" placeholder="e.g. 30">
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Allow Supervisor Comments</label>
+                        <select>
+                            <option value="YES">Yes</option>
+                            <option value="NO">No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Require Rating Before Approval</label>
+                        <select>
+                            <option value="YES">Yes</option>
+                            <option value="NO">No</option>
+                        </select>
+                    </div>
+
+                    <div class="evaluation-actions">
+                        <button class="save-btn">Save Settings</button>
+                        <button class="cancel-btn">Cancel</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- requirements setup -->
+            <div class="requirements-setup-container" id="requirements-setup-container">
+                <div class="modal-header">
+                    <h3>Requirements Setup</h3>
+                    <button id="closeRequirementsSetupModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="requirements-body">
+
+                    <div class="form-group">
+                        <label>Requirement Name</label>
+                        <input type="text" placeholder="e.g. Resume / CV">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Requirement Type</label>
+                        <select>
+                            <option value="DOCUMENT">Document</option>
+                            <option value="FORM">Form</option>
+                            <option value="REPORT">Report</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Submission Stage</label>
+                        <select>
+                            <option value="PRE-OJT">Pre-OJT</option>
+                            <option value="DURING-OJT">During OJT</option>
+                            <option value="POST-OJT">Post-OJT</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Required?</label>
+                        <select>
+                            <option value="YES">Yes (Required)</option>
+                            <option value="NO">No (Optional)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description / Instructions</label>
+                        <textarea placeholder="Provide instructions for students..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Deadline (if applicable)</label>
+                        <input type="date">
+                    </div>
+
+                    <div class="requirements-actions">
+                        <button class="save-btn">Add Requirement</button>
+                        <button class="cancel-btn">Cancel</button>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
             <!-- dashboard -->
             <section class="admin-dashboard" id="admin-dashboard">
 
@@ -534,23 +830,38 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
                 <div class="preparation-grid">
                     <div class="create-section-container">
-                        <button class="create-btn">
-                            <span class="icon">📅</span>
-                            <span class="text">OJT Batch Setup</span>
+                        <button class="create-btn" id="ojt-program-btn">
+                            <span class="icon">⚙</span>
+                            <span class="text">OJT Program
+                                Setup</span>
                         </button>
                     </div>
 
                     <div class="create-section-container">
-                        <button class="create-btn">
+                        <button class="create-btn" id="department-management-btn">
                             <span class="icon">🏫</span>
-                            <span class="text">Course Management</span>
+                            <span class="text">Department Management</span>
                         </button>
                     </div>
 
                     <div class="create-section-container">
-                        <button class="create-btn">
-                            <span class="icon">+</span>
-                            <span class="text">RFID Setup</span>
+                        <button class="create-btn" id="rfid-attendance-btn">
+                            <span class="icon">📡</span>
+                            <span class="text">RFID Attendance Configuration</span>
+                        </button>
+                    </div>
+
+                    <div class="create-section-container">
+                        <button class="create-btn" id="evaluation-settings-btn">
+                            <span class="icon">⭐</span>
+                            <span class="text">Evaluation Settings</span>
+                        </button>
+                    </div>
+
+                    <div class="create-section-container">
+                        <button class="create-btn" id="requirements-setup-btn">
+                            <span class="icon">📄</span>
+                            <span class="text">Requirements Setup</span>
                         </button>
                     </div>
 

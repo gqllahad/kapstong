@@ -585,10 +585,10 @@ background:#eee;
 /* preparations */
 .preparation-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
     gap: 20px;
     padding: 25px;
-     background-color: #ffffff;
+    background-color: #ffffff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     border: 1px solid #e0e0e0;
@@ -608,24 +608,29 @@ background:#eee;
 }
 
 .create-btn {
-    display: flex;
+   display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 
-    background: linear-gradient(135deg, #83a2e4, #6e89d4); 
+    background: linear-gradient(135deg, #83a2e4, #6e89d4);
     color: white;
 
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
 
-    padding: 11px 16px;
-    font-size: 14px;
+    padding: 8px 12px;
+    font-size: 13px;
     font-weight: 600;
 
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
 
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.2);
+}
+
+.create-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
 }
 
 .supervisor-btn .icon {
@@ -1396,7 +1401,8 @@ tbody tr {
 }
 
 .all-student-modal, .student-application-view, .student-application-approve, .student-application-reject, .supervisor-container
-,.all-supervisor-modal, .all-unverified-modal, .assign-student-container, .supervisor-view{
+,.all-supervisor-modal, .all-unverified-modal, .assign-student-container, .supervisor-view, .ojt-program-container, .department-management-container,
+.rfid-attendance-container, .evaluation-settings-container, .requirements-setup-container{
     position: fixed;
     top: 50%;
     left: 50%;
@@ -1414,7 +1420,8 @@ tbody tr {
 }
 
 .all-student-modal.show, .student-application-view.show, .student-application-approve.show, .student-application-reject.show, .supervisor-container.show 
-,.all-supervisor-modal.show, .all-unverified-modal.show, .assign-student-container.show, .supervisor-view.show{
+,.all-supervisor-modal.show, .all-unverified-modal.show, .assign-student-container.show, .supervisor-view.show, .ojt-program-container.show, .department-management-container.show,
+.rfid-attendance-container.show, .evaluation-settings-container.show, .requirements-setup-container.show{
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
@@ -1772,8 +1779,203 @@ tbody tr {
     cursor: not-allowed;
 }
 
+/* form layout */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 13px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-group textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #6e89d4;
+    box-shadow: 0 0 0 2px rgba(110,137,212,0.2);
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-group select[multiple] {
+    height: 110px;
+}
 
 
+/* system config buttons */
+.ojt-program-container {
+    width: 500px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.ojt-program-body {
+    margin-top: 15px;
+}
+
+.ojt-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.department-management-container {
+    width: 520px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.department-body {
+    margin-top: 15px;
+}
+
+.department-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.rfid-attendance-container {
+    width: 520px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.rfid-body {
+    margin-top: 15px;
+}
+
+.rfid-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.evaluation-settings-container {
+    width: 520px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.evaluation-body {
+    margin-top: 15px;
+}
+
+.criteria-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #f9fafb;
+    margin-top: 5px;
+}
+
+.criteria-box input {
+    margin-bottom: 8px;
+}
+
+.evaluation-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.requirements-setup-container {
+    width: 520px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.requirements-body {
+    margin-top: 15px;
+}
+
+.requirements-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #6e89d4, #83a2e4);
+    color: white;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: #e5e7eb;
+    color: #333;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    opacity: 0.9;
+}
+
+.cancel-btn:hover {
+    background: #d1d5db;
+}
+
+
+
+
+
+
+
+/* animations */
 @keyframes zoomIn {
     from { transform: scale(0.8); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
@@ -1784,5 +1986,11 @@ tbody tr {
 @media (max-width: 768px) {
     .pie-charts {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .preparation-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

@@ -272,6 +272,8 @@ function openTaskDetails(taskID) {
             const supervisorFeedbackSection = document.getElementById("supervisorFeedbackSection");
             const ratingSection = document.getElementById("ratingSection");
 
+             const notesCard = studentNoteSection.closest(".info-card");
+
             document.getElementById("modalStudentNote").innerText =
                 data.student_note ? data.student_note : "No student note provided";
 
@@ -281,14 +283,23 @@ function openTaskDetails(taskID) {
             document.getElementById("modalSupervisorRating").innerText =
                 data.rating ? data.rating : "No rating provided";
 
-            if (status === "APPROVED" || status === "REJECTED") {
+           if (status === "APPROVED" || status === "REJECTED") {
                 studentNoteSection.style.display = "block";
                 supervisorFeedbackSection.style.display = "block";
                 ratingSection.style.display = "block";
-            } else {
+                notesCard.style.display = "block";
+            } 
+            else if (status === "SUBMITTED" || status === "IN PROGRESS") {
+                studentNoteSection.style.display = "block";
+                supervisorFeedbackSection.style.display = "none";
+                ratingSection.style.display = "none";
+                notesCard.style.display = "block";
+            } 
+            else if (status === "NOT STARTED") {
                 studentNoteSection.style.display = "none";
                 supervisorFeedbackSection.style.display = "none";
                 ratingSection.style.display = "none";
+                notesCard.style.display = "none";
             }
         });
 }

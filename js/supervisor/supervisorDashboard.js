@@ -25,6 +25,9 @@ const closeCreateTask = document.getElementById("closeCreateTaskModal");
 const editTaskContainer = document.getElementById("task-edit-container");
 const closeEditTask = document.getElementById("closeEditTaskModal");
 
+const viewTaskDetails = document.getElementById("task-view");
+const closeViewTaskDetails = document.getElementById("closeTaskViewModal");
+
 const studentApplicationApprove = document.getElementById("student-application-approve");
 
 const buttons = document.querySelectorAll(".view-student-btn");
@@ -466,6 +469,62 @@ function previewImage(src) {
     modal.style.display = "flex";
 }
 
+// view task
+function viewTask(taskID) {
+    overlay.classList.add("show");
+    viewTaskDetails.classList.add("show");
+
+    fetch("functions/getTaskDetailsFinished.php?taskID=" + taskID)
+        .then(res => res.json())
+        .then(data => {
+
+            const fileBtn = document.getElementById("viewUploadedFileBtn");
+            const fileStatus = document.getElementById("uploadedFileStatus");
+
+            if (data.submission_file) {
+                const files = data.submission_file.split(",");
+                const firstFile = files[0].trim();
+
+                const filePath = "../../uploads/student_tasks/" +
+                    data.studentID + "/" + firstFile;
+
+                fileBtn.dataset.file = filePath;
+                fileBtn.style.display = "inline-block";
+
+                fileStatus.innerText = "Uploaded";
+                fileStatus.className = "status-badge success";
+            } else {
+                fileBtn.style.display = "none";
+
+                fileStatus.innerText = "No File Uploaded";
+                fileStatus.className = "status-badge missing";
+            }
+
+            document.getElementById("modalTaskTitle").innerText = data.title;
+            document.getElementById("modalTaskDesc").innerText = data.description;
+            document.getElementById("modalTaskStatus").innerText = data.status;
+            document.getElementById("modalTaskDue").innerText = data.due_date;
+            document.getElementById("modalTaskCompleted").innerText =
+                data.completed_at ? data.completed_at : "Not completed yet";
+
+            document.getElementById("modalTaskProgress").innerText =
+                data.progress + "%";
+
+            document.getElementById("modalStudentNote").innerText =
+                data.student_note ? data.student_note : "No student note provided";
+
+            document.getElementById("modalSupervisorFeedback").innerText =
+                data.supervisor_feedback ? data.supervisor_feedback : "No supervisor feedback";
+
+            document.getElementById("modalSupervisorRating").innerText =
+                data.rating ? data.rating : "No rating provided";
+
+            document.getElementById("studentNoteSection").style.display = "block";
+            document.getElementById("supervisorFeedbackSection").style.display = "block";
+            document.getElementById("ratingSection").style.display = "block";
+        });
+}
+
 // edit tasks
 function editTask(taskID) {
 
@@ -513,8 +572,9 @@ function closeTaskModal(){
     overlay.classList.remove("show");
 }
 
-// task approvals
 
+
+// task approvals
 
 
 document.getElementById("closeImagePreview").addEventListener("click", function () {
@@ -525,6 +585,11 @@ document.getElementById("imagePreviewModal").addEventListener("click", function 
     if (e.target.id === "imagePreviewModal") {
         this.style.display = "none";
     }
+});
+
+closeViewTaskDetails.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    viewTaskDetails.classList.remove("show");
 });
 
 
@@ -700,6 +765,7 @@ overlay.addEventListener("click", () => {
     studentBreakdown.classList.remove("show");
     editTaskContainer.classList.remove("show");
     studentApplicationApprove.classList.remove("show");
+    viewTaskDetails.classList.remove("show");
 });
 
 

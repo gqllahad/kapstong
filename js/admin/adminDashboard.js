@@ -86,6 +86,27 @@ const AssignStudent = document.getElementById("assign-student-container");
 const AssignStudentBtn = document.getElementById("assign-student-btn");
 const AssignCloseBtn = document.getElementById("closeAssignModal");
 
+const ojtSetupBtn = document.getElementById("ojt-program-btn");
+const closeOjtSetupBtn = document.getElementById("closeOjtProgramModal");
+
+const deparmentManagementBtn = document.getElementById("department-management-btn");
+const closeDeparmentManagementBtn = document.getElementById("closeDepartmentManagementModal");
+
+const rfidAttendanceBtn = document.getElementById("rfid-attendance-btn");
+const closeRfidAttendanceBtn = document.getElementById("closeRfidAttendanceModal");
+
+const evaluationSettingsBtn = document.getElementById("evaluation-settings-btn");
+const closeEvaluationSettingsBtn = document.getElementById("closeEvaluationSettingsModal");
+
+const requirementsSetupBtn = document.getElementById("requirements-setup-btn");
+const closeRequirementsSetupBtn = document.getElementById("closeRequirementsSetupModal");
+
+const ojtSetup = document.getElementById("ojt-program-container");
+const deparmentManagement = document.getElementById("department-management-container");
+const rfidAttendance = document.getElementById("rfid-attendance-container");
+const evaluationSettings = document.getElementById("evaluation-settings-container");
+const requirementsSetup = document.getElementById("requirements-setup-container");
+
 let selectedStudentIDs = [];
 let selectedSupervisorID = null;
 
@@ -650,6 +671,11 @@ overlay.addEventListener('click', () => {
       allUnverified.classList.remove("show");
       AssignStudent.classList.remove("show");
       superView.classList.remove("show");
+      ojtSetup.classList.remove("show")
+      deparmentManagement.classList.remove("show")
+      rfidAttendance.classList.remove("show")
+      evaluationSettings.classList.remove("show")
+      requirementsSetup.classList.remove("show")
 });
 
 allStudentBtn.addEventListener("click", () => {
@@ -1059,7 +1085,53 @@ document.getElementById("assign-btn").addEventListener("click", function () {
 
 });
 
- 
+
+// system config buttons
+
+ojtSetupBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+    ojtSetup.classList.add("show");
+});
+closeOjtSetupBtn.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    ojtSetup.classList.remove("show");
+});
+
+deparmentManagementBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+    deparmentManagement.classList.add("show");
+});
+closeDeparmentManagementBtn.addEventListener("click", () => {
+     overlay.classList.remove("show");
+    deparmentManagement.classList.remove("show");
+});
+
+rfidAttendanceBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+    rfidAttendance.classList.add("show");
+});
+closeRfidAttendanceBtn.addEventListener("click", () => {
+     overlay.classList.remove("show");
+    rfidAttendance.classList.remove("show");
+});
+
+evaluationSettingsBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+    evaluationSettings.classList.add("show");
+});
+closeEvaluationSettingsBtn.addEventListener("click", () => {
+     overlay.classList.remove("show");
+    evaluationSettings.classList.remove("show");
+});
+
+requirementsSetupBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+    requirementsSetup.classList.add("show");
+});
+closeRequirementsSetupBtn.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    requirementsSetup.classList.remove("show");
+}); 
 
 
 

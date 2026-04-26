@@ -84,6 +84,133 @@ $superID = getSupervisorIDByUserID($conn, $userID);
             <div class="student-application-approve" id="student-application-approve">
             </div>
 
+            <!-- view approved/rejected tasks -->
+            <div class="task-view" id="task-view">
+                <div class="modal-header">
+                    <h3>Task Details</h3>
+                    <button id="closeTaskViewModal" class="modal-close-profile">&times;</button>
+                </div>
+                <div class="task-modal-content">
+
+
+                    <div class="task-modal-body">
+
+                        <div class="task-info-grid">
+
+                            <div class="info-item">
+                                <label>Title</label>
+                                <p id="modalTaskTitle"></p>
+                            </div>
+
+                            <div class="info-card">
+
+                                <div class="card-header" onclick="toggleSection(this)">
+                                    <h4>Descriptions </h4>
+                                    <span class="arrow">▼</span>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="info-item">
+                                        <label>Description</label>
+                                        <p id="modalTaskDesc"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-card">
+
+                                <div class="card-header" onclick="toggleSection(this)">
+                                    <h4>Progress </h4>
+                                    <span class="arrow">▼</span>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="info-item">
+                                        <label>Status</label>
+                                        <span id="modalTaskStatus" class="status-badge"></span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>Due Date</label>
+                                        <p id="modalTaskDue"></p>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>Completed Date</label>
+                                        <p id="modalTaskCompleted"></p>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>Progress</label>
+                                        <p id="modalTaskProgress"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="divider"></div>
+
+                            <div class="info-card" id="uploadedFileSection">
+
+                                <div class="card-header" onclick="toggleSection(this)">
+                                    <h4>Uploaded Files</h4>
+                                    <span class="arrow">▼</span>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="documents-grid">
+
+                                        <div class="doc-card">
+
+                                            <button
+                                                id="viewUploadedFileBtn"
+                                                class="btn-preview"
+                                                style="display:none;"
+                                                onclick="previewImage(document.getElementById('viewUploadedFileBtn').dataset.file)">
+                                                👁 View File
+                                            </button>
+
+                                            <span
+                                                id="uploadedFileStatus"
+                                                class="status-badge missing">
+                                                No File Uploaded
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-card">
+
+                                <div class="card-header" onclick="toggleSection(this)">
+                                    <h4>Notes </h4>
+                                    <span class="arrow">▼</span>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="info-item" id="studentNoteSection" style="display:none;">
+                                        <label>Student Note</label>
+                                        <p id="modalStudentNote"></p>
+                                    </div>
+
+                                    <div class="info-item" id="supervisorFeedbackSection" style="display:none;">
+                                        <label>Supervisor Feedback</label>
+                                        <p id="modalSupervisorFeedback"></p>
+                                    </div>
+
+                                    <div class="info-item" id="ratingSection" style="display:none;">
+                                        <label>Supervisor Rating</label>
+                                        <p id="modalSupervisorRating"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- view student charts -->
             <div id="student-progress-container" class="student-progress-container">
                 <div class="modal-header">
