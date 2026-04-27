@@ -83,10 +83,34 @@ $taskScore =
     ? (($approved * 100) + ($submitted * 75) + ($inProgress * 50)) / $totalTasks
     : 0;
 
+$weightQuery = "
+    SELECT attendance_weight, progress_weight, task_weight
+    FROM evaluation_settings
+    WHERE superID = (
+        SELECT superID FROM student_supervisor WHERE studentID = '$studentID' LIMIT 1
+    )
+    LIMIT 1
+";
+
+$weightResult = $conn->query($weightQuery);
+$weightRow = $weightResult->fetch_assoc();
+
+$attendanceW = $weightRow['attendance_weight'] ?? 0.20;
+$progressW   = $weightRow['progress_weight'] ?? 0.30;
+$taskW       = $weightRow['task_weight'] ?? 0.50;
+
+$total = $attendanceW + $progressW + $taskW;
+
+if ($total > 0) {
+    $attendanceW /= $total;
+    $progressW   /= $total;
+    $taskW       /= $total;
+}
+
 $finalGrade =
-    ($attendanceScore * 0.30) +
-    ($progressScore * 0.40) +
-    ($taskScore * 0.30);
+    ($attendanceScore * $attendanceW) +
+    ($progressScore * $progressW) +
+    ($taskScore * $taskW);
 
 if ($finalGrade >= 90) $remarks = "EXCELLENT";
 else if ($finalGrade >= 80) $remarks = "VERY GOOD";

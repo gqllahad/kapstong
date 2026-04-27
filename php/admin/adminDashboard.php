@@ -467,60 +467,31 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <div class="evaluation-body">
 
                     <div class="form-group">
-                        <label>Rating System</label>
-                        <select>
-                            <option value="LETTER">Letter Grade (A+, A, B+)</option>
-                            <option value="NUMERIC">Numeric (1 - 100)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Passing Grade / Rating</label>
-                        <select>
-                            <option value="A+">A+</option>
-                            <option value="A">A</option>
-                            <option value="B+">B+</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Evaluation Criteria</label>
+                        <label>Evaluation Criteria (%)</label>
 
                         <div class="criteria-box">
 
-                            <label>Attendance (%)</label>
-                            <input type="number" placeholder="e.g. 30">
+                            <div class="criteria-item">
+                                <label>Attendance (%)</label>
+                                <input type="number" id="attendanceWeight" placeholder="e.g. 20">
+                            </div>
 
-                            <label>Performance (%)</label>
-                            <input type="number" placeholder="e.g. 40">
+                            <div class="criteria-item">
+                                <label>Performance (%)</label>
+                                <input type="number" id="progressWeight" placeholder="e.g. 30">
+                            </div>
 
-                            <label>Task Completion (%)</label>
-                            <input type="number" placeholder="e.g. 30">
+                            <div class="criteria-item">
+                                <label>Task Completion (%)</label>
+                                <input type="number" id="taskWeight" placeholder="e.g. 50">
+                            </div>
 
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Allow Supervisor Comments</label>
-                        <select>
-                            <option value="YES">Yes</option>
-                            <option value="NO">No</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Require Rating Before Approval</label>
-                        <select>
-                            <option value="YES">Yes</option>
-                            <option value="NO">No</option>
-                        </select>
-                    </div>
-
                     <div class="evaluation-actions">
-                        <button class="save-btn">Save Settings</button>
-                        <button class="cancel-btn">Cancel</button>
+                        <button class="cancel-btn" onclick="closeEvaluationSettings()">Cancel</button>
+                        <button class="save-btn" onclick="saveEvaluationSettings()">Save Settings</button>
                     </div>
 
                 </div>

@@ -555,6 +555,42 @@ function loadPieChart() {
         .catch(err => console.error("Pie chart error:", err));
 }
 
+// evaluation settings
+function loadEvaluationSettings(superID = null) {
+
+    fetch("functions/getEvaluationSettings.php?superID=" + superID)
+        .then(res => res.json())
+        .then(data => {
+
+            document.getElementById("attendanceWeight").value = data.attendance_weight * 100;
+            document.getElementById("progressWeight").value = data.progress_weight * 100;
+            document.getElementById("taskWeight").value = data.task_weight * 100;
+
+        });
+}
+
+function saveEvaluationSettings() {
+
+    const attendance = document.getElementById("attendanceWeight").value / 100;
+    const progress = document.getElementById("progressWeight").value / 100;
+    const task = document.getElementById("taskWeight").value / 100;
+
+    fetch("functions/saveEvaluationSettings.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "attendance=" + attendance +
+            "&progress=" + progress +
+            "&task=" + task
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+    });
+}
+
 // bar chart (go)
 // document.addEventListener("DOMContentLoaded", loadChart, loadPieChart);
 // setInterval(loadChart, 5000);

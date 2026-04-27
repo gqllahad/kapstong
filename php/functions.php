@@ -729,12 +729,35 @@ function renderEvaluationList($conn, $superID, $search = '')
             }
         }
 
-        $taskScore = ($taskTotal > 0) ? ($taskSum / $taskTotal) : 0;
+        $taskScore = ($taskTotal > 0)
+            ? ($taskSum / $taskTotal)
+            : 0;
+
+        $weightData = $conn->query("
+            SELECT attendance_weight, progress_weight, task_weight
+            FROM evaluation_settings
+            WHERE superID IS NULL
+            LIMIT 1
+        ");
+
+        $weightRow = $weightData->fetch_assoc() ?? [];
+
+        $attendanceW = floatval($weightRow['attendance_weight'] ?? 0.33);
+        $progressW    = floatval($weightRow['progress_weight'] ?? 0.33);
+        $taskW        = floatval($weightRow['task_weight'] ?? 0.33);
+
+        $totalW = $attendanceW + $progressW + $taskW;
+
+        if ($totalW > 0) {
+            $attendanceW /= $totalW;
+            $progressW    /= $totalW;
+            $taskW        /= $totalW;
+        }
 
         $finalGrade =
-            ($attendanceScore * 0.30) +
-            ($progressScore * 0.40) +
-            ($taskScore * 0.30);
+            ($attendanceScore * $attendanceW) +
+            ($progressScore * $progressW) +
+            ($taskScore * $taskW);
 
         $remarkColor = '#DC2626';
 
