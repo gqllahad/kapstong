@@ -1071,6 +1071,191 @@ function renderActivityLogTable($conn, $search = '')
     return $output;
 }
 
+// ojt settings
+function renderActiveOJTCard($conn)
+{
+    $sql = "SELECT academic_year, required_hours, start_date, end_date, status
+            FROM ojt_settings
+            WHERE status = 'ACTIVE'
+            ORDER BY settingID DESC
+            LIMIT 1";
+
+    $result = $conn->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+
+        $row = $result->fetch_assoc();
+
+        return '
+            <div class="ojt-card-box">
+                <h4>Current Active OJT Setup</h4>
+
+                <p><strong>Academic Year:</strong> ' . htmlspecialchars($row['academic_year']) . '</p>
+
+                <p><strong>Required Hours:</strong> ' . htmlspecialchars($row['required_hours']) . ' Hours</p>
+
+                <p><strong>Duration:</strong> 
+                    ' . date("M d, Y", strtotime($row['start_date'])) . ' 
+                    to 
+                    ' . date("M d, Y", strtotime($row['end_date'])) . '
+                </p>
+
+                <p><strong>Status:</strong> 
+                    <span class="active-status">ACTIVE</span>
+                </p>
+            </div>
+        ';
+    }
+
+    return '
+        <div class="ojt-card-box empty">
+            <p>No active OJT setup found.</p>
+        </div>
+    ';
+}
+
+// department management table
+function renderDepartmentManagementTable($conn, $department = '')
+{
+    $where = "";
+
+    if (!empty($department)) {
+        $where = "WHERE prg_department = '" . $conn->real_escape_string($department) . "'";
+    }
+
+    $sql = "SELECT program_id, prg_name, prg_acro, prg_department, prg_department_code, status
+            FROM program 
+            $where
+            ORDER BY prg_department ASC";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+
+        while ($row = $result->fetch_assoc()) {
+
+            $status = strtoupper($row['status']);
+
+            if ($status == "ACTIVE") {
+                $statusColor = "#22C55E";
+            } else {
+                $statusColor = "#EF4444";
+            }
+
+            $output .= '
+            <tr>
+                <td>' . htmlspecialchars($row['prg_name']) . '</td>
+
+                <td>' . htmlspecialchars($row['prg_acro']) . '</td>
+
+                <td>
+                    ' . htmlspecialchars($row['prg_department']) . '
+                    <small style="color:gray;">(' . htmlspecialchars($row['prg_department_code']) . ')</small>
+                </td>
+
+                <td style="color: ' . $statusColor . '; font-weight:600;">
+                    ' . htmlspecialchars($row['status']) . '
+                </td>
+
+                <td>
+                    <button 
+                        class="edit-program-btn"
+                        data-id="' . $row['program_id'] . '"
+                        data-name="' . htmlspecialchars($row['prg_name']) . '"
+                        data-acro="' . htmlspecialchars($row['prg_acro']) . '"
+                        data-department="' . htmlspecialchars($row['prg_department']) . '"
+                        data-departmentcode="' . htmlspecialchars($row['prg_department_code']) . '"
+                        data-status="' . htmlspecialchars($row['status']) . '">
+                        Edit
+                    </button>
+                    <button class="delete-program-btn" data-id="' . $row['program_id'] . '">Delete</button>
+                </td>
+            </tr>';
+        }
+    } else {
+
+        $output .= '
+        <tr>
+            <td colspan="5" style="text-align:center; padding:15px;">
+                No programs found
+            </td>
+        </tr>';
+    }
+
+    return $output;
+}
+
+function renderDepartmentOptions($conn)
+{
+    $sql = "SELECT DISTINCT prg_department, prg_department_code FROM program";
+    $result = $conn->query($sql);
+
+    $output = '<option value="">All Departments</option>';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $output .= '
+                <option value="' . htmlspecialchars($row['prg_department']) . '">
+                    ' . htmlspecialchars($row['prg_department']) . ' (' . htmlspecialchars($row['prg_department_code']) . ')
+                </option>
+            ';
+        }
+    }
+
+    return $output;
+}
+
+// evaluation settings
+function renderActiveEvaluationCard($conn)
+{
+    $sql = "SELECT attendance_weight, progress_weight, task_weight, date_updated
+            FROM evaluation_settings
+            ORDER BY settingID DESC
+            LIMIT 1";
+
+    $result = $conn->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+
+        $row = $result->fetch_assoc();
+
+        $attendance = $row['attendance_weight'] * 100;
+        $progress = $row['progress_weight'] * 100;
+        $task = $row['task_weight'] * 100;
+
+        return '
+        <div class="eval-card">
+            <h4>Current Evaluation Settings</h4>
+
+            <div class="eval-grid">
+                <div class="eval-item">
+                    <span>Attendance</span>
+                    <strong>' . $attendance . '%</strong>
+                </div>
+
+                <div class="eval-item">
+                    <span>Performance</span>
+                    <strong>' . $progress . '%</strong>
+                </div>
+
+                <div class="eval-item">
+                    <span>Task Completion</span>
+                    <strong>' . $task . '%</strong>
+                </div>
+            </div>
+
+            <small>Last updated: ' . date("M d, Y h:i A", strtotime($row['date_updated'])) . '</small>
+        </div>';
+    }
+
+    return '
+    <div class="eval-card empty">
+        <p>No evaluation settings found.</p>
+    </div>';
+}
+
 
 // admin daashboard cards
 function countStudents($conn)
@@ -1252,4 +1437,47 @@ function getSupervisorTrend($conn, $table, $column, $value, $dateColumn)
     if ($total == 0) return "0%";
 
     return round(($recent / $total) * 100, 1) . "%";
+}
+
+// supervisor alerts
+function getSupervisorAlerts($conn)
+{
+    $alerts = [];
+
+    $sql1 = "
+        SELECT s.studentID, s.name
+        FROM ojtstudent s
+        LEFT JOIN attendance_logs a 
+        ON s.studentID = a.studentID 
+        AND a.log_date >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+        WHERE a.attendanceID IS NULL
+    ";
+
+    $result1 = $conn->query($sql1);
+
+    while ($row = $result1->fetch_assoc()) {
+        $alerts[] = [
+            "type" => "warning",
+            "message" => $row['name'] . "has not recorded attendance for 5 days"
+        ];
+    }
+
+    $sql2 = "
+        SELECT s.name
+        FROM student_tasks t
+        JOIN ojtstudent s ON t.studentID = s.studentID
+        WHERE t.status IN ('NOT STARTED')
+        AND t.due_date < CURDATE()
+    ";
+
+    $result2 = $conn->query($sql2);
+
+    while ($row = $result2->fetch_assoc()) {
+        $alerts[] = [
+            "type" => "danger",
+            "message" => $row['name'] . " has overdue tasks"
+        ];
+    }
+
+    return $alerts;
 }

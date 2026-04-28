@@ -35,5 +35,5 @@ $stmt->execute();
 
 echo json_encode([
     "status" => "success",
-    "message" => "Evaluation settings updated"
+    "message" => "Evaluation settings updated!"
 ]);

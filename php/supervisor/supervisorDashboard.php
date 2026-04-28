@@ -551,18 +551,33 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
 
                 <!-- ALERTS -->
-                <div style="background:white; padding:20px; border-radius:12px;">
-                    <h3 style="margin-bottom:15px;">Alerts</h3>
+                <div class="alerts-container">
+                    <h3>Alerts</h3>
 
-                    <ul style="list-style:none; padding:0;">
+                    <ul class="alerts-list scrollable">
 
-                        <li style="padding:10px; background:#fff3cd; margin-bottom:10px; border-radius:6px;">
-                            ⚠️ Juan Dela Cruz has not submitted logs for 3 days
-                        </li>
+                        <?php
+                        $alerts = getSupervisorAlerts($conn);
 
-                        <li style="padding:10px; background:#ffe4e6; margin-bottom:10px; border-radius:6px;">
-                            ⚠️ Maria Santos is behind required hours
-                        </li>
+                        if (count($alerts) > 0):
+
+                            foreach ($alerts as $alert):
+                        ?>
+
+                                <li class="alert-item <?= $alert['type'] ?>">
+                                    ⚠️ <?= htmlspecialchars($alert['message']) ?>
+                                </li>
+
+                            <?php
+                            endforeach;
+                        else:
+                            ?>
+
+                            <li class="alert-item success">
+                                ✅ No issues detected. All students are active.
+                            </li>
+
+                        <?php endif; ?>
 
                     </ul>
                 </div>

@@ -56,7 +56,7 @@ if ($documents) {
     $description = "Student Remove Uploaded Document";
 
     $target_type = "student";
-    $target_id = $row['studentID'];
+    $target_id = $studentID;
 
     $act_log->bind_param(
         "isssssss",

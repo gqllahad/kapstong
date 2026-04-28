@@ -5,16 +5,21 @@ require_once("../../kapstongConnection.php");
 
 $studentID = $_SESSION['studentID'];
 
-$sql = $conn->query("
+$sql = $conn->prepare("
     SELECT taskID, title, status, due_date, completed_at
     FROM student_tasks
-    WHERE studentID = '$studentID'
-     ORDER BY date_created DESC
+    WHERE studentID = ?
+    ORDER BY date_created DESC
 ");
+
+$sql->bind_param("s", $studentID);
+$sql->execute();
+
+$result = $sql->get_result();
 
 $data = [];
 
-while ($row = $sql->fetch_assoc()) {
+while ($row = $result->fetch_assoc()) {
     $row['status'] = strtoupper(trim($row['status']));
     $data[] = $row;
 }

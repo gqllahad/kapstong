@@ -582,6 +582,38 @@ background:#eee;
     background: var(--view-btn-hover);
 }
 
+.edit-btn, .edit-program-btn {
+    background: #0891b2; 
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.edit-program-btn:hover, .edit-btn:hover {
+    background: #0e7490; 
+}
+
+.delete-btn, .delete-program-btn {
+    background: #dc2626; 
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.delete-btn:hover, .delete-program-btn:hover {
+    background: #b91c1c; 
+}
+
 /* preparations */
 .preparation-grid {
     display: grid;
@@ -1322,7 +1354,7 @@ tbody tr {
     gap: 10px;
 }
 
-.search-container input[type="text"] {
+.search-container input[type="text"], .search-container select {
     padding: 10px 12px;
     font-size: 15px;
 
@@ -1335,12 +1367,12 @@ tbody tr {
     transition: 0.3s ease;
 }
 
-.search-container input[type="text"]:focus {
+.search-container input[type="text"]:focus,  .search-container select:focus {
     border-color: #6e89d4;
      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
-#approvalTableBody, #unverifiedTableBody, #allStudentBody, #allSupervisorBody, #activityLogTableBody {
+#approvalTableBody, #unverifiedTableBody, #allStudentBody, #allSupervisorBody, #activityLogTableBody, #filterProgramsBody {
     transition: opacity 0.3s ease;
 }
 
@@ -1401,7 +1433,7 @@ tbody tr {
 }
 
 .all-student-modal, .student-application-view, .student-application-approve, .student-application-reject, .supervisor-container
-,.all-supervisor-modal, .all-unverified-modal, .assign-student-container, .supervisor-view, .ojt-program-container, .department-management-container,
+,.all-supervisor-modal, .all-unverified-modal, .assign-student-container, .supervisor-view, .ojt-program-container, .department-management-container,.department-management-modal,
 .rfid-attendance-container, .evaluation-settings-container, .requirements-setup-container{
     position: fixed;
     top: 50%;
@@ -1420,7 +1452,7 @@ tbody tr {
 }
 
 .all-student-modal.show, .student-application-view.show, .student-application-approve.show, .student-application-reject.show, .supervisor-container.show 
-,.all-supervisor-modal.show, .all-unverified-modal.show, .assign-student-container.show, .supervisor-view.show, .ojt-program-container.show, .department-management-container.show,
+,.all-supervisor-modal.show, .all-unverified-modal.show, .assign-student-container.show, .supervisor-view.show, .ojt-program-container.show, .department-management-container.show,.department-management-modal.show,
 .rfid-attendance-container.show, .evaluation-settings-container.show, .requirements-setup-container.show{
     opacity: 1;
     visibility: visible;
@@ -1850,8 +1882,70 @@ tbody tr {
     margin-top: 20px;
 }
 
+.current-ojt-card {
+    margin-bottom: 20px;
+}
+
+.ojt-card-box {
+    background: linear-gradient(135deg, #EFF6FF, #FFFFFF);
+    border: 1px solid #BFDBFE;
+    border-left: 5px solid #2563EB;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.08);
+    transition: 0.3s ease;
+}
+
+.ojt-card-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.12);
+}
+
+.ojt-card-box h4 {
+    margin-bottom: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1D4ED8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ojt-card-box h4::before {
+    content: "📘";
+    font-size: 18px;
+}
+
+.ojt-card-box p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #374151;
+}
+
+.ojt-card-box p strong {
+    color: #1F2937;
+}
+
+.active-status {
+    background: #DBEAFE;
+    color: #1D4ED8;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.ojt-card-box.empty {
+    text-align: center;
+    padding: 25px;
+    color: #6B7280;
+    background: #F8FAFC;
+    border: 1px dashed #BFDBFE;
+}
+
 .department-management-container {
-    width: 520px;
+    width: 100%;
     background: #fff;
     border-radius: 12px;
     padding: 20px;
@@ -1922,6 +2016,65 @@ tbody tr {
     margin-top: 18px;
 }
 
+.current-eval-card {
+    margin-bottom: 18px;
+}
+
+.eval-card {
+    background: linear-gradient(135deg, #EFF6FF, #FFFFFF);
+    border: 1px solid #BFDBFE;
+    border-left: 5px solid #2563EB;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.08);
+}
+
+.eval-card h4 {
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1D4ED8;
+}
+
+.eval-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.eval-item {
+    background: #F8FAFC;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #E0E7FF;
+    text-align: center;
+}
+
+.eval-item span {
+    display: block;
+    font-size: 12px;
+    color: #6B7280;
+}
+
+.eval-item strong {
+    font-size: 16px;
+    color: #1E3A8A;
+}
+
+.eval-card small {
+    color: #6B7280;
+    font-size: 12px;
+}
+
+.eval-card.empty {
+    padding: 18px;
+    text-align: center;
+    color: #6B7280;
+    background: #F8FAFC;
+    border: 1px dashed #BFDBFE;
+}
+
 .requirements-setup-container {
     width: 520px;
     background: #fff;
@@ -1967,6 +2120,28 @@ tbody tr {
 
 .cancel-btn:hover {
     background: #d1d5db;
+}
+
+/* toast */
+#toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 250px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: 0.3s ease;
+    z-index: 9999;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+#toast.show {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 

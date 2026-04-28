@@ -89,8 +89,13 @@ const AssignCloseBtn = document.getElementById("closeAssignModal");
 const ojtSetupBtn = document.getElementById("ojt-program-btn");
 const closeOjtSetupBtn = document.getElementById("closeOjtProgramModal");
 
-const deparmentManagementBtn = document.getElementById("department-management-btn");
-const closeDeparmentManagementBtn = document.getElementById("closeDepartmentManagementModal");
+const departmentManagementBtn = document.getElementById("department-management-btn");
+const departmentManagementModal = document.getElementById("department-management-modal");
+const filterProgramsBody = document.getElementById("filterProgramsBody");
+
+const closeDeparmentManagementBtn = document.getElementById("closeDepartmentManagement");
+const closeDeparmentManagementModalBtn = document.getElementById("closeDepartmentManagementModal");
+
 
 const rfidAttendanceBtn = document.getElementById("rfid-attendance-btn");
 const closeRfidAttendanceBtn = document.getElementById("closeRfidAttendanceModal");
@@ -98,11 +103,12 @@ const closeRfidAttendanceBtn = document.getElementById("closeRfidAttendanceModal
 const evaluationSettingsBtn = document.getElementById("evaluation-settings-btn");
 const closeEvaluationSettingsBtn = document.getElementById("closeEvaluationSettingsModal");
 
+
 const requirementsSetupBtn = document.getElementById("requirements-setup-btn");
 const closeRequirementsSetupBtn = document.getElementById("closeRequirementsSetupModal");
 
 const ojtSetup = document.getElementById("ojt-program-container");
-const deparmentManagement = document.getElementById("department-management-container");
+const departmentManagement = document.getElementById("department-management-container");
 const rfidAttendance = document.getElementById("rfid-attendance-container");
 const evaluationSettings = document.getElementById("evaluation-settings-container");
 const requirementsSetup = document.getElementById("requirements-setup-container");
@@ -124,6 +130,25 @@ let assignSearchTimer;
 
 
 // Functions 
+
+// toast
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+
+    toast.style.background =
+        type === "success" ? "#28a745" :
+        type === "error" ? "#dc3545" :
+        type === "warning" ? "#ffc107" :
+        "#333";
+
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+}
 
 function viewUser(studentID, source) {
 
@@ -210,7 +235,10 @@ function approveUser(studentID) {
                 btn.disabled = !checkbox.checked;
             });
         }
-    });
+        showToast(data.message, data.success ? "success" : "error");
+    }).catch(() => {
+            showToast("Server error occurred", "error");
+        });
 };
 
 function approveStudent(studentID) {
@@ -225,12 +253,14 @@ function approveStudent(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-        alert("Student approved successfully!");
+         showToast(data.message, data.success ? "success" : "error");
 
         closeApproveModal();
         location.reload();
     })
-    .catch(err => console.error(err));
+    .catch(() => {
+            showToast("Server error occurred", "error");
+        });
 }
 
 function rejectUser(studentID) {
@@ -259,7 +289,11 @@ function rejectUser(studentID) {
                 btn.disabled = !checkbox.checked;
             });
         }
-    });
+
+         showToast(data.message, data.success ? "success" : "error");
+    }) .catch(() => {
+            showToast("Server error occurred", "error");
+        });
 };
 
 function rejectStudent(studentID) {
@@ -283,12 +317,14 @@ function rejectStudent(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-        alert("Student rejected successfully!");
+       showToast(data.message, data.success ? "success" : "error");
 
         closeRejectModal();
         location.reload();
     })
-    .catch(err => console.error(err));
+    .catch(() => {
+            showToast("Server error occurred", "error");
+        });
 }
 
 function closeSuperViewModal() {
@@ -565,8 +601,7 @@ function loadEvaluationSettings(superID = null) {
             document.getElementById("attendanceWeight").value = data.attendance_weight * 100;
             document.getElementById("progressWeight").value = data.progress_weight * 100;
             document.getElementById("taskWeight").value = data.task_weight * 100;
-
-        });
+        })
 }
 
 function saveEvaluationSettings() {
@@ -575,19 +610,201 @@ function saveEvaluationSettings() {
     const progress = document.getElementById("progressWeight").value / 100;
     const task = document.getElementById("taskWeight").value / 100;
 
+     if (isNaN(attendance) || isNaN(progress) || isNaN(task)) {
+        alert("Please enter valid values.");
+        return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("attendance", attendance);
+    formData.append("progress", progress);
+    formData.append("task", task);
+
     fetch("functions/saveEvaluationSettings.php", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body:
-            "attendance=" + attendance +
-            "&progress=" + progress +
-            "&task=" + task
+        body: formData
     })
     .then(res => res.json())
     .then(data => {
-        alert(data.message);
+        showToast(data.message, data.status ? "success" : "error");
+        
+        if (data.status) {
+            setTimeout(() => {
+                evaluationSettings.classList.remove("show");
+                overlay.classList.remove("show");
+            }, 500);
+        
+        }
+
+    }).catch(() => {
+    showToast("Server error occurred", "error");
+    });
+}
+
+// ojt settings
+function saveOJTSettings() {
+
+    const academicYear = document.getElementById("academicYear").value;
+    const requiredHours = document.getElementById("requiredHours").value;
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    const status = document.getElementById("status").value;
+
+    if (!academicYear || !requiredHours || !startDate || !endDate) {
+        alert("Please complete all fields.");
+        return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("academic_year", academicYear);
+    formData.append("required_hours", requiredHours);
+    formData.append("start_date", startDate);
+    formData.append("end_date", endDate);
+    formData.append("status", status);
+
+    fetch("functions/saveOjtSettings.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+       showToast(data.message, data.success ? "success" : "error");
+       if (data.success) {
+
+        document.getElementById("academicYear").value = "";
+        document.getElementById("requiredHours").value = "";
+        document.getElementById("startDate").value = "";
+        document.getElementById("endDate").value = "";
+        document.getElementById("status").value = "ACTIVE";
+        
+        setTimeout(() => {
+            ojtSetup.classList.remove("show");
+            overlay.classList.remove("show");
+        }, 500);
+        
+    }
+    })
+    .catch(err => {
+       showToast("Server error occurred", "error");
+    });
+}
+
+function filterPrograms() {
+
+    const department = document.getElementById("departmentFilter").value;
+
+    clearTimeout(searchTimer);
+
+    let value = this.value;
+
+    searchTimer = setTimeout(() => {
+     filterProgramsBody.classList.add("fade-out");
+
+    fetch("functions/filterPrograms.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "department=" + department
+    })
+    .then(res => res.text())
+    .then(data => {
+
+        setTimeout(() => {
+                filterProgramsBody.innerHTML = data;
+
+                filterProgramsBody.classList.remove("fade-out");
+                filterProgramsBody.classList.add("fade-in");
+
+                setTimeout(() => {
+                    filterProgramsBody.classList.remove("fade-in");
+                }, 200);
+
+            }, 200);
+        
+    })
+    .catch(() => {
+        showToast("Failed to load data", "error");
+    });
+    }, 300);
+}
+
+function updateDepartmentCode() {
+    const select = document.getElementById("prg_department");
+    const selectedText = select.options[select.selectedIndex].text;
+
+    const match = selectedText.match(/\((.*?)\)/);
+
+    document.getElementById("prg_department_code").value =
+        match ? match[1] : "";
+}
+
+function updateProgram() {
+
+    const programId = document.getElementById("program_id").value;
+    const programName = document.getElementById("prg_name").value;
+    const programCode = document.getElementById("prg_acro").value;
+    const departmentName = document.getElementById("prg_department").value;
+    const departmentCode = document.getElementById("prg_department_code").value;
+    const status = document.getElementById("prg_status").value;
+
+    if (
+        !programName ||
+        !programCode ||
+        !departmentName ||
+        !departmentCode ||
+        !status
+    ) {
+        showToast("Please complete all fields.", "error");
+        return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("program_id", programId);
+    formData.append("prg_name", programName);
+    formData.append("prg_acro", programCode);
+    formData.append("prg_department", departmentName);
+    formData.append("prg_department_code", departmentCode);
+    formData.append("status", status);
+
+    fetch("functions/updateProgram.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        showToast(data.message, data.success ? "success" : "error");
+
+        if (data.success) {
+
+            document.getElementById("department-management-modal").style.display = "none";
+
+            document.getElementById("program_id").value = "";
+            document.getElementById("prg_name").value = "";
+            document.getElementById("prg_acro").value = "";
+            document.getElementById("prg_department").value = "";
+            document.getElementById("prg_department_code").value = "";
+            document.getElementById("prg_status").value = "";
+
+            filterPrograms();
+
+            setTimeout(() => {
+                departmentManagementModal.classList.remove("show");
+                departmentManagement.classList.add("show");
+            }, 500);
+        }
+    })
+    .catch(() => {
+        showToast("Server error occurred.", "error");
     });
 }
 
@@ -610,6 +827,24 @@ menuToggle.addEventListener("click", (e) => {
 document.addEventListener("click", (e) => {
     if (!menuToggle.contains(e.target) && !profileMenu.contains(e.target)) {
         profileMenu.hidden = true;
+    }
+});
+
+document.addEventListener("click", function (e) {
+
+    if (e.target.classList.contains("edit-program-btn")) {
+
+        const btn = e.target;
+
+        departmentManagement.classList.remove("show");
+        departmentManagementModal.classList.add("show");
+
+        document.getElementById("program_id").value = btn.dataset.id;
+        document.getElementById("prg_name").value = btn.dataset.name;
+        document.getElementById("prg_acro").value = btn.dataset.acro;
+        document.getElementById("prg_department").value = btn.dataset.department;
+        document.getElementById("prg_department_code").value = btn.dataset.departmentcode;
+        document.getElementById("prg_status").value = btn.dataset.status || "ACTIVE";
     }
 });
 
@@ -708,7 +943,10 @@ overlay.addEventListener('click', () => {
       AssignStudent.classList.remove("show");
       superView.classList.remove("show");
       ojtSetup.classList.remove("show")
-      deparmentManagement.classList.remove("show")
+
+      departmentManagement.classList.remove("show")
+      departmentManagementModal.classList.remove("show")
+
       rfidAttendance.classList.remove("show")
       evaluationSettings.classList.remove("show")
       requirementsSetup.classList.remove("show")
@@ -1133,13 +1371,18 @@ closeOjtSetupBtn.addEventListener("click", () => {
     ojtSetup.classList.remove("show");
 });
 
-deparmentManagementBtn.addEventListener("click", () => {
+departmentManagementBtn.addEventListener("click", () => {
     overlay.classList.add("show");
-    deparmentManagement.classList.add("show");
+    departmentManagement.classList.add("show");
 });
 closeDeparmentManagementBtn.addEventListener("click", () => {
      overlay.classList.remove("show");
-    deparmentManagement.classList.remove("show");
+    departmentManagement.classList.remove("show");
+});
+
+closeDeparmentManagementModalBtn.addEventListener("click", () => {
+    departmentManagementModal.classList.remove("show");
+    departmentManagement.classList.add("show");
 });
 
 rfidAttendanceBtn.addEventListener("click", () => {

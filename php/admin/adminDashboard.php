@@ -67,6 +67,8 @@ if ($_SESSION['role'] !== "ADMIN") {
 
         <!-- MAIN -->
         <main class="content">
+            <div id="toast"></div>
+
             <div id="overlay" class="overlay"></div>
 
             <!-- unverified accounts -->
@@ -293,6 +295,7 @@ if ($_SESSION['role'] !== "ADMIN") {
             </div>
 
             <!-- systemconfig modals -->
+
             <!-- ojt setup -->
             <div class="ojt-program-container" id="ojt-program-container">
                 <div class="modal-header">
@@ -302,49 +305,54 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 <div class="ojt-program-body">
 
+                    <div class="current-ojt-card">
+                        <?php echo renderActiveOJTCard($conn); ?>
+                    </div>
+
                     <div class="form-group">
                         <label>Academic Year</label>
-                        <input type="text" placeholder="e.g. 2026 - 2027">
+                        <input type="text" id="academicYear" placeholder="e.g. 2026 - 2027">
                     </div>
 
                     <div class="form-group">
                         <label>Required OJT Hours</label>
-                        <input type="number" placeholder="e.g. 600">
+                        <input type="number" id="requiredHours" placeholder="e.g. 600">
                     </div>
 
                     <div class="form-row">
 
                         <div class="form-group">
                             <label>Start Date</label>
-                            <input type="date">
+                            <input type="date" id="startDate">
                         </div>
 
                         <div class="form-group">
                             <label>End Date</label>
-                            <input type="date">
+                            <input type="date" id="endDate">
                         </div>
 
                     </div>
 
                     <div class="form-group">
                         <label>Status</label>
-                        <select>
+                        <select id="status">
                             <option value="ACTIVE">Active</option>
                             <option value="INACTIVE">Inactive</option>
                         </select>
                     </div>
 
                     <div class="ojt-actions">
-                        <button class="cancel-btn">Cancel</button>
-                        <button class="save-btn">Save Setup</button>
+                        <button type="button" onclick="saveOJTSettings()" class="save-btn">
+                            Save Setup
+                        </button>
                     </div>
 
                 </div>
-
             </div>
 
             <!-- deparment management -->
-            <div class="department-management-container" id="department-management-container">
+
+            <div class="department-management-modal" id="department-management-modal">
                 <div class="modal-header">
                     <h3>Department Management</h3>
                     <button id="closeDepartmentManagementModal" class="modal-close">&times;</button>
@@ -352,44 +360,96 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 <div class="department-body">
 
+                    <input type="hidden" id="program_id">
+
+                    <div class="form-group">
+                        <label>Program Name</label>
+                        <input
+                            type="text"
+                            id="prg_name"
+                            placeholder="e.g. Bachelor of Science in Information Technology">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Program Code</label>
+                        <input
+                            type="text"
+                            id="prg_acro"
+                            placeholder="e.g. BSIT">
+                    </div>
+
                     <div class="form-group">
                         <label>Department Name</label>
-                        <input type="text" placeholder="e.g. College of Computer Studies">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Department Code</label>
-                        <input type="text" placeholder="e.g. CCS">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Department Head</label>
-                        <input type="text" placeholder="e.g. Dr. Juan Dela Cruz">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Assigned Programs</label>
-                        <select multiple>
-                            <option>BSIT</option>
-                            <option>BSCS</option>
-                            <option>BSEMC</option>
-                            <option>BSIS</option>
+                        <select id="prg_department" onchange="updateDepartmentCode()">
+                            <?php echo renderDepartmentOptions($conn); ?>
                         </select>
                     </div>
 
                     <div class="form-group">
+                        <label>Department Code</label>
+                        <input
+                            type="text"
+                            id="prg_department_code"
+                            placeholder="e.g. CCS"
+                            readonly>
+                    </div>
+
+                    <div class="form-group">
                         <label>Status</label>
-                        <select>
+                        <select id="prg_status">
                             <option value="ACTIVE">Active</option>
                             <option value="INACTIVE">Inactive</option>
                         </select>
                     </div>
 
                     <div class="department-actions">
-                        <button class="save-btn">Save Department</button>
-                        <button class="cancel-btn">Cancel</button>
+                        <button class="save-btn" onclick="updateProgram()">
+                            Save Program
+                        </button>
                     </div>
 
+                </div>
+            </div>
+
+
+            <div class="department-management-container" id="department-management-container">
+                <div class="modal-header">
+                    <h3>Department Management</h3>
+                    <button id="closeDepartmentManagement" class="modal-close">&times;</button>
+                </div>
+
+                <div class="search-filter">
+
+                    <div class="search-container">
+
+                        <i class="bi bi-funnel search-icon"></i>
+
+                        <select id="departmentFilter" onchange="filterPrograms(this.value)">
+                            <?php echo renderDepartmentOptions($conn); ?>
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Program Name</th>
+                                <th>Code</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="filterProgramsBody">
+                            <?php
+                            echo renderDepartmentManagementTable($conn);
+                            ?>
+                        </tbody>
+                    </table>
                 </div>
                 <!-- Dept	Code	Head	Programs	Status	Action -->
             </div>
@@ -465,6 +525,9 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
                 <div class="evaluation-body">
+                    <div class="current-eval-card">
+                        <?php echo renderActiveEvaluationCard($conn); ?>
+                    </div>
 
                     <div class="form-group">
                         <label>Evaluation Criteria (%)</label>
@@ -490,7 +553,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                     </div>
 
                     <div class="evaluation-actions">
-                        <button class="cancel-btn" onclick="closeEvaluationSettings()">Cancel</button>
                         <button class="save-btn" onclick="saveEvaluationSettings()">Save Settings</button>
                     </div>
 
@@ -899,6 +961,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../../js/admin/adminDashboard.js"></script>
