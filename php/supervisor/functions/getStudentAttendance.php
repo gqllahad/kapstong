@@ -2,6 +2,7 @@
 
 header('Content-Type: application/json');
 
+require_once("../../auth/supervisor_auth.php");
 require_once("../../kapstongConnection.php");
 
 $studentID = $_GET['studentID'] ?? '';

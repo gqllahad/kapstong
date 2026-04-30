@@ -1440,44 +1440,107 @@ function getSupervisorTrend($conn, $table, $column, $value, $dateColumn)
 }
 
 // supervisor alerts
-function getSupervisorAlerts($conn)
+function getSupervisorAlerts($conn, $superID)
 {
     $alerts = [];
 
     $sql1 = "
-        SELECT s.studentID, s.name
+        SELECT s.studentID, s.name,
+       MAX(a.log_date) as last_attendance
         FROM ojtstudent s
+        INNER JOIN student_supervisor ss 
+            ON ss.studentID = s.studentID
         LEFT JOIN attendance_logs a 
-        ON s.studentID = a.studentID 
-        AND a.log_date >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
-        WHERE a.attendanceID IS NULL
+            ON s.studentID = a.studentID
+        WHERE ss.superID = ?
+        AND ss.status = 'ACTIVE'
+        GROUP BY s.studentID
+        HAVING last_attendance IS NULL 
+        OR last_attendance < DATE_SUB(CURDATE(), INTERVAL 5 DAY)
     ";
 
-    $result1 = $conn->query($sql1);
+    $stmt1 = $conn->prepare($sql1);
+    $stmt1->bind_param("i", $superID);
+    $stmt1->execute();
+    $result1 = $stmt1->get_result();
 
     while ($row = $result1->fetch_assoc()) {
         $alerts[] = [
             "type" => "warning",
-            "message" => $row['name'] . "has not recorded attendance for 5 days"
+            "priority" => 1,
+            "message" => $row['name'] . " has not recorded attendance for 5 days",
+            "action" => "viewStudentProgress",
+            "id" => $row['studentID']
         ];
     }
 
     $sql2 = "
-        SELECT s.name
-        FROM student_tasks t
-        JOIN ojtstudent s ON t.studentID = s.studentID
-        WHERE t.status IN ('NOT STARTED')
-        AND t.due_date < CURDATE()
-    ";
+    SELECT s.name, t.title, t.taskID
+    FROM student_tasks t
+    INNER JOIN ojtstudent s 
+        ON t.studentID = s.studentID
+    INNER JOIN student_supervisor ss 
+        ON ss.studentID = s.studentID
+    WHERE ss.superID = ?
+      AND ss.status = 'ACTIVE'
+      AND t.status IN ('NOT STARTED', 'IN PROGRESS')
+      AND t.due_date < CURDATE()
+";
 
-    $result2 = $conn->query($sql2);
+    $stmt2 = $conn->prepare($sql2);
+    $stmt2->bind_param("i", $superID);
+    $stmt2->execute();
+    $result2 = $stmt2->get_result();
 
     while ($row = $result2->fetch_assoc()) {
         $alerts[] = [
             "type" => "danger",
-            "message" => $row['name'] . " has overdue tasks"
+            "priority" => 2,
+            "message" => $row['name'] . " - Task '" . $row['title'] . "'  is overdue",
+            "action" => "viewTask",
+            "id" => $row['taskID']
         ];
     }
+
+
+    $sql3 = "
+        SELECT s.studentID, s.name
+        FROM ojtstudent s
+        INNER JOIN student_supervisor ss 
+            ON ss.studentID = s.studentID
+        WHERE ss.superID = ?
+          AND ss.status = 'ACTIVE'
+          AND NOT EXISTS (
+              SELECT 1 FROM attendance_logs a
+              WHERE a.studentID = s.studentID
+                AND a.log_date >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+          )
+          AND NOT EXISTS (
+              SELECT 1 FROM student_tasks t
+              WHERE t.studentID = s.studentID
+                AND t.status IN ('IN PROGRESS', 'SUBMITTED', 'APPROVED')
+          )
+    ";
+
+    $stmt3 = $conn->prepare($sql3);
+    $stmt3->bind_param("i", $superID);
+    $stmt3->execute();
+    $result3 = $stmt3->get_result();
+
+    while ($row = $result3->fetch_assoc()) {
+        $alerts[] = [
+            "type" => "critical",
+            "priority" => 3,
+            "message" => $row['name'] . " is inactive (no attendance + no task activity)",
+            "action" => "viewStudentProgress",
+            "id" => $row['studentID']
+        ];
+    }
+
+    usort($alerts, function ($a, $b) {
+        return $b['priority'] <=> $a['priority'];
+    });
+
 
     return $alerts;
 }

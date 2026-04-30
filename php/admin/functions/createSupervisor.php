@@ -51,6 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtUser->bind_param("ssss", $name, $email, $password, $mobile);
         $stmtUser->execute();
 
+        $userID = $conn->insert_id;
+
         $stmtSupervisor = $conn->prepare("
             INSERT INTO supervisor (name, email, number, department)
             VALUES (?, ?, ?, ?)
@@ -60,6 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtSupervisor->execute();
 
         $superID = $conn->insert_id;
+
+        $updateUser = $conn->prepare("
+            UPDATE users 
+            SET superID = ? 
+            WHERE userID = ?
+        ");
+
+        $updateUser->bind_param("ii", $superID, $userID);
+        $updateUser->execute();
 
         $assigned_by = $_SESSION['user_id'];
         $ip = getUserIP();
@@ -102,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $conn->commit();
 
-        echo json_encode(["status" => "success", "message" => "Supervisor created successfully"]);
+        echo json_encode(["status" => "success", "message" => "Supervisor created successfully", "superID" => $superID]);
     } catch (Exception $e) {
 
         $conn->rollback();

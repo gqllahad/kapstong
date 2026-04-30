@@ -99,7 +99,7 @@ if (!empty($fields)) {
     $description = "Student Edited Information";
 
     $target_type = "student";
-    $target_id = $row['studentID'];
+    $target_id = $studentID;
 
     $act_log->bind_param(
         "isssssss",

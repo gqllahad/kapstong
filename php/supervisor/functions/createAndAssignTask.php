@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-
+require_once("../../auth/supervisor_auth.php");
 session_start();
 
 

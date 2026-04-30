@@ -98,7 +98,7 @@ function viewEvaluationBreakdown(studentID){
 
 
 function loadPieChart() {
-    fetch("../../php/admin/functions/getChartData.php")
+    fetch("functions/getOverallAttendanceChart.php", {credentials: "include"})
         .then(res => res.json())
         .then(data => {
 
@@ -106,11 +106,10 @@ function loadPieChart() {
 
             //colors
             const pieColors = data.labels.map(label => {
-                if (label === "ADMIN") {
-                    return "#5c77f0";
-                } else if (label === "student") {
-                    return "#4e69e0";
-                }
+                if (label === "Present") return "#22c55e";
+                if (label === "Late") return "#f59e0b";
+                if (label === "Absent") return "#ef4444";
+                if (label === "Excused") return "#3b82f6";
                 return "#6c757d";
             });
             
@@ -142,21 +141,11 @@ function loadPieChart() {
 }
 
 function loadLineChart() {
-    fetch("../../php/admin/functions/getChartData.php")
-        .then(res => res.json())
+    fetch("functions/getAttendanceChart.php", {credentials: "include"})
+         .then(res => res.json())
         .then(data => {
 
             const ctx = document.getElementById('lineChart');
-
-            //colors
-            const pieColors = data.labels.map(label => {
-                if (label === "ADMIN") {
-                    return "#5c77f0";
-                } else if (label === "student") {
-                    return "#4e69e0";
-                }
-                return "#6c757d";
-            });
 
             if (window.lineChartInstance) {
                 window.lineChartInstance.destroy();
@@ -166,30 +155,40 @@ function loadLineChart() {
                 type: 'line',
                 data: {
                     labels: data.labels,
-                    datasets: [{
-                        label: 'Users',
-                        data: data.values,
-                        borderColor: '#5c77f0',
-                        backgroundColor: 'rgba(92, 119, 240, 0.2)',
-                        fill: true,
-                        tension: 0.3,
-                        pointHoverRadius: 6,
-                        pointRadius: 5
-                    }]
+                    datasets: [
+                        {
+                            label: 'Present',
+                            data: data.present,
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'Late',
+                            data: data.late,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'Absent',
+                            data: data.absent,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            fill: true
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
+                    interaction : {
+                        mode :'index',
+                        intersect : false
                     },
                     plugins: {
                         legend: {
                             position: 'bottom'
                         }
-                    },
-                    tooltip: {
-                        enabled: true
                     },
                     scales: {
                         y: {
@@ -201,11 +200,86 @@ function loadLineChart() {
 
         })
         .catch(err => console.error("Line chart error:", err));
+
+       
+}
+
+function loadTaskProgressChart() {
+    fetch("functions/getTaskChart.php", { credentials: "include" })
+        .then(res => res.json())
+        .then(data => {
+
+            const ctx = document.getElementById('barChart');
+
+            if (window.barChartInstance) {
+                window.barChartInstance.destroy();
+            }
+
+            window.barChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Task Completion %',
+                            data: data.progress,
+                            backgroundColor: data.progress.map(value => {
+                                if (value >= 80) return '#22c55e';   
+                                if (value >= 50) return '#f59e0b';   
+                                return '#ef4444';                   
+                            }),
+                            borderRadius: 8,
+                            categoryPercentage: 0.6,
+                            barPercentage: 0.7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                     maintainAspectRatio: false,
+
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + "% completed";
+                                }
+                            }
+                        }
+                    },
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: value => value + "%"
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                autoSkip: false
+                            }
+                        }
+                    }
+                }
+            });
+
+        })
+        .catch(err => console.error("Progress chart error:", err));
 }
 
 function loadStudentProgressChart(studentID) {
 
-    fetch("functions/getStudentProgress.php?studentID=" + studentID)
+    fetch("functions/getStudentProgress.php?studentID=" + studentID, {credentials: "include"})
         .then(res => res.json())
         .then(data => {
 
@@ -250,7 +324,7 @@ function loadStudentProgressChart(studentID) {
 
 function loadStudentAttendanceChart(studentID) {
 
-    fetch("functions/getStudentAttendance.php?studentID=" + studentID)
+    fetch("functions/getStudentAttendance.php?studentID=" + studentID, {credentials: "include"})
         .then(res => res.json())
         .then(data => {
 
@@ -304,7 +378,7 @@ function loadStudentAttendanceChart(studentID) {
 
 function loadStudentAttendanceTable(studentID) {
 
-    fetch("functions/getStudentAttendanceTable.php?studentID=" + studentID)
+    fetch("functions/getStudentAttendanceTable.php?studentID=" + studentID, {credentials: "include"})
         .then(res => res.text())
         .then(data => {
             document.getElementById("attendanceReportBody").innerHTML = data;
@@ -314,7 +388,7 @@ function loadStudentAttendanceTable(studentID) {
 
 function loadStudentTaskTable(studentID) {
 
-    fetch("functions/getStudentTaskTable.php?studentID=" + studentID)
+    fetch("functions/getStudentTaskTable.php?studentID=" + studentID, {credentials: "include"})
         .then(res => res.text())
         .then(data => {
             document.getElementById("assignedStudentTaskBody").innerHTML = data;
@@ -341,7 +415,7 @@ function getRemarkClass(remark) {
 
 function viewEvaluationReport(studentID) {
 
-    fetch("functions/getStudentEvaluationReport.php?studentID=" + studentID)
+    fetch("functions/getStudentEvaluationReport.php?studentID=" + studentID, {credentials: "include"})
         .then(res => res.json())
         .then(data => {
 
@@ -474,7 +548,7 @@ function viewTask(taskID) {
     overlay.classList.add("show");
     viewTaskDetails.classList.add("show");
 
-    fetch("functions/getTaskDetailsFinished.php?taskID=" + taskID)
+    fetch("functions/getTaskDetailsFinished.php?taskID=" + taskID, {credentials: "include"})
         .then(res => res.json())
         .then(data => {
 
@@ -528,7 +602,7 @@ function viewTask(taskID) {
 // edit tasks
 function editTask(taskID) {
 
-    fetch("functions/getTaskDetails.php?taskID=" + taskID)
+    fetch("functions/getTaskDetails.php?taskID=" + taskID, {credentials: "include"})
         .then(res => res.json())
         .then(data => {
 
@@ -934,6 +1008,7 @@ buttons.forEach(btn => {
 window.addEventListener("DOMContentLoaded", () => {
     loadLineChart();
     loadPieChart();
+    loadTaskProgressChart();
 });
 
 

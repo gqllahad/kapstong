@@ -539,13 +539,18 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                 <section class="dashboard-charts">
                     <section class="wrapper line-chart">
-                        <h2>Line Chart (Users per Role)</h2>
+                        <h2>Attendance Trends Over Time</h2>
                         <canvas id="lineChart"></canvas>
                     </section>
 
                     <section class="wrapper pie-chart">
-                        <h2>Attendance Evaluation</h2>
+                        <h2>Overall Attendance Distribution</h2>
                         <canvas id="pieChart"></canvas>
+                    </section>
+
+                    <section class="wrapper bar-chart">
+                        <h2>Task Completion Overview</h2>
+                        <canvas id="barChart"></canvas>
                     </section>
                 </section>
 
@@ -557,7 +562,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     <ul class="alerts-list scrollable">
 
                         <?php
-                        $alerts = getSupervisorAlerts($conn);
+                        $alerts = getSupervisorAlerts($conn, $superID);
 
                         if (count($alerts) > 0):
 
@@ -565,7 +570,14 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                         ?>
 
                                 <li class="alert-item <?= $alert['type'] ?>">
+
                                     ⚠️ <?= htmlspecialchars($alert['message']) ?>
+
+                                    <button class="alert-btn"
+                                        onclick="<?= $alert['action'] ? $alert['action'] . '(' . $alert['id'] . ')' : '' ?>">
+                                        View
+                                    </button>
+
                                 </li>
 
                             <?php

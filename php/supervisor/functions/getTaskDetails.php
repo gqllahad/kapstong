@@ -1,5 +1,5 @@
 <?php
-
+require_once("../../auth/supervisor_auth.php");
 require_once("../../kapstongConnection.php");
 
 $taskID = $_GET['taskID'] ?? '';

@@ -46,6 +46,10 @@ if (isset($_POST['login-submit'])) {
                 $_SESSION['studentID'] = $row["studentID"];
             }
 
+            if ($_SESSION['role'] === "supervisor") {
+                $_SESSION['superID'] = $row["superID"];
+            }
+
             $ip = getUserIP();
 
             $stmt = $conn->prepare("

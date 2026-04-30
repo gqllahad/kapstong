@@ -1,6 +1,12 @@
 <?php
-
+require_once("../../auth/supervisor_auth.php");
 require_once("../../kapstongConnection.php");
+
+// if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'supervisor') {
+//     http_response_code(403);
+//     echo json_encode(["error" => "Unauthorized"]);
+//     exit;
+// }
 
 $taskID = $_POST['taskID'] ?? '';
 
