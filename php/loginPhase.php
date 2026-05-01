@@ -55,8 +55,11 @@ if (isset($_GET['success'])) {
   <header class="header">
     <div class="container">
       <h1 class="logo-text">
-        OJT <br />
-        Tracking System Granby
+        <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" class="logo-img">
+        <div>
+          <div>OJT</div>
+          <small>Tracking System Granby</small>
+        </div>
       </h1>
       <nav class="nav">
         <a href="#log-start">Home</a>
@@ -85,14 +88,11 @@ if (isset($_GET['success'])) {
 
   <section class="log-start" id="log-start">
     <div class="container scroll-reveal">
-      <h2>OJT Tracking Granby</h2>
-      <p>
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Culpa illum
-        consequatur non quibusdam ipsa itaque inventore molestias, aspernatur
-        quod sequi dolorem sed consectetur fugiat consequuntur natus cum
-        sapiente ea aut.
+      <h2 class="typing-text"></h2>
+      <p class="hero-desc active">
+        A web-based system designed to track, monitor, and manage OJT (On-the-Job Training) records efficiently for students and administrators.
       </p>
-      <button id="btn">Click Me</button>
+      <button id="btn">Get Started</button>
     </div>
   </section>
 
@@ -100,33 +100,29 @@ if (isset($_GET['success'])) {
 
   <section class="log-hows" id="log-hows">
     <div class="container scroll-reveal">
-      <h2>
-        How the OJT Tracker <br />
-        System works
-      </h2>
-      <p>Seamless communication designed for easy community interaction.</p>
+      <h2>How the OJT Tracking System Works</h2>
+      <p style="padding : 20px 10px;">
+        A simple 3-step process for managing student OJT records efficiently.
+      </p>
+
 
       <div class="how-container">
         <div class="how-individual">
-          <div class="how-image"></div>
-          <h3>Create your Profile</h3>
-          <p class="how-text">Register with verified local credentials.</p>
+          <div class="how-image register"></div>
+          <h3>Student Registration</h3>
+          <p class="how-text">Students create an account using verified school credentials.</p>
         </div>
 
         <div class="how-individual">
-          <div class="how-image"></div>
-          <h3>Select notification preference</h3>
-          <p class="how-text">
-            Choose the type of notifications you want to receive.
-          </p>
+          <div class="how-image progress"></div>
+          <h3>Track OJT Progress</h3>
+          <p class="how-text">Monitor attendance, hours, and daily OJT activities in real time.</p>
         </div>
 
         <div class="how-individual">
-          <div class="how-image"></div>
-          <h3>Start receiving updates</h3>
-          <p class="how-text">
-            Get notifications about your local community.
-          </p>
+          <div class="how-image reports "></div>
+          <h3>Generate Reports</h3>
+          <p class="how-text">Administrators can evaluate and export student performance reports.</p>
         </div>
       </div>
     </div>
@@ -146,7 +142,8 @@ if (isset($_GET['success'])) {
 
     <form action="starts.php" method="POST">
       <div class="login-container scroll-reveal">
-        <h2 style="padding: 3% 3%;">Sign In</h2>
+        <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" class="logo-img" style="border-radius: 50%;">
+        <h2>Sign In</h2>
         <div class="login-inner-container">
           <div class="login-box">
             <input type="email" name="loginEmail" id="loginEmail" placeholder=" " required />

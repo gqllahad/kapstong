@@ -1439,6 +1439,16 @@ function getSupervisorTrend($conn, $table, $column, $value, $dateColumn)
     return round(($recent / $total) * 100, 1) . "%";
 }
 
+function timeAgo($datetime)
+{
+    $time = time() - strtotime($datetime);
+
+    if ($time < 60) return "Just now";
+    if ($time < 3600) return floor($time / 60) . " mins ago";
+    if ($time < 86400) return floor($time / 3600) . " hrs ago";
+    return floor($time / 86400) . " days ago";
+}
+
 // supervisor alerts
 function getSupervisorAlerts($conn, $superID)
 {
@@ -1543,4 +1553,63 @@ function getSupervisorAlerts($conn, $superID)
 
 
     return $alerts;
+}
+
+// recent activitylogs
+function getSupervisorActivities($conn, $superID)
+{
+    $activities = [];
+
+    $sql = "
+        SELECT 
+            al.description,
+            al.target_type,
+            al.created_at
+
+        FROM activity_log al
+
+        WHERE al.target_type IN ('attendance', 'assignment')
+
+        AND (
+            al.target_id IN (
+                SELECT ss.studentID
+                FROM student_supervisor ss
+                WHERE ss.superID = ?
+                AND ss.status = 'ACTIVE'
+            )
+        )
+
+        ORDER BY al.created_at DESC
+        LIMIT 10
+    ";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $superID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+
+        $type = "info";
+
+        if ($row['target_type'] === 'attendance') {
+            $type = "primary";
+        } elseif ($row['target_type'] === 'assignment') {
+            $type = "success";
+        } elseif (strpos(strtolower($row['description']), 'late') !== false) {
+            $type = "warning";
+        } elseif (strpos(strtolower($row['description']), 'failed') !== false) {
+            $type = "danger";
+        } else {
+            $type = "info";
+        }
+
+        $activities[] = [
+            "type" => $type,
+            "message" => $row['description'],
+            "time" => timeAgo($row['created_at'])
+        ];
+    }
+
+    return $activities;
 }

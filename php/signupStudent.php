@@ -27,7 +27,7 @@ require_once("functions.php");
         <main class="content">
 
             <section class="sign-logo"> <a href="loginPhase.php">
-                    <img src="../images/download.jpg" alt="logo">
+                    <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" alt="logo">
                 </a> </section>
 
             <section class="upper-text"> SIGN UP</section>

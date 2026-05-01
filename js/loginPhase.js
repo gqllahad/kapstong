@@ -1,6 +1,11 @@
 const reveals = document.querySelectorAll(".scroll-reveal");
 const signUp = document.getElementById("ls-switch");
 
+// designs
+const text = "OJT Tracking System Granby";
+let index = 0;
+
+
 // Invaded logins
 const invaderLogin = document.getElementById("invaderLogin");
 const modalInvader = document.getElementById("accessDenied");
@@ -14,6 +19,17 @@ const modalSignSuccess = document.getElementById("signSuccess");
 const loginEmail = document.getElementById("loginEmail");
 const loginPass = document.getElementById("loginPassword");
 
+// functions
+
+function type() {
+  if (index < text.length) {
+    document.querySelector(".typing-text").textContent += text.charAt(index);
+    index++;
+    setTimeout(type, 80);
+  } else {
+    document.querySelector(".typing-text").style.borderRight = "none";
+  }
+}
 
 function revealOnScroll() {
   const windowHeight = window.innerHeight;
@@ -106,6 +122,7 @@ if (modalLoginError) {
 
 
 window.addEventListener("scroll", revealOnScroll);
+window.addEventListener("load", type);
 
 window.addEventListener("DOMContentLoaded", revealOnScroll);
 

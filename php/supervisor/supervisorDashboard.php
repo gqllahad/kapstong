@@ -554,45 +554,79 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     </section>
                 </section>
 
+                <div class="dashboard-bottom">
+                    <!-- ALERTS -->
+                    <div class="alerts-container">
+                        <h3>Alerts</h3>
 
-                <!-- ALERTS -->
-                <div class="alerts-container">
-                    <h3>Alerts</h3>
-
-                    <ul class="alerts-list scrollable">
-
-                        <?php
-                        $alerts = getSupervisorAlerts($conn, $superID);
-
-                        if (count($alerts) > 0):
-
-                            foreach ($alerts as $alert):
-                        ?>
-
-                                <li class="alert-item <?= $alert['type'] ?>">
-
-                                    ⚠️ <?= htmlspecialchars($alert['message']) ?>
-
-                                    <button class="alert-btn"
-                                        onclick="<?= $alert['action'] ? $alert['action'] . '(' . $alert['id'] . ')' : '' ?>">
-                                        View
-                                    </button>
-
-                                </li>
+                        <ul class="alerts-list scrollable">
 
                             <?php
-                            endforeach;
-                        else:
+                            $alerts = getSupervisorAlerts($conn, $superID);
+
+                            if (count($alerts) > 0):
+
+                                foreach ($alerts as $alert):
                             ?>
 
-                            <li class="alert-item success">
-                                ✅ No issues detected. All students are active.
-                            </li>
+                                    <li class="alert-item <?= $alert['type'] ?>">
 
-                        <?php endif; ?>
+                                        ⚠️ <?= htmlspecialchars($alert['message']) ?>
 
-                    </ul>
+                                        <button class="alert-btn"
+                                            onclick="<?= $alert['action'] ? $alert['action'] . '(' . $alert['id'] . ')' : '' ?>">
+                                            View
+                                        </button>
+
+                                    </li>
+
+                                <?php
+                                endforeach;
+                            else:
+                                ?>
+
+                                <li class="alert-item success">
+                                    ✅ No issues detected. All students are active.
+                                </li>
+
+                            <?php endif; ?>
+
+                        </ul>
+                    </div>
+
+                    <!-- activity logs (recent) -->
+                    <div class="activity-container">
+                        <h3>Recent Activity</h3>
+
+                        <ul class="activity-list scrollable">
+
+                            <?php
+                            $activities = getSupervisorActivities($conn, $superID);
+
+                            if (count($activities) > 0):
+                                foreach ($activities as $act):
+                            ?>
+
+                                    <li class="activity-item <?= $act['type'] ?>">
+                                        🧾 <?= htmlspecialchars($act['message']) ?>
+                                        <small><?= $act['time'] ?></small>
+                                    </li>
+
+                                <?php endforeach;
+                            else: ?>
+
+                                <li class="activity-item success">
+                                    ✅ No recent activity
+                                </li>
+
+                            <?php endif; ?>
+
+                        </ul>
+                    </div>
                 </div>
+
+
+
             </section>
 
             <!-- supervisor oversight -->
