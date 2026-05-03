@@ -879,18 +879,21 @@ function renderAssignStudentList($conn, $search = '')
 }
 
 // assigning task to student (supervisor)
-function renderTaskAssignStudentList($conn, $search = '')
+function renderTaskAssignStudentList($conn, $superID, $search = '')
 {
     $where = "
         WHERE users.role = 'student'
         AND users.isVerified = 'VERIFIED'
+        AND ss.superID = '$superID'
+        AND ss.status = 'ACTIVE'
     ";
 
     if (!empty($search)) {
         $where .= " AND (
             users.studentID LIKE '%$search%' OR
-            users.name LIKE '%$search%' OR ojtstudent.course LIKE '%$search%'
-            OR ojtstudent.yearLevel LIKE '%$search%'
+            users.name LIKE '%$search%' OR 
+            ojtstudent.course LIKE '%$search%' OR
+            ojtstudent.yearLevel LIKE '%$search%'
         )";
     }
 
@@ -902,6 +905,9 @@ function renderTaskAssignStudentList($conn, $search = '')
             ojtstudent.course,
             ojtstudent.yearLevel
         FROM users
+
+        INNER JOIN student_supervisor ss
+            ON users.studentID = ss.studentID
 
         LEFT JOIN ojtstudent
             ON users.studentID = ojtstudent.studentID

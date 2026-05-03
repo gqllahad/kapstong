@@ -223,7 +223,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                         <div class="input-group">
                             <label>Mobile Number</label>
-                            <input type="text" name="mobile" placeholder="09XXXXXXXXX" required>
+                            <input type="text" name="mobile" placeholder="09XXXXXXXXX" maxlength="11" required>
                         </div>
 
                         <div class="input-group">
@@ -231,9 +231,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <select name="department" required>
                                 <option value="">Select Department</option>
                                 <option value="IT">Information Technology</option>
-                                <option value="CS">Computer Science</option>
-                                <option value="BUSINESS">Business</option>
-                                <option value="ENGINEERING">Engineering</option>
+                                <option value="BSCrim">Criminology</option>
                             </select>
                         </div>
 

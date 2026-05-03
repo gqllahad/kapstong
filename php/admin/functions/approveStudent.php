@@ -42,10 +42,9 @@ if (!empty($studentID)) {
                 studentID,
                 required_hours,
                 completed_hours,
-                attendance_days,
                 completion_status
             )
-            VALUES (?, 500, 0, 0, 'ONGOING')
+            VALUES (?, 500, 0, 'ONGOING')
         ");
         $progressStmt->bind_param("s", $studentID);
         $progressStmt->execute();

@@ -93,7 +93,7 @@ if (isset($_POST['submitDocuments'])) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
-    $userID = $_SESSION['userID'];
+    $userID = $_SESSION['user_id'];
 
     $action = "Upload Document";
     $module = "document";

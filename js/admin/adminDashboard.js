@@ -235,7 +235,6 @@ function approveUser(studentID) {
                 btn.disabled = !checkbox.checked;
             });
         }
-        showToast(data.message, data.success ? "success" : "error");
     }).catch(() => {
             showToast("Server error occurred", "error");
         });
@@ -253,6 +252,7 @@ function approveStudent(studentID) {
     })
     .then(res => res.text())
     .then(response => {
+
          showToast(data.message, data.success ? "success" : "error");
 
         closeApproveModal();
@@ -1176,13 +1176,21 @@ supervisorForm.addEventListener("submit", function (e) {
             supervisorForm.reset();
             document.getElementById("createSupervisorBtn").disabled = true;
 
+            overlay.classList.remove("show");
+            superCreate.classList.remove("show");
+
+            showToast(data.message, data.status ? "success" : "error");
+
+            setTimeout(() => {
+    location.reload();
+}, 1000);
+
         } else {
             messageBox.style.color = "red";
         }
     })
     .catch(err => {
-        messageBox.textContent = "Something went wrong.";
-        messageBox.style.color = "red";
+       showToast(data.message, data.status ? "success" : "error");
     });
 });
 

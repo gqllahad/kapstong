@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $conn->commit();
 
-        echo json_encode(["status" => "success", "message" => "Supervisor created successfully", "superID" => $superID]);
+        echo json_encode(["status" => "success",  "message" => "Supervisor created successfully", "superID" => $superID]);
     } catch (Exception $e) {
 
         $conn->rollback();

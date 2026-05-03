@@ -371,7 +371,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                                     placeholder="🔍 Search student by name, ID, Course or Yearlevel...">
 
                                 <div class="list-box" id="taskStudentList">
-                                    <?php echo renderTaskAssignStudentList($conn); ?>
+                                    <?php echo renderTaskAssignStudentList($conn, $superID); ?>
                                 </div>
                             </div>
                         </div>
