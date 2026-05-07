@@ -920,7 +920,7 @@ background:#eee;
 .table-container {
     width: 99%;
     max-height: 450px;
-    max-width: 1150px;
+    max-width: 1350px;
     overflow-y: auto;
     padding: 10px; 
     border-radius: 12px; 
@@ -1486,7 +1486,7 @@ tbody tr {
 
 /* approve button */
 .btn-approve {
-    align-self: flex-end;
+    /* align-self: flex-end;
 
     background: linear-gradient(135deg, #16a34a, #15803d);
     color: white;
@@ -1499,18 +1499,83 @@ tbody tr {
     font-weight: 600;
 
     cursor: pointer;
-    transition: 0.25s;
+    transition: 0.25s; */
+
+     background: #2f80ed;
+    color: #ffffff;
+
+    border: 2px solid #2f80ed;
+    border-radius: 8px;
+
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    box-shadow: 0 2px 6px rgba(47, 128, 237, 0.15);
 }
 
 .btn-approve:disabled {
-    background: #9ca3af;
+    /* background: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none; */
+    background: #cbd5e1;
+    border-color: #cbd5e1;
+    color: #6b7280;
     cursor: not-allowed;
     box-shadow: none;
 }
 
+.btn-approve:active {
+    transform: scale(0.98);
+}
+
 .btn-approve:not(:disabled):hover {
+    /* transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); */
+
+     background: #1f6fd6;
+    border-color: #1f6fd6;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 4px 12px rgba(47, 128, 237, 0.25);
+}
+
+.btn-approve-secondary {
+     border-color: #4a90e2;
+    color: #1f6fd6;
+    border: 2px solid #2f80ed;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 6px rgba(47, 128, 237, 0.08);
+}
+
+.btn-approve-secondary:hover {
+    background: #1f6fd6;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(47, 128, 237, 0.2);
+}
+
+.btn-approve-secondary:active {
+    transform: scale(0.97);
+}
+
+.btn-approve-secondary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.25);
 }
 
 .btn-reject {
@@ -2145,8 +2210,81 @@ tbody tr {
 }
 
 
+/* Rfid */
+.rfid-section {
+    background: #ffffff;
+    border: 1px solid #dbe9ff;
+    border-left: 5px solid #2f80ed;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(47, 128, 237, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+}
 
+.rfid-section label {
+    font-weight: 600;
+    color: #2f80ed;
+    font-size: 0.95rem;
+}
 
+#rfidInput {
+    padding: 10px 12px;
+    border: 1px solid #cfe2ff;
+    border-radius: 8px;
+    outline: none;
+    font-size: 0.95rem;
+    transition: 0.2s ease;
+}
+
+#rfidInput:focus {
+    border-color: #2f80ed;
+    box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.15);
+}
+
+.rfid-status {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.rfid-status {
+    position: relative;
+}
+
+.rfid-status::after {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background: #2f80ed;
+    animation: pulse 1.2s infinite;
+}
+
+.rfid-rescan {
+    margin-top: 5px;
+    padding: 9px 12px;
+    background: #2f80ed;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s ease;
+    width: fit-content;
+}
+
+.rfid-rescan:hover {
+    background: #1f6fd6;
+    transform: translateY(-1px);
+}
+
+.rfid-rescan:active {
+    transform: scale(0.98);
+}
 
 
 
@@ -2154,6 +2292,12 @@ tbody tr {
 @keyframes zoomIn {
     from { transform: scale(0.8); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+    100% { opacity: 0.3; transform: scale(1); }
 }
 
 

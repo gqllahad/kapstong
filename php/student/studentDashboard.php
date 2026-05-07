@@ -265,8 +265,9 @@ $documents = getStudentDocuments($conn, $studentID);
                     <h3>Task Details</h3>
                     <button id="closeTaskViewModal" class="modal-close-profile">&times;</button>
                 </div>
+                 <div class="task-status-message" id="taskStatusMessage"></div>
                 <div class="task-modal-content">
-
+               
 
                     <div class="task-modal-body">
 
@@ -300,10 +301,10 @@ $documents = getStudentDocuments($conn, $studentID);
                                 </div>
 
                                 <div class="card-body">
-                                    <div class="info-item">
+                                    <!-- <div class="info-item">
                                         <label>Status</label>
                                         <span id="modalTaskStatus" class="status-badge"></span>
-                                    </div>
+                                    </div> -->
 
                                     <div class="info-item">
                                         <label>Due Date</label>
@@ -319,6 +320,21 @@ $documents = getStudentDocuments($conn, $studentID);
                                         <label>Progress</label>
                                         <p id="modalTaskProgress"></p>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="info-card" id="uploadedFilesCard" style="display:none;">
+
+                                <div class="card-header" onclick="toggleSection(this)">
+                                    <h4>Uploaded Files</h4>
+                                    <span class="arrow">▼</span>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="documents-grid" id="studentUploadedFiles">
+                                    </div>
+
                                 </div>
                             </div>
 
@@ -347,7 +363,6 @@ $documents = getStudentDocuments($conn, $studentID);
                                     </div>
                                 </div>
                             </div>
-
                         </div>
 
                     </div>
@@ -355,6 +370,9 @@ $documents = getStudentDocuments($conn, $studentID);
                     <div class="task-modal-actions">
                         <button id="submitTaskBtn" class="submit-task-btn">
                             Submit Task
+                        </button>
+                        <button id="reSubmitTaskBtn" class="resubmit-task-btn">
+                            Resubmit Task
                         </button>
                     </div>
 
@@ -548,11 +566,12 @@ $documents = getStudentDocuments($conn, $studentID);
 
                 </div>
 
-                <div id="imagePreviewModal" class="image-modal">
+                
+            </section>
+            <div id="imagePreviewModal" class="image-modal">
                     <span id="closeImagePreview">&times;</span>
                     <img id="previewImg">
                 </div>
-            </section>
 
         </main>
     </div>

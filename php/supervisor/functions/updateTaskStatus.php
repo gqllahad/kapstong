@@ -16,7 +16,7 @@ if (empty($taskID) || empty($status)) {
     exit;
 }
 
-if ($status === "APPROVED" && empty($rating) && empty($feedback)) {
+if ($status === "APPROVED" && empty($rating)) {
     echo json_encode([
         "status" => "error",
         "message" => "Rating is required when approving a task"
@@ -46,6 +46,7 @@ if ($status === 'APPROVED') {
     ");
 
     $stmt->bind_param("sssi", $status, $feedback, $rating, $taskID);
+
 } else {
 
     $stmt = $conn->prepare("
@@ -62,12 +63,74 @@ if ($status === 'APPROVED') {
     $stmt->bind_param("sssi", $status, $feedback, $rating, $taskID);
 }
 
+$get = $conn->prepare("
+    SELECT studentID, title
+    FROM student_tasks
+    WHERE taskID = ?
+");
+
+$get->bind_param("i", $taskID);
+$get->execute();
+$result = $get->get_result();
+$task = $result->fetch_assoc();
 
 if ($stmt->execute()) {
+
+    $ip = getUserIP();
+    $userID = $_SESSION['user_id'];
+    $role = "SUPERVISOR";
+    $module = "TASK";
+
+    if ($status === "APPROVED") {
+
+        $action = "Approve Task";
+
+        $description = "Approved task '{$task['title']}' for student ID {$task['studentID']} with rating $rating";
+
+    } else {
+
+        $action = "Reject Task";
+
+        $description = "Rejected task '{$task['title']}' for student ID {$task['studentID']} with feedback: $feedback";
+    }
+
+    $target_type = "task";
+    $target_id = $taskID;
+
+    $log = $conn->prepare("
+        INSERT INTO activity_log
+        (
+            userID,
+            role,
+            action,
+            module,
+            description,
+            target_type,
+            target_id,
+            ip_address
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    $log->bind_param(
+        "isssssss",
+        $userID,
+        $role,
+        $action,
+        $module,
+        $description,
+        $target_type,
+        $target_id,
+        $ip
+    );
+
+    $log->execute();
+
     echo json_encode([
         "status" => "success",
         "message" => "Task updated successfully"
     ]);
+
 } else {
     echo json_encode([
         "status" => "error",

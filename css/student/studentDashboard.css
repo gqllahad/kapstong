@@ -503,6 +503,12 @@ flex:1;
     transform: translate(-50%, -50%) scale(1);
 }
 
+.view-task-container{
+    border-radius: 18px;
+    overflow: hidden;
+    border-left: 8px solid #d1d5db;
+}
+
 .account-btn {
     width: 100%;
     padding: 12px;
@@ -740,6 +746,48 @@ flex:1;
     text-transform: uppercase;
 }
 
+.task-status-message {
+    margin-bottom: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 500;
+    background: #f8fafc;
+    border-left: 4px solid #cbd5e1;
+    color: #334155;
+}
+
+.task-message-approved {
+    background: rgba(16,185,129,0.08);
+    border-left-color: #10b981;
+    color: #047857;
+}
+
+.task-message-rejected {
+    background: rgba(239,68,68,0.08);
+    border-left-color: #ef4444;
+    color: #b91c1c;
+}
+
+.task-message-submitted {
+    background: rgba(37,99,235,0.08);
+    border-left-color: #2563eb;
+    color: #1d4ed8;
+}
+
+.task-message-progress {
+    background: rgba(245,158,11,0.08);
+    border-left-color: #f59e0b;
+    color: #b45309;
+}
+
+.task-message-notstarted {
+    background: rgba(107,114,128,0.08);
+    border-left-color: #6b7280;
+    color: #4b5563;
+}
+
 .task-status.not-started {
     background: #e5e7eb; 
     color: #374151;
@@ -764,6 +812,31 @@ flex:1;
 .task-status.rejected {
     background: #fee2e2; 
     color: #991b1b;
+}
+
+.task-approved {
+    border-left-color: #10b981;
+    box-shadow: 0 0 20px rgba(16,185,129,0.15);
+}
+
+.task-rejected {
+    border-left-color: #ef4444;
+    box-shadow: 0 0 20px rgba(239,68,68,0.15);
+}
+
+.task-submitted {
+    border-left-color: #2563eb;
+    box-shadow: 0 0 20px rgba(37,99,235,0.15);
+}
+
+.task-progress {
+    border-left-color: #f59e0b;
+    box-shadow: 0 0 20px rgba(245,158,11,0.15);
+}
+
+.task-notstarted {
+    border-left-color: #9ca3af;
+    box-shadow: 0 0 20px rgba(156,163,175,0.15);
 }
 
 .task-desc {
@@ -870,6 +943,7 @@ flex:1;
 }
 
 .submit-task-btn {
+    display: none;
     width: 100%;
     margin-top: 15px;
     padding: 12px;
@@ -880,6 +954,24 @@ flex:1;
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s ease;
+}
+
+.resubmit-task-btn{
+    display: none;
+     width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.resubmit-task-btn:hover{
+     background: #1d4ed8;
 }
 
 .submit-task-btn:hover {
@@ -948,6 +1040,44 @@ flex:1;
     color: #6b7280;
     font-size: 18px;
    
+}
+
+.documents-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-top:10px;
+}
+
+.doc-card{
+    background:#f8fbff;
+    border:1px solid #dbeafe;
+    border-radius:14px;
+    padding:16px;
+    width:180px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    box-shadow:0 4px 12px rgba(37,99,235,0.08);
+}
+
+.status-badge.success{
+    background:#dcfce7;
+    color:#166534;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.status-badge.missing{
+    background:#fee2e2;
+    color:#991b1b;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
 }
 
 

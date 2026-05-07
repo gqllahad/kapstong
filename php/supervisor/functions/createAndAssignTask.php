@@ -49,6 +49,47 @@ foreach ($studentIDs as $studentID) {
 
     if ($stmt->execute()) {
         $successCount++;
+
+    $ip = getUserIP();
+    $userID = $_SESSION['user_id'];
+    $role = "SUPERVISOR";
+    $action = "Assign Task";
+    $module = "TASK";
+
+    $description = "Assigned task '$title' to student ID $studentID";
+
+    $target_type = "assignment";
+    $target_id = $studentID;
+
+    $log = $conn->prepare("
+        INSERT INTO activity_log
+        (
+            userID,
+            role,
+            action,
+            module,
+            description,
+            target_type,
+            target_id,
+            ip_address
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    $log->bind_param(
+        "isssssss",
+        $userID,
+        $role,
+        $action,
+        $module,
+        $description,
+        $target_type,
+        $target_id,
+        $ip
+    );
+
+    $log->execute();
+
     }
 }
 

@@ -61,5 +61,8 @@ echo json_encode([
     "rating" => $row['rating'] ?? null,
     "completed_at" => $row['completed_at']
         ? date("M d, Y", strtotime($row['completed_at']))
-        : null
+        : null,
+    "studentID" => $row['studentID'] ?? null,
+    "submission_file" => $row['submission_file'] ?? null
+
 ]);

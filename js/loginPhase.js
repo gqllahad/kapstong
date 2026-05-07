@@ -2,7 +2,7 @@ const reveals = document.querySelectorAll(".scroll-reveal");
 const signUp = document.getElementById("ls-switch");
 
 // designs
-const text = "OJT Tracking System Granby";
+const text = "Granby OJT Tracking System";
 let index = 0;
 
 

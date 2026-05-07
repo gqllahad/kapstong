@@ -67,7 +67,7 @@ require_once("functions.php");
                         </div>
 
                         <div class="sign-box duos studentEmail">
-                            <input name="signEmail" type="email" class="full" id="studentEmail" placeholder=" " required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" />
+                            <input name="signEmail" type="email" class="full" id="studentEmail" placeholder=" " required  /> <!-- pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" -->
                             <span>Email</span>
                             <p id="studentEmail-warning" style="color:red; display:none; font-weight : 600; font-size: 0.5rem;">Email already been used!</p>
                         </div>

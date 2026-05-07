@@ -335,15 +335,6 @@ document.querySelectorAll('[id^="prev"]').forEach(btn => {
 });
 
 
-//account details
-studentIDStep2.addEventListener("input", () => {
-    studentIDStep3.value = studentIDStep2.value;
-});
-
-studentEmail1.addEventListener("input", () => {
-    studentEmail2.value = studentEmail1.value;
-});
-
 confirmPasswordInput.addEventListener("focus", () => {
     if (!passwordInput.value) {
         showToast("Passwords do not match!", 3000);
@@ -354,6 +345,8 @@ confirmPasswordInput.addEventListener("focus", () => {
 
 // STUDENT CHECK
 studentIDStep2.addEventListener("input", () => {
+    studentIDStep3.value = studentIDStep2.value;
+
     const studentID = studentIDStep2.value.trim();
     if(studentID === "") return;
 
@@ -377,6 +370,8 @@ studentIDStep2.addEventListener("input", () => {
 
 
 studentEmail1.addEventListener("input", () => {
+    studentEmail2.value = studentEmail1.value;
+
     const studentEmail = studentEmail1.value.trim();
     if(studentEmail === "") return;
 

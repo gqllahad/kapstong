@@ -125,9 +125,12 @@ const assignForm = document.getElementById("assignStudentSupervisorForm");
 const studentList = document.getElementById("studentList");
 const supervisorList = document.getElementById("supervisorList");
 
+// timwers
 let activitySearchTimer;
 let assignSearchTimer;
+let timer;
 
+let isReassignMode = false;
 
 // Functions 
 
@@ -227,41 +230,136 @@ function approveUser(studentID) {
     .then(data => {
         studentApplicationApprove.innerHTML = data;
 
-        const checkbox = document.getElementById("confirmApprove");
-        const btn = document.getElementById("approveBtn");
+         initApproveModal(studentID);
 
-        if (checkbox && btn) {
-            checkbox.addEventListener("change", () => {
-                btn.disabled = !checkbox.checked;
-            });
-        }
+        // const checkbox = document.getElementById("confirmApprove");
+        // const btn = document.getElementById("approveBtn");
+
+        // if (checkbox && btn) {
+        //     checkbox.addEventListener("change", () => {
+        //         btn.disabled = !checkbox.checked;
+        //     });
+        // }
     }).catch(() => {
             showToast("Server error occurred", "error");
         });
 };
 
+function initApproveModal(studentID) {
+    const checkbox = document.getElementById("confirmApprove");
+    const approveBtn = document.getElementById("approveBtn");
+    const rfidInput = document.getElementById("rfidInput");
+    const statusText = document.getElementById("rfidStatus");
+
+    if (!checkbox || !approveBtn || !rfidInput) return;
+
+    approveBtn.disabled = true;
+
+    setTimeout(() => rfidInput.focus(), 300);
+
+    rfidInput.addEventListener("input", function () {
+        clearTimeout(timer);
+
+    timer = setTimeout(() => {
+        const value = this.value.trim();
+
+        if (value !== "") {
+            statusText.innerText = "RFID Captured ✔";
+
+            if (checkbox.checked) {
+                approveBtn.disabled = false;
+            }
+
+            this.disabled = true;
+        } else {
+            statusText.innerText = "Waiting for scan...";
+            approveBtn.disabled = true;
+         }
+        }, 200);
+    });
+
+    checkbox.addEventListener("change", function () {
+        if (this.checked && rfidInput.value.trim().length > 5) {
+            approveBtn.disabled = false;
+        } else {
+            approveBtn.disabled = true;
+        }
+    });
+
+    rfidInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            approveStudent(studentID);
+        }
+    });
+}
+
 function approveStudent(studentID) {
-    if (!confirm("Are you sure you want to approve this student?")) return;
+    const rfidInput = document.getElementById("rfidInput");
+    const approveBtn = document.getElementById("approveBtn");
+
+    const rfid = rfidInput?.value.trim();
+
+    if (!rfid) {
+        alert("Please scan RFID first or use 'Approve Without RFID'.");
+        return;
+    }
+
+    if (!confirm("Approve student and register RFID?")) return;
+
+    approveBtn.disabled = true;
 
     fetch("functions/approveStudent.php", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: "studentID=" + encodeURIComponent(studentID)
+        body: "studentID=" + encodeURIComponent(studentID) + 
+              "&rfid=" + encodeURIComponent(rfid)
     })
     .then(res => res.text())
     .then(response => {
-
-         showToast(data.message, data.success ? "success" : "error");
-
+        alert(response);
         closeApproveModal();
         location.reload();
     })
-    .catch(() => {
-            showToast("Server error occurred", "error");
-        });
+    .catch(err => {
+        console.error(err);
+        approveBtn.disabled = false;
+    });
 }
+
+function resetRFID() {
+    const input = document.getElementById("rfidInput");
+    const status = document.getElementById("rfidStatus");
+
+    input.disabled = false;
+    input.value = "";
+    input.focus();
+
+    if (status) status.innerText = "Waiting for scan...";
+}
+
+function approveWithoutRFID(studentID) {
+    if (!confirm("Approve student WITHOUT RFID? You can register it later.")) return;
+
+    fetch("functions/approveStudent.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "studentID=" + encodeURIComponent(studentID) + 
+              "&no_rfid=1"
+    })
+    .then(res => res.text())
+    .then(response => {
+        alert(response);
+        closeApproveModal();
+        location.reload();
+    })
+    .catch(err => console.error(err));
+}
+
 
 function rejectUser(studentID) {
     
@@ -289,11 +387,7 @@ function rejectUser(studentID) {
                 btn.disabled = !checkbox.checked;
             });
         }
-
-         showToast(data.message, data.success ? "success" : "error");
-    }) .catch(() => {
-            showToast("Server error occurred", "error");
-        });
+    });
 };
 
 function rejectStudent(studentID) {
@@ -317,14 +411,12 @@ function rejectStudent(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-       showToast(data.message, data.success ? "success" : "error");
+        alert("Student rejected successfully!");
 
         closeRejectModal();
         location.reload();
     })
-    .catch(() => {
-            showToast("Server error occurred", "error");
-        });
+    .catch(err => console.error(err));
 }
 
 function closeSuperViewModal() {
@@ -338,9 +430,20 @@ function closeSuperViewModal() {
 
 function closeApproveModal() {
 
+    const rfidInput = document.getElementById("rfidInput");
+    const statusText = document.getElementById("rfidStatus");
+
+    if (rfidInput) {
+        rfidInput.value = "";
+        rfidInput.disabled = false;
+    }
+
+    if (statusText) {
+        statusText.innerText = "Waiting for scan...";
+    }
+
     studentApplicationApprove.classList.remove("show");
     overlay.classList.remove("show");
-    
 }
 
 function closeRejectModal() {
@@ -414,6 +517,54 @@ function getStatusColor(value) {
     if (value >= 1) return statusColors.good;
     if (value >= 20) return statusColors.warning;
     return statusColors.danger;
+}
+
+// reassign student
+function reAssignUser(studentID) {
+
+    fetch("functions/unAssignStudent.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "studentID=" + encodeURIComponent(studentID)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.status === "success") {
+
+             isReassignMode = true;
+
+            refreshAssignStudentList();
+
+            overlay.classList.add("show");
+            AssignStudent.classList.add("show");
+
+            studentApplicationView.classList.remove("show");
+
+            AssignCloseBtn.style.display = "none";
+
+        } else {
+            alert(data.message);
+        }
+
+    })
+    .catch(err => console.error(err));
+}
+
+function refreshAssignStudentList() {
+
+    fetch("functions/renderAssignStudentList.php")
+        .then(res => res.text())
+        .then(html => {
+
+            document.getElementById("studentList").innerHTML = html;
+
+        })
+        .catch(err => {
+            console.error("Failed to refresh student list:", err);
+        });
 }
 
 
@@ -1196,14 +1347,30 @@ supervisorForm.addEventListener("submit", function (e) {
 
 // assign student-supervisor btn
 AssignStudentBtn.addEventListener("click", () => {
+
+    isReassignMode = false;
+
     overlay.classList.add("show");
     AssignStudent.classList.add("show");
+
+    AssignCloseBtn.style.display = "block";
 
 });
 
 AssignCloseBtn.addEventListener("click", () => {
-    overlay.classList.remove("show");
-    AssignStudent.classList.remove("show");
+     AssignStudent.classList.remove("show");
+
+    if (isReassignMode) {
+
+        studentApplicationView.classList.add("show");
+        isReassignMode = false;
+
+    } else {
+
+        overlay.classList.remove("show");
+
+    }
+
 });
 
 document.getElementById("studentList").addEventListener("click", function (e) {

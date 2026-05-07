@@ -8,6 +8,7 @@ const menuItems = document.querySelectorAll('.menu li');
 const approvalReport = document.getElementById("approvalReportBody");
 const studentProgress = document.getElementById("studentProgressBody");
 const assignTask = document.getElementById("assignedTaskBody");
+const activityLogBody = document.getElementById("activityLogTableBody");
 
 // modals
 const overlay = document.getElementById("overlay");
@@ -42,14 +43,17 @@ const superDashboardBtn = document.getElementById("supervisor-dashboard-btn");
 const superOversightBtn = document.getElementById("supervisor-oversight-btn");
 const superStudentsBtn = document.getElementById("supervisor-students-btn");
 const superEvaluationBtn = document.getElementById("supervisor-evaluation-btn");
+const superActivityBtn = document.getElementById("supervisor-activity-btn");
 
 const superDashboard = document.getElementById("supervisor-dashboard");
 const superOversight = document.getElementById("supervisor-oversight");
 const superStudents = document.getElementById("supervisor-students");
 const superEvaluation = document.getElementById("supervisor-evaluation");
+const superActivity = document.getElementById("supervisor-activity");
 
 // timers
 let searchTimer;
+let activitySearchTimer;
 let assignSearchTimer;
 
 // arrays
@@ -57,6 +61,8 @@ let selectedTaskStudentIDs = [];
 
 // assign list
 const studentList = document.getElementById("taskStudentList");
+
+
 
 
 // functions
@@ -697,6 +703,7 @@ superDashboardBtn.addEventListener("click", () => {
     superOversight.style.display = "none";
      superStudents.style.display = "none";
      superEvaluation.style.display = "none";
+     superActivity.style.display = "none";
 });
 
 superOversightBtn.addEventListener("click", () => {
@@ -705,6 +712,7 @@ superOversightBtn.addEventListener("click", () => {
     superDashboard.style.display = "none";
     superStudents.style.display = "none";
     superEvaluation.style.display = "none";
+    superActivity.style.display = "none";
 });
 
 superStudentsBtn.addEventListener("click", () => {
@@ -712,6 +720,7 @@ superStudentsBtn.addEventListener("click", () => {
 
     superDashboard.style.display = "none";
     superOversight.style.display = "none";
+    superActivity.style.display = "none";
     superEvaluation.style.display = "none";
 });
 
@@ -720,11 +729,20 @@ superEvaluationBtn.addEventListener("click", () => {
     
     superStudents.style.display = "none";
     superDashboard.style.display = "none";
+    superActivity.style.display = "none";
     superOversight.style.display = "none";
     
 });
 
-
+superActivityBtn.addEventListener("click", () => {
+    superActivity.style.display = "block";
+    
+    superEvaluation.style.display = "none";
+    superStudents.style.display = "none";
+    superDashboard.style.display = "none";
+    superOversight.style.display = "none";
+    
+});
 
 // search tables
 document.getElementById("reportApprovalSearch").addEventListener("keyup", function () {
@@ -990,6 +1008,47 @@ closeEditTask.addEventListener("click", () => {
 
 });
 
+// activity search
+// document.getElementById("superActivityLogSearch").addEventListener("keyup", function () {
+
+//     clearTimeout(activitySearchTimer);
+
+//     let value = this.value;
+
+//     const superID = document.getElementById("superID").value;
+
+//     activitySearchTimer = setTimeout(() => {
+
+//         activityLogBody.classList.add("fade-out");
+
+//         fetch("functions/searchSupervisorActivityLog.php", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/x-www-form-urlencoded"
+//             },
+//             body: "search=" + encodeURIComponent(value) +
+//                   "&superID=" + encodeURIComponent(superID)
+//         })
+//         .then(res => res.text())
+//         .then(data => {
+
+//             setTimeout(() => {
+//                 activityLogBody.innerHTML = data;
+
+//                 activityLogBody.classList.remove("fade-out");
+//                 activityLogBody.classList.add("fade-in");
+
+//                 setTimeout(() => {
+//                     activityLogBody.classList.remove("fade-in");
+//                 }, 200);
+
+//             }, 200);
+
+//         });
+
+//     }, 300);
+// });
+
 // buttons student dashboard view
 buttons.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -1009,6 +1068,92 @@ window.addEventListener("DOMContentLoaded", () => {
     loadLineChart();
     loadPieChart();
     loadTaskProgressChart();
+});
+
+// activity log
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("superActivityLogSearch");
+    const moduleFilter = document.getElementById("moduleFilter");
+    const tableBody = document.getElementById("activityLogTableBody");
+
+    if (!searchInput || !moduleFilter || !tableBody) return;
+
+    let timer;
+
+    function fetchLogs() {
+
+        const search = searchInput.value;
+        const module = moduleFilter.value.toUpperCase();
+
+        fetch("functions/searchSupervisorActivityLog.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "search=" + encodeURIComponent(search) +
+                "&module=" + encodeURIComponent(module) 
+              
+        })
+        .then(res => res.text())
+        .then(data => {
+            tableBody.innerHTML = data;
+        });
+    }
+
+    searchInput.addEventListener("keyup", function () {
+        clearTimeout(timer);
+        timer = setTimeout(fetchLogs, 300);
+    });
+
+    moduleFilter.addEventListener("change", fetchLogs);
+
+    fetchLogs();
+});
+
+// supervisor attendance
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("studentAttendanceSearch");
+    const statusFilter = document.getElementById("attendanceStatusFilter");
+    const tableBody = document.getElementById("studentAttendanceBody");
+
+    if (!searchInput || !statusFilter || !tableBody) return;
+
+    let timer;
+
+    function fetchAttendance() {
+
+        const search = searchInput.value;
+        const status = statusFilter.value;
+
+        fetch("functions/searchStudentAttendance.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "search=" + encodeURIComponent(search) +
+                "&status=" + encodeURIComponent(status)
+        })
+        .then(res => res.text())
+        .then(data => {
+            tableBody.innerHTML = data;
+        })
+        .catch(err => {
+            console.error("Attendance fetch error:", err);
+        });
+    }
+
+    searchInput.addEventListener("keyup", function () {
+        clearTimeout(timer);
+        timer = setTimeout(fetchAttendance, 300);
+    });
+
+    statusFilter.addEventListener("change", fetchAttendance);
+
+    fetchAttendance();
 });
 
 

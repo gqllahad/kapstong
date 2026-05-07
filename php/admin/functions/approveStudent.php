@@ -1,24 +1,60 @@
 <?php
 require_once("../../kapstongConnection.php");
 
-$studentID = $_POST['studentID'] ?? '';
+$studentID = $_POST['studentID'] ?? null;
+$rfid = $_POST['rfid'] ?? null;
+$no_rfid = $_POST['no_rfid'] ?? null;
+$message = '';
 
-if (empty($studentID)) {
+
+if (!$studentID) {
     exit("Invalid student");
 }
 
-if (!empty($studentID)) {
+if (!empty($rfid)) {
 
-    // ojtstudnet
+    $check = $conn->prepare("SELECT studentID FROM users WHERE rfid_uid = ?");
+    $check->bind_param("s", $rfid);
+    $check->execute();
+    $result = $check->get_result();
+
+    if ($result->num_rows > 0) {
+        exit("RFID already registered to another student!");
+    }
+
     $userStmt = $conn->prepare("
-    UPDATE users 
-    SET isVerified = 'VERIFIED' 
-    WHERE studentID = ?
-");
+        UPDATE users 
+        SET isVerified = 'VERIFIED',
+            rfid_uid = ?,
+            rfid_status = 'Registered'
+        WHERE studentID = ?
+    ");
+    $userStmt->bind_param("ss", $rfid, $studentID);
+    $userStmt->execute();
+
+    $message = "Approved with RFID!";
+}
+
+elseif (!empty($no_rfid)) {
+
+    $userStmt = $conn->prepare("
+        UPDATE users 
+        SET isVerified = 'VERIFIED',
+            rfid_status = 'Not Registered'
+        WHERE studentID = ?
+    ");
     $userStmt->bind_param("s", $studentID);
     $userStmt->execute();
 
-    // student_documents
+    $message = "Approved without RFID!";
+}
+
+else {
+    exit("No approval action specified.");
+}
+
+
+ // student_documents
     $docStmt = $conn->prepare("
     UPDATE student_documents 
     SET status = 'APPROVED' 
@@ -49,4 +85,17 @@ if (!empty($studentID)) {
         $progressStmt->bind_param("s", $studentID);
         $progressStmt->execute();
     }
-}
+
+    echo $message;
+
+// if (!empty($studentID)) {
+//     $userStmt = $conn->prepare("
+//     UPDATE users 
+//     SET isVerified = 'VERIFIED' 
+//     WHERE studentID = ?
+// ");
+//     $userStmt->bind_param("s", $studentID);
+//     $userStmt->execute();
+
+   
+// }

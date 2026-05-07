@@ -179,17 +179,36 @@ if ($row = $result->fetch_assoc()) {
 
         <div class="approval-section">
 
+        <div class="rfid-section">
+         <label>Scan RFID Card</label>
+            <input 
+                type="text" 
+                id="rfidInput" 
+                placeholder="Tap RFID card here..."
+                autocomplete="off"
+            >
+            <small id="rfidStatus" class="rfid-status">Waiting for scan...</small>
+        </div>
+
+        <button type="button" class="rfid-rescan" onclick="resetRFID()">Rescan</button>
+
             <label class="approve-checkbox">
                 <input type="checkbox" id="confirmApprove">
                 <span>I confirm that this student will be approved.</span>
             </label>
 
-            <button
+           <button
                 class="btn-approve"
                 id="approveBtn"
                 disabled
                 onclick="approveStudent('<?= $row['studentID'] ?>')">
-                ✔ Approve Student
+                ✔ Approve & Register RFID
+            </button>
+
+            <button 
+                class="btn-approve-secondary"
+                onclick="approveWithoutRFID('<?= $row['studentID'] ?>')">
+               Approve (RFID Later)
             </button>
 
         </div>

@@ -103,6 +103,9 @@ const closeEditModalBtn = document.getElementById('closeEditModal');
 const viewTaskDetails = document.getElementById("view-task-container");
 const closeViewTaskDetails = document.getElementById("closeTaskViewModal");
 
+const modalContainer = document.getElementById("view-task-container");
+const statusMessage = document.getElementById("taskStatusMessage");
+
 // task array
 let allTasks = [];
 
@@ -113,6 +116,14 @@ let selectedFiles = [];
 // functions
 
 // unverified
+
+window.previewImage = function(src) {
+    const modal = document.getElementById("imagePreviewModal");
+    const img = document.getElementById("previewImg");
+
+    img.src = src;
+    modal.style.display = "flex";
+}
 
 function previewImage(src) {
     const modal = document.getElementById("imagePreviewModal");
@@ -250,7 +261,7 @@ function openTaskDetails(taskID) {
 
             document.getElementById("modalTaskTitle").innerText = data.title;
             document.getElementById("modalTaskDesc").innerText = data.description;
-            document.getElementById("modalTaskStatus").innerText = data.status;
+            // document.getElementById("modalTaskStatus").innerText = data.status;
             document.getElementById("modalTaskDue").innerText = data.due_date;
             document.getElementById("modalTaskCompleted").innerText =
                 data.completed_at ? data.completed_at : "Not completed yet";
@@ -258,14 +269,124 @@ function openTaskDetails(taskID) {
                 data.progress + "%";
 
             const submitBtn = document.getElementById("submitTaskBtn");
+            const reSubmitBtn = document.getElementById("reSubmitTaskBtn");
             submitBtn.dataset.taskid = taskID;
+            reSubmitBtn.dataset.taskid = taskID;
 
             const status = (data.status || "").toUpperCase().trim();
+            statusMessage.className = "task-status-message";
+            const uploadedFilesCard = document.getElementById("uploadedFilesCard");
+            const studentUploadedFiles = document.getElementById("studentUploadedFiles");
 
-            if (status === "APPROVED" || status === "SUBMITTED" || status === "REJECTED") {
-                submitBtn.style.display = "none";
+            studentUploadedFiles.innerHTML = "";
+
+            modalContainer.classList.remove(
+                "task-approved",
+                "task-rejected",
+                "task-submitted",
+                "task-progress",
+                "task-notstarted"
+            );
+
+            if (
+                status === "APPROVED" ||
+                status === "REJECTED" ||
+                status === "SUBMITTED"
+            ) {
+
+                uploadedFilesCard.style.display = "block";
+
+                if (data.submission_file && data.submission_file.trim() !== "") {
+
+                    const files = data.submission_file.split(",");
+
+                    files.forEach(file => {
+
+                        const cleanFile = file.trim();
+
+                        studentUploadedFiles.innerHTML += `
+                            <div class="doc-card">
+
+                                <button 
+                                    class="btn-preview"
+                                    onclick="previewImage('../../uploads/student_tasks/${data.studentID}/${cleanFile}')">
+                                    👁 View File
+                                </button>
+
+                                <span class="status-badge success">
+                                    Uploaded
+                                </span>
+
+                            </div>
+                        `;
+                    });
+
+                } else {
+
+                    studentUploadedFiles.innerHTML = `
+                        <span class="status-badge missing">
+                            No File Uploaded
+                        </span>
+                    `;
+                }
+
             } else {
+
+                uploadedFilesCard.style.display = "none";
+            }
+
+            if (status === "APPROVED") {
+
+                modalContainer.classList.add("task-approved");
+
+                statusMessage.classList.add("task-message-approved");
+
+                statusMessage.innerText =
+                    "✅ This task has been approved by your supervisor.";
+
+            } else if (status === "REJECTED") {
+
+                modalContainer.classList.add("task-rejected");
+                 statusMessage.classList.add("task-message-rejected");
+
+                statusMessage.innerText =
+                    "❌ This task was rejected. Please review the feedback and resubmit.";
+
+            } else if (status === "SUBMITTED") {
+
+                modalContainer.classList.add("task-submitted");
+                statusMessage.classList.add("task-message-submitted");
+
+                statusMessage.innerText =
+                    "📤 Your task has been submitted and is awaiting supervisor review.";
+
+
+            } else if (status === "IN PROGRESS") {
+
+                modalContainer.classList.add("task-progress");
+                 statusMessage.classList.add("task-message-progress");
+
+                statusMessage.innerText =
+                    "⏳ This task is currently in progress. Complete it before the due date.";
+
+            } else {
+
+                modalContainer.classList.add("task-notstarted");
+                statusMessage.classList.add("task-message-notstarted");
+
+                statusMessage.innerText =
+                    "📝 This task has not been started yet.";
+            }
+
+            if (status === "REJECTED" || status === "SUBMITTED") {
+                reSubmitBtn.style.display = "inline-block";
+                submitBtn.style.display = "none";
+            }else if( status === "APPROVED"){
+                submitBtn.style.display = "none";
+                reSubmitBtn.style.display = "none";
+            } else if(status === "NOT STARTED" || status == "IN PROGRESS") {
                 submitBtn.style.display = "inline-block";
+                reSubmitBtn.style.display = "none";
             }
 
             const studentNoteSection = document.getElementById("studentNoteSection");
@@ -951,6 +1072,16 @@ if(studentTasksBtn){
     });
 
     document.getElementById("submitTaskBtn").addEventListener("click", function () {
+        const taskID = this.dataset.taskid;
+        
+        viewTaskDetails.classList.remove("show");
+        submitTaskModal.classList.add("show");
+
+        document.getElementById("submitTaskID").value = taskID;
+       
+    });
+
+     document.getElementById("reSubmitTaskBtn").addEventListener("click", function () {
         const taskID = this.dataset.taskid;
         
         viewTaskDetails.classList.remove("show");

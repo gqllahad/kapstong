@@ -27,6 +27,10 @@ if (isset($_GET['success'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kapstong</title>
   <link rel="stylesheet" href="../css/loginPhase.css" />
+  <link
+  href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
+  rel='stylesheet'
+>
   <meta name="description" content="Kapstong for you and me!" />
 </head>
 
@@ -87,54 +91,138 @@ if (isset($_GET['success'])) {
   </header>
 
   <section class="log-start" id="log-start">
-    <div class="container scroll-reveal">
-      <h2 class="typing-text"></h2>
-      <p class="hero-desc active">
-        A web-based system designed to track, monitor, and manage OJT (On-the-Job Training) records efficiently for students and administrators.
-      </p>
-      <button id="btn">Get Started</button>
+
+  <div class="hero-overlay"></div>
+
+  <div class="container scroll-reveal hero-content">
+
+    <span class="hero-tag">
+      RFID-Powered Attendance Monitoring
+    </span>
+
+    <h1 class="typing-text">
+    </h1>
+
+    <p class="hero-desc active">
+      A modern web-based platform designed to simplify attendance monitoring,
+      RFID tracking, and OJT management for students, coordinators, and administrators
+      with real-time and secure record handling.
+    </p>
+
+    <div class="hero-buttons">
+
+      <button class="primary-btn">
+       <a href="rfid_test.php">Get Started</a> 
+      </button>
+
+      <button class="secondary-btn">
+        Learn More
+      </button>
+
     </div>
-  </section>
+
+    <div class="hero-stats">
+
+      <div class="stat-card">
+        <h3>RFID</h3>
+        <p>Smart Attendance</p>
+      </div>
+
+      <div class="stat-card">
+        <h3>Real-Time</h3>
+        <p>Monitoring System</p>
+      </div>
+
+      <div class="stat-card">
+        <h3>Secure</h3>
+        <p>Data Management</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
 
   <hr />
 
   <section class="log-hows" id="log-hows">
-    <div class="container scroll-reveal">
-      <h2>How the OJT Tracking System Works</h2>
-      <p style="padding : 20px 10px;">
-        A simple 3-step process for managing student OJT records efficiently.
-      </p>
+  <div class="container scroll-reveal">
 
+    <span class="section-tag">System Workflow</span>
 
-      <div class="how-container">
-        <div class="how-individual">
-          <div class="how-image register"></div>
-          <h3>Student Registration</h3>
-          <p class="how-text">Students create an account using verified school credentials.</p>
-        </div>
+    <h2>How the OJT Tracking System Works</h2>
 
-        <div class="how-individual">
-          <div class="how-image progress"></div>
-          <h3>Track OJT Progress</h3>
-          <p class="how-text">Monitor attendance, hours, and daily OJT activities in real time.</p>
-        </div>
+    <p class="how-subtitle">
+      The system streamlines student attendance and OJT monitoring through
+      RFID technology, providing a faster and more reliable workflow for
+      administrators, coordinators, and students.
+    </p>
 
-        <div class="how-individual">
-          <div class="how-image reports "></div>
-          <h3>Generate Reports</h3>
-          <p class="how-text">Administrators can evaluate and export student performance reports.</p>
-        </div>
+    <div class="how-container">
+
+      <div class="how-individual">
+
+        <div class="step-number">01</div>
+
+        <div class="how-image register"></div>
+
+        <h3>RFID Student Registration</h3>
+
+        <p class="how-text">
+          Students are registered into the system with their assigned RFID cards
+          and verified OJT information for secure attendance monitoring.
+        </p>
+
       </div>
+
+      <div class="how-individual">
+
+        <div class="step-number">02</div>
+
+        <div class="how-image progress"></div>
+
+        <h3>Real-Time Attendance Tracking</h3>
+
+        <p class="how-text">
+          Students scan their RFID cards to automatically record attendance,
+          time-in, and time-out activities in real time.
+        </p>
+
+      </div>
+
+      <div class="how-individual">
+
+        <div class="step-number">03</div>
+
+        <div class="how-image reports"></div>
+
+        <h3>Monitoring & Reports</h3>
+
+        <p class="how-text">
+          Coordinators and administrators can monitor student records,
+          evaluate attendance, and generate performance reports efficiently.
+        </p>
+
+      </div>
+
     </div>
-  </section>
+  </div>
+</section>
 
   <hr />
 
   <section class="log-container" id="log-container">
+
     <div
       class="container scroll-reveal"
       id="sign-container"
       style="text-align: left; margin: 0 5%">
+
+      <span class="hero-tag">
+         Student & Administrator Login
+      </span>
+      
       <h1>Don't have an account?</h1>
       <p>If your an OJT student, Signup now!</p>
       <button id="ls-switch" class="ls-switch">Sign Up</button>
@@ -174,17 +262,56 @@ if (isset($_GET['success'])) {
   <hr />
 
   <section class="log-about" id="log-about">
-    <div class="about-container container">
-      <h2>Developers</h2>
-      <p>
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Culpa illum
-        consequatur non quibusdam ipsa itaque inventore molestias, aspernatur
-        quod sequi dolorem sed consectetur fugiat consequuntur natus cum
-        sapiente ea aut.
-      </p>
-      <button id="btn">haha</button>
+  <div class="about-container container">
+
+    <span class="about-tag">RFID-Powered Monitoring System</span>
+
+    <h2>OJT Tracking and Attendance System</h2>
+
+    <p class="about-description">
+      The OJT Tracking System is a modern attendance and monitoring platform
+      designed to simplify the management of On-the-Job Training students through
+      RFID technology. The system enables fast, accurate, and contactless attendance
+      recording by allowing students to scan their RFID cards upon arrival and departure.
+    </p>
+
+    <p class="about-description">
+      This system helps coordinators and administrators efficiently monitor student
+      attendance, track training records, and reduce manual errors commonly found in
+      traditional attendance methods. With a centralized database and real-time tracking,
+      the platform improves reliability, security, and overall management of OJT activities.
+    </p>
+
+    <div class="about-features">
+
+      <div class="feature-card">
+        <i class="bx bx-scan"></i>
+        <h3>RFID Attendance</h3>
+        <p>
+          Fast and automated attendance logging using RFID technology.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <i class="bx bx-time-five"></i>
+        <h3>Real-Time Monitoring</h3>
+        <p>
+          Track student attendance records and time logs instantly.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <i class="bx bx-data"></i>
+        <h3>Centralized Records</h3>
+        <p>
+          Securely manage attendance data and OJT information in one system.
+        </p>
+      </div>
+
     </div>
-  </section>
+
+  </div>
+</section>
 </body>
 
 <script src="../js/loginPhase.js"></script>

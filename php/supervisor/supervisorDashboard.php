@@ -60,6 +60,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 <li><button id="supervisor-oversight-btn"><i class="bi bi-journal-text"></i> Task Reviews</button></li>
                 <li><button id="supervisor-students-btn"><i class="bi bi-file-earmark-text"></i>Students</button></li>
                 <li><button id="supervisor-evaluation-btn"><i class="bi bi-bar-chart-line"></i> Reports / Evaluation</button></li>
+                <li><button id="supervisor-activity-btn"><i class="bi bi-bar-chart-line"></i> Activity Log</button></li>
             </ul>
 
         </aside>
@@ -777,6 +778,66 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                         </table>
                     </div>
                 </div>
+
+            
+                <!-- student attendances -->
+                  <div class="top-bar">
+
+                    <div class="top-header">
+                        <h3 class="table-title">Attendance</h3>
+                        <p>Search and review student attendance records.</p>
+                    </div>
+
+                    <div class="search-filter">
+
+                        <div class="search-container">
+                            <i class="bi bi-search search-icon"></i>
+                            <input 
+                                type="text" 
+                                id="studentAttendanceSearch"
+                                placeholder="Search by Student ID, Name, or RFID"
+                            >
+                        </div>
+
+                        <div class="filter-group">
+
+                            <select id="attendanceStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="present">Present</option>
+                                <option value="late">Late</option>
+                                <option value="absent">Absent</option>
+                                <option value="excused">Excused</option>
+                            </select>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>RFID</th>
+                                    <th>Date</th>
+                                    <th>Time in</th>
+                                    <th>Time out</th>
+                                    <th>Status</th>
+                                    <th>Total hours</th>
+                                    <th>Remarks</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="studentAttendanceBody">
+                                <?php
+                                $search = $_POST['search'] ?? '';
+                                echo renderStudentMainAttendance($conn, $superID, $search);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+
             </section>
 
             <!-- reports evaluation -->
@@ -810,6 +871,72 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 </div>
 
             </section>
+
+            <!-- activity logs -->
+             <div class="supervisor-activity" id="supervisor-activity">
+                <div class="top-bar">
+
+                    <div class="top-header">
+                        <h3 class="table-title">Activity Logs</h3>
+                        <p>Monitor system actions and user activities.</p>
+                    </div>
+
+                    <div class="search-filter">
+                        <div class="search-container">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" id="superActivityLogSearch"
+                                placeholder="Search by target ID..">
+                        </div>
+
+
+                        <div class="filter-group">
+
+                            <select id="moduleFilter">
+                                <option value="">All Modules</option>
+                                <option value="TASK">Task</option>
+                                <option value="ATTENDANCE">Attendance</option>
+                                <option value="ASSIGNMENT">ASSIGNMENT</option>
+                                <option value="DOCUMENT">Document</option>
+                                <option value="SYSTEM">System</option>
+                            </select>
+
+                        </div>
+                    </div>
+
+                    
+
+                </div>
+
+                <div class="activity-log-container">
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Activity Type</th>
+                                    <th>Module</th>
+                                    <th>Target Type</th>
+                                    <th>Target ID</th>
+                                    <th>IP Address</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="activityLogTableBody">
+                                <?php
+                                $search = $_POST['search'] ?? '';
+                                $module = $_POST['module'] ?? '';
+                                echo renderSupervisorActivityLogTable($conn, $superID, $search, $module);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+             </div>
 
             <div id="imagePreviewModal" class="image-modal">
                 <span id="closeImagePreview">&times;</span>

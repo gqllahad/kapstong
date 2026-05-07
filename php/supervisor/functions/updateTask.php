@@ -21,21 +21,79 @@ if (
     exit;
 }
 
-$sql = "
+$stmt = $conn->prepare("
     UPDATE student_tasks
-    SET
-        title = '$title',
-        description = '$description',
-        due_date = '$due_date',
-        status = '$status'
-    WHERE taskID = '$taskID'
-";
+    SET title = ?, description = ?, due_date = ?, status = ?
+    WHERE taskID = ?
+");
 
-if ($conn->query($sql)) {
+$stmt->bind_param(
+    "ssssi",
+    $title,
+    $description,
+    $due_date,
+    $status,
+    $taskID
+);
+
+$getTask = $conn->prepare("
+    SELECT studentID
+    FROM student_tasks
+    WHERE taskID = ?
+");
+
+$getTask->bind_param("i", $taskID);
+$getTask->execute();
+$result = $getTask->get_result();
+$task = $result->fetch_assoc();
+
+if ($stmt->execute()) {
+
+    $ip = getUserIP();
+    $userID = $_SESSION['user_id'];
+    $role = "SUPERVISOR";
+    $action = "Update Task";
+    $module = "TASK";
+
+    $description = "Updated task '$title' (ID: $taskID) assigned to student ID {$task['studentID']}";
+
+    $target_type = "task";
+    $target_id = $taskID;
+
+    $log = $conn->prepare("
+        INSERT INTO activity_log
+        (
+            userID,
+            role,
+            action,
+            module,
+            description,
+            target_type,
+            target_id,
+            ip_address
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    $log->bind_param(
+        "isssssss",
+        $userID,
+        $role,
+        $action,
+        $module,
+        $description,
+        $target_type,
+        $target_id,
+        $ip
+    );
+
+    $log->execute();
+
     echo json_encode([
         "status" => "success",
         "message" => "Task updated successfully"
     ]);
+
 } else {
     echo json_encode([
         "status" => "error",

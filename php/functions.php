@@ -356,6 +356,9 @@ function renderSupervisorAssignedStudents($conn, $superID)
                             <button class="view-btn" onclick="viewUser(\'' . $row['studentID'] . '\', \'supervisorView\')">
                                 View
                             </button>
+                            <button class="view-btn" onclick="reAssignUser(\'' . $row['studentID'] . '\', \'supervisorView\')">
+                                Reassign
+                            </button>
                         </div>
 
                     </div>';
@@ -951,6 +954,108 @@ function renderTaskAssignStudentList($conn, $superID, $search = '')
     return $output;
 }
 
+function renderStudentMainAttendance($conn, $superID, $search = '', $status = '')
+{
+    $sql = "
+        SELECT 
+            attendance_logs.attendanceID,
+            attendance_logs.log_date,
+            attendance_logs.time_in,
+            attendance_logs.time_out,
+            attendance_logs.status,
+            attendance_logs.total_hours,
+            attendance_logs.remarks,
+            attendance_logs.rfid_uid,
+            attendance_logs.studentID,
+            ojtstudent.name
+        FROM attendance_logs
+
+        INNER JOIN student_supervisor 
+            ON student_supervisor.studentID = attendance_logs.studentID
+
+        LEFT JOIN ojtstudent 
+            ON ojtstudent.studentID = attendance_logs.studentID
+
+        WHERE student_supervisor.superID = ?
+        AND student_supervisor.status = 'ACTIVE'
+    ";
+
+    $params = [];
+    $types = "i";
+    $params[] = $superID;
+
+    if (!empty($search)) {
+        $sql .= " AND (
+            attendance_logs.studentID LIKE ? OR
+            ojtstudent.name LIKE ? OR
+            attendance_logs.rfid_uid LIKE ?
+        )";
+
+        $like = "%$search%";
+        $types .= "sss";
+        $params[] = $like;
+        $params[] = $like;
+        $params[] = $like;
+    }
+
+    if (!empty($status)) {
+        $sql .= " AND attendance_logs.status = ?";
+        $types .= "s";
+        $params[] = $status;
+    }
+
+    $sql .= " ORDER BY attendance_logs.created_at DESC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $status = strtolower($row['status']);
+
+            $color = match($status) {
+                'present' => '#059669',
+                'late' => '#F59E0B',
+                'absent' => '#EF4444',
+                'excused' => '#3B82F6',
+                default => '#9CA3AF'
+            };
+
+            $output .= "
+            <tr>
+                <td>{$row['rfid_uid']}</td>
+                <td>{$row['log_date']}</td>
+                <td>{$row['time_in']}</td>
+                <td>{$row['time_out']}</td>
+                <td style='color:$color;font-weight:600'>" . strtoupper($row['status']) . "</td>
+                <td>{$row['total_hours']}</td>
+                <td>{$row['remarks']}</td>
+                <td>
+                    <button class='view-btn'
+                        onclick=\"viewAttendance('{$row['attendanceID']}')\">
+                        View
+                    </button>
+                </td>
+            </tr>";
+        }
+    } else {
+        $output .= "
+        <tr>
+            <td colspan='8' style='text-align:center;padding:15px'>
+                No attendance records found
+            </td>
+        </tr>";
+    }
+
+    return $output;
+}
+
 function renderAssignSupervisorList($conn, $search = '')
 {
     $where = "WHERE 1=1";
@@ -996,6 +1101,101 @@ function renderAssignSupervisorList($conn, $search = '')
 
     return $output;
 }
+
+// supervisor activity log view
+function renderSupervisorActivityLogTable($conn, $superID, $search = '', $module = '')
+{
+    $sql = "
+        SELECT 
+            activity_log.logID,
+            activity_log.role,
+            activity_log.action,
+            activity_log.module,
+            activity_log.description,
+            activity_log.target_type,
+            activity_log.target_id,
+            activity_log.ip_address,
+            activity_log.created_at,
+            users.name,
+            users.email
+        FROM activity_log
+        INNER JOIN student_supervisor ss
+            ON ss.studentID = activity_log.target_id
+        LEFT JOIN users
+            ON activity_log.userID = users.userID
+        WHERE ss.superID = ?
+    ";
+
+    $params = [];
+    $types = "i";
+    $params[] = $superID;
+
+    if (!empty($search)) {
+        $sql .= " AND (
+            users.name LIKE ? OR
+            activity_log.action LIKE ? OR
+            activity_log.module LIKE ? OR
+            activity_log.target_id LIKE ?
+        )";
+
+        $like = "%$search%";
+        $types .= "ssss";
+
+        array_push($params, $like, $like, $like, $like);
+    }
+
+    if (!empty($module)) {
+        $sql .= " AND activity_log.module = ?";
+        $types .= "s";
+        $params[] = $module;
+    }
+
+    $sql .= " ORDER BY activity_log.created_at DESC";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bind_param($types, ...$params);
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $role = strtoupper($row['role']);
+
+            $roleColor = match($role) {
+                'STUDENT' => '#3B82F6',
+                'SUPERVISOR' => '#F59E0B',
+                'ADMIN' => '#374151',
+                default => '#9CA3AF'
+            };
+
+            $output .= "
+            <tr>
+                <td>{$row['name']}</td>
+                <td style='color:$roleColor;font-weight:600'>$role</td>
+                <td>{$row['action']}</td>
+                <td>{$row['module']}</td>
+                <td>{$row['target_type']}</td>
+                <td>{$row['target_id']}</td>
+                <td>{$row['ip_address']}</td>
+                <td>" . date("M d, Y h:i A", strtotime($row['created_at'])) . "</td>
+            </tr>";
+        }
+    } else {
+        $output .= "
+        <tr>
+            <td colspan='8' style='text-align:center;'>No supervisor activity found</td>
+        </tr>";
+    }
+
+    return $output;
+}
+
+
 
 // admin activity_log view
 function renderActivityLogTable($conn, $search = '')
