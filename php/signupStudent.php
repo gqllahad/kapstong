@@ -240,6 +240,11 @@ require_once("functions.php");
         </main>
     </div>
 
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loader"></div>
+        <p>Creating your account...</p>
+    </div>
+
 </body>
 <script src="../js/signupPhase.js"></script>
 

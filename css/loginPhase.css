@@ -27,7 +27,7 @@ html{
     --approved-color-sub : #02c74a;
 
     --front-text : #111827;
-    --accent-gold: #f5c542;    /* gold/yellow */
+    --accent-gold: #f5c542;    
   --text-dark: #1f2937;
   --text-muted: #4b5563;
 }
@@ -646,11 +646,11 @@ hr {
 }
 
 .progress {
-  background-image: url(../images/s1.gif);
+  background-image: url(../kapstongImage/Gemini_Generated_Image_v1w25cv1w25cv1w2.png);
 }
 
 .reports {
-  background-image: url(../images/s1.gif);
+  background-image: url(../kapstongImage/Gemini_Generated_Image_ruvv78ruvv78ruvv.png);
 }
 
 
@@ -868,58 +868,72 @@ hr {
 
 
 /* modal success signup */
-.signSuccess-box{
+.signSuccess-box {
+    position: fixed;
+    left: 20px;
+    top: 130px;
+
     display: flex;
-    border: none;
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 0;
-    min-height: 0;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    justify-content: center;
     align-items: center;
-    text-align: center;
+
+    width: 320px;
+    max-width: 90%;
+
+    padding: 14px 18px;
+
+    border-radius: 12px;
+
     background: linear-gradient(
         135deg,
-        rgba(0, 255, 21, 0.25),
-        rgba(0, 255, 0, 0.05)
+        rgba(0, 255, 21, 0.28),
+        rgba(0, 255, 21, 0.08)
     );
 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 
-        0 8px 32px rgba(0,0,0,0.2),
-        0 0 12px rgba(0, 255, 21, 0.6);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border: 1px solid rgba(0, 255, 100, 0.45);
+
+    box-shadow:
+        0 12px 35px rgba(0,0,0,0.45),
+        0 0 20px rgba(0, 255, 21, 0.35);
+
+    color: #ffffff;
+
+    font-weight: 700;
+    font-family: Arial, Helvetica, sans-serif;
+
+    z-index: 9999;
+
     opacity: 0;
-    transform: translateY(-40px); 
-    transition: all 1.3s ease-out; 
+    transform: translateX(-120%);
+    pointer-events: none;
+
+    transition: all 0.35s ease;
 }
 
-.signSuccess-box.active{
+.signSuccess-box.active {
     opacity: 1;
-    max-height: 100px;
-    transform: translateY(0);
-     margin: 0.75rem auto;
-    padding: 0.75rem 1rem;
-    animation: shake 0.7s ease;
+    transform: translateX(0);
+    pointer-events: auto;
+
+    animation: toastShake 0.4s ease;
+}
+
+.signSuccess-box.hide {
+    opacity: 0;
+    transform: translateX(-120%);
 }
 
 .signSuccess-box p {
-    display: flex;
-    align-items: center;
-    left: auto;
     margin: 0;
-    position: static;
-    text-align: center;
-    font-size: 1.1rem;
-    font-weight: 600;
-    font-family: Arial, Helvetica, sans-serif;
-    color: var(--front-text); 
-     word-wrap: break-word;
+
+    font-size: 0.95rem;
+    line-height: 1.4;
+
+    color: #ffffff;
+
+    word-wrap: break-word;
     overflow-wrap: break-word;
 }
 

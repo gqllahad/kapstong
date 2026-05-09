@@ -1341,7 +1341,8 @@ supervisorForm.addEventListener("submit", function (e) {
         }
     })
     .catch(err => {
-       showToast(data.message, data.status ? "success" : "error");
+       console.error(err);
+        showToast("Something went wrong", "error");
     });
 });
 

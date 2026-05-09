@@ -62,10 +62,43 @@ let selectedTaskStudentIDs = [];
 // assign list
 const studentList = document.getElementById("taskStudentList");
 
+// settings
 
+const accountModal = document.getElementById("account-settings-supervisor");
+const changePasswordModal = document.getElementById("change-password-modal-supervisor");
+
+const openAccountBtn = document.getElementById("openAccountSettingsBtn");
+const openChangePasswordBtn = document.getElementById("openChangePasswordSupervisor");
+
+const closeAccountBtn = document.getElementById("closeAccountModalSupervisor");
+const backBtn = document.getElementById("backToAccountSettingsSupervisor");
 
 
 // functions
+
+// force
+document.addEventListener("DOMContentLoaded", function () {
+
+    const force = window.forceChangePassword;
+
+    if (force == 1) {
+
+        const overlayWow = document.getElementById("forcePasswordOverlay");
+
+        overlayWow.style.display = "flex";
+
+        document.body.style.overflow = "hidden";
+
+        document.querySelector(".sidebar").style.pointerEvents = "none";
+        document.querySelector(".content").style.pointerEvents = "none";
+    }
+});
+
+document.addEventListener("keydown", e => {
+    if (forceChangePassword == 1 && e.key === "Escape") {
+        e.preventDefault();
+    }
+});
 
 // toggles
 function toggleSection(header) {
@@ -102,6 +135,33 @@ function viewEvaluationBreakdown(studentID){
         }, 200);
 }
 
+// settings
+function togglePassword(inputId, icon) {
+    const input = document.getElementById(inputId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.textContent = "Show"; 
+    } else {
+        input.type = "password";
+        icon.textContent = "Hide";
+    }
+};
+
+// toast
+function showToast(message, type = "success") {
+    const container = document.getElementById("toast-container");
+
+    const toast = document.createElement("div");
+    toast.classList.add("toast", type);
+    toast.textContent = message;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3500);
+}
 
 function loadPieChart() {
     fetch("functions/getOverallAttendanceChart.php", {credentials: "include"})
@@ -858,6 +918,8 @@ overlay.addEventListener("click", () => {
     editTaskContainer.classList.remove("show");
     studentApplicationApprove.classList.remove("show");
     viewTaskDetails.classList.remove("show");
+     accountModal.classList.remove('show');
+      changePasswordModal.classList.remove('show');
 });
 
 
@@ -1157,4 +1219,24 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// settings
+openAccountBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+    accountModal.classList.add("show");
+});
+
+closeAccountBtn.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    accountModal.classList.remove("show");
+});
+
+document.getElementById('openChangePasswordSupervisor').addEventListener('click', () => {
+    accountModal.classList.remove('show');
+    changePasswordModal.classList.add('show');
+});
+
+document.getElementById('backToAccountSettingsSupervisor').addEventListener('click', () => {
+    changePasswordModal.classList.remove('show');
+    accountModal.classList.add('show');
+});
 

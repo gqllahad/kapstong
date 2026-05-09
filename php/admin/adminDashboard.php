@@ -235,11 +235,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                             </select>
                         </div>
 
-                        <div class="input-group">
-                            <label>Temporary Password</label>
-                            <input type="password" name="password" placeholder="Create temporary password" required>
-                        </div>
-
                         <div class="checkbox-group">
                             <input type="checkbox" id="confirmCreateSupervisor">
                             <label for="confirmCreateSupervisor">

@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $role = "ADMIN";
             $action = "Assign Student";
-            $module = "assignment";
+            $module = "ASSIGNMENT";
             $description = "Assigned student $studentID to supervisor ID $superID";
             $target_type = "assignment";
             $target_id = $studentID;

@@ -14,6 +14,16 @@ if ($_SESSION['role'] !== "supervisor") {
 }
 
 $userID = $_SESSION['user_id'];
+
+
+$stmtForce = $conn->prepare("SELECT mustChangePassword FROM users WHERE userID = ?");
+$stmtForce->bind_param("i", $userID);
+$stmtForce->execute();
+$resultForce = $stmtForce->get_result();
+$rowForce = $resultForce->fetch_assoc();
+
+$forceChange = $rowForce['mustChangePassword'];
+
 $superID = getSupervisorIDByUserID($conn, $userID);
 
 ?>
@@ -38,6 +48,24 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
 
 <body>
+
+<?php if (isset($_SESSION['success'])): ?>
+<script>
+    window.addEventListener("DOMContentLoaded", function () {
+        showToast("<?= $_SESSION['success'] ?>", "success");
+    });
+</script>
+<?php unset($_SESSION['success']); endif; ?>
+
+
+<?php if (isset($_SESSION['error'])): ?>
+<script>
+    window.addEventListener("DOMContentLoaded", function () {
+        showToast("<?= $_SESSION['error'] ?>", "error");
+    });
+</script>
+<?php unset($_SESSION['error']); endif; ?>
+
     <!-- navbar -->
     <header class="navbar">
         <h1>Supervisor Dashboard</h1>
@@ -49,6 +77,28 @@ $superID = getSupervisorIDByUserID($conn, $userID);
             <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
     </header>
+
+    <div id="forcePasswordOverlay" style="display:none;">
+        <div class="force-box">
+            <div class="force-modal-header">
+                    <h2>⚠️ Change Password Required</h2>
+                    <p>You must change your password before continuing.</p>
+                      <a href="../logoutPhase.php" class="force-modal-close-profile">&times;</a>
+                </div>
+            
+
+            <form action="functions/settings.php" method="POST">
+                <input type="hidden" name="userID" value="<?= $_SESSION['user_id']; ?>">
+
+                <input type="password" name="newPassword" placeholder="New Password" required>
+                <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
+
+                <button type="submit" name="forceChangePasswordSupervisor">
+                    Update Password
+                </button>
+            </form>
+        </div>
+    </div>
 
 
     <div class="layout">
@@ -67,9 +117,69 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
         <!-- CONTENT -->
         <main class="content">
+            
             <div id="overlay" class="overlay"></div>
+            <div id="toast-container"></div>
 
             <!-- modals -->
+
+             <!-- Account settings modal (SUPERVISOR) -->
+            <div class="account-settings-modal" id="account-settings-supervisor">
+                <div class="modal-header">
+                    <h3>Account Settings</h3>
+                    <button id="closeAccountModalSupervisor" class="modal-close-profile">&times;</button>
+                </div>
+
+                <div class="form-section-account">
+                    <button class="account-btn" id="openChangePasswordSupervisor">Change Password</button>
+                </div>
+            </div>
+
+            <!-- change password -->
+            <div class="account-settings-modal" id="change-password-modal-supervisor">
+                <div class="modal-header">
+                    <h3>Change Password</h3>
+                    <button id="backToAccountSettingsSupervisor" class="modal-close-profile-sub">&larr; Back</button>
+                </div>
+
+                <form action="functions/settings.php" method="POST" class="modal-form">
+                    <div class="form-section-account">
+
+                        <input type="hidden" name="userID" value="<?php echo $_SESSION['user_id']; ?>">
+
+                        <div class="form-group-edit">
+                            <label>Old Password</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="oldPasswordSupervisor" name="oldPassword" placeholder="Enter old password">
+                                <i class="toggle-pass" onclick="togglePassword('oldPasswordSupervisor', this)">👁</i>
+                            </div>
+                        </div>
+
+                        <div class="form-group-edit">
+                            <label>New Password</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="newPasswordSupervisor" name="newPassword" placeholder="Enter new password">
+                                <i class="toggle-pass" onclick="togglePassword('newPasswordSupervisor', this)">👁</i>
+                            </div>
+                        </div>
+
+                        <div class="form-group-edit">
+                            <label>Confirm New Password</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="confirmPasswordSupervisor" name="confirmPassword" placeholder="Confirm new password">
+                                <i class="toggle-pass" onclick="togglePassword('confirmPasswordSupervisor', this)">👁</i>
+                            </div>
+                        </div>
+
+                        <div class="form-group-edit">
+                            <button type="submit" class="account-btn" name="changePasswordSupervisor">
+                                Save Password
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
 
             <!-- view Evaluation breakdown -->
             <div class="student-breakdown-container" id="student-breakdown-container">
@@ -626,8 +736,6 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     </div>
                 </div>
 
-
-
             </section>
 
             <!-- supervisor oversight -->
@@ -955,7 +1063,9 @@ $superID = getSupervisorIDByUserID($conn, $userID);
     </div>
 
 </body>
+<script>
+    window.forceChangePassword = <?= json_encode($forceChange) ?>;
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../../js/supervisor/supervisorDashboard.js"></script>
-
 </html>

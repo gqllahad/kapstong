@@ -25,6 +25,10 @@ const confirmPasswordInput = document.getElementById("confirmPasswordInput");
 const birthInputs = document.querySelectorAll('input[name="signBirth"]');
 const telInput = document.querySelector('input[name="signTel"]');
 
+// loading
+const form = document.getElementById("signupForm");
+const loadingScreen = document.getElementById("loadingScreen");
+
 
 // functions vanilla java
 function updateStepper() {
@@ -342,6 +346,11 @@ confirmPasswordInput.addEventListener("focus", () => {
     }
 });
 
+// loading
+form.addEventListener("submit", function () {
+    loadingScreen.classList.add("show");
+});
+
 
 // STUDENT CHECK
 studentIDStep2.addEventListener("input", () => {
@@ -404,7 +413,7 @@ studentEmail1.addEventListener("input", () => {
       .catch(err => console.error(err));
 });
 
-studentEmail1.addEventListener("blur", checkEmail);
+// studentEmail1.addEventListener("blur", checkEmail);
 
 // 1995215248
 

@@ -1,4 +1,12 @@
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../PHPMailer/src/PHPMailer.php';
+require '../PHPMailer/src/SMTP.php';
+require '../PHPMailer/src/Exception.php';
+
 require_once("kapstongConnection.php");
 require_once("functions.php");
 
@@ -59,7 +67,7 @@ if (isset($_POST['login-submit'])) {
     ");
 
             $action = "User Login";
-            $module = "authentication";
+            $module = "AUTHENTICATION";
             $description = "User successfully logged in";
 
             $target_type = "user";
@@ -94,6 +102,7 @@ if (isset($_POST['login-submit'])) {
 }
 
 if (isset($_POST['signupForm'])) {
+    session_start();
 
     //Student Information 
     $fName = $_POST['firstName'];
@@ -144,46 +153,78 @@ if (isset($_POST['signupForm'])) {
         exit();
     }
 
-    $conn->begin_transaction();
+    $_SESSION['signup_data'] = [
 
-    try {
-        $sqlInsertUsers = $conn->prepare("INSERT INTO users (name, email, mobileNumber, studentID, password) VALUES (?, ?, ?, ?, ?)");
-        $sqlInsertStudent = $conn->prepare("INSERT INTO ojtstudent (studentID, email, birthDate, mobileNumber, gender, course, yearLevel, name, address, semester, schoolYear) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    "firstName" => $fName,
+    "lastName" => $lName,
+    "middleName" => $mName,
+    "fullName" => $fullName,
 
-        $sqlInsertStudent->bind_param(
-            "sssssssssss",
-            $studentID,
-            $email,
-            $birth,
-            $mobile,
-            $gender,
-            $course,
-            $level,
-            $fullName,
-            $fullAddress,
-            $semester,
-            $schoolYear
-        );
+    "email" => $email,
+    "mobile" => $mobile,
+    "gender" => $gender,
+    "birth" => $birth,
 
-        $sqlInsertUsers->bind_param(
-            "sssss",
-            $fullName,
-            $email,
-            $mobile,
-            $studentID,
-            $password
-        );
+    "province" => $province,
+    "city" => $city,
+    "barangay" => $barangay,
+    "street" => $street,
+    "fullAddress" => $fullAddress,
 
-        $sqlInsertUsers->execute();
-        $sqlInsertStudent->execute();
+    "course" => $course,
+    "level" => $level,
+    "semester" => $semester,
+    "schoolYear" => $schoolYear,
 
-        $conn->commit();
+    "studentID" => $studentID,
+    "password" => $password
+    ];
 
-        header("Location: loginPhase.php?success=Account+created+successfully!#log-container");
-        exit();
+    $otp = rand(100000, 999999);
+
+    $_SESSION['signup_otp'] = $otp;
+    $_SESSION['otp_expiry'] = time() + 300;
+
+    $mail = new PHPMailer(true);
+
+try {
+
+    $mail->isSMTP();
+    $mail->Host = 'smtp.gmail.com';
+    $mail->SMTPAuth = true;
+
+    $mail->Username = 'madrigalinigojones@gmail.com';
+    $mail->Password = 'auvgdrtezpbblwqi';
+    $mail->SMTPSecure = 'tls';
+    $mail->Port = 587;
+
+    $mail->setFrom('madrigalinigojones@gmail.com', 'OJT System');
+
+    $mail->addAddress($email);
+
+    $mail->isHTML(true);
+
+    $mail->Subject = 'OTP Verification';
+
+    $mail->Body = "
+        <h2>Email Verification</h2>
+
+        <p>Your OTP Code is:</p>
+
+        <h1>$otp</h1>
+
+        <p>This expires in 5 minutes.</p>
+    ";
+
+    $mail->send();
+
+    header('Location: verifyOTP.php');
+    exit();
+
     } catch (Exception $e) {
-        $conn->rollback();
-        header("Location: signupStudent.php?error=Database+error");
+
+        header("Location: signupStudent.php?error=OTP+Email+Failed");
         exit();
     }
+
 };

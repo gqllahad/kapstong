@@ -82,7 +82,7 @@ if (isset($_GET['success'])) {
 
     <?php if ($successSignUp): ?>
       <div class="signSuccess-box" id="signSuccess">
-        <p>Account Created!</p>
+        <p>✅ Account Created Successfully!</p>
       </div>
 
     <?php endif; ?>

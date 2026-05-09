@@ -753,7 +753,6 @@ closeModalAccountBtn.addEventListener('click', () => {
     accountSettings.classList.remove('show');
 });
 
-
 document.getElementById('openChangePassword').addEventListener('click', () => {
     accountSettings.classList.remove('show');
     changePasswordModal.classList.add('show');
