@@ -1300,12 +1300,6 @@ function renderActiveOJTCard($conn)
 
                 <p><strong>Required Hours:</strong> ' . htmlspecialchars($row['required_hours']) . ' Hours</p>
 
-                <p><strong>Duration:</strong> 
-                    ' . date("M d, Y", strtotime($row['start_date'])) . ' 
-                    to 
-                    ' . date("M d, Y", strtotime($row['end_date'])) . '
-                </p>
-
                 <p><strong>Status:</strong> 
                     <span class="active-status">ACTIVE</span>
                 </p>
@@ -1318,6 +1312,23 @@ function renderActiveOJTCard($conn)
             <p>No active OJT setup found.</p>
         </div>
     ';
+}
+
+// attendance settings
+function getAttendanceSetting($conn, $key, $default = null) {
+
+    $stmt = $conn->prepare("
+        SELECT setting_value
+        FROM attendance_settings
+        WHERE setting_key = ?
+    ");
+
+    $stmt->bind_param("s", $key);
+    $stmt->execute();
+
+    $result = $stmt->get_result()->fetch_assoc();
+
+    return $result['setting_value'] ?? $default;
 }
 
 // department management table
@@ -1818,4 +1829,178 @@ function getSupervisorActivities($conn, $superID)
     }
 
     return $activities;
+}
+
+
+// student alerts
+function getStudentAlerts($conn, $studentID)
+{
+    $alerts = [];
+
+    $sql1 = "
+        SELECT COUNT(*) AS attendance_count
+        FROM attendance_logs
+        WHERE studentID = ?
+        AND log_date >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+    ";
+
+    $stmt1 = $conn->prepare($sql1);
+
+    if (!$stmt1) {
+        die("SQL1 Error: " . $conn->error);
+    }
+
+    $stmt1->bind_param("s", $studentID);
+    $stmt1->execute();
+
+    $attendanceData = $stmt1->get_result()->fetch_assoc();
+
+    if ($attendanceData['attendance_count'] == 0) {
+
+        $alerts[] = [
+            "type" => "warning",
+            "priority" => 1,
+            "message" => "You have no attendance recorded in the last 5 days.",
+            "action" => "openAttendance",
+            "id" => null
+        ];
+    }
+
+    $sql2 = "
+        SELECT taskID, title
+        FROM student_tasks
+        WHERE studentID = ?
+        AND status IN ('NOT STARTED', 'IN PROGRESS')
+        AND due_date < CURDATE()
+    ";
+
+    $stmt2 = $conn->prepare($sql2);
+
+    if (!$stmt2) {
+        die("SQL2 Error: " . $conn->error);
+    }
+
+    $stmt2->bind_param("s", $studentID);
+    $stmt2->execute();
+
+    $taskResults = $stmt2->get_result();
+
+    while ($row = $taskResults->fetch_assoc()) {
+
+        $alerts[] = [
+            "type" => "danger",
+            "priority" => 2,
+            "message" => "Task '" . $row['title'] . "' is overdue.",
+            "action" => "viewTask",
+            "id" => $row['taskID'] ?? null
+        ];
+    }
+
+    $sql3 = "
+        SELECT required_hours, completed_hours
+        FROM student_progress
+        WHERE studentID = ?
+    ";
+
+    $stmt3 = $conn->prepare($sql3);
+
+    if (!$stmt3) {
+        die("SQL3 Error: " . $conn->error);
+    }
+
+    $stmt3->bind_param("s", $studentID);
+    $stmt3->execute();
+
+    $progress = $stmt3->get_result()->fetch_assoc();
+
+    if ($progress) {
+
+        $requiredHours = (int)$progress['required_hours'];
+        $completedHours = (int)$progress['completed_hours'];
+
+        $progressPercentage = 0;
+
+        if ($requiredHours > 0) {
+            $progressPercentage = ($completedHours / $requiredHours) * 100;
+        }
+
+        if ($progressPercentage < 50) {
+
+            $alerts[] = [
+                "type" => "critical",
+                "priority" => 3,
+                "message" => "You are at risk of not completing your required OJT hours.",
+                "action" => "viewProgress",
+                "id" => null
+            ];
+        }
+    }
+
+    usort($alerts, function ($a, $b) {
+        return $b['priority'] <=> $a['priority'];
+    });
+
+    return $alerts;
+}
+
+// student attendance card
+function renderStudentAttendanceTable($conn, $studentID, $category = ''){
+    $sql = "
+        SELECT 
+            log_date,
+            time_in,
+            time_out,
+            status,
+            total_hours
+        FROM attendance_logs
+        WHERE studentID = ?
+    ";
+
+    $params = [$studentID];
+    $types = "s";
+
+    if (!empty($category)) {
+        $sql .= " AND status = ?";
+        $params[] = $category;
+        $types .= "s";
+    }
+
+    $sql .= " ORDER BY log_date DESC";
+
+    $stmt = $conn->prepare($sql);
+
+    if (!$stmt) {
+        die("SQL Error: " . $conn->error);
+    }
+
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+
+        while ($row = $result->fetch_assoc()) {
+
+            $output .= "
+            <tr>
+                <td>" . date("M d, Y", strtotime($row['log_date'])) . "</td>
+                <td>{$row['time_in']}</td>
+                <td>{$row['time_out']}</td>
+                <td>{$row['status']}</td>
+                <td>{$row['total_hours']}</td>
+            </tr>";
+        }
+
+    } else {
+
+        $output .= "
+        <tr>
+            <td colspan='5' style='text-align:center;'>No attendance found</td>
+        </tr>";
+    }
+
+    return $output;
 }

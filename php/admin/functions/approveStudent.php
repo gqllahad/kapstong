@@ -54,6 +54,7 @@ else {
 }
 
 
+
  // student_documents
     $docStmt = $conn->prepare("
     UPDATE student_documents 
@@ -63,28 +64,47 @@ else {
     $docStmt->bind_param("s", $studentID);
     $docStmt->execute();
 
+    // settings
+    $settingStmt = $conn->prepare("
+        SELECT required_hours 
+        FROM ojt_settings 
+        WHERE status = 'ACTIVE' 
+        LIMIT 1
+    ");
+
+    $settingStmt->execute();
+    $settingResult = $settingStmt->get_result();
+    $settings = $settingResult->fetch_assoc();
+
+    $requiredHours = $settings ? (int)$settings['required_hours'] : 500;
+
     // student_progress
     $checkStmt = $conn->prepare("
-        SELECT progressID FROM student_progress WHERE studentID = ?
+    SELECT progressID 
+    FROM student_progress 
+    WHERE studentID = ?
+");
+
+$checkStmt->bind_param("s", $studentID);
+$checkStmt->execute();
+$checkResult = $checkStmt->get_result();
+
+if ($checkResult->num_rows == 0) {
+
+    $progressStmt = $conn->prepare("
+        INSERT INTO student_progress (
+            studentID,
+            required_hours,
+            completed_hours,
+            completion_status
+        )
+        VALUES (?, ?, 0, 'ONGOING')
     ");
-    $checkStmt->bind_param("s", $studentID);
-    $checkStmt->execute();
-    $checkStmt->store_result();
 
-    if ($checkStmt->num_rows == 0) {
+    $progressStmt->bind_param("si", $studentID, $requiredHours);
+    $progressStmt->execute();
 
-        $progressStmt = $conn->prepare("
-            INSERT INTO student_progress (
-                studentID,
-                required_hours,
-                completed_hours,
-                completion_status
-            )
-            VALUES (?, 500, 0, 'ONGOING')
-        ");
-        $progressStmt->bind_param("s", $studentID);
-        $progressStmt->execute();
-    }
+}
 
     echo $message;
 

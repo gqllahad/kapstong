@@ -2,12 +2,56 @@
 
 session_start();
 require_once("kapstongConnection.php");
+require_once("functions.php");
 
 date_default_timezone_set('Asia/Manila');
 
-$MIN_WORK_MINUTES = 5;
-$MIN_BREAK_MINUTES = 5;
-$MAX_HOURS_PER_DAY = 8;
+$timeInStart = getAttendanceSetting($conn, 'morning_time_in', '07:50:00');
+
+$lateGraceMinutes = (int)getAttendanceSetting($conn, 'late_threshold_minutes ', 5);
+
+$lateTime = date(
+    "H:i:s",
+    strtotime($timeInStart . " +{$lateGraceMinutes} minutes")
+);
+
+// $timeInEnd   = getAttendanceSetting($conn, 'late_time', '08:05:00');
+// $lateTime   = getAttendanceSetting($conn, 'late_time', '08:05:00');
+
+$timeOutMorningTime = getAttendanceSetting($conn, 'morning_time_out', '12:00:00');
+
+$timeInAfternoonTime = getAttendanceSetting($conn, 'afternoon_time_out', '13:00:00');
+$timeOutAfternoonTime = getAttendanceSetting($conn, 'afternoon_time_out', '17:00:00');
+
+$MIN_WORK_MINUTES = (int)getAttendanceSetting(
+    $conn,
+    'minimum_work_minutes',
+    5
+);
+
+$MIN_BREAK_MINUTES = (int)getAttendanceSetting(
+    $conn,
+    'minimum_break_minutes',
+    5
+);
+
+$MAX_HOURS_PER_DAY = (int)getAttendanceSetting(
+    $conn,
+    'max_hours_per_day',
+    8
+);
+
+$snackBreakTime = (int)getAttendanceSetting(
+    $conn,
+    'snack_break_minutes',
+    15
+);
+
+$lunchBreakTime = (int)getAttendanceSetting(
+    $conn,
+    'lunch_break_minutes',
+    60
+);
 
 $current_time = date("H:i:s");
 $now = time();
@@ -63,16 +107,52 @@ if (isset($_POST['rfid'])) {
 
     $isFirstTimeToday = ($count['total'] == 0);
 
+    // logout of work
+    if ($current_time >= $timeOutAfternoonTime) {
+
+        if ($row && $row['time_out'] == null) {
+
+            $stmtOut = $conn->prepare("
+                UPDATE attendance_logs
+                SET time_out = NOW()
+                WHERE attendanceID = ?
+            ");
+
+            $stmtOut->bind_param("i", $row['attendanceID']);
+            $stmtOut->execute();
+
+            $_SESSION['status'] = "⛔ TIME OUT recorded.";
+
+            exit();
+        }
+
+        echo "Workday ended.";
+        exit();
+    }
+
     // time in
     if (!$row) {
 
-        $status = "PRESENT";
-
         if ($isFirstTimeToday) {
-            $status = ($current_time > "08:05:00") ? "LATE" : "ON TIME";
-        } else {
-            $status = "SESSION";
+
+    if (
+        $current_time < $timeInStart ||
+        $current_time > $lateTime
+    ) {
+            $_SESSION['status'] =
+                "⛔ Time-in allowed only between $timeInStart - $lateTime";
+
+            echo $_SESSION['status'];
+            exit();
         }
+
+        $status = ($current_time > $lateTime)
+            ? "late"
+            : "present";
+
+    } else {
+        $status = "SESSION";
+    }
 
         $stmtIn = $conn->prepare("
     INSERT INTO attendance_logs 
@@ -89,7 +169,7 @@ if (isset($_POST['rfid'])) {
 //    time out
     else if ($row['time_out'] == null) {
 
-          $timeIn = new DateTime($row['time_in']);
+    $timeIn = new DateTime($row['time_in']);
     $nowDT = new DateTime();
 
     $diff = $timeIn->diff($nowDT);
@@ -119,22 +199,74 @@ if (isset($_POST['rfid'])) {
         $last_timeout = strtotime($row['time_out']);
         $break_minutes = ($now - $last_timeout) / 60;
 
-        if ($break_minutes < $MIN_BREAK_MINUTES) {
-            $remaining = ceil($MIN_BREAK_MINUTES - $break_minutes);
-            $_SESSION['status'] = " Wait {$remaining} more minutes..";
-        } else {
+         $currentHour = date("H:i:s");
 
-            $status = ($current_time > "08:05:00") ? "late" : "present";
+        if (
+             $currentHour >= $timeOutMorningTime &&
+             $currentHour <= $timeInAfternoonTime
+        ) {
 
-            $stmtNew = $conn->prepare("
-                INSERT INTO attendance_logs (studentID, log_date, time_in, status, rfid_uid)
-                VALUES (?, CURDATE(), NOW(), ?, ?)
-            ");
-            $stmtNew->bind_param("sss", $studentID, $status, $rfid);
-            $stmtNew->execute();
+        if ($break_minutes < $lunchBreakTime) {
 
-            $_SESSION['status'] = " NEW SESSION STARTED!";
+                $remaining = ceil($lunchBreakTime - $break_minutes);
+
+                $_SESSION['status'] =
+                    "🍱 Lunch break ongoing. Wait {$remaining} more minutes.";
+
+                echo $_SESSION['status'];
+                exit();
+            }
+
+            $breakType = "LUNCH BREAK";
+        }else {
+
+            if ($break_minutes < $MIN_BREAK_MINUTES) {
+
+                $remaining = ceil($MIN_BREAK_MINUTES - $break_minutes);
+
+                $_SESSION['status'] =
+                    "☕ Break ongoing. Wait {$remaining} more minutes.";
+
+                echo $_SESSION['status'];
+                exit();
+            }
+
+            $breakType = "SHORT BREAK";
         }
+
+        $status = "present";
+
+        $stmtNew = $conn->prepare("
+            INSERT INTO attendance_logs
+            (studentID, log_date, time_in, status, rfid_uid)
+            VALUES (?, CURDATE(), NOW(), ?, ?)
+        ");
+
+        $stmtNew->bind_param("sss", $studentID, $status, $rfid);
+        $stmtNew->execute();
+
+        $_SESSION['status'] =
+            "✅ RETURNED FROM {$breakType}";
+
+        echo $_SESSION['status'];
+            exit();
+
+        // if ($break_minutes < $MIN_BREAK_MINUTES) {
+        //     $remaining = ceil($MIN_BREAK_MINUTES - $break_minutes);
+        //     $_SESSION['status'] = " Wait {$remaining} more minutes..";
+        // } else {
+
+        //     $status = ($current_time > "08:05:00") ? "late" : "present";
+
+        //     $stmtNew = $conn->prepare("
+        //         INSERT INTO attendance_logs (studentID, log_date, time_in, status, rfid_uid)
+        //         VALUES (?, CURDATE(), NOW(), ?, ?)
+        //     ");
+        //     $stmtNew->bind_param("sss", $studentID, $status, $rfid);
+        //     $stmtNew->execute();
+
+        //     $_SESSION['status'] = " NEW SESSION STARTED!";
+        // }
     }
 }
 echo $_SESSION['status'] ?? "UNKNOWN STATUS";

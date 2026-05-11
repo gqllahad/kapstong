@@ -85,7 +85,6 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     <p>You must change your password before continuing.</p>
                       <a href="../logoutPhase.php" class="force-modal-close-profile">&times;</a>
                 </div>
-            
 
             <form action="functions/settings.php" method="POST">
                 <input type="hidden" name="userID" value="<?= $_SESSION['user_id']; ?>">

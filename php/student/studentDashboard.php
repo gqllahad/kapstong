@@ -41,7 +41,7 @@ $documents = getStudentDocuments($conn, $studentID);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 
-<body>
+<body data-student-id="<?= $studentID ?>">
 
     <header class="navbar">
         <h1>OJT Student Dashboard</h1>
@@ -64,7 +64,7 @@ $documents = getStudentDocuments($conn, $studentID);
                     <button id="student-tasks-btn"><i class="bi bi-journal-text"></i> My Tasks</button>
                 </li>
                 <li><button id="student-documents-btn"><i class="bi bi-file-earmark-text"></i>My Documents</button></li>
-                <li><button><i class="bi bi-chat-left-text"></i> Messages</button></li>
+                <li><button><i class="bi bi-chat-left-text"></i> Activity logs</button></li>
             </ul>
         </aside>
 
@@ -88,7 +88,7 @@ $documents = getStudentDocuments($conn, $studentID);
                     <img id="profilePic" src="<?php
                                                 echo isset($documents['profilePicture']) && !empty($documents['profilePicture'])
                                                     ? '../../uploads/student_uploads/' . $studentID . '/' . $documents['profilePicture']
-                                                    : '../../../uploads/default.jpg';
+                                                    : '../../uploads/default.jpg';
                                                 ?>">
                     <div class="change-overlay">Change Profile</div>
                 </div>
@@ -379,6 +379,172 @@ $documents = getStudentDocuments($conn, $studentID);
                 </div>
             </div>
 
+
+            <!-- ojt progress modal -->
+            <div class="view-progress-chart" id="view-progress-chart">
+                <div class="modal-header">
+                    <h3>OJT Progress</h3>
+                    <button id="closeProgressViewModal" class="modal-close-profile">&times;</button>
+                </div>
+
+
+                <div id="hoursView" class="view-section">
+
+                    <div class="progress-card">
+
+                        <h3>OJT Progress</h3>
+
+                        <div class="chart-wrapper">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+
+                        <div class="progress-summary">
+                           <p class="progress-percent" id="progressPercent">
+                                0% Completed
+                            </p>
+
+                            <p class="progress-text">
+                                You're steadily progressing through your OJT requirements.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+             <!-- notification modal -->
+            <div class="notification-container" id="notification-container">
+                    <div class="modal-header">
+                        <h3>Notifications</h3>
+
+                        <button id="closeNotificationViewModal"
+                            class="modal-close-profile">
+                            &times;
+                        </button>
+                    </div>
+
+                    <div class="notification-modal-content">
+
+                    <?php
+                        $alerts = getStudentAlerts($conn, $studentID);
+                    ?>
+
+                    <ul class="alerts-list scrollable">
+
+                        <?php if (count($alerts) > 0): ?>
+
+                            <?php foreach ($alerts as $alert): ?>
+
+                                <li class="alert-item <?= htmlspecialchars($alert['type']) ?>">
+
+                                    <div class="alert-content">
+
+                                        <span class="alert-icon">
+                                            <?php
+                                                if ($alert['type'] === 'warning') {
+                                                    echo "⚠️";
+                                                } elseif ($alert['type'] === 'danger') {
+                                                    echo "⏰";
+                                                } elseif ($alert['type'] === 'critical') {
+                                                    echo "🚨";
+                                                } else {
+                                                    echo "ℹ️";
+                                                }
+                                            ?>
+                                        </span>
+
+                                        <span class="alert-message">
+                                            <?= htmlspecialchars($alert['message']) ?>
+                                        </span>
+
+                                    </div>
+
+                                    <?php if (!empty($alert['action'])): ?>
+
+                                        <button class="alert-btn"
+                                            onclick="handleAlert('<?= $alert['action'] ?>','<?= $alert['id'] ?? '' ?>')">
+                                            View
+                                        </button>
+
+                                    <?php endif; ?>
+
+                                </li>
+
+                            <?php endforeach; ?>
+
+                        <?php else: ?>
+
+                            <li class="alert-item success">
+                                🎉 No notifications right now.
+                            </li>
+
+                        <?php endif; ?>
+
+                    </ul>
+
+                </div>
+            </div>
+
+            <!-- attendance modal -->
+             <div class="attendance-container" id="attendance-container">
+                <div class="modal-header">
+                    <h3>Attendance</h3>
+                    <button id="closeAttendanceViewModal"
+                        class="modal-close-profile">
+                        &times;
+                    </button>
+                </div>
+
+                <div class="top-bar">
+
+                    <div class="top-header">
+                        <h3 class="table-title">Activity Logs</h3>
+                        <p>Monitor system actions and user activities.</p>
+                    </div>
+
+                    <div class="search-filter">
+                        <i class="bi bi-search search-icon"></i>
+                        <div class="filter-group">
+
+                            <select id="moduleFilter">
+                                <option value="">All Attendance</option>
+                                <option value="present">Present</option>
+                                <option value="late">Late</option>
+                                <option value="excused">Excused</option>
+                                <option value="absent">Absent</option>
+                            </select>
+
+                        </div>
+                    </div>
+
+                </div>
+
+              <div class="table-container-attendance">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
+                                <th>Status</th>
+                                <th>Total Hours</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="attendanceReportBody">
+                             <?php
+                                $category = $_POST['category'] ?? '';
+                                echo renderStudentAttendanceTable($conn, $studentID, $category);
+                                ?>
+                        </tbody>
+
+                    </table>
+
+                 </div>
+
+             </div>
+
             <!-- dashboard -->
             <section class="student-dashboard" id="student-dashboard">
                 <section class="title-header">
@@ -387,14 +553,20 @@ $documents = getStudentDocuments($conn, $studentID);
                 </section>
 
                 <section class="cards">
-                    <div class="card pending-task">
-                        <h3>OJT Status</h3>
-                        <p>View your current OJT assignments.</p>
+                    <div class="card pending-task" id="ojt-progress-btn">
+                        <h3>OJT Progress</h3>
+                        <p>Track your hours and training progress.</p>
                     </div>
-                    <div class="card notification">
+                    <div class="card notification" id="notification-btn">
                         <h3>Notifications</h3>
                         <p>Check announcements from your mentor.</p>
                     </div>
+
+                    <div class="card attendance" id="attendance-btn">
+                        <h3>Attendance</h3>
+                        <p>View your daily time-in and time-out logs.</p>
+                    </div>
+
                     <div class="card submitted-task">
                         <h3>Documents</h3>
                         <p>Upload or review submitted reports.</p>
@@ -404,12 +576,30 @@ $documents = getStudentDocuments($conn, $studentID);
 
                 <section class="dashboard-charts">
                     <section class="wrapper line-chart">
-                        <h2>Line Chart (Users per Role)</h2>
+                         <h2>Your Attendance Progress (Last 30 Days)</h2>
+                         <p class="chart-subtitle">Track your daily attendance consistency</p>
+                        <div class="attendance-legend">
+                        <span class="present">
+                            <i></i>
+                            1.0 = Present
+                        </span>
+                        <span class="late">
+                            <i></i>
+                            0.5 = Late
+                        </span>
+                        <span class="absent">
+                            <i></i>
+                            0 = Absent
+                        </span>
+                    </div>
                         <canvas id="lineChart"></canvas>
                     </section>
 
                     <section class="wrapper pie-chart">
-                        <h2>Attendance Evaluation</h2>
+                        <h2>Task Completion Overview</h2>
+                         <p class="chart-subtitle">
+                            Summary of your task progress and status.
+                        </p>
                         <canvas id="pieChart"></canvas>
                     </section>
                 </section>

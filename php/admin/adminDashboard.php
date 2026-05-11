@@ -312,7 +312,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <input type="number" id="requiredHours" placeholder="e.g. 600">
                     </div>
 
-                    <div class="form-row">
+                    <!-- <div class="form-row">
 
                         <div class="form-group">
                             <label>Start Date</label>
@@ -324,7 +324,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <input type="date" id="endDate">
                         </div>
 
-                    </div>
+                    </div> -->
 
                     <div class="form-group">
                         <label>Status</label>
@@ -457,8 +457,9 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <div class="rfid-body">
 
                     <div class="form-group">
-                        <label>Enable RFID Attendance</label>
-                        <select>
+                        <label for="rfid_enabled">Enable RFID Attendance</label>
+
+                        <select id="rfid_enabled" name="rfid_enabled">
                             <option value="1">Enabled</option>
                             <option value="0">Disabled</option>
                         </select>
@@ -466,43 +467,54 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                     <div class="form-group">
                         <label>Morning Time In</label>
-                        <input type="time">
+                        <input type="time" id="morning_time_in" name="morning_time_in">
                     </div>
 
                     <div class="form-group">
-                        <label>Cut-off Time (Late Threshold)</label>
-                        <input type="time">
+                        <label for="morning_time_out">
+                            Morning Time Out
+                        </label>
+
+                        <input
+                            type="time"
+                            id="morning_time_out"
+                            name="morning_time_out"
+                        >
+                    </div>
+
+                     <div class="form-group">
+                        <label for="afternoon_time_in">Afternoon Time In</label>
+                        <input type="time" id="afternoon_time_in" name="afternoon_time_in">
                     </div>
 
                     <div class="form-group">
-                        <label>Time Out</label>
-                        <input type="time">
+                        <label for="afternoon_time_out">Afternoon Time Out</label>
+                        <input type="time" id="afternoon_time_out" name="afternoon_time_out">
                     </div>
 
-                    <div class="form-group">
-                        <label>Allowed Late Minutes</label>
-                        <input type="number" placeholder="e.g. 15">
+                     <div class="form-group">
+                        <label for="allowed_late_minutes">
+                            Allowed Late Minutes
+                        </label>
+
+                        <input
+                            type="number"
+                            id="allowed_late_minutes"
+                            name="allowed_late_minutes"
+                            placeholder="e.g. 15"
+                            min="0"
+                        >
+
+                        <small style="margin:10px;">
+                            Students arriving after the allowed minutes
+                            will automatically be marked late.
+                        </small>
                     </div>
 
-                    <div class="form-group">
-                        <label>RFID Device Mode</label>
-                        <select>
-                            <option value="AUTO">Auto Scan</option>
-                            <option value="MANUAL">Manual Approval</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Allow Multiple Scans per Day</label>
-                        <select>
-                            <option value="NO">No</option>
-                            <option value="YES">Yes</option>
-                        </select>
-                    </div>
-
-                    <div class="rfid-actions">
-                        <button class="save-btn">Save Settings</button>
-                        <button class="cancel-btn">Cancel</button>
+                   <div class="rfid-actions">
+                        <button type="button" class="save-btn" onclick="saveRfidSettings()">
+                            Save Settings
+                        </button>
                     </div>
 
                 </div>
@@ -726,25 +738,34 @@ if ($_SESSION['role'] !== "ADMIN") {
 
 
                     <section class="wrapper bar-chart">
-                        <h2>Bar Chart</h2>
+                        <h2>Attendance per Day (Last 7 Days)</h2>
                         <canvas id="barChart"></canvas>
                     </section>
 
                     <section class="deadline-container">
-                        <p>Deadlines</p>
-                        <div class="task-item">
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum, tempore. Inventore dignissimos, a sed iusto odit officiis nihil aliquam, in molestiae reiciendis quae ducimus numquam expedita rem necessitatibus magni commodi?</p>
-                        </div>
+                        <p>At-Risk Students</p>
+
+                        <div id="risk-list"></div>
                     </section>
 
                     <section class="wrapper line-chart">
-                        <h2>Line Chart</h2>
+                        <h2>Attendance Trend (Last 30 Days)</h2>
                         <canvas id="lineChart"></canvas>
                     </section>
 
                     <section class="wrapper-pie pie-chart">
-                        <h2>Pie Chart </h2>
-                        <canvas id="pieChart"></canvas>
+                        <h2>Attendance Overview</h2>
+
+                        <div class="pie-grid">
+                            <canvas id="pieChart"></canvas>
+                            <div class="pie-summary">
+                                <h3>Attendance Health</h3>
+                                <p id="health-score">--%</p>
+                                <small id="total-attendance">
+                                    Total Attendance: --
+                                </small>
+                            </div>
+                        </div>
                     </section>
 
                 </section>

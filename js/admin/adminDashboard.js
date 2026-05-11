@@ -569,21 +569,11 @@ function refreshAssignStudentList() {
 
 
 function loadBarChart() {
-    fetch("../../php/admin/functions/getChartData.php")
+    fetch("../../php/admin/functions/getBarChartData.php")
         .then(res => res.json())
         .then(data => {
 
             const ctx = document.getElementById('barChart');
-
-            //colors
-            const pieColors = data.labels.map(label => {
-                if (label === "ADMIN") {
-                    return "#5c77f0";
-                } else if (label === "student") {
-                    return "#4e69e0";
-                }
-                return "#6c757d";
-            });
 
             if (window.barChartInstance) {
                 window.barChartInstance.destroy();
@@ -594,30 +584,19 @@ function loadBarChart() {
                 data: {
                     labels: data.labels,
                     datasets: [{
-                        label: 'Users',
+                        label: 'Attendance per Day (Last 7 Days)',
                         data: data.values,
-                        borderColor: '#5c77f0',
-                        backgroundColor: 'rgba(92, 119, 240, 0.2)',
-                        fill: true,
-                        tension: 0.3,
-                        pointHoverRadius: 6,
-                        pointRadius: 5
+                        backgroundColor: "#60a5fa",
+                        borderRadius: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            display: false
                         }
-                    },
-                    tooltip: {
-                        enabled: true
                     },
                     scales: {
                         y: {
@@ -628,26 +607,16 @@ function loadBarChart() {
             });
 
         })
-        .catch(err => console.error("Line chart error:", err));
+        .catch(err => console.error("Bar chart error:", err));
 }
 
 // line chart
 function loadLineChart() {
-    fetch("../../php/admin/functions/getChartData.php")
+    fetch("../../php/admin/functions/getLineChartData.php")
         .then(res => res.json())
         .then(data => {
 
             const ctx = document.getElementById('lineChart');
-
-            //colors
-            const pieColors = data.labels.map(label => {
-                if (label === "ADMIN") {
-                    return "#5c77f0";
-                } else if (label === "student") {
-                    return "#4e69e0";
-                }
-                return "#6c757d";
-            });
 
             if (window.lineChartInstance) {
                 window.lineChartInstance.destroy();
@@ -658,31 +627,34 @@ function loadLineChart() {
                 data: {
                     labels: data.labels,
                     datasets: [{
-                        label: 'Users',
+                        label: 'Attendance Trend (Last 30 Days)',
                         data: data.values,
-                        borderColor: '#5c77f0',
-                        backgroundColor: 'rgba(92, 119, 240, 0.2)',
+
+                        borderColor: '#60a5fa',
+                        backgroundColor: 'rgba(96, 165, 250, 0.2)',
+
                         fill: true,
-                        tension: 0.3,
-                        pointHoverRadius: 6,
-                        pointRadius: 5
+                        tension: 0.4,
+
+                        pointRadius: 5,
+                        pointHoverRadius: 7
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+
                     interaction: {
                         mode: 'index',
                         intersect: false
                     },
+
                     plugins: {
                         legend: {
                             position: 'bottom'
                         }
                     },
-                    tooltip: {
-                        enabled: true
-                    },
+
                     scales: {
                         y: {
                             beginAtZero: true
@@ -698,25 +670,22 @@ function loadLineChart() {
 
 // pie chart
 function loadPieChart() {
-    fetch("../../php/admin/functions/getChartData.php")
+    fetch("../../php/admin/functions/getDonutChartData.php")
         .then(res => res.json())
         .then(data => {
 
             const ctx = document.getElementById('pieChart');
 
-            //colors
-            const pieColors = data.labels.map(label => {
-                if (label === "ADMIN") {
-                    return "#5c77f0";
-                } else if (label === "student") {
-                    return "#4e69e0"; 
-                }
-                return "#6c757d"; 
-            });
-
             if (window.pieChartInstance) {
                 window.pieChartInstance.destroy();
             }
+
+            const colors = {
+                Present: "#22c55e",
+                Late: "#facc15",
+                Absent: "#ef4444",
+                Excused: "#60a5fa"
+            };
 
             window.pieChartInstance = new Chart(ctx, {
                 type: 'doughnut',
@@ -724,7 +693,8 @@ function loadPieChart() {
                     labels: data.labels,
                     datasets: [{
                         data: data.values,
-                         backgroundColor: pieColors
+                        backgroundColor: data.labels.map(l => colors[l] || "#94a3b8"),
+                        borderWidth: 0
                     }]
                 },
                 options: {
@@ -734,12 +704,70 @@ function loadPieChart() {
                             position: 'bottom'
                         }
                     },
-                    cutout : '70%'
+
+                    cutout: '65%'
                 }
             });
 
         })
-        .catch(err => console.error("Pie chart error:", err));
+        .catch(err => console.error("Donut chart error:", err));
+}
+
+// doughnut chart health score
+function loadHealthScore() {
+
+    fetch("../../php/admin/functions/getAttendanceHealthScore.php")
+        .then(res => res.json())
+        .then(data => {
+
+            document.getElementById("health-score").innerText = data.score + "%";
+
+            const total =
+                Number(data.present) +
+                Number(data.late) +
+                Number(data.absent) +
+                Number(data.excused);
+
+            document.getElementById("total-attendance").innerText =
+                "Total Attendance: " + total;
+        });
+}
+
+// at risk students
+function loadRiskStudents() {
+
+    console.log("Risk loader triggered");
+    fetch("../../php/admin/functions/getAtRiskStudents.php")
+        .then(res => res.json())
+        .then(data => {
+
+            const container = document.getElementById("risk-list");
+            container.innerHTML = "";
+
+            data.forEach(student => {
+
+                let color = "info";
+
+                if (student.risk === "HIGH") color = "danger";
+                if (student.risk === "MEDIUM") color = "warning";
+
+                container.innerHTML += `
+                    <div class="task-item ${color}">
+                        <strong>Student: ${student.studentID}</strong>
+                        <p>
+                            Absents: ${student.absents} |
+                            Lates: ${student.lates}
+                        </p>
+                        <small>
+                            Tasks: ${student.overdue_tasks} overdue |
+                            Progress: ${student.progress}
+                        </small>
+                        <span class="risk-tag">${student.risk} RISK</span>
+                    </div>
+                `;
+            });
+
+        });
 }
 
 // evaluation settings
@@ -792,6 +820,102 @@ function saveEvaluationSettings() {
 
     }).catch(() => {
     showToast("Server error occurred", "error");
+    });
+}
+
+// rfid settings
+
+function loadRfidSettings() {
+
+    document.getElementById("rfid_enabled")
+        .addEventListener("change", function () {
+            toggleRfidInputs(this.value);
+        });
+
+    fetch("functions/getRfidSettings.php")
+    .then(res => res.json())
+    .then(data => {
+
+        document.querySelector("[name='rfid_enabled']").value = data.rfid_enabled;
+        document.getElementById("morning_time_in").value = data.morning_time_in;
+        document.getElementById("morning_time_out").value = data.morning_time_out;
+        document.getElementById("afternoon_time_in").value = data.afternoon_time_in;
+        document.getElementById("afternoon_time_out").value = data.afternoon_time_out;
+        document.getElementById("allowed_late_minutes").value = data.allowed_late_minutes;
+
+        toggleRfidInputs(data.rfid_enabled);
+    });
+}
+
+function toggleRfidInputs(isEnabled) {
+
+    const inputs = [
+        "morning_time_in",
+        "morning_time_out",
+        "afternoon_time_in",
+        "afternoon_time_out",
+        "allowed_late_minutes"
+    ];
+
+    inputs.forEach(id => {
+        const el = document.getElementById(id);
+
+        if (el) {
+            el.disabled = (isEnabled == "0");
+        }
+    });
+}
+
+function saveRfidSettings() {
+
+    const formData = new URLSearchParams();
+
+    formData.append("rfid_enabled",
+        document.querySelector("[name='rfid_enabled']").value
+    );
+
+    formData.append("morning_time_in",
+        document.getElementById("morning_time_in").value
+    );
+
+    formData.append("morning_time_out",
+        document.getElementById("morning_time_out").value
+    );
+
+    formData.append("afternoon_time_in",
+        document.getElementById("afternoon_time_in").value
+    );
+
+    formData.append("afternoon_time_out",
+        document.getElementById("afternoon_time_out").value
+    );
+
+    formData.append("allowed_late_minutes",
+        document.getElementById("allowed_late_minutes").value
+    );
+
+    fetch("functions/saveRfidSettings.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        showToast(data.message, data.status ? "success" : "error");
+
+        if (data.status) {
+            setTimeout(() => {
+                rfidAttendance.classList.remove("show");
+                overlay.classList.remove("show");
+            }, 500);
+        }
+
+    })
+    .catch(() => {
+        showToast("Server error occurred", "error");
     });
 }
 
@@ -967,6 +1091,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loadBarChart();   
     loadPieChart();   
     loadLineChart();
+    loadRiskStudents();
+    loadHealthScore();
 });
 
 // menu (Upper) 
@@ -1027,6 +1153,7 @@ adminDashboardBtn.addEventListener("click", () => {
 
     adminApproval.style.display = "none";
     adminPreparation.style.display = "none";
+
 });
 
 adminApprovalBtn.addEventListener("click", () => {
@@ -1564,6 +1691,8 @@ closeDeparmentManagementModalBtn.addEventListener("click", () => {
 rfidAttendanceBtn.addEventListener("click", () => {
     overlay.classList.add("show");
     rfidAttendance.classList.add("show");
+
+    loadRfidSettings();
 });
 closeRfidAttendanceBtn.addEventListener("click", () => {
      overlay.classList.remove("show");

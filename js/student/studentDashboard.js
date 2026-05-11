@@ -1,6 +1,8 @@
 const sideBar = document.querySelector('.sidebar');
 const mainContent = document.querySelector('.content');
 
+const studentID = document.body.dataset.studentId;
+
 // menu profile
 const menuToggle = document.getElementById("menuToggle");
 const profileMenu = document.getElementById("profileMenu");
@@ -105,6 +107,20 @@ const closeViewTaskDetails = document.getElementById("closeTaskViewModal");
 
 const modalContainer = document.getElementById("view-task-container");
 const statusMessage = document.getElementById("taskStatusMessage");
+
+// verified dashboard cards
+const progressCardBtn = document.getElementById("ojt-progress-btn");
+const progressCard = document.getElementById("view-progress-chart");
+const closeProgressCard = document.getElementById("closeProgressViewModal");
+
+const notificationCardBtn = document.getElementById("notification-btn");
+const notificationCard = document.getElementById("notification-container");
+const closeNotificationCard = document.getElementById("closeNotificationViewModal");
+
+const attendanceCardBtn = document.getElementById("attendance-btn");
+const attendanceCard = document.getElementById("attendance-container");
+const closeAttendanceCard = document.getElementById("closeAttendanceViewModal");
+
 
 // task array
 let allTasks = [];
@@ -425,6 +441,54 @@ function openTaskDetails(taskID) {
         });
 }
 
+// handler alerts
+function handleAlert(action, id = null) {
+
+    switch(action) {
+
+        case "viewTask":
+
+            if (id){
+                notificationCard.classList.remove("show");
+                openTaskDetails(id);
+            }
+            break;
+
+        case "openAttendance":
+            openAttendanceModal();
+            break;
+
+        case "viewProgress":
+            openProgressModal();
+            break;
+    }
+}
+
+function openProgressModal(){
+    notificationCard.classList.remove("show");
+    progressCard.classList.add("show");
+
+    loadStudentProgressChart(studentID);
+}
+
+function  openAttendanceModal(){
+    notificationCard.classList.remove("show");
+    attendanceCard.classList.add("show");
+}
+
+// attendance card
+// function loadStudentAttendanceTable(studentID) {
+
+//     fetch("student_functions/getStudentAttendanceTable.php?studentID=" + studentID, {
+//         credentials: "include"
+//     })
+//     .then(res => res.text())
+//     .then(data => {
+//         document.getElementById("attendanceReportBody").innerHTML = data;
+//     })
+//     .catch(err => console.error("Attendance load error:", err));
+// }
+
 function renderTasks(filter) {
     const container = document.getElementById("taskList");
     container.innerHTML = "";
@@ -563,6 +627,85 @@ function loadTasks() {
 }
 
 
+// progress Chart View modal
+function loadStudentProgressChart(studentID) {
+
+    fetch("student_functions/getStudentProgress.php?studentID=" + studentID, {
+        credentials: "include"
+    })
+    .then(res => res.json())
+    .then(data => {
+        
+        const ctx = document.getElementById('progressChart');
+
+        if (!ctx) return;
+
+        if (window.progressChartInstance) {
+            window.progressChartInstance.destroy();
+        }
+
+        const completed = Number(data.completed ?? 0);
+        const required = Number(data.required ?? 500);
+        const remaining = required - completed;
+
+        const percent = ((completed / required) * 100).toFixed(1);
+
+        document.getElementById("progressPercent").innerText =
+        `${percent}% Completed`;
+
+        window.progressChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Remaining'],
+                datasets: [{
+                    data: [completed, remaining],
+                    backgroundColor: ['#22c55e', '#e5e7eb'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '75%',
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw} hrs`;
+                            }
+                        }
+                    }
+                }
+            },
+            plugins: [{
+                id: 'centerText',
+                beforeDraw(chart) {
+                    const { width } = chart;
+                    const { ctx } = chart;
+                    ctx.restore();
+
+                    const fontSize = (width / 10).toFixed(2);
+                    ctx.font = fontSize + "px sans-serif";
+                    ctx.textBaseline = "middle";
+
+                    const text = percent + "%";
+                    const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                    const textY = chart.height / 2;
+
+                    ctx.fillStyle = "#111827";
+                    ctx.fillText(text, textX, textY);
+                    ctx.save();
+                }
+            }]
+        });
+
+    })
+    .catch(err => console.error("Progress chart error:", err));
+}
+
+
 function closeResponseModal() {
     const modal = document.getElementById("responseModal");
     modal.classList.remove("show");
@@ -612,65 +755,131 @@ function removeFile(index) {
 
 // Chartss
 function loadPieChart() {
-    fetch("../../php/admin/functions/getChartData.php")
-        .then(res => res.json())
-        .then(data => {
 
-            const ctx = document.getElementById('pieChart');
+    fetch(`../../php/student/student_functions/getStudentTaskChart.php?studentID=${studentID}`)
 
-            //colors
-            const pieColors = data.labels.map(label => {
-                if (label === "ADMIN") {
-                    return "#5c77f0";
-                } else if (label === "student") {
-                    return "#4e69e0";
-                }
-                return "#6c757d";
-            });
-            
-            if (window.pieChartInstance) {
-                window.pieChartInstance.destroy();
+    .then(res => res.json())
+
+    .then(data => {
+
+        const ctx = document.getElementById('pieChart');
+
+        if (!data.values || data.values.length === 0) {
+
+            data.labels = ["No Tasks Yet"];
+            data.values = [1];
+
+            data.empty = true;
+        }
+
+        const colors = data.labels.map(status => {
+
+            if (status === "APPROVED") {
+                return "#22c55e";
             }
 
-            window.pieChartInstance = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        data: data.values,
-                        backgroundColor: pieColors
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
+            if (status === "SUBMITTED") {
+                return "#3b82f6";
+            }
+
+            if (status === "IN PROGRESS") {
+                return "#facc15";
+            }
+
+            if (status === "REJECTED") {
+                return "#ef4444";
+            }
+
+            if (status === "NOT STARTED") {
+                return "#9ca3af";
+            }
+
+            return "#d1d5db";
+        });
+
+        if (window.pieChartInstance) {
+            window.pieChartInstance.destroy();
+        }
+
+        window.pieChartInstance = new Chart(ctx, {
+
+            type: 'doughnut',
+
+            data: {
+                labels: data.labels,
+
+                datasets: [{
+                    data: data.values,
+                    backgroundColor: colors,
+                    borderWidth: 2,
+                    borderColor: "#ffffff"
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+
+                cutout: '70%',
+
+                plugins: {
+
+                    legend: {
+                        position: 'bottom',
+
+                        labels: {
+                            padding: 18,
+                            usePointStyle: true,
+                            font: {
+                                size: 11
+                            }
                         }
+                    },
+
+                    tooltip: {
+                        enabled: !data.empty
                     }
                 }
-            });
+            }
+        });
 
-        })
-        .catch(err => console.error("Pie chart error:", err));
+        let existing = document.querySelector(".chart-empty-message");
+
+        if (existing) {
+            existing.remove();
+        }
+
+        if (data.empty) {
+
+            const message = document.createElement("p");
+
+            message.className = "chart-empty-message";
+
+            message.textContent =
+                "No task records available yet.";
+
+            ctx.parentNode.appendChild(message);
+        }
+
+    })
+
+    .catch(err => console.error("Pie chart error:", err));
 }
 
 function loadLineChart() {
-    fetch("../../php/admin/functions/getChartData.php")
+    fetch(`../../php/student/student_functions/getStudentAttendanceTrend.php?studentID=${studentID}`)
         .then(res => res.json())
         .then(data => {
 
             const ctx = document.getElementById('lineChart');
 
-            //colors
-            const pieColors = data.labels.map(label => {
-                if (label === "ADMIN") {
-                    return "#5c77f0";
-                } else if (label === "student") {
-                    return "#4e69e0";
-                }
-                return "#6c757d";
-            });
+            if (!data.values || data.values.length === 0) {
+
+                data.labels = ["No Attendance Yet"];
+                data.values = [1];
+
+                data.empty = true;
+            }   
 
             if (window.lineChartInstance) {
                 window.lineChartInstance.destroy();
@@ -681,15 +890,47 @@ function loadLineChart() {
                 data: {
                     labels: data.labels,
                     datasets: [{
-                        label: 'Users',
-                        data: data.values,
-                        borderColor: '#5c77f0',
-                        backgroundColor: 'rgba(92, 119, 240, 0.2)',
-                        fill: true,
-                        tension: 0.3,
-                        pointHoverRadius: 6,
-                        pointRadius: 5
-                    }]
+                                    label: 'Attendance Trend',
+                                    data: data.values,
+                                    fill: true,
+                                    tension: 0.4,
+                                    borderWidth: 3,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7,
+                                    pointBorderWidth: 2,
+                                    backgroundColor: 'rgba(59, 130, 246, 0.10)',
+                                    pointBackgroundColor: data.values.map(value => {
+
+                                        if (value == 1) {
+                                            return '#22c55e';
+                                        }
+
+                                        if (value == 0.5) {
+                                            return '#facc15'; 
+                                        }
+
+                                        return '#ef4444'; 
+                                    }),
+
+                                    pointBorderColor: '#ffffff',
+
+                                    segment: {
+                                        borderColor: ctx => {
+
+                                            const value = ctx.p1.parsed.y;
+
+                                            if (value == 1) {
+                                                return '#22c55e'; 
+                                            }
+
+                                            if (value == 0.5) {
+                                                return '#facc15';
+                                            }
+
+                                            return '#ef4444'; 
+                                        }
+                                    }
+                                }]
                 },
                 options: {
                     responsive: true,
@@ -702,19 +943,35 @@ function loadLineChart() {
                             position: 'bottom'
                         }
                     },
-                    tooltip: {
-                        enabled: true
-                    },
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            max: 1
                         }
                     }
                 }
             });
 
+             let existing = document.querySelector(".chart-empty-message");
+
+        if (existing) {
+            existing.remove();
+        }
+
+        if (data.empty) {
+
+            const message = document.createElement("p");
+
+            message.className = "chart-empty-message";
+
+            message.textContent =
+                "No Attendance records available yet.";
+
+            ctx.parentNode.appendChild(message);
+        }
+
         })
-        .catch(err => console.error("Line chart error:", err));
+        .catch(err => console.error("Attendance trend error:", err));
 }
 
 
@@ -1199,6 +1456,9 @@ overlay.addEventListener('click', () => {
 
     submitTaskModal?.classList.remove("show");
     viewTaskDetails?.classList.remove("show");
+    progressCard?.classList.remove("show");
+    notificationCard?.classList.remove("show");
+    attendanceCard?.classList.remove("show");
 
     if (editForm) editForm.reset();
 });
@@ -1244,6 +1504,79 @@ if(studentTasksBtn){
 
         renderTasks(this.dataset.filter);
     });
+});
+}
+
+
+if(progressCardBtn){
+    progressCardBtn.addEventListener("click", () => {
+        progressCard.classList.add("show");
+        overlay.classList.add("show");
+
+        loadStudentProgressChart(studentID);
+    });
+
+    closeProgressCard.addEventListener("click", () => {
+        progressCard.classList.remove("show");
+        overlay.classList.remove("show");
+    });
+}
+
+if(notificationCardBtn){
+    notificationCardBtn.addEventListener("click", () => {
+        notificationCard.classList.add("show");
+        overlay.classList.add("show");
+    });
+
+    closeNotificationCard.addEventListener("click", () => {
+        notificationCard.classList.remove("show");
+        overlay.classList.remove("show");
+    });
+
+}
+
+if(attendanceCardBtn){
+    attendanceCardBtn.addEventListener("click", () => {
+        attendanceCard.classList.add("show");
+        overlay.classList.add("show");
+
+        // loadStudentAttendanceTable(studentID);
+    })
+
+    closeAttendanceCard.addEventListener("click", () => {
+        attendanceCard.classList.remove("show");
+        overlay.classList.remove("show");
+    })
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+    const moduleFilter = document.getElementById("moduleFilter");
+    const tableBody = document.getElementById("attendanceReportBody");
+
+    if (!moduleFilter || !tableBody) return;
+
+    function fetchLogs() {
+
+        const category = moduleFilter.value;
+
+        fetch("student_functions/searchStudentAttendanceTable.php", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "category=" + encodeURIComponent(category)
+        })
+        .then(res => res.text())
+        .then(data => {
+            tableBody.innerHTML = data;
+        })
+        .catch(err => console.error("Fetch error:", err));
+    }
+
+    moduleFilter.addEventListener("change", fetchLogs);
+
+    fetchLogs();
 });
 }
 
