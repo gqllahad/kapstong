@@ -1635,7 +1635,7 @@ tbody tr {
 
 .all-student-modal, .student-application-view, .student-application-approve, .student-application-reject, .supervisor-container
 ,.all-supervisor-modal, .all-unverified-modal, .assign-student-container, .supervisor-view, .ojt-program-container, .department-management-container,.department-management-modal,
-.rfid-attendance-container, .evaluation-settings-container, .requirements-setup-container{
+.rfid-attendance-container, .evaluation-settings-container, .requirements-setup-container, .create-course-modal{
     position: fixed;
     top: 50%;
     left: 50%;
@@ -1654,7 +1654,7 @@ tbody tr {
 
 .all-student-modal.show, .student-application-view.show, .student-application-approve.show, .student-application-reject.show, .supervisor-container.show 
 ,.all-supervisor-modal.show, .all-unverified-modal.show, .assign-student-container.show, .supervisor-view.show, .ojt-program-container.show, .department-management-container.show,.department-management-modal.show,
-.rfid-attendance-container.show, .evaluation-settings-container.show, .requirements-setup-container.show{
+.rfid-attendance-container.show, .evaluation-settings-container.show, .requirements-setup-container.show, .create-course-modal.show{
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
@@ -2241,7 +2241,7 @@ tbody tr {
     margin-top: 15px;
 }
 
-.rfid-actions {
+.rfid-actions, .modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;

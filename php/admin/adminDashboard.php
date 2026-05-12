@@ -298,33 +298,19 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 <div class="ojt-program-body">
 
-                    <div class="current-ojt-card">
+                    <div class="current-ojt-card" id="activeOJTContainer">
                         <?php echo renderActiveOJTCard($conn); ?>
                     </div>
 
                     <div class="form-group">
                         <label>Academic Year</label>
-                        <input type="text" id="academicYear" placeholder="e.g. 2026 - 2027">
+                        <input type="text" id="academicYear" placeholder="e.g. 2026 - 2027"  pattern="\d{4}\s*-\s*\d{4}">
                     </div>
 
                     <div class="form-group">
                         <label>Required OJT Hours</label>
                         <input type="number" id="requiredHours" placeholder="e.g. 600">
                     </div>
-
-                    <!-- <div class="form-row">
-
-                        <div class="form-group">
-                            <label>Start Date</label>
-                            <input type="date" id="startDate">
-                        </div>
-
-                        <div class="form-group">
-                            <label>End Date</label>
-                            <input type="date" id="endDate">
-                        </div>
-
-                    </div> -->
 
                     <div class="form-group">
                         <label>Status</label>
@@ -411,6 +397,8 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <button id="closeDepartmentManagement" class="modal-close">&times;</button>
                 </div>
 
+
+            <div class="user-management">
                 <div class="search-filter">
 
                     <div class="search-container">
@@ -424,6 +412,12 @@ if ($_SESSION['role'] !== "ADMIN") {
                     </div>
 
                 </div>
+                    <button class="assign-student-btn" onclick="openCreateCourseModal()">
+                        <span class="icon">+</span>
+                        <span class="text">Create Course</span>
+                    </button>
+                </div>
+                
 
                 <div class="table-container">
                     <table>
@@ -445,6 +439,52 @@ if ($_SESSION['role'] !== "ADMIN") {
                     </table>
                 </div>
                 <!-- Dept	Code	Head	Programs	Status	Action -->
+            </div>
+
+            <div class="create-course-modal" id="create-course-modal">
+                <div class="modal-header">
+                    <h3>Create Course</h3>
+                    <button id="closeCreateCourseModal" class="modal-close">&times;</button>
+                </div>
+
+                 <div class="modal-body">
+
+                    <div class="form-group">
+                        <label>Program Name</label>
+                        <input type="text" id="prg_name_create" placeholder="e.g. Bachelor of Science in Information Technology">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Program Acronym</label>
+                        <input type="text" id="prg_acro_create" placeholder="e.g. BSIT">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" id="prg_department_create" placeholder="e.g. College of Computing">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Department Code</label>
+                        <input type="text" id="prg_department_code_create" placeholder="e.g. CCIS">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="prg_status_create">
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="saveCourse()" class="save-btn">
+                            Save Course
+                        </button>
+                    </div>
+
+                </div>
+
             </div>
 
             <!-- rfid attendance -->

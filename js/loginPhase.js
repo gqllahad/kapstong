@@ -5,6 +5,10 @@ const signUp = document.getElementById("ls-switch");
 const text = "Granby OJT Tracking System";
 let index = 0;
 
+// loading
+const form = document.getElementById("loginForm");
+const loginLoadingScreen = document.getElementById("loginLoadingnScreen");
+const loadingScreen = document.getElementById("loadingScreen");
 
 // Invaded logins
 const invaderLogin = document.getElementById("invaderLogin");
@@ -45,7 +49,12 @@ function revealOnScroll() {
 }
 
 signUp.addEventListener("click", () => {
-  window.location.href = "signupStudent.php";
+  loadingScreen.classList.add("show");
+
+  setTimeout(()=>{
+    window.location.href = "signupStudent.php";
+  }, 1000);
+  
 });
 
 // login invader
@@ -80,6 +89,11 @@ if(modalSignSuccess){
 
     }, 4000);
 }
+
+// login
+form.addEventListener("submit" ,function () {
+    loginLoadingScreen.classList.add("show");
+});
 
 // incorrect login
 

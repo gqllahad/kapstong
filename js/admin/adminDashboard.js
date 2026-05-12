@@ -736,7 +736,6 @@ function loadHealthScore() {
 // at risk students
 function loadRiskStudents() {
 
-    console.log("Risk loader triggered");
     fetch("../../php/admin/functions/getAtRiskStudents.php")
         .then(res => res.json())
         .then(data => {
@@ -920,25 +919,67 @@ function saveRfidSettings() {
 }
 
 // ojt settings
+
+function loadActiveOJTCard() {
+
+    fetch("functions/getActiveOJTCard.php")
+    .then(res => res.text())
+    .then(html => {
+
+        document.getElementById("activeOJTContainer").innerHTML = html;
+
+    })
+    .catch(err => {
+        console.error(err);
+    });
+}
+
+function loadOJTSettings() {
+
+    fetch("functions/getOjtSettings.php")
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+
+            document.getElementById("academicYear").value =
+                data.academic_year || "";
+
+            document.getElementById("requiredHours").value =
+                data.required_hours || "";
+
+            document.getElementById("status").value =
+                data.status || "ACTIVE";
+        }
+
+    });
+
+}
+
 function saveOJTSettings() {
 
     const academicYear = document.getElementById("academicYear").value;
     const requiredHours = document.getElementById("requiredHours").value;
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
     const status = document.getElementById("status").value;
 
-    if (!academicYear || !requiredHours || !startDate || !endDate) {
-        alert("Please complete all fields.");
+    if (!academicYear && !requiredHours && !status) {
+        showToast("Please enter one field!", "error");
         return;
     }
 
     const formData = new URLSearchParams();
-    formData.append("academic_year", academicYear);
-    formData.append("required_hours", requiredHours);
-    formData.append("start_date", startDate);
-    formData.append("end_date", endDate);
-    formData.append("status", status);
+
+    if (academicYear) {
+        formData.append("academic_year", academicYear);
+    }
+
+    if (requiredHours) {
+        formData.append("required_hours", requiredHours);
+    }
+
+    if (status) {
+        formData.append("status", status);
+    }
 
     fetch("functions/saveOjtSettings.php", {
         method: "POST",
@@ -952,15 +993,13 @@ function saveOJTSettings() {
        showToast(data.message, data.success ? "success" : "error");
        if (data.success) {
 
-        document.getElementById("academicYear").value = "";
-        document.getElementById("requiredHours").value = "";
-        document.getElementById("startDate").value = "";
-        document.getElementById("endDate").value = "";
-        document.getElementById("status").value = "ACTIVE";
-        
+        loadActiveOJTCard();
+        loadOJTSettings();
+
+        ojtSetup.classList.remove("show");
         setTimeout(() => {
-            ojtSetup.classList.remove("show");
-            overlay.classList.remove("show");
+            
+             ojtSetup.classList.add("show");
         }, 500);
         
     }
@@ -1080,6 +1119,89 @@ function updateProgram() {
     })
     .catch(() => {
         showToast("Server error occurred.", "error");
+    });
+}
+
+function openCreateCourseModal(){
+    const modal = document.getElementById("create-course-modal");
+    const exitModal = document.getElementById("closeCreateCourseModal");
+
+    if (!modal) {
+        showToast("Create Course Modal not found", "error");
+        return;
+    }
+
+    departmentManagement.classList.remove("show");
+    modal.classList.add("show");
+
+    exitModal.addEventListener("click", () => {
+        modal.classList.remove("show");
+        departmentManagement.classList.add("show");
+
+    });
+
+    overlay.addEventListener("click", () => {
+        modal.classList.remove("show");
+        departmentManagement.classList.remove("show");
+    })
+
+}
+
+function saveCourse() {
+
+    const prg_name = document.getElementById("prg_name_create").value.trim();
+    const prg_acro = document.getElementById("prg_acro_create").value.trim();
+    const prg_department = document.getElementById("prg_department_create").value.trim();
+    const prg_department_code = document.getElementById("prg_department_code_create").value.trim();
+    const prg_status = document.getElementById("prg_status_create").value;
+
+    console.log(prg_name, "HAHA");
+
+    if (!prg_name || !prg_acro || !prg_department || !prg_department_code) {
+        showToast("Please complete all fields!!", "error");
+        return;
+    }
+
+    const formData = new URLSearchParams();
+
+    formData.append("prg_name", prg_name);
+    formData.append("prg_acro", prg_acro);
+    formData.append("prg_department", prg_department);
+    formData.append("prg_department_code", prg_department_code);
+    formData.append("prg_status", prg_status);
+
+    fetch("functions/saveCourse.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        showToast(data.message, data.success ? "success" : "error");
+
+        if (data.success) {
+
+            document.getElementById("prg_name_create").value = "";
+            document.getElementById("prg_acro_create").value = "";
+            document.getElementById("prg_department_create").value = "";
+            document.getElementById("prg_department_code_create").value = "";
+            document.getElementById("prg_status_create").value = "ACTIVE";
+
+            setTimeout(() => {
+                document.getElementById("create-course-modal").classList.remove("show");
+                departmentManagement.classList.add("show");
+            }, 500);
+
+            
+        }
+
+    })
+    .catch(err => {
+        console.error(err);
+        showToast("Server error occurred", "error");
     });
 }
 
@@ -1668,6 +1790,8 @@ document.getElementById("assign-btn").addEventListener("click", function () {
 ojtSetupBtn.addEventListener("click", () => {
     overlay.classList.add("show");
     ojtSetup.classList.add("show");
+
+    loadOJTSettings();
 });
 closeOjtSetupBtn.addEventListener("click", () => {
     overlay.classList.remove("show");

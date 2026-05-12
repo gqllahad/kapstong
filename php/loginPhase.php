@@ -228,7 +228,7 @@ if (isset($_GET['success'])) {
       <button id="ls-switch" class="ls-switch">Sign Up</button>
     </div>
 
-    <form action="starts.php" method="POST">
+    <form id="loginForm" action="starts.php" method="POST">
       <div class="login-container scroll-reveal">
         <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" class="logo-img" style="border-radius: 50%;">
         <h2>Sign In</h2>
@@ -253,7 +253,6 @@ if (isset($_GET['success'])) {
             class="login-submit"
             name="login-submit" />
         </div>
-
 
       </div>
     </form>
@@ -312,6 +311,24 @@ if (isset($_GET['success'])) {
 
   </div>
 </section>
+
+
+    <div id="loadingScreen" class="loading-screen">
+        <!-- <div class="loader"></div> -->
+        <div class="logo-loader">
+          <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" class="logo-img-loading">
+        </div>
+        <p>Signing up..</p>
+    </div>
+
+    <div id="loginLoadingnScreen" class="loading-screen">
+        <div class="logo-loader">
+          <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" class="logo-img-loading">
+        </div>
+        <p>Logging in..</p>
+    </div>
+
+
 </body>
 
 <script src="../js/loginPhase.js"></script>

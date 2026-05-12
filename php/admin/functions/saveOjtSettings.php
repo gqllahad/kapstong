@@ -2,42 +2,36 @@
 header('Content-Type: application/json');
 require_once("../../kapstongConnection.php");
 
-$academic_year = $_POST['academic_year'];
-$required_hours = $_POST['required_hours'];
-$start_date = $_POST['start_date'];
-$end_date = $_POST['end_date'];
-$status = $_POST['status'];
+$academic_year = $_POST['academic_year'] ?? null;
+$required_hours = $_POST['required_hours'] ?? null;
+$status = $_POST['status'] ?? null;
 
 $check = $conn->query("SELECT settingID FROM ojt_settings WHERE status='ACTIVE' LIMIT 1");
 
 if ($check->num_rows > 0 && $status == "ACTIVE") {
 
     $sql = "UPDATE ojt_settings 
-            SET academic_year=?, required_hours=?, start_date=?, end_date=?, status=?
+            SET academic_year=?, required_hours=?, status=?
             WHERE status='ACTIVE'";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-        "sisss",
+        "sis",
         $academic_year,
         $required_hours,
-        $start_date,
-        $end_date,
         $status
     );
 } else {
 
     $sql = "INSERT INTO ojt_settings 
-            (academic_year, required_hours, start_date, end_date, status)
-            VALUES (?, ?, ?, ?, ?)";
+            (academic_year, required_hours, status)
+            VALUES (?, ?, ?)";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-        "sisss",
+        "sis",
         $academic_year,
         $required_hours,
-        $start_date,
-        $end_date,
         $status
     );
 }
