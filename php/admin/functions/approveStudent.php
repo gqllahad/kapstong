@@ -1,5 +1,7 @@
 <?php
+require_once("../../auth/admin_auth.php");
 require_once("../../kapstongConnection.php");
+
 
 $studentID = $_POST['studentID'] ?? null;
 $rfid = $_POST['rfid'] ?? null;
@@ -52,8 +54,6 @@ elseif (!empty($no_rfid)) {
 else {
     exit("No approval action specified.");
 }
-
-
 
  // student_documents
     $docStmt = $conn->prepare("

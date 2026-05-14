@@ -2,6 +2,7 @@
 
 header('Content-Type: application/json');
 require_once("../../kapstongConnection.php");
+require_once("../../auth/admin_auth.php");
 
 $prg_name = $_POST['prg_name'] ?? null;
 $prg_acro = $_POST['prg_acro'] ?? null;

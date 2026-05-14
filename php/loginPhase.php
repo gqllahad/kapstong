@@ -314,7 +314,6 @@ if (isset($_GET['success'])) {
 
 
     <div id="loadingScreen" class="loading-screen">
-        <!-- <div class="loader"></div> -->
         <div class="logo-loader">
           <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" class="logo-img-loading">
         </div>

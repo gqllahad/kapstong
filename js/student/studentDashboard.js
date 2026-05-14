@@ -646,9 +646,11 @@ function loadStudentProgressChart(studentID) {
 
         const completed = Number(data.completed ?? 0);
         const required = Number(data.required ?? 500);
-        const remaining = required - completed;
+        const remaining = Math.max(required - completed, 0);
 
-        const percent = ((completed / required) * 100).toFixed(1);
+        const percent = required > 0
+            ? ((completed / required) * 100).toFixed(1)
+            : 0;
 
         document.getElementById("progressPercent").innerText =
         `${percent}% Completed`;

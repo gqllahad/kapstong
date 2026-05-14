@@ -301,7 +301,7 @@ function approveStudent(studentID) {
     const rfid = rfidInput?.value.trim();
 
     if (!rfid) {
-        alert("Please scan RFID first or use 'Approve Without RFID'.");
+        showToast("Please scan RFID first or use 'Approve Without RFID'.", "error");
         return;
     }
 
@@ -319,12 +319,12 @@ function approveStudent(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-        alert(response);
+        showToast(reponse, "success");
         closeApproveModal();
         location.reload();
     })
     .catch(err => {
-        console.error(err);
+        showToast(err, "error");
         approveBtn.disabled = false;
     });
 }
@@ -353,11 +353,11 @@ function approveWithoutRFID(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-        alert(response);
+        showToast(response, "success");
         closeApproveModal();
         location.reload();
     })
-    .catch(err => console.error(err));
+    showToast(err, "error");
 }
 
 
@@ -396,7 +396,7 @@ function rejectStudent(studentID) {
     const note = document.getElementById("rejectNote").value;
 
     if (!reason) {
-        alert("Please select a rejection reason");
+        showToast("Please select a rejection reason", "error");
         return;
     }
 
@@ -411,12 +411,12 @@ function rejectStudent(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-        alert("Student rejected successfully!");
+        showToast("Student rejected successfully!", "success");
 
         closeRejectModal();
         location.reload();
     })
-    .catch(err => console.error(err));
+    showToast(err, "error");
 }
 
 function closeSuperViewModal() {
@@ -531,8 +531,9 @@ function reAssignUser(studentID) {
     })
     .then(res => res.json())
     .then(data => {
-
+        
         if (data.status === "success") {
+            showToast("Student Reassigning...", "success");
 
              isReassignMode = true;
 
@@ -546,7 +547,7 @@ function reAssignUser(studentID) {
             AssignCloseBtn.style.display = "none";
 
         } else {
-            alert(data.message);
+            showToast(data.message, "error");
         }
 
     })
@@ -606,6 +607,24 @@ function loadBarChart() {
                 }
             });
 
+            let existing = document.querySelector(".chart-empty-message");
+
+        if (existing) {
+            existing.remove();
+        }
+
+        if (data.empty) {
+
+            const message = document.createElement("p");
+
+            message.className = "chart-empty-message";
+
+            message.textContent =
+                "No Task records available yet.";
+
+            ctx.parentNode.appendChild(message);
+        }
+
         })
         .catch(err => console.error("Bar chart error:", err));
 }
@@ -663,6 +682,24 @@ function loadLineChart() {
                 }
             });
 
+        let existing = document.querySelector(".chart-empty-message");
+
+        if (existing) {
+            existing.remove();
+        }
+
+        if (data.empty) {
+
+            const message = document.createElement("p");
+
+            message.className = "chart-empty-message";
+
+            message.textContent =
+                "No Attendance record trends yet.";
+
+            ctx.parentNode.appendChild(message);
+        }
+
         })
         .catch(err => console.error("Line chart error:", err));
 }
@@ -708,6 +745,24 @@ function loadPieChart() {
                     cutout: '65%'
                 }
             });
+
+        let existing = document.querySelector(".chart-empty-message");
+
+        if (existing) {
+            existing.remove();
+        }
+
+        if (data.empty) {
+
+            const message = document.createElement("p");
+
+            message.className = "chart-empty-message";
+
+            message.textContent =
+                "No Attendance Overview available yet.";
+
+            ctx.parentNode.appendChild(message);
+        }
 
         })
         .catch(err => console.error("Donut chart error:", err));
@@ -789,7 +844,7 @@ function saveEvaluationSettings() {
     const task = document.getElementById("taskWeight").value / 100;
 
      if (isNaN(attendance) || isNaN(progress) || isNaN(task)) {
-        alert("Please enter valid values.");
+        showToast("Please enter valid values.", "error");
         return;
     }
 
@@ -930,7 +985,7 @@ function loadActiveOJTCard() {
 
     })
     .catch(err => {
-        console.error(err);
+        showToast(err, "error");
     });
 }
 
@@ -1005,7 +1060,7 @@ function saveOJTSettings() {
     }
     })
     .catch(err => {
-       showToast("Server error occurred", "error");
+       showToast(err, "error");
     });
 }
 
@@ -1200,8 +1255,7 @@ function saveCourse() {
 
     })
     .catch(err => {
-        console.error(err);
-        showToast("Server error occurred", "error");
+        showToast(err, "error");
     });
 }
 
@@ -1590,8 +1644,7 @@ supervisorForm.addEventListener("submit", function (e) {
         }
     })
     .catch(err => {
-       console.error(err);
-        showToast("Something went wrong", "error");
+        showToast(err, "error");
     });
 });
 
@@ -1747,12 +1800,12 @@ document.getElementById("supervisorAssignSearch").addEventListener("keyup", func
 document.getElementById("assign-btn").addEventListener("click", function () {
 
     if (selectedStudentIDs.length === 0) {
-        alert("Please select at least one student.");
+        showToast("Please select at least one student.", "error");
         return;
     }
 
     if (!selectedSupervisorID) {
-        alert("Please select a supervisor.");
+        showToast("Please select a supervisor.", "error");
         return;
     }
 
@@ -1771,15 +1824,16 @@ document.getElementById("assign-btn").addEventListener("click", function () {
     .then(res => res.json())
     .then(data => {
 
-        alert(data.message);
-
         if (data.status === "success") {
-            location.reload();
+             showToast(data.message, "success");
+             setTimeout(() => {
+                location.reload();
+             }, 500);
+            
         }
     })
     .catch(err => {
-        alert("Something went wrong.");
-        console.log(err);
+        showToast("Something went wrong", "error");
     });
 
 });

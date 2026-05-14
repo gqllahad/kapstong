@@ -2,6 +2,7 @@
 
 session_start();
 require_once("../../kapstongConnection.php");
+require_once("../../auth/admin_auth.php");
 require_once("../../functions.php");
 
 header('Content-Type: application/json');
@@ -106,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         echo json_encode([
             "status" => "success",
-            "message" => "Students assigned successfully"
+            "message" => "Student(s) assigned successfully"
         ]);
     } catch (Exception $e) {
 

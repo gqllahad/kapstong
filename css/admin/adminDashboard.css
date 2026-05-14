@@ -2486,6 +2486,17 @@ tbody tr {
 .rfid-rescan:active {
     transform: scale(0.98);
 }
+/* empty charts */
+
+.chart-empty-message{
+    text-align: center;
+    margin-top: 12px;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    color: #94a3b8;
+}
 
 
 

@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once("../../kapstongConnection.php");
+require_once("../../auth/admin_auth.php");
 
 $academic_year = $_POST['academic_year'] ?? null;
 $required_hours = $_POST['required_hours'] ?? null;

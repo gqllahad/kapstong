@@ -529,6 +529,7 @@ $documents = getStudentDocuments($conn, $studentID);
                                 <th>Time Out</th>
                                 <th>Status</th>
                                 <th>Total Hours</th>
+                                <th>State</th>
                             </tr>
                         </thead>
 

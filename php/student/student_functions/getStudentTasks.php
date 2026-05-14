@@ -2,6 +2,7 @@
 session_start();
 header('Content-Type: application/json');
 require_once("../../kapstongConnection.php");
+require_once("../../auth/student_auth.php");
 
 $studentID = $_SESSION['studentID'];
 

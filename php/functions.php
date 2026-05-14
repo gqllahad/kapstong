@@ -956,12 +956,12 @@ function renderTaskAssignStudentList($conn, $superID, $search = '')
 
 function renderStudentMainAttendance($conn, $superID, $search = '', $status = '')
 {
-    $sql = "
+     $sql = "
         SELECT 
             attendance_logs.attendanceID,
             attendance_logs.log_date,
-            attendance_logs.time_in,
-            attendance_logs.time_out,
+            attendance_logs.first_time_in,
+            attendance_logs.final_time_out,
             attendance_logs.status,
             attendance_logs.total_hours,
             attendance_logs.remarks,
@@ -1004,7 +1004,7 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
         $params[] = $status;
     }
 
-    $sql .= " ORDER BY attendance_logs.created_at DESC";
+    $sql .= " ORDER BY attendance_logs.log_date DESC, attendance_logs.first_time_in DESC";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param($types, ...$params);
@@ -1031,8 +1031,8 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
             <tr>
                 <td>{$row['rfid_uid']}</td>
                 <td>{$row['log_date']}</td>
-                <td>{$row['time_in']}</td>
-                <td>{$row['time_out']}</td>
+                <td>{$row['first_time_in']}</td>
+                <td>{$row['final_time_out']}</td>
                 <td style='color:$color;font-weight:600'>" . strtoupper($row['status']) . "</td>
                 <td>{$row['total_hours']}</td>
                 <td>{$row['remarks']}</td>
@@ -1948,10 +1948,11 @@ function renderStudentAttendanceTable($conn, $studentID, $category = ''){
     $sql = "
         SELECT 
             log_date,
-            time_in,
-            time_out,
+            first_time_in,
+            final_time_out,
             status,
-            total_hours
+            total_hours,
+            current_state
         FROM attendance_logs
         WHERE studentID = ?
     ";
@@ -1984,13 +1985,26 @@ function renderStudentAttendanceTable($conn, $studentID, $category = ''){
 
         while ($row = $result->fetch_assoc()) {
 
+            $timeIn = $row['first_time_in']
+                ? date("h:i A", strtotime($row['first_time_in']))
+                : '--';
+
+            $timeOut = $row['final_time_out']
+                ? date("h:i A", strtotime($row['final_time_out']))
+                : '--';
+
+            $hours = $row['total_hours']
+                ? number_format($row['total_hours'], 2)
+                : '0.00';
+
             $output .= "
             <tr>
                 <td>" . date("M d, Y", strtotime($row['log_date'])) . "</td>
-                <td>{$row['time_in']}</td>
-                <td>{$row['time_out']}</td>
+                <td>{$timeIn}</td>
+                <td>{$timeOut}</td>
                 <td>{$row['status']}</td>
-                <td>{$row['total_hours']}</td>
+                <td>{$hours}</td>
+                <td>{$row['current_state']}</td>
             </tr>";
         }
 
@@ -1998,7 +2012,7 @@ function renderStudentAttendanceTable($conn, $studentID, $category = ''){
 
         $output .= "
         <tr>
-            <td colspan='5' style='text-align:center;'>No attendance found</td>
+            <td colspan='6' style='text-align:center;'>No attendance found</td>
         </tr>";
     }
 

@@ -267,7 +267,6 @@ function loadLineChart() {
         })
         .catch(err => console.error("Line chart error:", err));
 
-       
 }
 
 function loadTaskProgressChart() {

@@ -2,6 +2,7 @@
 
 header('Content-Type: application/json');
 require_once("../../kapstongConnection.php");
+require_once("../../auth/student_auth.php");
 
 $taskID = $_GET['taskID'] ?? '';
 

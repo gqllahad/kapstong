@@ -2,6 +2,7 @@
 
 header('Content-Type: application/json');
 require_once("../../kapstongConnection.php");
+require_once("../../auth/admin_auth.php");
 
 $sql = "SELECT academic_year, required_hours, status
         FROM ojt_settings

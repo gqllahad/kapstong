@@ -1,14 +1,25 @@
 <?php
 header('Content-Type: application/json');
 require_once("../../kapstongConnection.php");
+require_once("../../auth/admin_auth.php");
 
 $rfid_enabled = $_POST['rfid_enabled'] ?? 0;
 
-$morning_time_in = $_POST['morning_time_in'] ?? null;
-$morning_time_out = $_POST['morning_time_out'] ?? null;
+$morning_time_in = !empty($_POST['morning_time_in'])
+    ? date("H:i:s", strtotime($_POST['morning_time_in']))
+    : null;
 
-$afternoon_time_in = $_POST['afternoon_time_in'] ?? null;
-$afternoon_time_out = $_POST['afternoon_time_out'] ?? null;
+$morning_time_out = !empty($_POST['morning_time_out'])
+    ? date("H:i:s", strtotime($_POST['morning_time_out']))
+    : null;
+
+$afternoon_time_in = !empty($_POST['afternoon_time_in'])
+    ? date("H:i:s", strtotime($_POST['afternoon_time_in']))
+    : null;
+
+$afternoon_time_out = !empty($_POST['afternoon_time_out'])
+    ? date("H:i:s", strtotime($_POST['afternoon_time_out']))
+    : null;
 
 $allowed_late_minutes = $_POST['allowed_late_minutes'] ?? 0;
 
@@ -26,7 +37,7 @@ $settings = [
     "morning_time_out" => $morning_time_out,
     "afternoon_time_in" => $afternoon_time_in,
     "afternoon_time_out" => $afternoon_time_out,
-    "allowed_late_minutes" => $allowed_late_minutes
+    "late_threshold_minutes" => $allowed_late_minutes
 ];
 
 $stmt = $conn->prepare("

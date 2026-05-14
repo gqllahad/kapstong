@@ -1,8 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once("../../kapstongConnection.php");
-
-session_start();
+require_once("../../auth/student_auth.php");
 
 $studentID = $_SESSION['studentID'] ?? '';
 
@@ -37,8 +36,8 @@ if (!$row) {
     exit;
 }
 
-$completed = (int)$row['completed_hours'];
-$required = (int)$row['required_hours'];
+$completed = (float)$row['completed_hours'];
+$required = (float)$row['required_hours'];
 $remaining = max($required - $completed, 0);
 
 echo json_encode([

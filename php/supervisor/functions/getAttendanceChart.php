@@ -5,16 +5,17 @@ require_once("../../kapstongConnection.php");
 
 $sql = "
     SELECT 
-        DATE(log_date) AS log_date,
+        a.log_date,
 
-        SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) AS present_count,
-        SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) AS late_count,
-        SUM(CASE WHEN status = 'absent' THEN 1 ELSE 0 END) AS absent_count
+        SUM(CASE WHEN a.status = 'present' THEN 1 ELSE 0 END) AS present_count,
+        SUM(CASE WHEN a.status = 'late' THEN 1 ELSE 0 END) AS late_count,
 
-    FROM attendance_logs
+        (SELECT COUNT(*) FROM users WHERE role = 'student') -
+        SUM(CASE WHEN a.status IN ('present','late') THEN 1 ELSE 0 END) AS absent_count
 
-    GROUP BY DATE(log_date)
-    ORDER BY DATE(log_date) ASC
+    FROM attendance_logs a
+    GROUP BY a.log_date
+    ORDER BY a.log_date ASC
 ";
 
 $result = $conn->query($sql);
@@ -25,6 +26,7 @@ $late = [];
 $absent = [];
 
 while ($row = $result->fetch_assoc()) {
+
     $labels[] = $row['log_date'];
     $present[] = (int)$row['present_count'];
     $late[] = (int)$row['late_count'];

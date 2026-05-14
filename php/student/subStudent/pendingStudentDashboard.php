@@ -2,6 +2,7 @@
 
 session_start();
 require_once("../../kapstongConnection.php");
+require_once("../../auth/student_auth.php");
 require_once("../../functions.php");
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
