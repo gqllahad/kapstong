@@ -113,6 +113,19 @@ const rfidAttendance = document.getElementById("rfid-attendance-container");
 const evaluationSettings = document.getElementById("evaluation-settings-container");
 const requirementsSetup = document.getElementById("requirements-setup-container");
 
+const viewAllBtn = document.getElementById("view-all-btn");
+const viewAll = document.getElementById("view-all-modal");
+const closeViewAllBtn = document.getElementById("closeViewAllModal");
+
+// downloads
+const downloadAllStudentBtn = document.getElementById("downloadAllStudentBtn");
+const downloadAllStudent = document.getElementById("download-all-student-modal");
+const closeDownloadAllStudent = document.getElementById("closeAllStudentDownloadModal");
+
+const downloadAllSupervisorBtn = document.getElementById("downloadAllSupervisorBtn");
+const downloadAllSupervisor = document.getElementById("download-all-supervisor-modal");
+const closeDownloadAllSupervisor = document.getElementById("closeAllSupervisorDownloadModal");
+
 let selectedStudentIDs = [];
 let selectedSupervisorID = null;
 
@@ -718,10 +731,10 @@ function loadPieChart() {
             }
 
             const colors = {
-                Present: "#22c55e",
-                Late: "#facc15",
-                Absent: "#ef4444",
-                Excused: "#60a5fa"
+                 Present: "#3b82f6",
+                Late: "#93c5fd",
+                Absent: "#1d4ed8",
+                Excused: "#bfdbfe"
             };
 
             window.pieChartInstance = new Chart(ctx, {
@@ -796,31 +809,170 @@ function loadRiskStudents() {
         .then(data => {
 
             const container = document.getElementById("risk-list");
+
             container.innerHTML = "";
 
             data.forEach(student => {
 
-                let color = "info";
+                const progress = parseFloat(student.progress_percent);
 
-                if (student.risk === "HIGH") color = "danger";
-                if (student.risk === "MEDIUM") color = "warning";
+                let badgeClass = "track";
+                let badgeText = "ON TRACK";
+                let progressClass = "good";
+
+                if (progress < 75) {
+                    badgeClass = "behind";
+                    badgeText = "BEHIND";
+                    progressClass = "low";
+                }
+                else if (progress < 90) {
+                    badgeClass = "soon";
+                    badgeText = "DUE SOON";
+                    progressClass = "medium";
+                }
 
                 container.innerHTML += `
-                    <div class="task-item ${color}">
-                        <strong>Student: ${student.studentID}</strong>
-                        <p>
-                            Absents: ${student.absents} |
-                            Lates: ${student.lates}
-                        </p>
-                        <small>
-                            Tasks: ${student.overdue_tasks} overdue |
-                            Progress: ${student.progress}
-                        </small>
-                        <span class="risk-tag">${student.risk} RISK</span>
+                    <div class="task-item">
+
+                        <div class="student-top">
+
+                            <div class="student-info">
+                                <strong>${student.name}</strong>
+                                <span class="student-role">
+                                    ${student.role}
+                                </span>
+                            </div>
+
+                            <span class="status-badge ${badgeClass}">
+                                ${badgeText}
+                            </span>
+
+                        </div>
+
+                        <div class="progress-wrapper">
+
+                            <div class="progress-label">
+                                <span>
+                                    ${student.completed_hours} / 
+                                    ${student.required_hours} Hours
+                                </span>
+
+                                <span>
+                                    ${progress}%
+                                </span>
+                            </div>
+
+                            <div class="progress-bar">
+                               <div 
+                                    class="progress-fill ${progressClass}"
+                                    style="width:${student.progress_percent}%">
+                                </div>
+                            </div>
+
+                        <div class="student-meta">
+                            <span class="meta-pill">
+                                Absents: ${student.absents}
+                            </span>
+
+                            <span class="meta-pill">
+                                Lates: ${student.lates}
+                            </span>
+
+                            <span class="meta-pill">
+                                ${student.overdue_tasks} Overdue Tasks
+                            </span>
+                        </div>
+
                     </div>
                 `;
             });
+        });
+}
 
+function loadAllRiskStudents() {
+
+    fetch("../../php/admin/functions/getAllAtRiskStudent.php")
+        .then(res => res.json())
+        .then(data => {
+
+            const container = document.getElementById("all-risk-list");
+
+            container.innerHTML = "";
+
+            data.forEach(student => {
+
+                const progress = parseFloat(student.progress_percent);
+
+                let badgeClass = "track";
+                let badgeText = "ON TRACK";
+                let progressClass = "good";
+
+                if (progress < 75) {
+                    badgeClass = "behind";
+                    badgeText = "BEHIND";
+                    progressClass = "low";
+                }
+                else if (progress < 90) {
+                    badgeClass = "soon";
+                    badgeText = "DUE SOON";
+                    progressClass = "medium";
+                }
+
+                container.innerHTML += `
+                    <div class="task-item">
+
+                        <div class="student-top">
+
+                            <div class="student-info">
+                                <strong>${student.name}</strong>
+                                <span class="student-role">
+                                    ${student.role}
+                                </span>
+                            </div>
+
+                            <span class="status-badge ${badgeClass}">
+                                ${badgeText}
+                            </span>
+
+                        </div>
+
+                        <div class="progress-wrapper">
+
+                            <div class="progress-label">
+                                <span>
+                                    ${student.completed_hours} / 
+                                    ${student.required_hours} Hours
+                                </span>
+
+                                <span>
+                                    ${progress}%
+                                </span>
+                            </div>
+
+                            <div class="progress-bar">
+                               <div 
+                                    class="progress-fill ${progressClass}"
+                                    style="width:${student.progress_percent}%">
+                                </div>
+                            </div>
+
+                        <div class="student-meta">
+                            <span class="meta-pill">
+                                Absents: ${student.absents}
+                            </span>
+
+                            <span class="meta-pill">
+                                Lates: ${student.lates}
+                            </span>
+
+                            <span class="meta-pill">
+                                ${student.overdue_tasks} Overdue Tasks
+                            </span>
+                        </div>
+
+                    </div>
+                `;
+            });
         });
 }
 
@@ -895,7 +1047,8 @@ function loadRfidSettings() {
         document.getElementById("morning_time_out").value = data.morning_time_out;
         document.getElementById("afternoon_time_in").value = data.afternoon_time_in;
         document.getElementById("afternoon_time_out").value = data.afternoon_time_out;
-        document.getElementById("allowed_late_minutes").value = data.allowed_late_minutes;
+        document.getElementById("allowed_late_minutes").value = data.late_threshold_minutes;
+        document.getElementById("late_time").value = data.late_time;
 
         toggleRfidInputs(data.rfid_enabled);
     });
@@ -908,7 +1061,8 @@ function toggleRfidInputs(isEnabled) {
         "morning_time_out",
         "afternoon_time_in",
         "afternoon_time_out",
-        "allowed_late_minutes"
+        "allowed_late_minutes",
+        "late_time"
     ];
 
     inputs.forEach(id => {
@@ -946,6 +1100,10 @@ function saveRfidSettings() {
 
     formData.append("allowed_late_minutes",
         document.getElementById("allowed_late_minutes").value
+    );
+
+    formData.append("late_time",
+        document.getElementById("late_time").value
     );
 
     fetch("functions/saveRfidSettings.php", {
@@ -1404,6 +1562,9 @@ overlay.addEventListener('click', () => {
       rfidAttendance.classList.remove("show")
       evaluationSettings.classList.remove("show")
       requirementsSetup.classList.remove("show")
+      viewAll.classList.remove("show")
+      downloadAllStudent.classList.remove("show")
+      downloadAllSupervisor.classList.remove("show")
 });
 
 allStudentBtn.addEventListener("click", () => {
@@ -1544,42 +1705,102 @@ document.getElementById("allUnverifiedSearch").addEventListener("keyup", functio
     }, 300);
 });
 
-document.getElementById("activityLogSearch").addEventListener("keyup", function () {
+// activity log search
+document.addEventListener("DOMContentLoaded", function () {
 
-    clearTimeout(activitySearchTimer);
+    const searchInput = document.getElementById("activityLogSearch");
+    const moduleFilter = document.getElementById("moduleFilter");
+    const dateFromInput = document.getElementById("dateFrom");
+    const dateToInput = document.getElementById("dateTo");
+    const tableBody = document.getElementById("activityLogTableBody");
 
-    let value = this.value;
+    if (!searchInput || !moduleFilter || !tableBody || !dateFromInput || !dateToInput ) return;
 
-    activitySearchTimer = setTimeout(() => {
+    let timer;
 
-        activityLogBody.classList.add("fade-out");
+    function fetchLogs() {
+
+        const search = searchInput.value;
+        const module = moduleFilter.value.toUpperCase();
+        const dateFrom = dateFromInput.value;
+        const dateTo = dateToInput.value;
 
         fetch("functions/searchActivityLog.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "search=" + encodeURIComponent(value)
+            body:
+                "search=" + encodeURIComponent(search) +
+                "&module=" + encodeURIComponent(module) +
+                "&dateFrom=" + encodeURIComponent(dateFrom) +
+                "&dateTo=" + encodeURIComponent(dateTo)
+              
         })
         .then(res => res.text())
         .then(data => {
+             setTimeout(() => {
+                tableBody.innerHTML = data;
 
-            setTimeout(() => {
-                activityLogBody.innerHTML = data;
-
-                activityLogBody.classList.remove("fade-out");
-                activityLogBody.classList.add("fade-in");
+                tableBody.classList.remove("fade-out");
+                tableBody.classList.add("fade-in");
 
                 setTimeout(() => {
-                    activityLogBody.classList.remove("fade-in");
+                    tableBody.classList.remove("fade-in");
                 }, 200);
 
             }, 200);
-
         });
+    }
 
-    }, 300);
+    searchInput.addEventListener("keyup", function () {
+        clearTimeout(timer);
+        timer = setTimeout(fetchLogs, 300);
+    });
+
+    moduleFilter.addEventListener("change", fetchLogs);
+    dateFromInput.addEventListener("change", fetchLogs);
+    dateToInput.addEventListener("change", fetchLogs);
+
+    fetchLogs();
 });
+
+// document.getElementById("activityLogSearch").addEventListener("keyup", function () {
+
+//     clearTimeout(activitySearchTimer);
+
+//     let value = this.value;
+
+//     activitySearchTimer = setTimeout(() => {
+
+//         activityLogBody.classList.add("fade-out");
+
+//         fetch("functions/searchActivityLog.php", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/x-www-form-urlencoded"
+//             },
+//             body: "search=" + encodeURIComponent(value)
+//         })
+//         .then(res => res.text())
+//         .then(data => {
+
+//             setTimeout(() => {
+//                 activityLogBody.innerHTML = data;
+
+//                 activityLogBody.classList.remove("fade-out");
+//                 activityLogBody.classList.add("fade-in");
+
+//                 setTimeout(() => {
+//                     activityLogBody.classList.remove("fade-in");
+//                 }, 200);
+
+//             }, 200);
+
+//         });
+
+//     }, 300);
+// });
 
 // bugg
 // studentApplicationClose.addEventListener("click", () => {
@@ -1894,6 +2115,39 @@ closeRequirementsSetupBtn.addEventListener("click", () => {
     overlay.classList.remove("show");
     requirementsSetup.classList.remove("show");
 }); 
+
+viewAllBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+    viewAll.classList.add("show");
+    loadAllRiskStudents();
+}); 
+
+closeViewAllBtn.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    viewAll.classList.remove("show");
+}); 
+
+// downloads laayout
+
+downloadAllStudentBtn.addEventListener("click", () => {
+    allStudent.classList.remove("show");
+    downloadAllStudent.classList.add("show");
+});
+
+closeDownloadAllStudent.addEventListener("click", () => {
+    downloadAllStudent.classList.remove("show");
+    allStudent.classList.add("show");
+});
+
+downloadAllSupervisorBtn.addEventListener("click", () => {
+    allSupervisor.classList.remove("show");
+    downloadAllSupervisor.classList.add("show");
+});
+
+closeDownloadAllSupervisor.addEventListener("click", () => {
+    downloadAllSupervisor.classList.remove("show");
+    allSupervisor.classList.add("show");
+});
 
 
 

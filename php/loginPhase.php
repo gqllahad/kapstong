@@ -59,7 +59,7 @@ if (isset($_GET['success'])) {
   <header class="header">
     <div class="container">
       <h1 class="logo-text">
-        <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" class="logo-img">
+        <img src="../kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
         <div>
           <div>OJT</div>
           <small>Tracking System Granby</small>
@@ -230,7 +230,7 @@ if (isset($_GET['success'])) {
 
     <form id="loginForm" action="starts.php" method="POST">
       <div class="login-container scroll-reveal">
-        <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" class="logo-img" style="border-radius: 50%;">
+        <img src="../kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
         <h2>Sign In</h2>
         <div class="login-inner-container">
           <div class="login-box">
@@ -315,14 +315,14 @@ if (isset($_GET['success'])) {
 
     <div id="loadingScreen" class="loading-screen">
         <div class="logo-loader">
-          <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" class="logo-img-loading">
+          <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
         </div>
         <p>Signing up..</p>
     </div>
 
     <div id="loginLoadingnScreen" class="loading-screen">
         <div class="logo-loader">
-          <img src="../kapstongImage/da3309ad-0163-4fd3-bc04-d26b468c5224.jpg" class="logo-img-loading">
+          <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
         </div>
         <p>Logging in..</p>
     </div>

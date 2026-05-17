@@ -8,5 +8,7 @@ $userID = $_SESSION['user_id'];
 $superID = getSupervisorIDByUserID($conn, $userID);
 $search = $_POST['search'] ?? '';
 $module = $_POST['module'] ?? '';
+$dateFrom = $_POST['dateFrom'] ?? '';
+$dateTo = $_POST['dateTo'] ?? '';
 
-echo renderSupervisorActivityLogTable($conn, $superID, $search, $module);
+echo renderSupervisorActivityLogTable($conn, $superID, $search, $module, $dateFrom, $dateTo);

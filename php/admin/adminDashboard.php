@@ -112,7 +112,15 @@ if ($_SESSION['role'] !== "ADMIN") {
             <div class="all-supervisor-modal" id="all-supervisor-modal">
                 <div class="modal-header">
                     <h3>Supervisors</h3>
-                    <button id="closeAllSupervisorModal" class="modal-close">&times;</button>
+
+                    <div class="header-actions">
+                        <button id="downloadAllSupervisorBtn" class="download-btn">
+                            <i class="bi bi-download"></i>
+                            Download All
+                        </button>
+
+                        <button id="closeAllSupervisorModal" class="modal-close">&times;</button>
+                    </div>
                 </div>
 
                 <div class="search-container">
@@ -145,11 +153,63 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
             </div>
 
+            <!-- download supervisor data -->
+             <div class="download-all-supervisor-modal" id="download-all-supervisor-modal">
+
+                <div class="download-content">
+
+                    <div class="download-header">
+                        <h3>Download Supervisor PDF</h3>
+                        <button class="modal-close" id="closeAllSupervisorDownloadModal">&times;</button>
+                    </div>
+
+                    <form action="functions/download_all_supervisor_pdf.php" method="GET">
+
+                        <div class="form-group">
+                            <label>Department</label>
+
+                            <select name="department">
+                                <option value="">All Departments</option>
+                                <option value="COI">College of Informations</option>
+                                <option value="CCJ">College of Criminal Justice</option>
+                                <option value="CoI">College of Informatics</option>
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+
+                            <select name="status">
+                                <option value="">All</option>
+                                <option value="ACTIVE">Active</option>
+                                <option value="COMPLETED">Completed</option>
+                            </select>
+
+                        </div>
+
+                        <button type="submit" class="generate-btn">
+                            Generate PDF
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
             <!-- student accounts -->
             <div class="all-student-modal" id="all-student-modal">
                 <div class="modal-header">
                     <h3>Students</h3>
+
+                    <div class="header-actions">
+                        <button id="downloadAllStudentBtn" class="download-btn">
+                            <i class="bi bi-download"></i>
+                            Download All
+                        </button>
                     <button id="closeAllStudentModal" class="modal-close">&times;</button>
+                    </div>
                 </div>
 
                 <div class="search-container">
@@ -182,6 +242,44 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
             </div>
+
+            <!-- download students data -->
+             <div class="download-all-student-modal" id="download-all-student-modal">
+
+                <div class="download-content">
+
+                    <div class="download-header">
+                        <h3>Download Student PDF</h3>
+                        <button class="modal-close" id="closeAllStudentDownloadModal">&times;</button>
+                    </div>
+
+                    <form action="functions/download_all_students_pdf.php" method="GET">
+
+                        <div class="form-group">
+                            <label>Course</label>
+
+                            <select name="course">
+                                 <?php echo renderSelectOptions($conn, 'program'); ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Year Level</label>
+
+                            <select name="year">
+                               <?php echo renderSelectOptions($conn, 'year'); ?>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="generate-btn">
+                            Generate PDF
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>`
 
             <!-- student application modal -->
             <div class="student-application-view" id="student-application-view">
@@ -229,10 +327,18 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <div class="input-group">
                             <label>Department</label>
                             <select name="department" required>
-                                <option value="">Select Department</option>
-                                <option value="IT">Information Technology</option>
-                                <option value="BSCrim">Criminology</option>
+                                <?php echo renderSelectOptions($conn, 'department'); ?>
                             </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Company Name</label>
+                            <input type="text" name="company" placeholder="Enter company name" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Position</label>
+                            <input type="text" name="position" placeholder="e.g. HR Manager / Team Lead">
                         </div>
 
                         <div class="checkbox-group">
@@ -532,6 +638,11 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <input type="time" id="afternoon_time_out" name="afternoon_time_out">
                     </div>
 
+                    <div class="form-group">
+                        <label for="late_time">Late threshold</label>
+                        <input type="time" id="late_time" name="late_time">
+                    </div>
+
                      <div class="form-group">
                         <label for="allowed_late_minutes">
                             Allowed Late Minutes
@@ -663,6 +774,20 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
             </div>
 
+            <!-- viewall -->
+            <div class="view-all-modal" id="view-all-modal">
+                <div class="modal-header">
+                    <h3>Intern Progress</h3>
+                    <button id="closeViewAllModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="view-all-container">
+                        <div id="all-risk-list" class="risk-list"></div>
+                </div>
+            
+
+            </div>
+
 
 
 
@@ -671,7 +796,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
 
                 <section class="cards">
-                    <div class="card unverified-student">
+                    <div class="card unverified-students">
 
                         <?php
                         $unverifiedStudents = countUnverifiedStudents($conn);
@@ -682,44 +807,68 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <span class="card-badge"><?= $unBadge ?></span>
 
                         <div class="card-content">
-                            <div>
-                                <h3>UNVERIFIED STUDENT</h3>
-                                <p>Awaiting verification</p>
+
+                        <div class="card-left">
+
+                                <div class="card-top">
+                                     <div class="card-icon">
+                                        <i class="bi bi-person-badge-fill"></i>
+                                    </div>
+
+                                    <div>
+                                         <h3>UNVERIFIED STUDENT</h3>
+                                         <p>Awaiting verification</p>
+                                    </div>
+                                </div>
 
                                 <span class="trend">
-                                    ▲ <?= $unTrend ?> this week
+                                    <?= $unTrend ?> this week
                                 </span>
+
                             </div>
 
                             <h2><?= $unverifiedStudents ?></h2>
                         </div>
                     </div>
 
-                    <div class="card student">
+                
+                    <div class="card students">
 
                         <?php
-                        $pendingStudents = countPendingStudents($conn);
-                        $pendingTrend = getTrend($conn, 'student', 'PENDING');
-                        $pendingBadge = getBadge($pendingStudents);
-                        ?>
+                            $pendingStudents = countPendingStudents($conn);
+                            $pendingTrend = getTrend($conn, 'student', 'PENDING');
+                            $pendingBadge = getBadge($pendingStudents);
+                            ?>
 
                         <span class="card-badge"><?= $pendingBadge ?></span>
 
                         <div class="card-content">
-                            <div>
-                                <h3>FOR REVIEW</h3>
-                                <p>Students awaiting approval and verification.</p>
+
+                            <div class="card-left">
+
+                                <div class="card-top">
+                                    <div class="card-icon">
+                                        <i class="bi bi-hourglass-split"></i>
+                                    </div>
+
+                                    <div>
+                                        <h3>FOR REVIEW</h3>
+                                        <p>Students awaiting approval and verification.</p>
+                                    </div>
+                                </div>
 
                                 <span class="trend">
-                                    ▲ <?= $pendingTrend ?> this week
+                                    <?= $pendingTrend ?> this week
                                 </span>
+
                             </div>
 
-                            <h2 class="white-h2"><?= $pendingStudents ?></h2>
+                            <h2><?= $pendingStudents ?></h2>
+
                         </div>
                     </div>
 
-                    <div class="card unverified-supervisor">
+                    <div class="card unverified-supervisors">
 
                         <?php
                         $students = countStudents($conn);
@@ -730,13 +879,23 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <span class="card-badge"><?= $badge ?></span>
 
                         <div class="card-content">
-                            <div>
-                                <h3>STUDENTS</h3>
-                                <p>Total number of verified and active students.</p>
+                            <div class="card-left">
+
+                                <div class="card-top">
+                                    <div class="card-icon">
+                                        <i class="bi bi-mortarboard-fill"></i>
+                                    </div>
+
+                                    <div>
+                                         <h3>STUDENTS</h3>
+                                         <p>Total number of verified and active students.</p>
+                                    </div>
+                                </div>
 
                                 <span class="trend">
-                                    ▲ <?= $trend ?> this week
+                                    <?= $trend ?> this week
                                 </span>
+
                             </div>
 
                             <h2><?= $students ?></h2>
@@ -744,7 +903,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                     </div>
 
-                    <div class="card supervisor">
+                    <div class="card supervisors">
                         <?php
                         $supervisor = countSupervisors($conn);
                         $superTrend = getTrend($conn, 'supervisor', 'VERIFIED');
@@ -754,25 +913,30 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <span class="card-badge"><?= $superBadge ?></span>
 
                         <div class="card-content">
-                            <div>
-                                <h3>SUPERVISORS</h3>
-                                <p>Total number of verified supervisors.</p>
+                            <div class="card-left">
+
+                                <div class="card-top">
+                                    <div class="card-icon">
+                                        <i class="bi bi-briefcase-fill"></i>
+                                    </div>
+
+                                    <div>
+                                         <h3>SUPERVISORS</h3>
+                                        <p>Total number of verified supervisors.</p>
+                                    </div>
+                                </div>
 
                                 <span class="trend">
-                                    ▲ <?= $superTrend ?> this week
+                                    <?= $superTrend ?> this week
                                 </span>
+
                             </div>
 
-                            <h2 class="white-h2"><?= $supervisor ?></h2>
+                            <h2><?= $supervisor ?></h2>
                         </div>
                     </div>
 
                 </section>
-
-                <div class="title-block-bot">
-                    <h2>Dashboard</h2>
-                    <p>Manage supervisors and user accounts in the system</p>
-                </div>
 
                 <section class="dashboard-layout">
 
@@ -782,11 +946,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <canvas id="barChart"></canvas>
                     </section>
 
-                    <section class="deadline-container">
-                        <p>At-Risk Students</p>
-
-                        <div id="risk-list"></div>
-                    </section>
+                   <!-- dead -->
 
                     <section class="wrapper line-chart">
                         <h2>Attendance Trend (Last 30 Days)</h2>
@@ -809,6 +969,24 @@ if ($_SESSION['role'] !== "ADMIN") {
                     </section>
 
                 </section>
+                 <section class="deadline-container">
+
+                        <div class="deadline-header">
+                            <div>
+                                <p class="deadline-title">Intern Progress</p>
+                                <span class="deadline-subtitle">
+                                    Monitor intern completion status and risk levels
+                                </span>
+                            </div>
+
+                            <button class="view-all-btn" id="view-all-btn">
+                                View All Students
+                            </button>
+                        </div>
+
+                        <div id="risk-list" class="risk-list"></div>
+
+                    </section>
             </section>
 
             <!-- application approvals -->
@@ -822,12 +1000,16 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                     <div class="user-action-btn">
                         <button class="assign-student-btn" id="assign-student-btn">
-                            <span class="icon">→</span>
+                            <span class="icon">
+                                <i class="bi bi-arrow-right-circle"></i>
+                            </span>
                             <span class="text">Assign Student to Supervisor</span>
                         </button>
 
                         <button class="supervisor-btn" id="supervisor-btn">
-                            <span class="icon">+</span>
+                            <span class="icon">
+                                <i class="bi bi-person-plus-fill"></i>
+                            </span>
                             <span class="text">Create Supervisor</span>
                         </button>
                     </div>
@@ -918,7 +1100,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <div class="preparation-grid">
                     <div class="create-section-container">
                         <button class="create-btn" id="ojt-program-btn">
-                            <span class="icon">⚙</span>
+                            <i class="bi bi-gear-fill icon"></i>
                             <span class="text">OJT Program
                                 Setup</span>
                         </button>
@@ -926,28 +1108,28 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                     <div class="create-section-container">
                         <button class="create-btn" id="department-management-btn">
-                            <span class="icon">🏫</span>
+                             <i class="bi bi-building icon"></i>
                             <span class="text">Department Management</span>
                         </button>
                     </div>
 
                     <div class="create-section-container">
                         <button class="create-btn" id="rfid-attendance-btn">
-                            <span class="icon">📡</span>
+                            <i class="bi bi-wifi icon"></i>
                             <span class="text">RFID Attendance Configuration</span>
                         </button>
                     </div>
 
                     <div class="create-section-container">
                         <button class="create-btn" id="evaluation-settings-btn">
-                            <span class="icon">⭐</span>
+                            <i class="bi bi-star-fill icon"></i>
                             <span class="text">Evaluation Settings</span>
                         </button>
                     </div>
 
                     <div class="create-section-container">
                         <button class="create-btn" id="requirements-setup-btn">
-                            <span class="icon">📄</span>
+                            <i class="bi bi-file-earmark-text icon"></i>
                             <span class="text">Requirements Setup</span>
                         </button>
                     </div>
@@ -965,8 +1147,28 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <div class="search-container">
                             <i class="bi bi-search search-icon"></i>
                             <input type="text" id="activityLogSearch"
-                                placeholder="Search by user, action, module, or target">
+                                placeholder="Search by user, action or target">
                         </div>
+
+
+                        <div class="filter-group">
+
+                            <select id="moduleFilter">
+                                <option value="">All Modules</option>
+                                <option value="TASK">Task</option>
+                                <option value="ATTENDANCE">Attendance</option>
+                                <option value="ASSIGNMENT">ASSIGNMENT</option>
+                                <option value="DOCUMENT">Document</option>
+                                <option value="SYSTEM">System</option>
+                            </select>
+
+                        </div>
+
+                        <div class="filter-group">
+                            <input type="date" id="dateFrom" title="From date">
+                            <input type="date" id="dateTo" title="To date">
+                        </div>
+
                     </div>
 
                 </div>
@@ -991,7 +1193,10 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <tbody id="activityLogTableBody">
                                 <?php
                                 $search = $_POST['search'] ?? '';
-                                echo renderActivityLogTable($conn, $search);
+                                $module = $_POST['module'] ?? '';
+                                $dateFrom = $_POST['dateFrom'] ?? '';
+                                $dateTo = $_POST['dateTo'] ?? '';
+                                echo renderActivityLogTable($conn, $search, $module, $dateFrom, $dateTo);
                                 ?>
                             </tbody>
                         </table>

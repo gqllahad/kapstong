@@ -21,6 +21,10 @@ $afternoon_time_out = !empty($_POST['afternoon_time_out'])
     ? date("H:i:s", strtotime($_POST['afternoon_time_out']))
     : null;
 
+$late_time = !empty($_POST['late_time'])
+    ? date("H:i:s", strtotime($_POST['late_time']))
+    : null;
+
 $allowed_late_minutes = $_POST['allowed_late_minutes'] ?? 0;
 
 if (!$morning_time_in || !$morning_time_out) {
@@ -37,7 +41,8 @@ $settings = [
     "morning_time_out" => $morning_time_out,
     "afternoon_time_in" => $afternoon_time_in,
     "afternoon_time_out" => $afternoon_time_out,
-    "late_threshold_minutes" => $allowed_late_minutes
+    "late_threshold_minutes" => $allowed_late_minutes,
+    "late_time" => $late_time
 ];
 
 $stmt = $conn->prepare("

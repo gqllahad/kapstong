@@ -415,11 +415,46 @@ function renderApprovalReportList($conn, $superID, $search = '')
 
             $output .= '
             <tr>
-                <td>' . $row['studentID'] . '</td>
-                <td>' . $row['name'] . '</td>
-                <td>' . $row['title'] . '</td>
-                <td>' . $row['status'] . '</td>
-                <td>' . date("M d, Y h:i A", strtotime($row['date_created'])) . '</td>
+                <td>
+            <div class="student-id-cell">
+                #' . $row['studentID'] . '
+            </div>
+        </td>
+
+        <td>
+            <div class="student-name-cell">
+                <div class="student-avatar">
+                    ' . strtoupper(substr($row['name'], 0, 1)) . '
+                </div>
+
+                <span>' . $row['name'] . '</span>
+            </div>
+        </td>
+
+                <td>
+            <div class="task-title-cell">
+                <span class="task-title">
+                    ' . $row['title'] . '
+                </span>
+
+                <small class="task-subtitle">
+                    Awaiting supervisor review
+                </small>
+            </div>
+        </td>
+                <td>
+                    <span class="status-pill submitted">
+                        ' . $row['status'] . '
+                    </span>
+                </td>
+                <td>
+            <div class="date-cell">
+                ' . date("M d, Y", strtotime($row['date_created'])) . '
+                <small>
+                    ' . date("h:i A", strtotime($row['date_created'])) . '
+                </small>
+            </div>
+        </td>
                 <td>
                     <button 
                         class="view-btn" 
@@ -444,7 +479,7 @@ function renderApprovalReportList($conn, $superID, $search = '')
 }
 
 // task management (supervisor)
-function renderTaskManagementList($conn, $superID, $search = '')
+function renderTaskManagementList($conn, $superID, $search = '', $status = '', $deadline = '')
 {
     $where = "
         WHERE student_tasks.superID = '$superID'
@@ -454,9 +489,16 @@ function renderTaskManagementList($conn, $superID, $search = '')
         $where .= " AND (
             student_tasks.studentID LIKE '%$search%' OR
             ojtstudent.name LIKE '%$search%' OR
-            student_tasks.title LIKE '%$search%' OR
-            student_tasks.status LIKE '%$search%'
+            student_tasks.title LIKE '%$search%'
         )";
+    }
+
+    if (!empty($deadline)) {
+        $where .= " AND student_tasks.due_date = '$deadline'";
+    }
+
+    if (!empty($status)) {
+        $where .= " AND student_tasks.status = '$status'";
     }
 
     $sql = "
@@ -465,6 +507,7 @@ function renderTaskManagementList($conn, $superID, $search = '')
             student_tasks.studentID,
             ojtstudent.name,
             student_tasks.title,
+            student_tasks.description,
             student_tasks.due_date,
             student_tasks.status,
             student_tasks.date_created
@@ -528,11 +571,34 @@ function renderTaskManagementList($conn, $superID, $search = '')
 
             $output .= '
             <tr>
-                <td style="font-weight:600;">' . $row['title'] . '</td>
-                <td>' . $row['name'] . '</td>
+                <td>
+                    <div class="task-title-cell">
+                        <span class="task-title">
+                            ' . $row['title'] . '
+                        </span>
+
+                        <small class="task-subtitle">
+                             ' . $row['description'] . '
+                        </small>
+                    </div>
+                </td>
+                <td>
+                    <div class="student-name-cell">
+                        <div class="student-avatar">
+                            ' . strtoupper(substr($row['name'], 0, 1)) . '
+                        </div>
+
+                        <span>' . $row['name'] . '</span>
+                    </div>
+                </td>
                 <td>' . date("M d, Y", strtotime($row['due_date'])) . '</td>
-                <td style="color:' . $color . '; font-weight:600;">
-                    ' . $status . '
+                <td>
+                    <span class="status-pill" style="
+                        background: ' . $color . ';
+                        border: 1px solid ' . $color . ';
+                    ">
+                        ' . $status . '
+                    </span>
                 </td>
                 <td style="display:flex;flex-direction:row;gap:10px;">
                     
@@ -616,11 +682,25 @@ function renderStudentProgressList($conn, $superID, $search = '')
 
             $output .= '
             <tr>
-                <td>' .  $row['name'] . '</td>
+                <td>
+                    <div class="student-name-cell">
+                        <div class="student-avatar">
+                            ' . strtoupper(substr($row['name'], 0, 1)) . '
+                        </div>
+
+                        <span>' . $row['name'] . '</span>
+                    </div>
+                </td>
                 <td>' . $completedHours . '</td>
                 <td>' . $requiredHours . '</td> 
                 <td>' . $remainingHours . '</td>
-                <td style="color: ' . $statusColor . '; font-weight:600;"> ' . $status . '</td>
+                <td> 
+                <span class="status-pill" style="
+                        background: ' . $statusColor . ';
+                        border: 1px solid ' . $statusColor . ';
+                    ">
+                        ' . $status . '
+                    </span></td>
                 <td>
                     <button 
                         class="view-btn" 
@@ -643,6 +723,30 @@ function renderStudentProgressList($conn, $superID, $search = '')
 }
 
 // evaluations (sueprvisor)
+
+function convertRatingToScore($rating)
+{
+    switch (strtoupper($rating)) {
+
+        case 'A+': return 100;
+        case 'A':  return 95;
+        case 'A-': return 90;
+
+        case 'B+': return 85;
+        case 'B':  return 80;
+        case 'B-': return 75;
+
+        case 'C+': return 70;
+        case 'C':  return 65;
+        case 'C-': return 60;
+
+        case 'D':  return 50;
+        case 'F':  return 0;
+
+        default:   return 0;
+    }
+}
+
 function renderEvaluationList($conn, $superID, $search = '')
 {
     $where = "
@@ -680,33 +784,49 @@ function renderEvaluationList($conn, $superID, $search = '')
 
         $studentID = $row['studentID'];
 
-        $att = $conn->query("
-            SELECT 
-                COUNT(*) as total,
-                SUM(status='present') as present
-            FROM attendance_logs
-            WHERE studentID = '$studentID'
-        ")->fetch_assoc();
-
-        $attendanceScore = ($att['total'] > 0)
-            ? ($att['present'] / $att['total']) * 100
-            : 0;
-
-        $prog = $conn->query("
-            SELECT completed_hours, required_hours
+        $progressData = $conn->query("
+            SELECT required_hours, completed_hours
             FROM student_progress
             WHERE studentID = '$studentID'
             LIMIT 1
         ")->fetch_assoc();
 
-        $progressScore = 0;
+        $requiredHours = floatval($progressData['required_hours'] ?? 0);
+        $completedHours = floatval($progressData['completed_hours'] ?? 0);
 
-        if ($prog && $prog['required_hours'] > 0) {
-            $progressScore = ($prog['completed_hours'] / $prog['required_hours']) * 100;
+        if ($requiredHours <= 0) {
+            $attendanceScore = 0;
+        } else {
+            $attendanceScore = min(
+                ($completedHours / $requiredHours) * 100,
+                100
+            );
         }
 
-        $taskResult = $conn->query("
+        $stageResult = $conn->query("
             SELECT status
+            FROM internship_stages
+            WHERE studentID = '$studentID'
+        ");
+
+        $totalStages = 0;
+        $completedStages = 0;
+
+        while ($s = $stageResult->fetch_assoc()) {
+
+            $totalStages++;
+
+            if ($s['status'] === 'COMPLETED') {
+                $completedStages++;
+            }
+        }
+
+        $progressScore = ($totalStages > 0)
+            ? ($completedStages / $totalStages) * 100
+            : 0;
+
+        $taskResult = $conn->query("
+            SELECT status, rating
             FROM student_tasks
             WHERE studentID = '$studentID'
         ");
@@ -715,21 +835,38 @@ function renderEvaluationList($conn, $superID, $search = '')
         $taskSum = 0;
 
         while ($t = $taskResult->fetch_assoc()) {
+
             $taskTotal++;
 
             switch ($t['status']) {
+
                 case 'APPROVED':
-                    $taskSum += 100;
+                    $statusScore = 90;
                     break;
+
                 case 'SUBMITTED':
-                    $taskSum += 75;
+                    $statusScore = 75;
                     break;
+
                 case 'IN PROGRESS':
-                    $taskSum += 50;
+                    $statusScore = 50;
                     break;
+
+                case 'NOT STARTED':
+                    $statusScore = 20;
+                    break;
+
+                case 'REJECTED':
+                    $statusScore = 0;
+                    break;
+
                 default:
-                    $taskSum += 0;
+                    $statusScore = 0;
             }
+
+            $ratingScore = convertRatingToScore($t['rating'] ?? '');
+
+            $taskSum += ($statusScore * 0.6) + ($ratingScore * 0.4);
         }
 
         $taskScore = ($taskTotal > 0)
@@ -790,7 +927,15 @@ function renderEvaluationList($conn, $superID, $search = '')
 
         $output .= '
         <tr>
-            <td>' . $row['name'] . '</td>
+            <td>
+                    <div class="student-name-cell">
+                        <div class="student-avatar">
+                            ' . strtoupper(substr($row['name'], 0, 1)) . '
+                        </div>
+
+                        <span>' . $row['name'] . '</span>
+                    </div>
+            </td>
 
             <td>' . round($attendanceScore, 2) . '%</td>
             <td>' . round($progressScore, 2) . '%</td>
@@ -954,7 +1099,7 @@ function renderTaskAssignStudentList($conn, $superID, $search = '')
     return $output;
 }
 
-function renderStudentMainAttendance($conn, $superID, $search = '', $status = '')
+function renderStudentMainAttendance($conn, $superID, $search = '', $status = '' ,$dateFromAttendance = '', $dateToAttendance = '')
 {
      $sql = "
         SELECT 
@@ -967,10 +1112,11 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
             attendance_logs.remarks,
             attendance_logs.rfid_uid,
             attendance_logs.studentID,
+            attendance_logs.created_at,
             ojtstudent.name
         FROM attendance_logs
 
-        INNER JOIN student_supervisor 
+        LEFT JOIN student_supervisor 
             ON student_supervisor.studentID = attendance_logs.studentID
 
         LEFT JOIN ojtstudent 
@@ -1004,9 +1150,22 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
         $params[] = $status;
     }
 
+    if (!empty($dateFromAttendance)) {
+        $sql .= " AND attendance_logs.log_date >= ?";
+        $types .= "s";
+        $params[] = $dateFromAttendance;
+    }
+
+    if (!empty($dateToAttendance)) {
+        $sql .= " AND attendance_logs.log_date >= ?";
+        $types .= "s";
+        $params[] = $dateToAttendance;
+    }
+
     $sql .= " ORDER BY attendance_logs.log_date DESC, attendance_logs.first_time_in DESC";
 
     $stmt = $conn->prepare($sql);
+
     $stmt->bind_param($types, ...$params);
     $stmt->execute();
 
@@ -1019,21 +1178,38 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
 
             $status = strtolower($row['status']);
 
-            $color = match($status) {
-                'present' => '#059669',
-                'late' => '#F59E0B',
-                'absent' => '#EF4444',
-                'excused' => '#3B82F6',
-                default => '#9CA3AF'
+            switch($status) {
+                case 'present':
+                    $color = '#059669';
+                    break;
+                case 'late':
+                    $color = '#F59E0B';
+                    break;
+                case 'absent':
+                    $color =  '#EF4444';
+                    break;
+                case 'excused':
+                    $color ='#3B82F6';
+                    break;
+                default: 
+                    $color ='#9CA3AF';
+                    break;
             };
 
             $output .= "
             <tr>
-                <td>{$row['rfid_uid']}</td>
-                <td>{$row['log_date']}</td>
-                <td>{$row['first_time_in']}</td>
-                <td>{$row['final_time_out']}</td>
-                <td style='color:$color;font-weight:600'>" . strtoupper($row['status']) . "</td>
+                <td><div class='student-id-cell'>
+                    #" . $row['rfid_uid'] . "
+                    </div>
+                </td>
+                <td>" . date('F d, Y', strtotime($row['log_date'])) . "</td>
+                <td>" . date('h:i A', strtotime($row['first_time_in'])) . "</td>
+                <td>" . date('h:i A', strtotime($row['final_time_out'])) . "</td>
+                <td>
+                    <span class='status-pill' style='background: " . $color . ";border: 1px solid " . $color . ";'>
+                        " . $row['status'] . "
+                    </span>
+                </td>
                 <td>{$row['total_hours']}</td>
                 <td>{$row['remarks']}</td>
                 <td>
@@ -1103,7 +1279,7 @@ function renderAssignSupervisorList($conn, $search = '')
 }
 
 // supervisor activity log view
-function renderSupervisorActivityLogTable($conn, $superID, $search = '', $module = '')
+function renderSupervisorActivityLogTable($conn, $superID, $search = '', $module = '', $dateFrom = '', $dateTo = '')
 {
     $sql = "
         SELECT 
@@ -1148,6 +1324,18 @@ function renderSupervisorActivityLogTable($conn, $superID, $search = '', $module
         $sql .= " AND activity_log.module = ?";
         $types .= "s";
         $params[] = $module;
+    }
+
+    if (!empty($dateFrom)) {
+        $sql .= " AND DATE(activity_log.created_at) >= ?";
+        $types .= "s";
+        $params[] = $dateFrom;
+    }
+
+    if (!empty($dateTo)) {
+        $sql .= " AND DATE(activity_log.created_at) <= ?";
+        $types .= "s";
+        $params[] = $dateTo;
     }
 
     $sql .= " ORDER BY activity_log.created_at DESC";
@@ -1198,39 +1386,72 @@ function renderSupervisorActivityLogTable($conn, $superID, $search = '', $module
 
 
 // admin activity_log view
-function renderActivityLogTable($conn, $search = '')
+function renderActivityLogTable($conn, $search = '', $module = '', $dateFrom = '', $dateTo = '')
 {
-    $where = "";
+    $sql = "
+        SELECT 
+            activity_log.logID,
+            activity_log.role,
+            activity_log.action,
+            activity_log.module,
+            activity_log.description,
+            activity_log.target_type,
+            activity_log.target_id,
+            activity_log.ip_address,
+            activity_log.created_at,
+            users.name,
+            users.email
+        FROM activity_log
+        LEFT JOIN users 
+            ON activity_log.userID = users.userID
+        WHERE 1=1
+    ";
+
+    $params = [];
+    $types = "";
 
     if (!empty($search)) {
-        $where = "WHERE (
-            users.name LIKE '%$search%' OR
-            users.email LIKE '%$search%' OR
-            activity_log.action LIKE '%$search%' OR
-            activity_log.module LIKE '%$search%' OR
-            activity_log.target_id LIKE '%$search%'
+        $sql .= " AND (
+            users.name LIKE ? OR
+            users.email LIKE ? OR
+            activity_log.action LIKE ? OR
+            activity_log.module LIKE ? OR
+            activity_log.target_id LIKE ?
         )";
+
+        $like = "%$search%";
+        $types .= "sssss";
+        array_push($params, $like, $like, $like, $like, $like);
     }
 
-    $sql = "SELECT 
-                activity_log.logID,
-                activity_log.role,
-                activity_log.action,
-                activity_log.module,
-                activity_log.description,
-                activity_log.target_type,
-                activity_log.target_id,
-                activity_log.ip_address,
-                activity_log.created_at,
-                users.name,
-                users.email
-            FROM activity_log
-            LEFT JOIN users 
-                ON activity_log.userID = users.userID
-            $where
-            ORDER BY activity_log.created_at DESC";
+    if (!empty($module)) {
+        $sql .= " AND activity_log.module = ?";
+        $types .= "s";
+        $params[] = $module;
+    }
 
-    $result = $conn->query($sql);
+    if (!empty($dateFrom)) {
+        $sql .= " AND DATE(activity_log.created_at) >= ?";
+        $types .= "s";
+        $params[] = $dateFrom;
+    }
+
+    if (!empty($dateTo)) {
+        $sql .= " AND DATE(activity_log.created_at) <= ?";
+        $types .= "s";
+        $params[] = $dateTo;
+    }
+
+    $sql .= " ORDER BY activity_log.created_at DESC";
+
+    $stmt = $conn->prepare($sql);
+
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     $output = '';
 
@@ -1239,43 +1460,128 @@ function renderActivityLogTable($conn, $search = '')
 
             $role = strtoupper($row['role']);
 
-            switch ($role) {
-                case 'STUDENT':
-                    $roleColor = '#3B82F6';
-                    break;
-                case 'SUPERVISOR':
-                    $roleColor = '#F59E0B';
-                    break;
-                case 'ADMIN':
-                    $roleColor = '#374151';
-                    break;
-                default:
-                    $roleColor = '#9CA3AF';
-            }
+            $roleColor = match ($role) {
+                'STUDENT' => '#3B82F6',
+                'SUPERVISOR' => '#F59E0B',
+                'ADMIN' => '#374151',
+                default => '#9CA3AF'
+            };
 
-            $output .= '
+            $output .= "
             <tr>
-                <td>' . $row['name'] . '</td>
-                <td style="color: ' . $roleColor . '; font-weight:600;"> ' . $role . '</td>
-                <td>' . $row['action'] . '</td>
-                <td>' . $row['module'] . '</td>
-                <td>' . $row['target_type'] . '</td>
-                <td>' . $row['target_id'] . '</td>
-                <td>' . $row['ip_address'] . '</td>
-                <td>' . date("M d, Y h:i A", strtotime($row['created_at'])) . '</td>
-            </tr>';
+                <td>{$row['name']}</td>
+                <td style='color:$roleColor;font-weight:600'>$role</td>
+                <td>{$row['action']}</td>
+                <td>{$row['module']}</td>
+                <td>{$row['target_type']}</td>
+                <td>{$row['target_id']}</td>
+                <td>{$row['ip_address']}</td>
+                <td>" . date("M d, Y h:i A", strtotime($row['created_at'])) . "</td>
+            </tr>";
         }
     } else {
-        $output .= '
+        $output .= "
         <tr>
-            <td colspan="8" style="text-align:center; padding:15px; font-weight:500;">
+            <td colspan='8' style='text-align:center; padding:15px;'>
                 No activity logs found
             </td>
-        </tr>';
+        </tr>";
     }
 
     return $output;
 }
+// function renderActivityLogTable($conn, $search = '', $module = '')
+// {
+//     $sql = "
+//         SELECT 
+//             activity_log.logID,
+//             activity_log.role,
+//             activity_log.action,
+//             activity_log.module,
+//             activity_log.description,
+//             activity_log.target_type,
+//             activity_log.target_id,
+//             activity_log.ip_address,
+//             activity_log.created_at,
+//             users.name,
+//             users.email
+//         FROM activity_log
+//         LEFT JOIN users 
+//             ON activity_log.userID = users.userID
+//         WHERE 1=1
+//     ";
+
+//     $params = [];
+//     $types = "";
+
+//     if (!empty($search)) {
+//         $sql .= " AND (
+//             users.name LIKE ? OR
+//             users.email LIKE ? OR
+//             activity_log.action LIKE ? OR
+//             activity_log.module LIKE ? OR
+//             activity_log.target_id LIKE ?
+//         )";
+
+//         $like = "%$search%";
+//         $types .= "sssss";
+//         array_push($params, $like, $like, $like, $like, $like);
+//     }
+
+//     if (!empty($module)) {
+//         $sql .= " AND activity_log.module = ?";
+//         $types .= "s";
+//         $params[] = $module;
+//     }
+
+//     $sql .= " ORDER BY activity_log.created_at DESC";
+
+//     $stmt = $conn->prepare($sql);
+
+//     if (!empty($params)) {
+//         $stmt->bind_param($types, ...$params);
+//     }
+
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+
+//     $output = '';
+
+//     if ($result->num_rows > 0) {
+//         while ($row = $result->fetch_assoc()) {
+
+//             $role = strtoupper($row['role']);
+
+//             $roleColor = match ($role) {
+//                 'STUDENT' => '#3B82F6',
+//                 'SUPERVISOR' => '#F59E0B',
+//                 'ADMIN' => '#374151',
+//                 default => '#9CA3AF'
+//             };
+
+//             $output .= "
+//             <tr>
+//                 <td>{$row['name']}</td>
+//                 <td style='color:$roleColor;font-weight:600'>$role</td>
+//                 <td>{$row['action']}</td>
+//                 <td>{$row['module']}</td>
+//                 <td>{$row['target_type']}</td>
+//                 <td>{$row['target_id']}</td>
+//                 <td>{$row['ip_address']}</td>
+//                 <td>" . date("M d, Y h:i A", strtotime($row['created_at'])) . "</td>
+//             </tr>";
+//         }
+//     } else {
+//         $output .= "
+//         <tr>
+//             <td colspan='8' style='text-align:center; padding:15px;'>
+//                 No activity logs found
+//             </td>
+//         </tr>";
+//     }
+
+//     return $output;
+// }
 
 // ojt settings
 function renderActiveOJTCard($conn)
@@ -1419,6 +1725,148 @@ function renderDepartmentOptions($conn)
                 </option>
             ';
         }
+    }
+
+    return $output;
+}
+
+// function renderProgramOptions($conn){
+
+//     $sql = "
+//         SELECT 
+//             program_id,
+//             prg_name,
+//             prg_acro
+//         FROM program
+//         WHERE status = 'ACTIVE'
+//         ORDER BY prg_name ASC
+//     ";
+
+//     $result = $conn->query($sql);
+
+//     $output = '<option value="">All Courses</option>';
+
+//     if($result && $result->num_rows > 0){
+
+//         while($row = $result->fetch_assoc()){
+
+//             $output .= '
+//                 <option value="' . htmlspecialchars($row['prg_acro']) . '">
+//                     ' . htmlspecialchars($row['prg_name']) . ' 
+//                     (' . htmlspecialchars($row['prg_acro']) . ')
+//                 </option>
+//             ';
+//         }
+//     }
+
+//     return $output;
+// }
+
+// function renderYearLevelOptions($conn){
+
+//     $sql = "
+//         SELECT DISTINCT yearLevel
+//         FROM ojtstudent
+//         WHERE yearLevel IS NOT NULL
+//         AND yearLevel != ''
+//         ORDER BY yearLevel ASC
+//     ";
+
+//     $result = $conn->query($sql);
+
+//     $output = '<option value="">All Year Levels</option>';
+
+//     if($result && $result->num_rows > 0){
+
+//         while($row = $result->fetch_assoc()){
+
+//             $output .= '
+//                 <option value="' . htmlspecialchars($row['yearLevel']) . '">
+//                     ' . htmlspecialchars($row['yearLevel']) . '
+//                 </option>
+//             ';
+//         }
+//     }
+
+//     return $output;
+// }
+
+function renderSelectOptions($conn, $type){
+
+    $output = '';
+
+    switch($type){
+
+        case 'program':
+
+            $sql = "
+                SELECT prg_name, prg_acro
+                FROM program
+                WHERE status = 'ACTIVE'
+                ORDER BY prg_name ASC
+            ";
+
+            $result = $conn->query($sql);
+
+            $output .= '<option value="">All Courses</option>';
+
+            while($row = $result->fetch_assoc()){
+
+                $output .= '
+                    <option value="'.$row['prg_acro'].'">
+                        '.$row['prg_name'].' ('.$row['prg_acro'].')
+                    </option>
+                ';
+            }
+
+        break;
+
+        case 'year':
+
+            $sql = "
+                SELECT DISTINCT yearLevel
+                FROM ojtstudent
+                ORDER BY yearLevel ASC
+            ";
+
+            $result = $conn->query($sql);
+
+            $output .= '<option value="">All Year Levels</option>';
+
+            while($row = $result->fetch_assoc()){
+
+                $output .= '
+                    <option value="'.$row['yearLevel'].'">
+                        '.$row['yearLevel'].'
+                    </option>
+                ';
+            }
+
+        break;
+
+        case 'department':
+             $sql = "SELECT program_id, prg_name, prg_acro, prg_department, prg_department_code 
+            FROM program 
+            WHERE status = 'ACTIVE'
+            ORDER BY prg_name ASC";
+
+            $result = $conn->query($sql);
+
+            $output = '<option value="">All Programs</option>';
+
+            if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+
+                    $label = $row['prg_name'] . ' (' . $row['prg_acro'] . ') - ' . $row['prg_department_code'];
+
+                  $output .= '
+                    <option value="'.$row['program_id'].'">
+                        '.$row['prg_acro'].' - '.$row['prg_department'].'
+                    </option>';
+                }
+            }
+
+        break;
     }
 
     return $output;
@@ -1936,6 +2384,76 @@ function getStudentAlerts($conn, $studentID)
         }
     }
 
+    $sqlStage = "
+            SELECT COALESCE(SUM(total_hours), 0) as hours
+            FROM attendance_logs
+            WHERE studentID = ?
+        ";
+
+        $stmtStage = $conn->prepare($sqlStage);
+
+        if (!$stmtStage) {
+            die("STAGE SQL Error: " . $conn->error);
+        }
+
+        $stmtStage->bind_param("s", $studentID);
+        $stmtStage->execute();
+
+        $stageData = $stmtStage->get_result()->fetch_assoc();
+
+        $hours = floatval($stageData['hours'] ?? 0);
+        
+        if ($hours <= 20) {
+
+            $alerts[] = [
+                "type" => "info",
+                "priority" => 3,
+                "message" => "ORIENTATION stage is now active (0–20 hours).",
+                "action" => "viewStage",
+                "id" => "ORIENTATION"
+            ];
+
+        } elseif ($hours <= 100) {
+
+            $alerts[] = [
+                "type" => "info",
+                "priority" => 3,
+                "message" => "You are now in BASIC TRAINING stage (21–100 hours).",
+                "action" => "viewStage",
+                "id" => "BASIC_TRAINING"
+            ];
+
+        } elseif ($hours <= 250) {
+
+            $alerts[] = [
+                "type" => "info",
+                "priority" => 3,
+                "message" => "SKILL DEVELOPMENT stage is now active.",
+                "action" => "viewStage",
+                "id" => "SKILL_DEVELOPMENT"
+            ];
+
+        } elseif ($hours <= 400) {
+
+            $alerts[] = [
+                "type" => "info",
+                "priority" => 3,
+                "message" => "ACTIVE DEPLOYMENT stage started. Handle real tasks carefully.",
+                "action" => "viewStage",
+                "id" => "ACTIVE_DEPLOYMENT"
+            ];
+
+        } else {
+
+            $alerts[] = [
+                "type" => "success",
+                "priority" => 0,
+                "message" => "FINAL PHASE reached. Prepare your final report.",
+                "action" => "viewStage",
+                "id" => "FINAL_PHASE"
+            ];
+        }
+
     usort($alerts, function ($a, $b) {
         return $b['priority'] <=> $a['priority'];
     });
@@ -2017,4 +2535,149 @@ function renderStudentAttendanceTable($conn, $studentID, $category = ''){
     }
 
     return $output;
+}
+
+
+// student reports
+function renderReports($conn, $studentID)
+{
+    $progressData = $conn->query("
+        SELECT completed_hours, required_hours
+        FROM student_progress
+        WHERE studentID = '$studentID'
+        LIMIT 1
+    ")->fetch_assoc();
+
+    $completed = floatval($progressData['completed_hours'] ?? 0);
+    $required = floatval($progressData['required_hours'] ?? 500);
+
+    $percent = ($required > 0)
+        ? ($completed / $required) * 100
+        : 0;
+
+    $stages = [
+        [
+            "type" => "ORIENTATION_REPORT",
+            "title" => "Orientation Report",
+            "desc" => "Submit onboarding reflection",
+            "min" => 0,
+            "max" => 20
+        ],
+        [
+            "type" => "WEEKLY_REPORT",
+            "title" => "Weekly Training Report",
+            "desc" => "Submit weekly learning progress",
+            "min" => 20,
+            "max" => 60
+        ],
+        [
+            "type" => "DEPLOYMENT_REPORT",
+            "title" => "Deployment Report",
+            "desc" => "Worksite performance report",
+            "min" => 60,
+            "max" => 90
+        ],
+        [
+            "type" => "FINAL_REPORT",
+            "title" => "Final Report",
+            "desc" => "Final internship summary",
+            "min" => 90,
+            "max" => 100
+        ]
+    ];
+
+    $output = '<div class="report-cards">';
+
+    foreach ($stages as $stage) {
+
+        $isUnlocked = $percent >= $stage['min'];
+
+        $class = $isUnlocked ? "clickable" : "locked";
+        $status = $isUnlocked ? "active" : "locked";
+        $text = $isUnlocked ? "Click to submit →" : "Locked";
+
+        $onclick = $isUnlocked
+            ? "openReportForm('{$stage['type']}', 1)"
+            : "";
+
+        $output .= "
+        <div class='report-card $class' onclick=\"$onclick\">
+
+            <div class='card-header'>
+                <div>
+                    <h4>{$stage['title']}</h4>
+                    <small>{$stage['min']}% - {$stage['max']}% Progress</small>
+                </div>
+
+                <span class='status $status'>
+                    " . strtoupper($status) . "
+                </span>
+            </div>
+
+            <div class='card-body'>
+                <p>{$stage['desc']}</p>
+
+                <div class='card-action-hint'>
+                    $text
+                </div>
+            </div>
+
+        </div>";
+    }
+
+    $output .= '</div>';
+
+    return $output;
+}
+
+function renderProgressHeader($conn, $studentID)
+{
+    $progress = $conn->query("
+        SELECT completed_hours, required_hours
+        FROM student_progress
+        WHERE studentID = '$studentID'
+        LIMIT 1
+    ")->fetch_assoc();
+
+    $hours = floatval($progress['completed_hours'] ?? 0);
+    $required = floatval($progress['required_hours'] ?? 500);
+
+    $percent = $required > 0 ? min(($hours / $required) * 100, 100) : 0;
+
+    if ($hours <= 20) {
+        $stage = "Orientation Stage";
+        $next = "Training Stage";
+        $nextThreshold = 21;
+    } elseif ($hours <= 200) {
+        $stage = "Training Stage";
+        $next = "Deployment Stage";
+        $nextThreshold = 201;
+    } elseif ($hours <= 400) {
+        $stage = "Deployment Stage";
+        $next = "Final Stage";
+        $nextThreshold = 401;
+    } else {
+        $stage = "Final Stage";
+        $next = "Completed";
+        $nextThreshold = $required;
+    }
+
+    return "
+    <div class='reports-progress-header'>
+
+        <div class='reports-progress-info'>
+            <h3>{$stage}</h3>
+            <p>You are currently in: {$hours} / {$required} hours</p>
+        </div>
+
+        <div class='reports-progress-bar'>
+            <div class='reports-progress-fill' style='width: {$percent}%;'></div>
+        </div>
+
+        <div class='reports-progress-meta'>
+            <span>Next: {$next} ({$nextThreshold} hrs)</span>
+        </div>
+
+    </div>
+    ";
 }

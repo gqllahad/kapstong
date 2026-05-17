@@ -546,6 +546,107 @@ $documents = getStudentDocuments($conn, $studentID);
 
              </div>
 
+            <!-- reports -->
+            <div class="reports-container" id="reports-container">
+                <div class="modal-header">
+                <h3>Internship Reports</h3>
+
+                <button id="closeReportsModal"
+                    class="modal-close-profile">
+                    &times;
+                </button>
+                </div>
+
+               
+
+                    <?php
+                     echo renderProgressHeader($conn, $studentID);
+                     echo renderReports($conn, $studentID);
+                    ?>
+                
+            </div>
+
+                <!-- REPORT FORM PANEL -->
+            <div class="report-form-panel" id="reportFormPanel">
+
+                <div class="form-header">
+                    <div>
+                        <h4 id="formTitle">Submit Report</h4>
+                        <small id="formSubtitle">Fill out the required details below</small>
+                    </div>
+
+                    <button onclick="closeReportForm()" class="close-btn">×</button>
+                </div>
+
+                <div class="form-body">
+                    <input type="hidden" id="report_type" name="report_type">
+                    <input type="hidden" id="stageID" name="stageID">
+
+                    <div class="context-box">
+
+                        <div class="context-item">
+                            <label>Report Type</label>
+                            <span id="reportTypeLabel">-</span>
+                        </div>
+
+                        <div class="context-item">
+                            <label>Stage</label>
+                            <span id="stageLabel">-</span>
+                        </div>
+
+                    </div>
+
+                    <div class="field">
+                        <label>Report Title</label>
+                        <input type="text"
+                            id="reportTitle"
+                            placeholder="e.g. Weekly Training Report - Week 1">
+                    </div>
+                    
+                    <div class="hint-box" id="reportHints">
+                        <strong>What should you include?</strong>
+                        <ul>
+                            <li>Tasks you accomplished</li>
+                            <li>Skills learned during this period</li>
+                            <li>Challenges encountered</li>
+                        </ul>
+                    </div>
+
+                    <div class="field">
+                        <label>Report Content</label>
+                        <textarea id="reportContent"
+                            placeholder="Write your report in detail..."></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label>Attachment (optional)</label>
+
+                        <input type="file" id="reportFile" multiple hidden>
+
+                        <button type="button"
+                            class="upload-btn"
+                            onclick="document.getElementById('reportFile').click()">
+                            + Upload File
+                        </button>
+
+                        <div id="reportFilePreview" class="file-preview-container"></div>
+
+                        <small class="upload-note">
+                            PDF, DOCX, JPG, PNG allowed
+                        </small>
+                    </div>
+
+                    <button class="submit-btn">
+                        Submit Report
+                    </button>
+
+                </div>
+
+            </div>
+            
+
+
+
             <!-- dashboard -->
             <section class="student-dashboard" id="student-dashboard">
                 <section class="title-header">
@@ -568,8 +669,8 @@ $documents = getStudentDocuments($conn, $studentID);
                         <p>View your daily time-in and time-out logs.</p>
                     </div>
 
-                    <div class="card submitted-task">
-                        <h3>Documents</h3>
+                    <div class="card submitted-task" id="reports-btn">
+                        <h3>Reports</h3>
                         <p>Upload or review submitted reports.</p>
                     </div>
                 </section>

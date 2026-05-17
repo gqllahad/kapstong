@@ -121,11 +121,16 @@ const attendanceCardBtn = document.getElementById("attendance-btn");
 const attendanceCard = document.getElementById("attendance-container");
 const closeAttendanceCard = document.getElementById("closeAttendanceViewModal");
 
+const reportCardBtn = document.getElementById("reports-btn");
+const reportCard = document.getElementById("reports-container");
+const closeReportCard = document.getElementById("closeReportsModal");
+
 
 // task array
 let allTasks = [];
 
 let selectedFiles = [];
+let reportFiles = [];
 
 // unverified
 
@@ -461,8 +466,12 @@ function handleAlert(action, id = null) {
         case "viewProgress":
             openProgressModal();
             break;
-    }
-}
+
+        case "viewStage":
+            openStageModal();
+            break;
+        }
+} 
 
 function openProgressModal(){
     notificationCard.classList.remove("show");
@@ -474,6 +483,103 @@ function openProgressModal(){
 function  openAttendanceModal(){
     notificationCard.classList.remove("show");
     attendanceCard.classList.add("show");
+}
+
+function openStageModal(){
+    notificationCard.classList.remove("show");
+    reportCard.classList.add("show");
+}
+
+function openReportForm(reportType, stageID) {
+
+    document.getElementById("reportFormPanel").classList.add("show");
+    reportCard.classList.remove("show");
+
+   document.getElementById("report_type").value = reportType;
+    document.getElementById("stageID").value = stageID;
+
+    const titles = {
+        "ORIENTATION_REPORT": "Orientation Report",
+        "WEEKLY_REPORT": "Weekly Training Report",
+        "FINAL_REPORT": "Final Internship Report"
+    };
+
+    const stages = {
+        1: "Orientation",
+        2: "Training",
+        3: "Deployment",
+        4: "Final"
+    };
+
+    document.getElementById("formTitle").innerText =
+        "Submit " + titles[reportType];
+
+    document.getElementById("reportTitle").value =
+        titles[reportType];
+
+    document.getElementById("reportTypeLabel").innerText =
+        titles[reportType];
+
+    document.getElementById("stageLabel").innerText =
+        stages[stageID];
+
+        document.getElementById("reportFile").addEventListener("change", function (e) {
+
+        const files = Array.from(e.target.files);
+
+        files.forEach(file => {
+
+            if (!reportFiles.some(f => f.name === file.name)) {
+                reportFiles.push(file);
+            }
+
+        });
+
+        renderReportFiles();
+    });
+} //inigo
+
+function renderReportFiles() {
+
+    const container = document.getElementById("reportFilePreview");
+    container.innerHTML = "";
+
+    reportFiles.forEach((file, index) => {
+
+        const chip = document.createElement("div");
+        chip.className = "file-chip";
+
+        chip.innerHTML = `
+            <span title="${file.name}">
+                ${file.name}
+            </span>
+
+            <button type="button" onclick="removeReportFile(${index})">
+                ×
+            </button>
+        `;
+
+        container.appendChild(chip);
+    });
+}
+
+function removeReportFile(index) {
+    reportFiles.splice(index, 1);
+    renderReportFiles();
+}
+
+function syncReportFilesToInput() {
+
+    const dt = new DataTransfer();
+
+    reportFiles.forEach(file => dt.items.add(file));
+
+    document.getElementById("reportFile").files = dt.files;
+}
+
+function closeReportForm() {
+    document.getElementById("reportFormPanel").classList.remove("show");
+    reportCard.classList.add("show");
 }
 
 // attendance card
@@ -1461,6 +1567,8 @@ overlay.addEventListener('click', () => {
     progressCard?.classList.remove("show");
     notificationCard?.classList.remove("show");
     attendanceCard?.classList.remove("show");
+     reportCard?.classList.remove("show");
+     document.getElementById("reportFormPanel")?.classList.remove("show");
 
     if (editForm) editForm.reset();
 });
@@ -1580,6 +1688,18 @@ if(attendanceCardBtn){
 
     fetchLogs();
 });
+}
+
+if(reportCardBtn){
+    reportCardBtn.addEventListener("click", () => {
+        overlay.classList.add("show");
+        reportCard.classList.add("show");
+    });
+
+    closeReportCard.addEventListener("click", () => {
+        overlay.classList.remove("show");
+        reportCard.classList.remove("show");
+    })
 }
 
 

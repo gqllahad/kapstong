@@ -649,6 +649,74 @@ function viewTask(taskID) {
             document.getElementById("modalTaskProgress").innerText =
                 data.progress + "%";
 
+            const warningBox = document.getElementById("taskDeadlineWarning");
+            const warningText = document.getElementById("taskDeadlineWarningText");
+
+            warningBox.style.display = "none";
+            warningBox.className = "task-deadline-warning";
+
+            if (data.due_date) {
+
+                const today = new Date();
+                const dueDate = new Date(data.due_date);
+
+                today.setHours(0,0,0,0);
+                dueDate.setHours(0,0,0,0);
+
+                const diffTime = dueDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                const taskStatus = data.status;
+
+                if (taskStatus !== "APPROVED" && taskStatus !== "REJECTED") {
+
+                    if (diffDays < 0) {
+
+                        warningBox.style.display = "flex";
+                        warningBox.classList.add("danger");
+
+                        warningText.innerHTML =
+                            "⚠ This task is overdue.";
+
+                    }
+                    else if (diffDays <= 2) {
+
+                        warningBox.style.display = "flex";
+                        warningBox.classList.add("danger");
+
+                        warningText.innerHTML =
+                            "⚠ This task is nearing its deadline. Due in " +
+                            diffDays + " day(s).";
+
+                    }
+                    else if (diffDays <= 5) {
+
+                        warningBox.style.display = "flex";
+                        warningBox.classList.add("warning");
+
+                        warningText.innerHTML =
+                            "⏳ This task is close to its due date.";
+
+                    }
+                }
+
+                if(taskStatus === "APPROVED"){
+                     warningBox.style.display = "flex";
+                    warningBox.classList.add("success");
+
+                    warningText.innerHTML =
+                        "⚠ This task is approved.";
+                }
+
+                if(taskStatus === "REJECTED"){
+                    warningBox.style.display = "flex";
+                    warningBox.classList.add("danger");
+
+                    warningText.innerHTML =
+                        "⚠ This task is rejected.";
+                }
+            }
+
             document.getElementById("modalStudentNote").innerText =
                 data.student_note ? data.student_note : "No student note provided";
 
@@ -872,39 +940,85 @@ document.getElementById("studentProcessSearch").addEventListener("keyup", functi
     }, 300);
 });
 
-document.getElementById("assignedTaskSearch").addEventListener("keyup", function () {
-    clearTimeout(searchTimer);
+// tasks
+document.addEventListener("DOMContentLoaded", function () {
 
-    let value = this.value;
+    const searchInput = document.getElementById("assignedTaskSearch");
+    const statusFilter = document.getElementById("taskStatusFilter");
+    const deadlineDate = document.getElementById("dateDeadline");
+    const tableBody = document.getElementById("assignedTaskBody");
 
-    searchTimer = setTimeout(() => {
+    if (!searchInput || !statusFilter || !tableBody || !deadlineDate) return;
 
-        assignTask.classList.add("fade-out");
+    let timer;
+
+    function fetchLogs() {
+
+        const search = searchInput.value;
+        const status = statusFilter.value.toUpperCase();
+        const deadline = deadlineDate.value;
 
         fetch("functions/searchTask.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "search=" + encodeURIComponent(value)
+            body:
+                "search=" + encodeURIComponent(search) +
+                "&status=" + encodeURIComponent(status) +
+                "&deadline=" + encodeURIComponent(deadline)
+              
         })
         .then(res => res.text())
         .then(data => {
-            setTimeout(() => {
-                assignTask.innerHTML = data;
-
-                assignTask.classList.remove("fade-out");
-                assignTask.classList.add("fade-in");
-
-                setTimeout(() => {
-                    assignTask.classList.remove("fade-in");
-                }, 200);
-
-            }, 200);
+            tableBody.innerHTML = data;
         });
+    }
 
-    }, 300);
+    searchInput.addEventListener("keyup", function () {
+        clearTimeout(timer);
+        timer = setTimeout(fetchLogs, 300);
+    });
+
+    statusFilter.addEventListener("change", fetchLogs);
+    deadlineDate.addEventListener("change", fetchLogs);
+
+    fetchLogs();
 });
+
+// document.getElementById("assignedTaskSearch").addEventListener("keyup", function () {
+//     clearTimeout(searchTimer);
+
+//     let value = this.value;
+
+//     searchTimer = setTimeout(() => {
+
+//         assignTask.classList.add("fade-out");
+
+//         fetch("functions/searchTask.php", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/x-www-form-urlencoded"
+//             },
+//             body: "search=" + encodeURIComponent(value)
+//         })
+//         .then(res => res.text())
+//         .then(data => {
+//             setTimeout(() => {
+//                 assignTask.innerHTML = data;
+
+//                 assignTask.classList.remove("fade-out");
+//                 assignTask.classList.add("fade-in");
+
+//                 setTimeout(() => {
+//                     assignTask.classList.remove("fade-in");
+//                 }, 200);
+
+//             }, 200);
+//         });
+
+//     }, 300);
+// });
 
 
 // modals
@@ -1136,9 +1250,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const searchInput = document.getElementById("superActivityLogSearch");
     const moduleFilter = document.getElementById("moduleFilter");
+    const dateFromInput = document.getElementById("dateFrom");
+    const dateToInput = document.getElementById("dateTo");
     const tableBody = document.getElementById("activityLogTableBody");
 
-    if (!searchInput || !moduleFilter || !tableBody) return;
+    if (!searchInput || !moduleFilter || !tableBody || !dateFromInput || !dateToInput) return;
 
     let timer;
 
@@ -1146,6 +1262,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const search = searchInput.value;
         const module = moduleFilter.value.toUpperCase();
+        const dateFrom = dateFromInput.value;
+        const dateTo = dateToInput.value;
 
         fetch("functions/searchSupervisorActivityLog.php", {
             method: "POST",
@@ -1154,7 +1272,9 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             body:
                 "search=" + encodeURIComponent(search) +
-                "&module=" + encodeURIComponent(module) 
+                "&module=" + encodeURIComponent(module) +
+                "&dateFrom=" + encodeURIComponent(dateFrom) +
+                "&dateTo=" + encodeURIComponent(dateTo)
               
         })
         .then(res => res.text())
@@ -1169,6 +1289,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     moduleFilter.addEventListener("change", fetchLogs);
+    dateFromInput.addEventListener("change", fetchLogs);
+    dateToInput.addEventListener("change", fetchLogs);
 
     fetchLogs();
 });
@@ -1178,9 +1300,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const searchInput = document.getElementById("studentAttendanceSearch");
     const statusFilter = document.getElementById("attendanceStatusFilter");
+    const AttendanceDateFromInput = document.getElementById("attendanceDateFrom");
+    const AttendanceDateToInput = document.getElementById("attendanceDateTo");
     const tableBody = document.getElementById("studentAttendanceBody");
 
-    if (!searchInput || !statusFilter || !tableBody) return;
+    
+
+    if (!searchInput || !statusFilter || !tableBody || !AttendanceDateFromInput || !AttendanceDateToInput) return;
 
     let timer;
 
@@ -1188,6 +1314,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const search = searchInput.value;
         const status = statusFilter.value;
+        const attendanceFrom = AttendanceDateFromInput.value;
+        const attendanceTo = AttendanceDateToInput.value;
+
+        console.log(attendanceFrom, attendanceTo );
 
         fetch("functions/searchStudentAttendance.php", {
             method: "POST",
@@ -1196,7 +1326,9 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             body:
                 "search=" + encodeURIComponent(search) +
-                "&status=" + encodeURIComponent(status)
+                "&status=" + encodeURIComponent(status) + 
+                "&attendanceFrom=" + encodeURIComponent(attendanceFrom) +
+                "&attendanceTo=" + encodeURIComponent(attendanceTo)
         })
         .then(res => res.text())
         .then(data => {
@@ -1213,6 +1345,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     statusFilter.addEventListener("change", fetchAttendance);
+    AttendanceDateFromInput.addEventListener("change", fetchAttendance);
+    AttendanceDateToInput.addEventListener("change", fetchAttendance);
 
     fetchAttendance();
 });

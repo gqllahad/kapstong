@@ -200,6 +200,10 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     <h3>Task Details</h3>
                     <button id="closeTaskViewModal" class="modal-close-profile">&times;</button>
                 </div>
+
+                <div id="taskDeadlineWarning" class="task-deadline-warning" style="display:none;">
+                    <span id="taskDeadlineWarningText"></span>
+                </div>
                 <div class="task-modal-content">
 
 
@@ -758,7 +762,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     <div class="top-bar">
 
                         <div class="top-header">
-                            <h3 class="table-title">Pending Report Approval</h3>
+                            <h3 class="table-title">Submitted Reports</h3>
                             <p>Search and review students waiting for approval.</p>
                         </div>
 
@@ -808,8 +812,26 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             <div class="search-container">
                                 <i class="bi bi-search search-icon"></i>
                                 <input type="text" id="assignedTaskSearch"
-                                    placeholder="Search by Title, Status, ID or Name...">
+                                    placeholder="Search by Title, ID or Name...">
                             </div>
+
+                            <div class="filter-group">
+
+                            <select id="taskStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="NOT STARTED">Not started</option>
+                                <option value="IN PROGRESS">In progress</option>
+                                <option value="SUBMITTED">Submitted</option>
+                                <option value="REJECTED">Rejected</option>
+                                <option value="APPROVED">Approved</option>
+                            </select>
+
+                            </div>
+
+                            <div class="filter-group">
+                                <input type="date" id="dateDeadline" title="From date">
+                            </div>
+
                         </div>
 
                     </div>
@@ -829,7 +851,9 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             <tbody id="assignedTaskBody">
                                 <?php
                                 $search = $_POST['search'] ?? '';
-                                echo renderTaskManagementList($conn, $superID, $search);
+                                $status = $_POST['status'] ?? '';
+                                $deadline = $_POST['deadline'] ?? '';
+                                echo renderTaskManagementList($conn, $superID, $search, $status, $deadline);
                                 ?>
                             </tbody>
                         </table>
@@ -918,6 +942,11 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                         </div>
 
+                        <div class="filter-group">
+                            <input type="date" id="attendanceDateFrom" title="From date">
+                            <input type="date" id="attendanceDateTo" title="To date">
+                        </div>
+
                     </div>
                 </div>
 
@@ -939,7 +968,9 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             <tbody id="studentAttendanceBody">
                                 <?php
                                 $search = $_POST['search'] ?? '';
-                                echo renderStudentMainAttendance($conn, $superID, $search);
+                                $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
+                                $dateToAttendance = $_POST['dateToAttendance'] ?? '';
+                                echo renderStudentMainAttendance($conn, $superID, $search, $dateFromAttendance, $dateToAttendance);
                                 ?>
                             </tbody>
                         </table>
@@ -1008,6 +1039,11 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             </select>
 
                         </div>
+
+                        <div class="filter-group">
+                            <input type="date" id="dateFrom" title="From date">
+                            <input type="date" id="dateTo" title="To date">
+                        </div>
                     </div>
 
                     
@@ -1035,7 +1071,9 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                                 <?php
                                 $search = $_POST['search'] ?? '';
                                 $module = $_POST['module'] ?? '';
-                                echo renderSupervisorActivityLogTable($conn, $superID, $search, $module);
+                                $dateFrom = $_POST['dateFrom'] ?? '';
+                                $dateTo = $_POST['dateTo'] ?? '';
+                                echo renderSupervisorActivityLogTable($conn, $superID, $search, $module, $dateFrom, $dateTo);
                                 ?>
                             </tbody>
                         </table>
