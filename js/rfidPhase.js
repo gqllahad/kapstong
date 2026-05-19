@@ -80,6 +80,7 @@ function loadAttendance() {
                             <th>Time Out</th>
                             <th>Hours</th>
                             <th>Status</th>
+                            <th>Current State</th>
                             <th>Remarks</th>
                         </tr>
                     </thead>
@@ -163,6 +164,12 @@ function loadAttendance() {
                         <td>
                             <span class="badge ${statusClass}">
                                 ${row.status}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="badge ${statusClass}">
+                                ${row.current_state}
                             </span>
                         </td>
 

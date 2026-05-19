@@ -330,8 +330,8 @@ input:focus {
 #dashboardPanel {
     position: fixed;
     top: 0;
-    right: -520px;
-    width: 600px;
+    right: -570px;
+    width: 650px;
     height: 100vh;
 
     background: #0f172a; 

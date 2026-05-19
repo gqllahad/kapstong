@@ -44,12 +44,14 @@ const superOversightBtn = document.getElementById("supervisor-oversight-btn");
 const superStudentsBtn = document.getElementById("supervisor-students-btn");
 const superEvaluationBtn = document.getElementById("supervisor-evaluation-btn");
 const superActivityBtn = document.getElementById("supervisor-activity-btn");
+const superAttendanceBtn = document.getElementById("supervisor-attendance-btn");
 
 const superDashboard = document.getElementById("supervisor-dashboard");
 const superOversight = document.getElementById("supervisor-oversight");
 const superStudents = document.getElementById("supervisor-students");
 const superEvaluation = document.getElementById("supervisor-evaluation");
 const superActivity = document.getElementById("supervisor-activity");
+const superAttendance = document.getElementById("supervisor-attendance");
 
 // timers
 let searchTimer;
@@ -75,6 +77,11 @@ const backBtn = document.getElementById("backToAccountSettingsSupervisor");
 
 
 // functions
+
+// open rfid
+function openRfid() {
+     window.open("../../php/rfid_test.php", "_blank");
+}
 
 // force
 document.addEventListener("DOMContentLoaded", function () {
@@ -831,6 +838,7 @@ superDashboardBtn.addEventListener("click", () => {
      superStudents.style.display = "none";
      superEvaluation.style.display = "none";
      superActivity.style.display = "none";
+     superAttendance.style.display = "none";
 });
 
 superOversightBtn.addEventListener("click", () => {
@@ -840,6 +848,7 @@ superOversightBtn.addEventListener("click", () => {
     superStudents.style.display = "none";
     superEvaluation.style.display = "none";
     superActivity.style.display = "none";
+    superAttendance.style.display = "none";
 });
 
 superStudentsBtn.addEventListener("click", () => {
@@ -849,6 +858,7 @@ superStudentsBtn.addEventListener("click", () => {
     superOversight.style.display = "none";
     superActivity.style.display = "none";
     superEvaluation.style.display = "none";
+    superAttendance.style.display = "none";
 });
 
 superEvaluationBtn.addEventListener("click", () => {
@@ -858,6 +868,7 @@ superEvaluationBtn.addEventListener("click", () => {
     superDashboard.style.display = "none";
     superActivity.style.display = "none";
     superOversight.style.display = "none";
+    superAttendance.style.display = "none";
     
 });
 
@@ -868,7 +879,18 @@ superActivityBtn.addEventListener("click", () => {
     superStudents.style.display = "none";
     superDashboard.style.display = "none";
     superOversight.style.display = "none";
+    superAttendance.style.display = "none";
     
+});
+
+superAttendanceBtn.addEventListener("click", () => {
+    superAttendance.style.display = "block";
+    
+    superEvaluation.style.display = "none";
+    superStudents.style.display = "none";
+    superDashboard.style.display = "none";
+    superOversight.style.display = "none";
+    superActivity.style.display = "none";
 });
 
 // search tables
@@ -985,41 +1007,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetchLogs();
 });
-
-// document.getElementById("assignedTaskSearch").addEventListener("keyup", function () {
-//     clearTimeout(searchTimer);
-
-//     let value = this.value;
-
-//     searchTimer = setTimeout(() => {
-
-//         assignTask.classList.add("fade-out");
-
-//         fetch("functions/searchTask.php", {
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/x-www-form-urlencoded"
-//             },
-//             body: "search=" + encodeURIComponent(value)
-//         })
-//         .then(res => res.text())
-//         .then(data => {
-//             setTimeout(() => {
-//                 assignTask.innerHTML = data;
-
-//                 assignTask.classList.remove("fade-out");
-//                 assignTask.classList.add("fade-in");
-
-//                 setTimeout(() => {
-//                     assignTask.classList.remove("fade-in");
-//                 }, 200);
-
-//             }, 200);
-//         });
-
-//     }, 300);
-// });
-
 
 // modals
 overlay.addEventListener("click", () => {

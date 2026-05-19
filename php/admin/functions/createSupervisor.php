@@ -27,6 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL);
     $mobile = trim($_POST['mobile'] ?? '');
     $department = trim($_POST['department'] ?? '');
+    $company = trim($_POST['company'] ?? '');
+    $position = trim($_POST['position'] ?? '');
 
     if (!$email) {
         echo json_encode(["status" => "error", "message" => "Invalid email"]);
@@ -64,11 +66,11 @@ $stmtUser->execute();
         $userID = $conn->insert_id;
 
         $stmtSupervisor = $conn->prepare("
-            INSERT INTO supervisor (name, email, number, department)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO supervisor (name, email, number, department, company_name, position)
+            VALUES (?, ?, ?, ?,?,?)
         ");
 
-        $stmtSupervisor->bind_param("ssss", $name, $email, $mobile, $department);
+        $stmtSupervisor->bind_param("ssssss", $name, $email, $mobile, $department, $company, $position);
         $stmtSupervisor->execute();
 
         $superID = $conn->insert_id;

@@ -12,10 +12,12 @@ const menuItems = document.querySelectorAll('.menu li');
 const adminDashboardBtn = document.getElementById('admin-dashboard-btn');
 const adminApprovalBtn = document.getElementById('admin-approval-btn');
 const adminPreparationBtn = document.getElementById('admin-preparation-btn');
+const adminAttendanceBtn = document.getElementById('admin-attendance-btn');
 
 const adminDashboard = document.getElementById('admin-dashboard');
 const adminApproval = document.getElementById('admin-approval');
 const adminPreparation = document.getElementById('admin-preparation');
+const adminAttendance = document.getElementById('admin-attendance');
 
 // colors
 const statusColors = {
@@ -117,6 +119,9 @@ const viewAllBtn = document.getElementById("view-all-btn");
 const viewAll = document.getElementById("view-all-modal");
 const closeViewAllBtn = document.getElementById("closeViewAllModal");
 
+const rfidRegister = document.getElementById("rfid-register-modal");
+const closeRfidRegister = document.getElementById("closeRfidRegisterModal");
+
 // downloads
 const downloadAllStudentBtn = document.getElementById("downloadAllStudentBtn");
 const downloadAllStudent = document.getElementById("download-all-student-modal");
@@ -146,6 +151,11 @@ let timer;
 let isReassignMode = false;
 
 // Functions 
+
+// open rfid
+function openRfid(){
+     window.open("../../php/rfid_test.php", "_blank");
+}
 
 // toast
 function showToast(message, type = "success") {
@@ -203,6 +213,65 @@ function viewUser(studentID, source) {
         studentApplicationView.innerHTML = data;
     });
 };
+
+function openRFIDRegisterModal(studentID)
+{
+    document.getElementById("rfidStudentID").value = studentID;
+
+    allStudent.classList.remove("show");
+    rfidRegister.classList.add("show");
+
+     setTimeout(() => {
+        document.getElementById("rfid_uid").focus();
+    }, 200);
+}
+
+function submitRFIDRegister()
+{
+    const studentID = document.getElementById("rfidStudentID").value;
+
+    const rfid_uid = document.getElementById("rfid_uid").value.trim();
+
+    if(rfid_uid === "")
+    {
+        showToast("Please scan RFID first", "warning"); 
+        return;
+    }
+
+    fetch("functions/register_rfid.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "studentID=" + encodeURIComponent(studentID)
+            + "&rfid_uid=" + encodeURIComponent(rfid_uid)
+    })
+    .then(response => response.text())
+    .then(data => {
+
+        if(data === "success")
+        {
+            showToast("RFID Registered Successfully", "success");
+
+
+            setTimeout(() => {
+                location.reload();
+            }, 500);
+            
+        }
+        else
+        {
+            showToast(data, "error");
+        }
+
+    })
+    .catch(error => {
+
+        showToast(error, "error");
+    });
+}
+
 
 function viewSupervisor(superID) {
     
@@ -332,7 +401,7 @@ function approveStudent(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-        showToast(reponse, "success");
+        showToast(response, "success");
         closeApproveModal();
         location.reload();
     })
@@ -1487,6 +1556,7 @@ adminDashboardBtn.addEventListener("click", () => {
 
     adminApproval.style.display = "none";
     adminPreparation.style.display = "none";
+    adminAttendance.style.display = "none";
 
 });
 
@@ -1496,6 +1566,7 @@ adminApprovalBtn.addEventListener("click", () => {
 
     adminDashboard.style.display = "none";
     adminPreparation.style.display = "none";
+    adminAttendance.style.display = "none";
 });
 
 adminPreparationBtn.addEventListener("click", () => {
@@ -1504,8 +1575,18 @@ adminPreparationBtn.addEventListener("click", () => {
 
     adminDashboard.style.display = "none";
     adminApproval.style.display = "none";
+    adminAttendance.style.display = "none";
 
 });
+
+adminAttendanceBtn.addEventListener("click", () => {
+    adminAttendance.style.display = "block";
+
+    adminPreparation.style.display = "none";
+    adminDashboard.style.display = "none";
+    adminApproval.style.display = "none";
+
+})
 
 document.getElementById("approvalSearch").addEventListener("keyup", function () {
     clearTimeout(searchTimer);
@@ -1565,6 +1646,7 @@ overlay.addEventListener('click', () => {
       viewAll.classList.remove("show")
       downloadAllStudent.classList.remove("show")
       downloadAllSupervisor.classList.remove("show")
+      rfidRegister.classList.remove("show");
 });
 
 allStudentBtn.addEventListener("click", () => {
@@ -1764,59 +1846,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetchLogs();
 });
-
-// document.getElementById("activityLogSearch").addEventListener("keyup", function () {
-
-//     clearTimeout(activitySearchTimer);
-
-//     let value = this.value;
-
-//     activitySearchTimer = setTimeout(() => {
-
-//         activityLogBody.classList.add("fade-out");
-
-//         fetch("functions/searchActivityLog.php", {
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/x-www-form-urlencoded"
-//             },
-//             body: "search=" + encodeURIComponent(value)
-//         })
-//         .then(res => res.text())
-//         .then(data => {
-
-//             setTimeout(() => {
-//                 activityLogBody.innerHTML = data;
-
-//                 activityLogBody.classList.remove("fade-out");
-//                 activityLogBody.classList.add("fade-in");
-
-//                 setTimeout(() => {
-//                     activityLogBody.classList.remove("fade-in");
-//                 }, 200);
-
-//             }, 200);
-
-//         });
-
-//     }, 300);
-// });
-
-// bugg
-// studentApplicationClose.addEventListener("click", () => {
-//     overlay.classList.remove("show");
-//     studentApplicationView.classList.remove("show");
-// });
-
-
-// studentApplicationApproveBtn.addEventListener("click", () => {
-//     overlay.classList.add("show");
-
-//     studentApplicationApprove.classList.add("show");
-// });
-
-
-
 
 // supervisor create
 superCreateBtn.addEventListener("click", () => {
@@ -2059,6 +2088,68 @@ document.getElementById("assign-btn").addEventListener("click", function () {
 
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("studentAttendanceSearch");
+    const statusFilter = document.getElementById("attendanceStatusFilter");
+    const courseFilter = document.getElementById("attendanceCourseFilter");
+    const attendanceDateFrom = document.getElementById("attendanceDateFrom");
+    const attendanceDateTo = document.getElementById("attendanceDateTo");
+    const tableBody = document.getElementById("studentAttendanceBody");
+
+    if (
+        !searchInput ||
+        !statusFilter ||
+        !attendanceDateFrom ||
+        !attendanceDateTo ||
+        !courseFilter ||
+        !tableBody
+    ) return;
+
+    let timer;
+
+    function fetchAdminAttendance() {
+
+        const search = searchInput.value;
+        const status = statusFilter.value;
+        const dateFrom = attendanceDateFrom.value;
+        const dateTo = attendanceDateTo.value;
+        const course = courseFilter.value;
+
+        fetch("functions/searchAdminAttendance.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "search=" + encodeURIComponent(search) +
+                "&status=" + encodeURIComponent(status) +
+                "&course=" + encodeURIComponent(course) +
+                "&dateFromAttendance=" + encodeURIComponent(dateFrom) +
+                "&dateToAttendance=" + encodeURIComponent(dateTo)
+        })
+        .then(response => response.text())
+        .then(data => {
+            tableBody.innerHTML = data;
+        })
+        .catch(error => {
+            console.error("Admin attendance fetch error:", error);
+        });
+    }
+
+    searchInput.addEventListener("keyup", function () {
+        clearTimeout(timer);
+        timer = setTimeout(fetchAdminAttendance, 300);
+    });
+
+    statusFilter.addEventListener("change", fetchAdminAttendance);
+    attendanceDateFrom.addEventListener("change", fetchAdminAttendance);
+    attendanceDateTo.addEventListener("change", fetchAdminAttendance);
+    courseFilter.addEventListener("change", fetchAdminAttendance);
+
+    fetchAdminAttendance();
+});
+
 
 // system config buttons
 
@@ -2147,6 +2238,14 @@ downloadAllSupervisorBtn.addEventListener("click", () => {
 closeDownloadAllSupervisor.addEventListener("click", () => {
     downloadAllSupervisor.classList.remove("show");
     allSupervisor.classList.add("show");
+});
+
+// reigister rfid
+
+
+closeRfidRegister.addEventListener("click", () => {
+    rfidRegister.classList.remove("show");
+    allStudent.classList.add("show");
 });
 
 

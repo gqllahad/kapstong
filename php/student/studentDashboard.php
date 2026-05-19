@@ -36,7 +36,8 @@ $documents = getStudentDocuments($conn, $studentID);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OJT Student Dashboard</title>
+    <title>Student Dashboard</title>
+    <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
     <link rel="stylesheet" href="../../css/student/studentDashboard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
@@ -64,7 +65,7 @@ $documents = getStudentDocuments($conn, $studentID);
                     <button id="student-tasks-btn"><i class="bi bi-journal-text"></i> My Tasks</button>
                 </li>
                 <li><button id="student-documents-btn"><i class="bi bi-file-earmark-text"></i>My Documents</button></li>
-                <li><button><i class="bi bi-chat-left-text"></i> Activity logs</button></li>
+                <li><button id="student-activity-btn"><i class="bi bi-chat-left-text"></i> Activity logs</button></li>
             </ul>
         </aside>
 
@@ -489,7 +490,7 @@ $documents = getStudentDocuments($conn, $studentID);
             <!-- attendance modal -->
              <div class="attendance-container" id="attendance-container">
                 <div class="modal-header">
-                    <h3>Attendance</h3>
+                    <h3>Attendance logs</h3>
                     <button id="closeAttendanceViewModal"
                         class="modal-close-profile">
                         &times;
@@ -499,7 +500,7 @@ $documents = getStudentDocuments($conn, $studentID);
                 <div class="top-bar">
 
                     <div class="top-header">
-                        <h3 class="table-title">Activity Logs</h3>
+                        <h3 class="table-title"></h3>
                         <p>Monitor system actions and user activities.</p>
                     </div>
 
@@ -823,6 +824,47 @@ $documents = getStudentDocuments($conn, $studentID);
                     </div>
 
                     <div class="info-section">
+                        <h3>OJT Information</h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Company Name</label>
+                                <input type="text" 
+                                    value="<?php echo htmlspecialchars($studentInfo['company_name'] ?? 'Not Assigned'); ?>" 
+                                    readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Assigned Supervisor</label>
+                                <input type="text" 
+                                    value="<?php echo htmlspecialchars($studentInfo['supervisor_name'] ?? 'Not Assigned'); ?>" 
+                                    readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Assigned Supervisor Position</label>
+                                <input type="text" 
+                                    value="<?php echo htmlspecialchars($studentInfo['supervisor_position'] ?? 'Not Assigned'); ?>" 
+                                    readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Supervisor Contact</label>
+                                <input type="text" 
+                                    value="<?php echo htmlspecialchars($studentInfo['supervisor_number'] ?? 'Not Available'); ?>" 
+                                    readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Internship Status</label>
+                                <input type="text" 
+                                    value="<?php echo htmlspecialchars($studentInfo['assignment_status'] ?? 'Ongoing'); ?>" 
+                                    readonly>
+                            </div>
+                        </div>        
+                    </div>
+
+                    <div class="info-section">
                         <h3>Uploaded Documents</h3>
 
                         <div class="documents-grid">
@@ -857,9 +899,78 @@ $documents = getStudentDocuments($conn, $studentID);
                     </div>
 
                 </div>
-
-                
             </section>
+
+            <section class="student-activity" id="student-activity">
+                <div class="top-bar">
+
+                    <div class="top-header">
+                        <h3 class="table-title">Activity Logs</h3>
+                        <p>Monitor system actions and user activities.</p>
+                    </div>
+
+                    <div class="search-filter">
+                        <div class="search-container">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" id="studentActivityLogSearch"
+                                placeholder="Search by target ID..">
+                        </div>
+
+
+                        <div class="filter-group">
+
+                            <select id="moduleFilter">
+                                <option value="">All Modules</option>
+                                <option value="TASK">Task</option>
+                                <option value="ATTENDANCE">Attendance</option>
+                                <option value="ASSIGNMENT">ASSIGNMENT</option>
+                                <option value="DOCUMENT">Document</option>
+                                <option value="SYSTEM">System</option>
+                            </select>
+
+                        </div>
+
+                        <div class="filter-group">
+                            <input type="date" id="dateFrom" title="From date">
+                            <input type="date" id="dateTo" title="To date">
+                        </div>
+                    </div>
+
+                </div>    
+                
+                
+                <div class="activity-log-container">
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Activity Type</th>
+                                    <th>Module</th>
+                                    <th>Target Type</th>
+                                    <th>Target ID</th>
+                                    <th>IP Address</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="activityLogTableBody">
+                                <?php
+                                $search = $_POST['search'] ?? '';
+                                $module = $_POST['module'] ?? '';
+                                $dateFrom = $_POST['dateFrom'] ?? '';
+                                $dateTo = $_POST['dateTo'] ?? '';
+                                echo renderStudentActivityLogTable($conn,$studentID, $search, $module, $dateFrom, $dateTo);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </section>
+
+
+
             <div id="imagePreviewModal" class="image-modal">
                     <span id="closeImagePreview">&times;</span>
                     <img id="previewImg">

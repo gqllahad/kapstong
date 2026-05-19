@@ -174,9 +174,10 @@ min-height:90vh;
 .menu li, .menu li i{
     background: transparent;
     overflow: hidden;
-    padding: 0.7rem;
-    margin: 15% 0;
+    padding: 0.4rem;
+    margin: 10% 0;
     border-radius: 8px;
+    cursor: pointer;
     transition: all 0.5s ease;
 }
 
@@ -215,14 +216,9 @@ min-height:90vh;
 }
 
 .menu i, .menu a i{
-    font-size: 1.3rem;
+    font-size: 1.2rem;
 }
 
-
-
-/* .sidebar li a:hover{
-background:#f0f0f0;
-} */
 
 /* CONTENT */
 
@@ -486,7 +482,7 @@ background:#eee;
     display: block;
 }
 
-.admin-approval, .admin-preparation {
+.admin-approval, .admin-preparation, .admin-attendance {
     display: none;
     padding: 20px;
 }
@@ -833,98 +829,6 @@ background:#eee;
 .pie-chart {
     grid-area: pie;
 }
-
-/* .deadline-container {
-    grid-area: task;
-} */
-
-/* .task-item {
-    padding: 12px 14px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-
-    background: #f8fafc;
-    border-left: 4px solid #94a3b8;
-
-    transition: all 0.25s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.task-item strong {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 4px;
-    color: #111827;
-}
-
-.task-item p {
-    margin: 0;
-    font-size: 13px;
-    color: #374151;
-}
-
-.task-item small {
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.task-item:hover {
-    transform: translateX(6px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
-
-.task-item.info {
-    border-left-color: #60a5fa;
-    background: #eff6ff;
-}
-
-.task-item.warning {
-    border-left-color: #facc15;
-    background: #fffbeb;
-}
-
-.task-item.danger {
-    border-left-color: #ef4444;
-    background: #fef2f2;
-}
-
-.risk-tag {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-
-    font-size: 11px;
-    font-weight: 700;
-
-    padding: 3px 8px;
-    border-radius: 999px;
-
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-}
-
-.deadline-container {
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(10px);
-
-    border-radius: 14px;
-    padding: 18px;
-
-    border-top: 5px solid rgba(37, 99, 235, 0.6);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-
-    max-height: 350px;
-    margin-top: 20px;
-    overflow-y: auto;
-}
-
-.deadline-container p:first-child {
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: #111827;
-} */
 
 .deadline-container, .view-all-container {
     background: rgba(255,255,255,0.88);
@@ -1417,6 +1321,98 @@ tbody tr {
     margin: 4px 0 0;
     font-size: 13px;
     color: #6b7280;
+}
+
+.student-id-cell {
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.student-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.student-avatar {
+    width: 34px;
+    height: 34px;
+
+    border-radius: 50%;
+
+    background: #dbeafe;
+    color: #2563eb;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.task-title-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.task-title {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.task-subtitle {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.date-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    font-weight: 600;
+    color: #334155;
+}
+
+.date-cell small {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.table-container table tbody tr {
+    transition: 0.2s ease;
+}
+
+.table-container table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 12px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+
+    color: white;
+
+    text-transform: uppercase;
+
+    min-width: 110px;
+}
+
+.status-pill.submitted {
+    background: #d97706; 
+    border-color: #fcd34d;
+    color: #fffbeb;
 }
 
 /* table search */
@@ -1926,7 +1922,7 @@ tbody tr {
 
 .all-student-modal, .student-application-view, .student-application-approve, .student-application-reject, .supervisor-container
 ,.all-supervisor-modal, .all-unverified-modal, .assign-student-container, .supervisor-view, .ojt-program-container, .department-management-container,.department-management-modal,
-.rfid-attendance-container, .evaluation-settings-container, .requirements-setup-container, .create-course-modal, .view-all-modal, .download-all-student-modal, .download-all-supervisor-modal{
+.rfid-attendance-container, .evaluation-settings-container, .requirements-setup-container, .create-course-modal, .view-all-modal, .download-all-student-modal, .download-all-supervisor-modal, .rfid-register-modal{
     position: fixed;
     top: 50%;
     left: 50%;
@@ -1945,10 +1941,20 @@ tbody tr {
 
 .all-student-modal.show, .student-application-view.show, .student-application-approve.show, .student-application-reject.show, .supervisor-container.show 
 ,.all-supervisor-modal.show, .all-unverified-modal.show, .assign-student-container.show, .supervisor-view.show, .ojt-program-container.show, .department-management-container.show,.department-management-modal.show,
-.rfid-attendance-container.show, .evaluation-settings-container.show, .requirements-setup-container.show, .create-course-modal.show, .view-all-modal.show, .download-all-student-modal.show, .download-all-supervisor-modal.show{
+.rfid-attendance-container.show, .evaluation-settings-container.show, .requirements-setup-container.show, .create-course-modal.show, .view-all-modal.show, .download-all-student-modal.show, .download-all-supervisor-modal.show, .rfid-register-modal.show{
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
+}
+
+.all-supervisor-modal, .all-unverified-modal, .all-student-modal{
+    width: 90%;
+    max-width: 1550px;
+}
+
+.department-management-container{
+    width: 90%;
+    max-width: 1000px;
 }
 
 /* approval options */
@@ -2201,6 +2207,38 @@ tbody tr {
 
 .info-card.active .arrow {
     transform: rotate(180deg);
+}
+
+.rfid-card {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s ease;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.rfid-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.rfid-icon {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.rfid-text h3 {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.rfid-text p {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 12px;
+    line-height: 1.4;
 }
 
 /* uploads */
@@ -2530,6 +2568,16 @@ tbody tr {
 
 .rfid-body {
     margin-top: 15px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.time-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .rfid-actions, .modal-actions {
@@ -2776,6 +2824,138 @@ tbody tr {
 
 .rfid-rescan:active {
     transform: scale(0.98);
+}
+
+.rfid-register-content{
+    width: 100%;
+    background: #fff;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.modal-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid #eee;
+}
+
+.rfid-register-body{
+    padding: 35px 28px;
+    text-align: center;
+}
+
+.rfid-icon{
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: rgba(59,130,246,.12);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rfid-icon i{
+    font-size: 38px;
+    color: #2563eb;
+}
+
+.rfid-title{
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.rfid-subtitle{
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.rfid-status{
+    padding: 14px;
+    border-radius: 12px;
+    background: #f5f7fb;
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 25px;
+    border: 1px solid #e5e7eb;
+}
+
+.register-rfid-btn{
+    width: 100%;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.register-rfid-btn:hover{
+    background: #1d4ed8;
+}
+
+.rfid-input-container{
+    margin-bottom: 24px;
+}
+
+.rfid-input{
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid #d1d5db;
+    outline: none;
+    font-size: 15px;
+    text-align: center;
+    transition: .2s ease;
+}
+
+.rfid-input:focus{
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+}
+
+.rfid-helper{
+    display: block;
+    margin-top: 10px;
+    color: #777;
+    font-size: 13px;
+}
+
+.rfid-text-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+     background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    color: #2563eb;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    padding: 4px 6px;
+
+    border-radius: 6px;
+
+    transition: .2s ease;
+}
+
+.rfid-text-btn i{
+    font-size: 13px;
+    line-height: 1;
+}
+
+.rfid-text-btn:hover{
+    background: rgba(37, 99, 235, 0.08);
 }
 /* empty charts */
 

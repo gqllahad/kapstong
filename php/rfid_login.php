@@ -80,9 +80,9 @@ if (isset($_POST['rfid'])) {
     $user = $result->fetch_assoc();
     $studentID = $user['studentID'];
 
-    $_SESSION['role'] = $user['role'];
-    $_SESSION['name'] = $user['name'];
-    $_SESSION['studentID'] = $studentID;
+    // $_SESSION['role'] = $user['role'];
+    // $_SESSION['name'] = $user['name'];
+    // $_SESSION['studentID'] = $studentID;
 
     $stmtAttendance = $conn->prepare("
         SELECT * FROM attendance_logs

@@ -22,6 +22,31 @@ if (isset($_POST['login-submit'])) {
         exit();
     }
 
+    $ip = getUserIP();
+    // $email = $userEmail;
+
+    //     $stmt_brute = $conn->prepare("
+    //         SELECT attempts, last_attempt 
+    //         FROM login_attempts 
+    //         WHERE email = ? AND ip_address = ?
+    //     ");
+    //     $stmt_brute->bind_param("ss", $email, $ip);
+    //     $stmt_brute->execute();
+    //     $attemptData = $stmt_brute->get_result()->fetch_assoc();
+
+    //     if ($attemptData && $attemptData['attempts'] >= 5) {
+
+    //         if (!empty($attemptData['last_attempt'])) {
+    //             $lastAttempt = strtotime($attemptData['last_attempt']);
+    //             $lockTime = 10 * 60;
+
+    //             if (time() - $lastAttempt < $lockTime) {
+    //                 header("Location: loginPhase.php?warning=Too many attempts. Try again later.");
+    //                 exit();
+    //             }
+    //         }
+    //     }
+
     $userPassword = $_POST["loginPassword"];
 
     $sql_prep = $conn->prepare("SELECT * FROM users WHERE email = ?");
@@ -58,7 +83,7 @@ if (isset($_POST['login-submit'])) {
                 $_SESSION['superID'] = $row["superID"];
             }
 
-            $ip = getUserIP();
+            
 
             $stmt = $conn->prepare("
         INSERT INTO activity_log 
@@ -87,9 +112,46 @@ if (isset($_POST['login-submit'])) {
 
             $stmt->execute();
 
+            // $delete = $conn->prepare("
+            //     DELETE FROM login_attempts 
+            //     WHERE email = ? AND ip_address = ?
+            // ");
+            // $delete->bind_param("ss", $email, $ip);
+            // $delete->execute();
+
             header("Location: trackerMain.php?login=Logging In..");
             exit();
         } else {
+            
+            // $check = $conn->prepare("
+            //     SELECT id 
+            //     FROM login_attempts 
+            //     WHERE email = ? AND ip_address = ?
+            // ");
+            // $check->bind_param("ss", $email, $ip);
+            // $check->execute();
+            // $res = $check->get_result();
+
+            // if ($row = $res->fetch_assoc()) {
+
+            //     $update = $conn->prepare("
+            //         UPDATE login_attempts 
+            //         SET attempts = attempts + 1,
+            //             last_attempt = NOW()
+            //         WHERE id = ?
+            //     ");
+            //     $update->bind_param("i", $row['id']);
+            //     $update->execute();
+
+            // } else {
+
+            //     $insert = $conn->prepare("
+            //         INSERT INTO login_attempts (email, ip_address, attempts, last_attempt)
+            //         VALUES (?, ?, 1, NOW())
+            //     ");
+            //     $insert->bind_param("ss", $email, $ip);
+            //     $insert->execute();
+            // }
 
             header("Location: loginPhase.php?warning=Incorrect+Password");
             exit();

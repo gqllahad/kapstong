@@ -52,10 +52,12 @@ const closeModalAccountBtn = document.getElementById('closeAccountModal');
 const studentDashboardBtn = document.getElementById("student-dashboard-btn");
 const studentTasksBtn = document.getElementById("student-tasks-btn");
 const studentDocumentsBtn = document.getElementById("student-documents-btn");
+const studentActivityBtn = document.getElementById("student-activity-btn");
 
 const studentDashboard = document.getElementById("student-dashboard");
 const studentTasks = document.getElementById("student-tasks");
 const studentDocuments = document.getElementById("student-documents");
+const studentActivity = document.getElementById("student-activity");
 
 // unverified Students
 
@@ -1409,7 +1411,7 @@ if(studentDashboardBtn){
 
         studentTasks.style.display = "none";
         studentDocuments.style.display = "none";
-
+        studentActivity.style.display = "none";
         studentDashboard.style.display = "block";
 
     });
@@ -1420,7 +1422,7 @@ if(studentTasksBtn){
 
         studentDashboard.style.display = "none";
         studentDocuments.style.display = "none";
-
+        studentActivity.style.display = "none";
         studentTasks.style.display = "block";
         
     });
@@ -1530,10 +1532,73 @@ if(studentDocumentsBtn){
 
         studentDashboard.style.display = "none";
         studentTasks.style.display = "none";
+        studentActivity.style.display = "none";
 
         studentDocuments.style.display = "block";
         
     });
+}
+
+if(studentActivityBtn){
+    studentActivityBtn.addEventListener("click", () => {
+        studentDashboard.style.display = "none";
+        studentTasks.style.display = "none";
+        studentDocuments.style.display = "none";
+
+        studentActivity.style.display = "block";
+
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+            const searchInput = document.getElementById("studentActivityLogSearch");
+            const moduleFilter = document.getElementById("moduleFilter");
+            const dateFromInput = document.getElementById("dateFrom");
+            const dateToInput = document.getElementById("dateTo");
+            const tableBody = document.getElementById("activityLogTableBody");
+
+            if (!searchInput || !moduleFilter || !tableBody || !dateFromInput || !dateToInput) return;
+
+            let timer;
+
+            function fetchLogs() {
+
+                const search = searchInput.value;
+                const module = moduleFilter.value.toUpperCase();
+                const dateFrom = dateFromInput.value;
+                const dateTo = dateToInput.value;
+
+
+                fetch("student_functions/searchStudentActivityLog.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body:
+                     "studentID=" + encodeURIComponent(studentID) +
+                        "search=" + encodeURIComponent(search) +
+                        "&module=" + encodeURIComponent(module) +
+                        "&dateFrom=" + encodeURIComponent(dateFrom) +
+                        "&dateTo=" + encodeURIComponent(dateTo)
+                    
+                })
+                .then(res => res.text())
+                .then(data => {
+                    tableBody.innerHTML = data;
+                });
+            }
+
+            searchInput.addEventListener("keyup", function () {
+                clearTimeout(timer);
+                timer = setTimeout(fetchLogs, 300);
+            });
+
+            moduleFilter.addEventListener("change", fetchLogs);
+            dateFromInput.addEventListener("change", fetchLogs);
+            dateToInput.addEventListener("change", fetchLogs);
+
+            fetchLogs();
+        });
 }
 
 if(verifiedPreview){

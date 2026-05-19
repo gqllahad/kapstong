@@ -600,6 +600,11 @@ transition: margin-left 0.9s ease;
     transform: translate(-50%, -50%) scale(1);
 }
 
+.attendance-container{
+    width: 90%;
+    max-width: 1050px;
+}
+
 /* notifications */
 .notification-modal-content {
     display: flex;
@@ -1443,7 +1448,7 @@ transition: margin-left 0.9s ease;
     display: block;
 }
 
-.unverified-student-documents, .student-documents {
+.unverified-student-documents, .student-documents,.student-activity {
     display: none;
 }
 
@@ -2312,6 +2317,23 @@ transition: opacity 0.3s ease;
     outline: none;
 }
 
+.filter-group input[type="date"] {
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1.5px solid #d1d5db;
+    background: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    min-width: 160px;
+}
+
+.filter-group input[type="date"]:focus {
+    border-color: #2563eb;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    outline: none;
+}
+
 /* reports */
 .stage-strip{
     display:flex;
@@ -2442,14 +2464,21 @@ transition: opacity 0.3s ease;
 }
 
 .reports-progress-header {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(37, 99, 235, 0.25);
     padding: 18px;
     border-radius: 14px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
     gap: 12px;
+
+    transition: all 0.2s ease;
+}
+
+.reports-progress-header:hover {
+    border-color: rgba(37, 99, 235, 0.6);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.12);
 }
 
 .reports-progress-info h3 {
@@ -2671,6 +2700,93 @@ transition: opacity 0.3s ease;
 .submit-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 8px 18px rgba(37, 99, 235, 0.18);
+}
+
+/* attendance table */
+.student-id-cell {
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.student-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.student-avatar {
+    width: 34px;
+    height: 34px;
+
+    border-radius: 50%;
+
+    background: #dbeafe;
+    color: #2563eb;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.task-title-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.task-title {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.task-subtitle {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.date-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    font-weight: 600;
+    color: #334155;
+}
+
+.date-cell small {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.table-container table tbody tr {
+    transition: 0.2s ease;
+}
+
+.table-container table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 12px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+
+    color: white;
+
+    text-transform: uppercase;
+
+    min-width: 110px;
 }
 
 

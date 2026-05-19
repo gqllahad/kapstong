@@ -85,7 +85,7 @@ function getStudentDocuments($conn, $studentID)
 
 function getStudentInfo($conn, $studentID)
 {
-    $stmt = $conn->prepare("
+     $stmt = $conn->prepare("
         SELECT 
             s.studentID,
             s.email,
@@ -99,9 +99,30 @@ function getStudentInfo($conn, $studentID)
             s.gender,
             s.yearLevel,
             s.birthDate,
-            s.address
+            s.address,
+            sup.superID,
+            sup.name AS supervisor_name,
+            sup.email AS supervisor_email,
+            sup.number AS supervisor_number,
+            sup.department AS supervisor_department,
+            sup.company_name,
+            sup.position AS supervisor_position,
+
+            ss.status AS assignment_status,
+            ss.date_assigned
+
         FROM ojtstudent s
-        LEFT JOIN program p ON s.course = p.prg_acro
+
+        LEFT JOIN program p 
+            ON s.course = p.prg_acro
+
+        LEFT JOIN student_supervisor ss 
+            ON s.studentID = ss.studentID 
+            AND ss.status = 'ACTIVE'
+
+        LEFT JOIN supervisor sup 
+            ON ss.superID = sup.superID
+
         WHERE s.studentID = ?
     ");
     $stmt->bind_param("s", $studentID);
@@ -111,6 +132,7 @@ function getStudentInfo($conn, $studentID)
     if ($result->num_rows > 0) {
         return $result->fetch_assoc();
     }
+
     return null;
 }
 
@@ -210,7 +232,9 @@ function renderStudentTable($conn, $type, $verifiedFilter, $search)
         users.email,
         users.isVerified,
         students.course,
-        students.yearLevel
+        students.yearLevel,
+        users.rfid_uid,
+        users.rfid_status
     FROM users users
     LEFT JOIN ojtstudent AS students
         ON users.studentID = students.studentID
@@ -225,6 +249,7 @@ function renderStudentTable($conn, $type, $verifiedFilter, $search)
         while ($row = $result->fetch_assoc()) {
 
             $status = $row['isVerified'];
+            $rfid_status = $row['rfid_status'];
 
             $output .= '
             <tr>
@@ -238,11 +263,17 @@ function renderStudentTable($conn, $type, $verifiedFilter, $search)
                 </td>
                 <td>';
 
-            if ($status === 'VERIFIED') {
+            if ($status === 'VERIFIED' && $rfid_status === 'Registered') {
                 $output .= '
-                             <button class="view-btn" onclick="viewUser(' . $row['studentID'] . ', \'allStudent\')">View</button>';
-            } else {
-                $output .= '<button class="view-btn" onclick="viewUser(' . $row['studentID'] . ', \'UnverifiedStudent\')">View</button>';
+                             <button class="view-btn" onclick="viewUser(\'' . $row['studentID'] . '\', \'allStudent\')">View</button>';
+            }
+            else if($status === 'VERIFIED' && $rfid_status === "Not Registered"){
+                $output .= '
+                             <button class="view-btn" onclick="viewUser(\'' . $row['studentID'] . '\', \'allStudent\')">View</button>
+                             <button class="rfid-text-btn"onclick="openRFIDRegisterModal(\'' . $row['studentID'] . '\')"><i class="bi bi-credit-card"></i>Register</button>';
+            }
+            else {
+                $output .= '<button class="view-btn" onclick="viewUser(\'' . $row['studentID'] . '\', \'UnverifiedStudent\')">View</button>';
             }
         }
     } else {
@@ -264,7 +295,9 @@ function renderSupervisorTable($conn, $search = '')
             supervisor.superID LIKE '%$search%' OR
             supervisor.name LIKE '%$search%' OR
             supervisor.email LIKE '%$search%' OR
-            supervisor.department LIKE '%$search%'
+            supervisor.department LIKE '%$search%' OR
+            supervisor.company_name LIKE '%$search%' OR
+            supervisor.position LIKE '%$search%'
         )";
     }
 
@@ -274,6 +307,8 @@ function renderSupervisorTable($conn, $search = '')
                 supervisor.email,
                 supervisor.number,
                 supervisor.department,
+                supervisor.company_name,
+                supervisor.position,
                 supervisor.date_created
             FROM supervisor
             $where
@@ -293,6 +328,8 @@ function renderSupervisorTable($conn, $search = '')
                 <td>' . $row['email'] . '</td>
                 <td>' . $row['number'] . '</td>
                 <td>' . $row['department'] . '</td>
+                <td>' . $row['company_name'] . '</td>
+                <td>' . $row['position'] . '</td>
                 <td>' . date("M d, Y h:i A", strtotime($row['date_created'])) . '</td>
                 <td>
                     <button class="view-btn" onclick="viewSupervisor(' . $row['superID'] . ')">View</button>
@@ -947,8 +984,6 @@ function renderEvaluationList($conn, $superID, $search = '')
 
             <td style="color: ' . $remarkColor . '; font-weight:600;">' . $remarks . '</td>
 
-            <td>' . date("M d, Y") . '</td>
-
             <td>
                 <button class="view-btn"
                     onclick="viewEvaluationBreakdown(\'' . $studentID . '\')">
@@ -1232,6 +1267,222 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
     return $output;
 }
 
+// render admin student attendance
+function renderAdminStudentAttendance($conn, $search = '',$status = '',$course = '',$dateFromAttendance = '', $dateToAttendance = '')
+{
+    $sql = "
+        SELECT 
+            attendance_logs.attendanceID,
+            attendance_logs.log_date,
+            attendance_logs.first_time_in,
+            attendance_logs.final_time_out,
+            attendance_logs.status,
+            attendance_logs.total_hours,
+            attendance_logs.remarks,
+            attendance_logs.rfid_uid,
+            attendance_logs.studentID,
+            attendance_logs.created_at,
+
+            ojtstudent.name,
+            ojtstudent.course,
+            ojtstudent.yearLevel
+
+        FROM attendance_logs
+
+        LEFT JOIN ojtstudent 
+            ON ojtstudent.studentID = attendance_logs.studentID
+
+        WHERE 1=1
+    ";
+
+    $params = [];
+    $types = "";
+
+    if (!empty($search)) {
+
+        $sql .= " AND (
+            attendance_logs.studentID LIKE ? OR
+            ojtstudent.name LIKE ? OR
+            attendance_logs.rfid_uid LIKE ? OR
+            ojtstudent.course LIKE ?
+        )";
+
+        $like = "%$search%";
+
+        $types .= "ssss";
+
+        $params[] = $like;
+        $params[] = $like;
+        $params[] = $like;
+        $params[] = $like;
+    }
+
+    if (!empty($status)) {
+
+        $sql .= " AND attendance_logs.status = ?";
+
+        $types .= "s";
+        $params[] = $status;
+    }
+
+    if (!empty($course)) {
+
+        $sql .= " AND ojtstudent.course = ?";
+
+        $types .= "s";
+        $params[] = $course;
+    }
+
+    if (!empty($dateFromAttendance)) {
+
+        $sql .= " AND attendance_logs.log_date >= ?";
+
+        $types .= "s";
+        $params[] = $dateFromAttendance;
+    }
+
+    if (!empty($dateToAttendance)) {
+
+        $sql .= " AND attendance_logs.log_date <= ?";
+
+        $types .= "s";
+        $params[] = $dateToAttendance;
+    }
+
+    $sql .= "
+        ORDER BY 
+            attendance_logs.log_date DESC,
+            attendance_logs.first_time_in DESC
+    ";
+
+    $stmt = $conn->prepare($sql);
+
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+
+        while ($row = $result->fetch_assoc()) {
+
+            $attendanceStatus = strtolower($row['status']);
+
+            switch ($attendanceStatus) {
+
+                case 'present':
+                    $color = '#059669';
+                    break;
+
+                case 'late':
+                    $color = '#F59E0B';
+                    break;
+
+                case 'absent':
+                    $color = '#EF4444';
+                    break;
+
+                case 'excused':
+                    $color = '#3B82F6';
+                    break;
+
+                default:
+                    $color = '#9CA3AF';
+                    break;
+            }
+
+            $timeIn = !empty($row['first_time_in'])
+                ? date('h:i A', strtotime($row['first_time_in']))
+                : '--';
+
+            $timeOut = !empty($row['final_time_out'])
+                ? date('h:i A', strtotime($row['final_time_out']))
+                : '--';
+
+            $output .= "
+            <tr>
+
+                <td>
+                    <div class='student-name-cell'>
+
+                        <div class='student-avatar'>
+                            " . strtoupper(substr($row['name'], 0, 1)) . "
+                        </div>
+
+                        <div class='student-info'>
+                            <span class='student-name'>
+                                {$row['name']}
+                            </span>
+
+                            <small class='student-id'>
+                                {$row['studentID']}
+                            </small>
+                        </div>
+
+                    </div>
+                </td>
+
+                <td>
+                    {$row['course']} - {$row['yearLevel']}
+                </td>
+
+                <td>
+                    <div class='student-id-cell'>
+                        #{$row['rfid_uid']}
+                    </div>
+                </td>
+
+                <td>
+                    " . date('F d, Y', strtotime($row['log_date'])) . "
+                </td>
+
+                <td>{$timeIn}</td>
+
+                <td>{$timeOut}</td>
+
+                <td>
+                    <span class='status-pill'
+                        style='background: {$color}15;
+                               color: {$color};
+                               border: 1px solid {$color}30;'>
+
+                        " . ucfirst($row['status']) . "
+
+                    </span>
+                </td>
+
+                <td>
+                    {$row['total_hours']} hrs
+                </td>
+
+                <td>
+                    {$row['remarks']}
+                </td>
+
+            </tr>";
+        }
+
+    } else {
+
+        $output .= "
+        <tr>
+            <td colspan='10'
+                style='text-align:center;padding:15px;'>
+
+                No attendance records found
+
+            </td>
+        </tr>";
+    }
+
+    return $output;
+}
+
 function renderAssignSupervisorList($conn, $search = '')
 {
     $where = "WHERE 1=1";
@@ -1383,6 +1634,99 @@ function renderSupervisorActivityLogTable($conn, $superID, $search = '', $module
     return $output;
 }
 
+// student activity log
+function renderStudentActivityLogTable($conn, $studentID, $search = '', $module = '', $dateFrom = '', $dateTo = '')
+{
+    $sql = "
+        SELECT 
+            activity_log.logID,
+            activity_log.role,
+            activity_log.action,
+            activity_log.module,
+            activity_log.description,
+            activity_log.target_type,
+            activity_log.target_id,
+            activity_log.ip_address,
+            activity_log.created_at,
+            users.name,
+            users.email
+        FROM activity_log
+        LEFT JOIN users 
+            ON activity_log.userID = users.userID
+        WHERE activity_log.target_id = ?
+    ";
+
+    $params = [];
+    $types = "s";
+    $params[] = $studentID;
+
+    if (!empty($search)) {
+        $sql .= " AND (
+            users.name LIKE ? OR
+            users.email LIKE ? OR
+            activity_log.action LIKE ? OR
+            activity_log.module LIKE ? OR
+            activity_log.target_id LIKE ?
+        )";
+
+        $like = "%$search%";
+        $types .= "sssss";
+        array_push($params, $like, $like, $like, $like, $like);
+    }
+
+    if (!empty($module)) {
+        $sql .= " AND activity_log.module = ?";
+        $types .= "s";
+        $params[] = $module;
+    }
+
+    if (!empty($dateFrom)) {
+        $sql .= " AND DATE(activity_log.created_at) >= ?";
+        $types .= "s";
+        $params[] = $dateFrom;
+    }
+
+    if (!empty($dateTo)) {
+        $sql .= " AND DATE(activity_log.created_at) <= ?";
+        $types .= "s";
+        $params[] = $dateTo;
+    }
+
+    $sql .= " ORDER BY activity_log.created_at DESC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+
+        while ($row = $result->fetch_assoc()) {
+
+            $output .= "
+            <tr>
+                <td>{$row['action']}</td>
+                <td>{$row['module']}</td>
+                <td>{$row['target_type']}</td>
+                <td>{$row['target_id']}</td>
+                <td>{$row['ip_address']}</td>
+                <td>" . date("M d, Y h:i A", strtotime($row['created_at'])) . "</td>
+            </tr>";
+        }
+
+    } else {
+        $output .= "
+        <tr>
+            <td colspan='6' style='text-align:center; padding:15px;'>
+                No activity logs found
+            </td>
+        </tr>";
+    }
+
+    return $output;
+}
 
 
 // admin activity_log view
@@ -2470,6 +2814,7 @@ function renderStudentAttendanceTable($conn, $studentID, $category = ''){
             final_time_out,
             status,
             total_hours,
+            remarks,
             current_state
         FROM attendance_logs
         WHERE studentID = ?
@@ -2503,27 +2848,60 @@ function renderStudentAttendanceTable($conn, $studentID, $category = ''){
 
         while ($row = $result->fetch_assoc()) {
 
-            $timeIn = $row['first_time_in']
-                ? date("h:i A", strtotime($row['first_time_in']))
-                : '--';
+         $status = strtolower($row['status']);
 
-            $timeOut = $row['final_time_out']
-                ? date("h:i A", strtotime($row['final_time_out']))
-                : '--';
+        switch ($status) {
+            case 'present':
+                $color = '#059669';
+                break;
+            case 'late':
+                $color = '#F59E0B';
+                break;
+            case 'absent':
+                $color = '#EF4444';
+                break;
+            case 'excused':
+                $color = '#3B82F6';
+                break;
+            default:
+                $color = '#9CA3AF';
+                break;
+        }
 
-            $hours = $row['total_hours']
-                ? number_format($row['total_hours'], 2)
-                : '0.00';
+            $timeIn = !empty($row['first_time_in'])
+            ? date('h:i A', strtotime($row['first_time_in']))
+            : '--';
+
+        $timeOut = !empty($row['final_time_out'])
+            ? date('h:i A', strtotime($row['final_time_out']))
+            : '--';
+
+        $hours = !empty($row['total_hours'])
+            ? number_format($row['total_hours'], 2)
+            : '0.00';
 
             $output .= "
-            <tr>
-                <td>" . date("M d, Y", strtotime($row['log_date'])) . "</td>
-                <td>{$timeIn}</td>
-                <td>{$timeOut}</td>
-                <td>{$row['status']}</td>
-                <td>{$hours}</td>
-                <td>{$row['current_state']}</td>
-            </tr>";
+        <tr>
+
+            <td>" . date('F d, Y', strtotime($row['log_date'])) . "</td>
+
+            <td>{$timeIn}</td>
+
+            <td>{$timeOut}</td>
+
+            <td>
+                <span class='status-pill' 
+                    style='background: {$color}15;
+                           color: {$color};
+                           border: 1px solid {$color}30;'>
+                    " . ucfirst($row['status']) . "
+                </span>
+            </td>
+
+            <td>{$hours}</td>
+
+            <td>" . htmlspecialchars($row['remarks']) . "</td>
+        </tr>";
         }
 
     } else {

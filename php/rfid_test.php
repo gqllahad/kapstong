@@ -1,8 +1,15 @@
+<?php
+require_once("auth/auth_guard.php");
+
+requireRole(['ADMIN', 'supervisor']);
+?>
 
 <?php if(isset($_SESSION['status'])): ?>
 
 <?php unset($_SESSION['status']); ?>
 <?php endif; ?>
+
+
 
 <!DOCTYPE html>
 <html>
@@ -28,9 +35,6 @@
 
         <h1>Granby On-the-Job Training Attendance System</h1>
 
-        <!-- <button class="action-btn" onclick="toggleDashboard()">
-            <i class='bx bx-dock-right'></i>
-        </button> -->
     </div>
 
     <div class="subtitle">Tap your card to record attendance</div>

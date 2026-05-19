@@ -25,7 +25,8 @@ if ($_SESSION['role'] !== "ADMIN") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>OJT MAIN PAGE</title>
+    <title>Admin Dashboard</title>
+    <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
 
     <link rel="stylesheet" href="../../css/admin/adminDashboard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -60,6 +61,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <li><button id="admin-dashboard-btn"><i class="bi bi-house"></i> Home</button></li>
                 <li><button id="admin-preparation-btn"><i class="bi bi-journal-text"></i> System Configuration</button></li>
                 <li><button id="admin-approval-btn"><i class="bi bi-file-earmark-text"></i>User Management</button></li>
+                <li><button id="admin-attendance-btn"><i class="bi bi-file-earmark-text"></i>Attendance Logs</button></li>
             </ul>
 
         </aside>
@@ -137,7 +139,9 @@ if ($_SESSION['role'] !== "ADMIN") {
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Mobile Number</th>
-                                <th>Department</th>
+                                <th>Handled Course</th>
+                                <th>Company Name</th>
+                                <th>Position</th>
                                 <th>Date Joined</th>
                                 <th>Action</th>
                             </tr>
@@ -242,6 +246,56 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
             </div>
+
+
+            <!-- student rfid register -->
+             <div class="rfid-register-modal" id="rfid-register-modal">
+                <div class="rfid-register-content">
+
+                    <div class="modal-header">
+                        <h3>Register RFID</h3>
+
+                        <button id="closeRfidRegisterModal"
+                            class="modal-close">
+                            &times;
+                        </button>
+                    </div>
+
+                    <div class="rfid-register-body">
+
+                        <input type="hidden" id="rfidStudentID">
+
+                        <div class="rfid-icon">
+                             <i class="bi bi-person-vcard"></i>
+                        </div>
+
+                        <h2 class="rfid-title">
+                            Scan RFID Card
+                        </h2>
+
+                        <p class="rfid-subtitle">
+                            Place the RFID card near the scanner
+                        </p>
+
+                        <div class="rfid-input-container">
+
+                            <input type="text"
+                                id="rfid_uid"
+                                class="rfid-input"
+                                placeholder="Tap RFID Card..."
+                                autocomplete="off">
+
+                        </div>
+
+                        <button class="register-rfid-btn"
+                            onclick="submitRFIDRegister()">
+                            Register RFID
+                        </button>
+
+                    </div>
+
+                </div>
+             </div>
 
             <!-- download students data -->
              <div class="download-all-student-modal" id="download-all-student-modal">
@@ -611,31 +665,36 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label>Morning Time In</label>
-                        <input type="time" id="morning_time_in" name="morning_time_in">
+                     <div class="time-row">
+                        <div class="form-group">
+                            <label>Morning Time In</label>
+                            <input type="time" id="morning_time_in" name="morning_time_in">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="morning_time_out">
+                                Morning Time Out
+                            </label>
+
+                            <input
+                                type="time"
+                                id="morning_time_out"
+                                name="morning_time_out"
+                            >
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="morning_time_out">
-                            Morning Time Out
-                        </label>
+                     <div class="time-row">
 
-                        <input
-                            type="time"
-                            id="morning_time_out"
-                            name="morning_time_out"
-                        >
-                    </div>
+                        <div class="form-group">
+                            <label for="afternoon_time_in">Afternoon Time In</label>
+                            <input type="time" id="afternoon_time_in" name="afternoon_time_in">
+                        </div>
 
-                     <div class="form-group">
-                        <label for="afternoon_time_in">Afternoon Time In</label>
-                        <input type="time" id="afternoon_time_in" name="afternoon_time_in">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="afternoon_time_out">Afternoon Time Out</label>
-                        <input type="time" id="afternoon_time_out" name="afternoon_time_out">
+                        <div class="form-group">
+                            <label for="afternoon_time_out">Afternoon Time Out</label>
+                            <input type="time" id="afternoon_time_out" name="afternoon_time_out">
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -794,7 +853,6 @@ if ($_SESSION['role'] !== "ADMIN") {
             <!-- dashboard -->
             <section class="admin-dashboard" id="admin-dashboard">
 
-
                 <section class="cards">
                     <div class="card unverified-students">
 
@@ -934,6 +992,33 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                             <h2><?= $supervisor ?></h2>
                         </div>
+                    </div>
+
+                    <div class="card rfid-card" onclick="openRfid()">
+
+                        <div class="card-content">
+
+                            <div class="card-left">
+
+                                <div class="card-top">
+
+                                    <div class="card-icon rfid-icon">
+                                        <i class="bi bi-broadcast-pin"></i>
+                                    </div>
+
+                                    <div class="rfid-text">
+                                        <h3>RFID Attendance</h3>
+                                        <p>Start real-time scanning for student attendance tracking</p>
+                                    </div>
+                                </div>
+
+                                <span class="trend">
+                                    Live scanning mode
+                                </span>
+
+                            </div>
+                        </div>
+
                     </div>
 
                 </section>
@@ -1205,6 +1290,95 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
             </section>
+
+
+            <!-- attendance logs -->
+             <section class="admin-attendance" id="admin-attendance">
+               <div class="title-block-bot">
+                    <h2>Student Attendance Management</h2>
+                    <p>Monitor, review, and manage attendance records of all OJT students.</p>
+                </div>
+
+                <div class="top-bar">
+
+                    <div class="top-header">
+                        <h3 class="table-title">Attendance Records</h3>
+                        <p>Search, filter, and review attendance logs across all students.</p>
+                    </div>
+
+                    <div class="search-filter">
+
+                        <div class="search-container">
+                            <i class="bi bi-search search-icon"></i>
+
+                            <input 
+                                type="text" 
+                                id="studentAttendanceSearch"
+                                placeholder="Search by Student ID, Name, Course, or RFID"
+                            >
+                        </div>
+
+                        <div class="filter-group">
+
+                            <select id="attendanceStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="PRESENT">Present</option>
+                                <option value="LATE">Late</option>
+                                <option value="ABSENT">Absent</option>
+                                <option value="EXCUSED">Excused</option>
+                            </select>
+
+                        </div>
+
+                        <div class="filter-group">
+
+                            <select id="attendanceCourseFilter">
+                                <option value="">All Courses</option>
+                                <option value="BSCS">BSCS</option>
+                                <option value="BSIT">BSIT</option>
+                                <option value="BSA">BSA</option>
+                            </select>
+
+                        </div>
+
+                        <div class="filter-group">
+                            <input type="date" id="attendanceDateFrom" title="From date">
+                            <input type="date" id="attendanceDateTo" title="To date">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Course</th>
+                                <th>RFID</th>
+                                <th>Date</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
+                                <th>Status</th>
+                                <th>Total Hours</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="studentAttendanceBody">
+                                <?php
+                                $search = $_POST['search'] ?? '';
+                                $status = $_POST['status'] ?? '';
+                                $course = $_POST['course'] ?? '';
+                                $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
+                                $dateToAttendance = $_POST['dateToAttendance'] ?? '';
+                                echo renderAdminStudentAttendance($conn, $search, $status, $dateFromAttendance, $dateToAttendance);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+             </section>
 
         </main>
 

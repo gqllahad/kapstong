@@ -38,8 +38,9 @@ $superID = getSupervisorIDByUserID($conn, $userID);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>OJT MAIN PAGE</title>
+    <title>Supervisor Dashboard</title>
 
+    <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
     <link rel="stylesheet" href="../../css/supervisor/supervisorDashboard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
@@ -108,8 +109,9 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 <li><button id="supervisor-dashboard-btn"><i class="bi bi-house"></i> Home </button></li>
                 <li><button id="supervisor-oversight-btn"><i class="bi bi-journal-text"></i> Task Reviews</button></li>
                 <li><button id="supervisor-students-btn"><i class="bi bi-file-earmark-text"></i>Students</button></li>
+                <li><button id="supervisor-attendance-btn"><i class="bi bi-calendar-check"></i> Attendance Log</button></li>
                 <li><button id="supervisor-evaluation-btn"><i class="bi bi-bar-chart-line"></i> Reports / Evaluation</button></li>
-                <li><button id="supervisor-activity-btn"><i class="bi bi-bar-chart-line"></i> Activity Log</button></li>
+                <li><button id="supervisor-activity-btn"><i class="bi bi-clock-history"></i> Activity Log</button></li>
             </ul>
 
         </aside>
@@ -649,6 +651,24 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                         </div>
                     </div>
 
+                    <div class="card rfid-card" onclick="openRfid()">
+
+                        <div class="card-content">
+                            <div class="card-icon rfid-icon">
+                                        <i class="bi bi-broadcast-pin"></i>
+                                    </div>
+                            <div class="rfid-text">
+                                <h3>RFID Attendance</h3>
+                                <p>Start real-time scanning for student attendance tracking</p>
+                            </div>
+
+                            <h2>
+                                <i class='bx bx-scan'></i>
+                            </h2>
+                        </div>
+
+                    </div>
+
                 </section>
 
                 <section class="dashboard-charts">
@@ -910,8 +930,14 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     </div>
                 </div>
 
-            
-                <!-- student attendances -->
+            </section>
+
+            <!-- student attendances -->
+             <section class="supervisor-attendance" id="supervisor-attendance">
+                    <div class="title-block-bot">
+                        <h2>Student Attendance</h2>
+                        <p>Monitor student attendance records and time logs.</p>
+                    </div>
                   <div class="top-bar">
 
                     <div class="top-header">
@@ -975,8 +1001,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             </tbody>
                         </table>
                     </div>
-
-            </section>
+             </section>
 
             <!-- reports evaluation -->
             <section class="supervisor-evaluation" id="supervisor-evaluation">
@@ -995,7 +1020,6 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                                 <th>Tasks</th>
                                 <th>Final Grade</th>
                                 <th>Remarks</th>
-                                <th>Date Generated</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -1045,8 +1069,6 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             <input type="date" id="dateTo" title="To date">
                         </div>
                     </div>
-
-                    
 
                 </div>
 
