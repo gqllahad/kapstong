@@ -712,8 +712,13 @@ function loadBarChart() {
 }
 
 // line chart
+
 function loadLineChart() {
-    fetch("../../php/admin/functions/getLineChartData.php")
+
+    const selectedMonth =
+        document.getElementById("monthSelector").value;
+
+    fetch(`../../php/admin/functions/getLineChartData.php?month=${selectedMonth}`)
         .then(res => res.json())
         .then(data => {
 
@@ -723,25 +728,33 @@ function loadLineChart() {
                 window.lineChartInstance.destroy();
             }
 
+            window.currentChartData = data;
+
             window.lineChartInstance = new Chart(ctx, {
+
                 type: 'line',
+
                 data: {
                     labels: data.labels,
+
                     datasets: [{
-                        label: 'Attendance Trend (Last 30 Days)',
+                        label: 'Attendance Records',
                         data: data.values,
 
                         borderColor: '#60a5fa',
-                        backgroundColor: 'rgba(96, 165, 250, 0.2)',
+                        backgroundColor: 'rgba(96,165,250,0.15)',
 
                         fill: true,
                         tension: 0.4,
 
-                        pointRadius: 5,
-                        pointHoverRadius: 7
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderWidth: 3
                     }]
                 },
+
                 options: {
+
                     responsive: true,
                     maintainAspectRatio: false,
 
@@ -751,40 +764,192 @@ function loadLineChart() {
                     },
 
                     plugins: {
+
                         legend: {
-                            position: 'bottom'
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: '#fff'
+                            }
                         }
+
                     },
 
                     scales: {
+
+                        x: {
+                            ticks: {
+                                color: '#9ca3af'
+                            },
+                            grid: {
+                                 color: 'rgba(0,0,0,0.08)',
+                                    drawBorder: false
+                            }
+                        },
+
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+
+                            ticks: {
+                                color: '#9ca3af'
+                            },
+
+                            grid: {
+                                 color: 'rgba(0,0,0,0.08)',
+                                drawBorder: false
+                            }
                         }
+
                     }
+
                 }
+
             });
-
-        let existing = document.querySelector(".chart-empty-message");
-
-        if (existing) {
-            existing.remove();
-        }
-
-        if (data.empty) {
-
-            const message = document.createElement("p");
-
-            message.className = "chart-empty-message";
-
-            message.textContent =
-                "No Attendance record trends yet.";
-
-            ctx.parentNode.appendChild(message);
-        }
 
         })
         .catch(err => console.error("Line chart error:", err));
+
 }
+
+function downloadChartCSV() {
+
+    const data = window.currentChartData;
+
+    if (!data) return;
+
+    let csv = "Date,Attendance\n";
+
+    data.labels.forEach((label, index) => {
+        csv += `${label},${data.values[index]}\n`;
+    });
+
+    const blob = new Blob([csv], {
+        type: 'text/csv'
+    });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+
+    a.download = "attendance-report.csv";
+
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+
+}
+
+function populateMonthDropdown() {
+
+    const select = document.getElementById("monthSelector");
+
+    const months = [
+        "January", "February", "March",
+        "April", "May", "June",
+        "July", "August", "September",
+        "October", "November", "December"
+    ];
+
+    const currentDate = new Date();
+
+    const currentMonth = currentDate.getMonth() + 1;
+
+    const currentYear = currentDate.getFullYear();
+
+    months.forEach((month, index) => {
+
+        const option = document.createElement("option");
+
+        const monthValue = String(index + 1).padStart(2, '0');
+
+        option.value = `${currentYear}-${monthValue}`;
+
+        option.textContent = `${month} ${currentYear}`;
+
+        if ((index + 1) === currentMonth) {
+            option.selected = true;
+        }
+
+        select.appendChild(option);
+
+    });
+
+}
+// function loadLineChart() {
+//     fetch("../../php/admin/functions/getLineChartData.php")
+//         .then(res => res.json())
+//         .then(data => {
+
+//             const ctx = document.getElementById('lineChart');
+
+//             if (window.lineChartInstance) {
+//                 window.lineChartInstance.destroy();
+//             }
+
+//             window.lineChartInstance = new Chart(ctx, {
+//                 type: 'line',
+//                 data: {
+//                     labels: data.labels,
+//                     datasets: [{
+//                         label: 'Attendance Trend (Last 30 Days)',
+//                         data: data.values,
+
+//                         borderColor: '#60a5fa',
+//                         backgroundColor: 'rgba(96, 165, 250, 0.2)',
+
+//                         fill: true,
+//                         tension: 0.4,
+
+//                         pointRadius: 5,
+//                         pointHoverRadius: 7
+//                     }]
+//                 },
+//                 options: {
+//                     responsive: true,
+//                     maintainAspectRatio: false,
+
+//                     interaction: {
+//                         mode: 'index',
+//                         intersect: false
+//                     },
+
+//                     plugins: {
+//                         legend: {
+//                             position: 'bottom'
+//                         }
+//                     },
+
+//                     scales: {
+//                         y: {
+//                             beginAtZero: true
+//                         }
+//                     }
+//                 }
+//             });
+
+//         let existing = document.querySelector(".chart-empty-message");
+
+//         if (existing) {
+//             existing.remove();
+//         }
+
+//         if (data.empty) {
+
+//             const message = document.createElement("p");
+
+//             message.className = "chart-empty-message";
+
+//             message.textContent =
+//                 "No Attendance record trends yet.";
+
+//             ctx.parentNode.appendChild(message);
+//         }
+
+//         })
+//         .catch(err => console.error("Line chart error:", err));
+// }
 
 
 // pie chart
@@ -817,14 +982,42 @@ function loadPieChart() {
                     }]
                 },
                 options: {
+
                     responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
+                    maintainAspectRatio: false,
+
+                    layout: {
+                        padding: 10
                     },
 
-                    cutout: '65%'
+                    plugins: {
+
+                        legend: {
+                            display: false
+                        },
+
+                        tooltip: {
+
+                            backgroundColor: '#111827',
+
+                            padding: 12,
+
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+
+                            borderColor: 'rgba(255,255,255,0.08)',
+                            borderWidth: 1,
+
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}`;
+                                }
+                            }
+                        }
+
+                    },
+
+                    cutout: '72%'
                 }
             });
 
@@ -866,8 +1059,23 @@ function loadHealthScore() {
                 Number(data.excused);
 
             document.getElementById("total-attendance").innerText =
-                "Total Attendance: " + total;
+                total + " Records";
         });
+}
+
+// quick actions
+function openAddSupervisor() {
+   superCreate.classList.add("show");
+   overlay.classList.add("show");
+}
+
+function openRFIDSettings() {
+    rfidAttendance.classList.add("show");
+    overlay.classList.add("show");
+}
+
+function openRFIDSettings() {
+    window.location.href = "rfidSettings.php";
 }
 
 // at risk students
@@ -1491,11 +1699,27 @@ function saveCourse() {
 // setInterval(loadChart, 5000);
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadBarChart();   
+    // loadBarChart();   
     loadPieChart();   
     loadLineChart();
     loadRiskStudents();
     loadHealthScore();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    populateMonthDropdown();
+
+    loadLineChart();
+
+    document
+        .getElementById("monthSelector")
+        .addEventListener("change", loadLineChart);
+
+    document
+        .getElementById("downloadChartBtn")
+        .addEventListener("click", downloadChartCSV);
+
 });
 
 // menu (Upper) 

@@ -994,7 +994,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </div>
                     </div>
 
-                    <div class="card rfid-card" onclick="openRfid()">
+                    <!-- <div class="card rfid-card" onclick="openRfid()">
 
                         <div class="card-content">
 
@@ -1002,9 +1002,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                                 <div class="card-top">
 
-                                    <div class="card-icon rfid-icon">
-                                        <i class="bi bi-broadcast-pin"></i>
-                                    </div>
+                                    
 
                                     <div class="rfid-text">
                                         <h3>RFID Attendance</h3>
@@ -1019,42 +1017,103 @@ if ($_SESSION['role'] !== "ADMIN") {
                             </div>
                         </div>
 
-                    </div>
+                    </div> -->
 
                 </section>
 
                 <section class="dashboard-layout">
 
-
-                    <section class="wrapper bar-chart">
-                        <h2>Attendance per Day (Last 7 Days)</h2>
-                        <canvas id="barChart"></canvas>
-                    </section>
-
-                   <!-- dead -->
-
                     <section class="wrapper line-chart">
-                        <h2>Attendance Trend (Last 30 Days)</h2>
-                        <canvas id="lineChart"></canvas>
-                    </section>
 
-                    <section class="wrapper-pie pie-chart">
-                        <h2>Attendance Overview</h2>
+                        <div class="chart-header">
 
-                        <div class="pie-grid">
-                            <canvas id="pieChart"></canvas>
-                            <div class="pie-summary">
-                                <h3>Attendance Health</h3>
-                                <p id="health-score">--%</p>
-                                <small id="total-attendance">
-                                    Total Attendance: --
-                                </small>
+                            <div class="chart-title">
+                                <h2>Attendance trend</h2>
+                                <p>Monitor attendance records by month</p>
                             </div>
+
+                            <div class="chart-actions">
+
+                                <select id="monthSelector">
+                                </select>
+
+                                <button id="downloadChartBtn">
+                                    <i class="bi bi-download"></i>
+                                    Download CSV
+                                </button>
+
+                            </div>
+
                         </div>
+
+                        <canvas id="lineChart"></canvas>
+
                     </section>
 
-                </section>
-                 <section class="deadline-container">
+                    <section class="wrapper pie-chart-card">
+
+                        <div class="pie-header">
+
+                            <div class="pie-title">
+                                <h2>Attendance Overview</h2>
+                                <p>Weekly attendance performance summary</p>
+                            </div>
+
+                            <div class="attendance-badge">
+                                Last 7 Days
+                            </div>
+
+                        </div>
+
+                        <div class="pie-content">
+
+                            <div class="pie-canvas-wrapper">
+                                <canvas id="pieChart"></canvas>
+                            </div>
+
+                            <div class="pie-summary">
+
+                                <div class="summary-card">
+                                    <span class="summary-label">Attendance Health</span>
+                                    <h3 id="health-score">--%</h3>
+                                </div>
+
+                                <div class="summary-card">
+                                    <span class="summary-label">Total Attendance</span>
+                                    <h4 id="total-attendance">--</h4>
+                                </div>
+
+                                <div class="attendance-legend">
+
+                                    <div class="legend-item">
+                                        <span class="legend-dot present"></span>
+                                        Present
+                                    </div>
+
+                                    <div class="legend-item">
+                                        <span class="legend-dot late"></span>
+                                        Late
+                                    </div>
+
+                                    <div class="legend-item">
+                                        <span class="legend-dot absent"></span>
+                                        Absent
+                                    </div>
+
+                                    <div class="legend-item">
+                                        <span class="legend-dot excused"></span>
+                                        Excused
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section class="deadline-container">
 
                         <div class="deadline-header">
                             <div>
@@ -1072,6 +1131,51 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <div id="risk-list" class="risk-list"></div>
 
                     </section>
+
+                    <section class="quick-action-container">
+                        <div class="quick-action-header">
+                            <div class="quick-action-title">
+                                <h2>Quick Actions</h2>
+                                <p>Instant system tools & shortcuts</p>
+                            </div>
+                        </div>
+
+                         <div class="quick-action-grid">
+                            <button onclick="openAddSupervisor()">
+                                <i class="bi bi-person-plus-fill"></i>
+                                <span>Add Supervisor</span>
+                            </button>
+
+                            <button onclick="openRfid()">
+                               <i class="bi bi-broadcast-pin"></i>
+                                <span>RFID</span>
+                            </button>
+
+                            <button onclick="openRFIDSettings()">
+                                <i class="bi bi-gear-fill"></i>
+                                <span>Settings</span>
+                            </button>
+
+                            <button onclick="generateReport()">
+                                <i class="bi bi-bar-chart-fill"></i>
+                                <span>Reports</span>
+                            </button>
+
+                            <button onclick="openStudents()">
+                                <i class="bi bi-people-fill"></i>
+                                <span>Students</span>
+                            </button>
+
+                            <button onclick="openLogs()">
+                                <i class="bi bi-journal-text"></i>
+                                <span>Logs</span>
+                            </button>
+
+                        </div>
+                    </section>
+
+                </section>
+                 
             </section>
 
             <!-- application approvals -->
