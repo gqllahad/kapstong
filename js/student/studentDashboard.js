@@ -141,27 +141,146 @@ let reportFiles = [];
 // unverified
 
 window.previewImage = function(src) {
-    const modal = document.getElementById("imagePreviewModal");
-    const img = document.getElementById("previewImg");
+    // const modal = document.getElementById("imagePreviewModal");
+    // const img = document.getElementById("previewImg");
 
-    img.src = src;
+    // img.src = src;
+    // modal.style.display = "flex";
+    previewFile(src);
+}
+
+function previewFile(src) {
+
+    const modal = document.getElementById("imagePreviewModal");
+    const container = document.getElementById("previewContainer");
+
+    const cleanSrc = src.trim();
+    const safeSrc = encodeURI(cleanSrc);
+
+    const extension = cleanSrc.split('.').pop().toLowerCase();
+
+    container.innerHTML = "";
+
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(extension)) {
+
+        container.innerHTML = `
+           <img src="${safeSrc}" style="max-width:100%; max-height:85vh; border-radius:10px; object-fit:contain;">
+        `;
+
+    } 
+    else if (extension === "pdf") {
+
+        container.innerHTML = `
+            <iframe src="${safeSrc}" 
+    style="width:100%;height:80vh;border:none;border-radius:10px;"></iframe>
+
+<p style="margin-top:10px; color:#cbd5e1; font-size:13px;">
+    If the PDF doesn't load,
+    <a href="${safeSrc}" target="_blank">Click here to open file</a>
+</p>
+        `;
+
+    } 
+    else {
+
+        container.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+                    <img src="${safeSrc}" style="max-width:100%; max-height:85vh; border-radius:10px; object-fit:contain;">
+
+                    <a href="${safeSrc}" download 
+                    style="
+                            text-decoration:none;
+                            padding:10px 14px;
+                            background:rgba(34,197,94,0.15);
+                            color:#22c55e;
+                            border-radius:8px;
+                            font-weight:600;
+                            border:1px solid rgba(34,197,94,0.3);
+                    ">
+                        Download Image
+                    </a>
+                </div>
+            `;
+    }
+
     modal.style.display = "flex";
 }
 
-function previewImage(src) {
-    const modal = document.getElementById("imagePreviewModal");
-    const img = document.getElementById("previewImg");
+// function previewImage(src) {
+//     const modal = document.getElementById("imagePreviewModal");
+//     const img = document.getElementById("previewImg");
 
-    img.src = src;
+//     img.src = src;
+//     modal.style.display = "flex";
+// }
+
+// function previewImageUnverified(src){
+//     const modal = document.getElementById("imageUnverifiedPreviewModal");
+//     const img = document.getElementById("previewUnverifiedImg");
+
+//     img.src = src;
+//     modal.style.display = "flex";
+// }
+
+function previewFileUnverified(src) {
+
+    const modal = document.getElementById("imagePreviewModal");
+    const container = document.getElementById("previewContainer");
+
+    const cleanSrc = src.trim();
+    const safeSrc = encodeURI(cleanSrc);
+
+    const extension = cleanSrc.split('.').pop().toLowerCase();
+
+    container.innerHTML = "";
+
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(extension)) {
+
+        container.innerHTML = `
+           <img src="${safeSrc}" style="max-width:100%; max-height:85vh; border-radius:10px; object-fit:contain;">
+        `;
+
+    } 
+    else if (extension === "pdf") {
+
+        container.innerHTML = `
+            <iframe src="${safeSrc}" 
+    style="width:100%;height:80vh;border:none;border-radius:10px;"></iframe>
+
+<p style="margin-top:10px; color:#cbd5e1; font-size:13px;">
+    If the PDF doesn't load,
+    <a href="${safeSrc}" target="_blank">Click here to open file</a>
+</p>
+        `;
+
+    } 
+    else {
+
+        container.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+                    <img src="${safeSrc}" style="max-width:100%; max-height:85vh; border-radius:10px; object-fit:contain;">
+
+                    <a href="${safeSrc}" download 
+                    style="
+                            text-decoration:none;
+                            padding:10px 14px;
+                            background:rgba(34,197,94,0.15);
+                            color:#22c55e;
+                            border-radius:8px;
+                            font-weight:600;
+                            border:1px solid rgba(34,197,94,0.3);
+                    ">
+                        Download Image
+                    </a>
+                </div>
+            `;
+    }
+
     modal.style.display = "flex";
 }
 
-function previewImageUnverified(src){
-    const modal = document.getElementById("imageUnverifiedPreviewModal");
-    const img = document.getElementById("previewUnverifiedImg");
-
-    img.src = src;
-    modal.style.display = "flex";
+function previewImageUnverified(src) {
+    previewFileUnverified(src);
 }
 
 function closeEditModal() {
@@ -173,24 +292,97 @@ function closeEditModal() {
 
 // unverified
 
+// function handleFilePreview(inputElem, previewElem) {
+//     inputElem.addEventListener('change', () => {
+//         const file = inputElem.files[0];
+//         previewElem.innerHTML = '';
+
+//         if (!file) return;
+        
+//         const allowedTypes = ['image/jpeg', 'image/png'];
+//         if (!allowedTypes.includes(file.type)) {
+//             alert('Only JPG or PNG files are allowed!');
+//             inputElem.value = '';
+//             return;
+//         }
+
+//         const img = document.createElement('img');
+//         img.src = URL.createObjectURL(file);
+//         img.classList.add('preview-img');
+//         previewElem.appendChild(img);
+//     });
+// }
+
 function handleFilePreview(inputElem, previewElem) {
     inputElem.addEventListener('change', () => {
         const file = inputElem.files[0];
         previewElem.innerHTML = '';
 
         if (!file) return;
-        
-        const allowedTypes = ['image/jpeg', 'image/png'];
-        if (!allowedTypes.includes(file.type)) {
-            alert('Only JPG or PNG files are allowed!');
-            inputElem.value = '';
-            return;
+
+        const fileType = file.type;
+        const fileName = file.name.toLowerCase();
+
+        // IMAGE
+        if (fileType.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.classList.add('preview-img');
+            previewElem.appendChild(img);
         }
 
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
-        img.classList.add('preview-img');
-        previewElem.appendChild(img);
+        // PDF
+        else if (fileType === 'application/pdf') {
+            const iframe = document.createElement('iframe');
+            iframe.src = URL.createObjectURL(file);
+
+            iframe.style.width = "100%";
+            iframe.style.height = "400px";
+            iframe.style.border = "none";
+            iframe.style.borderRadius = "10px";
+
+            previewElem.appendChild(iframe);
+        }
+
+        // DOC / DOCX
+        else if (
+            fileType === 'application/msword' ||
+            fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+            fileName.endsWith('.doc') ||
+            fileName.endsWith('.docx')
+        ) {
+            const icon = document.createElement('div');
+
+            icon.innerHTML = `
+            
+                <div style="
+                    display:flex;
+                    flex-direction:column;
+                    align-items:center;
+                    gap:10px;
+                    padding:15px;
+                    background:rgba(255,255,255,0.05);
+                    border-radius:10px;
+                ">
+                    <i style="font-size:40px;">📄</i>
+                    <p style="margin:0;color:#cbd5e1;">
+                        ${file.name}
+                    </p>
+                    <small style="color:#94a3b8;">
+                        Word document preview not supported in browser
+                    </small>
+                </div>
+               
+            `;
+
+            previewElem.appendChild(icon);
+        }
+
+        // INVALID FILE
+        else {
+            alert('Unsupported file type!');
+            inputElem.value = '';
+        }
     });
 }
 
@@ -1622,6 +1814,7 @@ overlay.addEventListener('click', () => {
     previewFilesModal?.classList.remove('show');
     editModal?.classList.remove('show');
     profileModal?.classList.remove('show');
+    profilePendingModal?.classList.remove("show");
 
     accountSettings?.classList.remove("show");
     changePasswordModal?.classList.remove('show');

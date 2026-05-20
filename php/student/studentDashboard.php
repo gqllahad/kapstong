@@ -874,7 +874,7 @@ $documents = getStudentDocuments($conn, $studentID);
 
                                 <?php if (!empty($documents['idUpload'])): ?>
                                     <button class="btn-preview"
-                                        onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $documents['idUpload']; ?>')">
+                                        onclick="previewFile('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $documents['idUpload']; ?>')">
                                         View ID
                                     </button>
                                 <?php else: ?>
@@ -887,7 +887,7 @@ $documents = getStudentDocuments($conn, $studentID);
 
                                 <?php if (!empty($documents['regFormUpload'])): ?>
                                     <button class="btn-preview"
-                                        onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $documents['regFormUpload']; ?>')">
+                                        onclick="previewFile('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $documents['regFormUpload']; ?>')">
                                         View Form
                                     </button>
                                 <?php else: ?>
@@ -971,9 +971,15 @@ $documents = getStudentDocuments($conn, $studentID);
 
 
 
-            <div id="imagePreviewModal" class="image-modal">
+            <!-- <div id="imagePreviewModal" class="image-modal">
                     <span id="closeImagePreview">&times;</span>
                     <img id="previewImg">
+                </div> -->
+
+                <div id="imagePreviewModal" class="image-modal">
+                    <span id="closeImagePreview">&times;</span>
+
+                    <div id="previewContainer"></div>
                 </div>
 
         </main>

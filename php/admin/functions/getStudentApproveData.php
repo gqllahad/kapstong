@@ -130,7 +130,7 @@ if ($row = $result->fetch_assoc()) {
 
                         <?php if (!empty($row['idUpload'])): ?>
                             <button class="btn-preview"
-                                onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $row['idUpload']; ?>')">
+                                onclick="previewFile('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $row['idUpload']; ?>')">
                                 👁 View Document
                             </button>
                             <span class="status-badge success">Uploaded</span>
@@ -147,7 +147,7 @@ if ($row = $result->fetch_assoc()) {
 
                         <?php if (!empty($row['regFormUpload'])): ?>
                             <button class="btn-preview"
-                                onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $row['regFormUpload']; ?>')">
+                                onclick="previewFile('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $row['regFormUpload']; ?>')">
                                 👁 View Document
                             </button>
                             <span class="status-badge success">Uploaded</span>
@@ -164,7 +164,7 @@ if ($row = $result->fetch_assoc()) {
 
                         <?php if (!empty($row['profilePicture'])): ?>
                             <button class="btn-preview"
-                                onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $row['profilePicture']; ?>')">
+                                onclick="previewFile('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $row['profilePicture']; ?>')">
                                 👁 View Document
                             </button>
                             <span class="status-badge success">Uploaded</span>

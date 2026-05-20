@@ -23,7 +23,13 @@ if (isset($_POST['submitDocuments'])) {
     $idFile = $_FILES['idUpload'];
     $regFile = $_FILES['regFormUpload'];
 
-    $allowedTypes = ['image/jpeg', 'image/png'];
+    $allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+];
 
     $uploadDir = "../../../uploads/student_uploads/$studentID/";
 

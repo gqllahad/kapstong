@@ -75,6 +75,13 @@ const openChangePasswordBtn = document.getElementById("openChangePasswordSupervi
 const closeAccountBtn = document.getElementById("closeAccountModalSupervisor");
 const backBtn = document.getElementById("backToAccountSettingsSupervisor");
 
+// toggle
+const toggleBtn = document.getElementById("darkModeToggle");
+
+// current month
+window.currentMonth = null;
+
+
 
 // functions
 
@@ -117,6 +124,8 @@ function toggleSection(header) {
 
     card.classList.toggle("active");
 }
+
+
 
 // charts
 
@@ -170,111 +179,499 @@ function showToast(message, type = "success") {
     }, 3500);
 }
 
+// theme detector
+function isDarkMode() {
+    return document.body.classList.contains("dark-mode");
+}
+
+function getChartTextColor() {
+    return document.body.classList.contains("dark-mode")
+        ? '#e2e8f0'
+        : '#000';
+}
+
+function reloadAllCharts() {
+
+    if (window.lineChartInstance) {
+        window.lineChartInstance.destroy();
+    }
+
+    if (window.pieChartInstance) {
+        window.pieChartInstance.destroy();
+    }
+
+    if (window.barChartInstance) {
+        window.barChartInstance.destroy();
+    }
+
+    loadTaskProgressChart();
+
+    loadLineChart();
+    loadPieChart();
+}
+
 function loadPieChart() {
-    fetch("functions/getOverallAttendanceChart.php", {credentials: "include"})
-        .then(res => res.json())
-        .then(data => {
 
-            const ctx = document.getElementById('pieChart');
+    fetch("functions/getOverallAttendanceChart.php", {
+        credentials: "include"
+    })
 
-            //colors
-            const pieColors = data.labels.map(label => {
-                if (label === "Present") return "#22c55e";
-                if (label === "Late") return "#f59e0b";
-                if (label === "Absent") return "#ef4444";
-                if (label === "Excused") return "#3b82f6";
-                return "#6c757d";
-            });
-            
-            if (window.pieChartInstance) {
-                window.pieChartInstance.destroy();
-            }
+    .then(res => res.json())
 
-            window.pieChartInstance = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        data: data.values,
-                        backgroundColor: pieColors
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
+    .then(data => {
+
+        const ctx = document.getElementById('pieChart');
+
+        // Colors
+        const pieColors = data.labels.map(label => {
+
+            if (label === "Present") return "#22c55e";
+            if (label === "Late") return "#f59e0b";
+            if (label === "Absent") return "#ef4444";
+            if (label === "Excused") return "#3b82f6";
+
+            return "#6b7280";
+        });
+
+        if (window.pieChartInstance) {
+            window.pieChartInstance.destroy();
+        }
+
+        window.pieChartInstance = new Chart(ctx, {
+
+            type: 'doughnut',  
+
+            data: {
+
+                labels: data.labels,
+
+                datasets: [{
+
+                    data: data.values,
+
+                    backgroundColor: pieColors,
+
+                    borderWidth: 0,
+
+                    hoverOffset: 8
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: '70%', 
+
+                plugins: {
+
+                    legend: {
+
+                        position: 'bottom',
+
+                        labels: {
+
+                            color: getChartTextColor(),
+
+                            usePointStyle: true,
+
+                            pointStyle: 'circle',
+
+                            padding: 16,
+
+                            font: {
+                                size: 13
+                            }
+
                         }
-                    }
-                }
-            });
 
-        })
-        .catch(err => console.error("Pie chart error:", err));
+                    },
+
+                    tooltip: {
+
+                        backgroundColor: '#111827',
+
+                        titleColor: '#fff',
+
+                        bodyColor: '#d1d5db',
+
+                        borderColor: 'rgba(255,255,255,0.08)',
+
+                        borderWidth: 0,
+
+                        padding: 10
+
+                    }
+
+                }
+
+            },
+
+            plugins: [{
+
+                    id: 'centerText',
+
+                    beforeDraw(chart) {
+
+                        const { width, height, ctx } = chart;
+
+                        ctx.save();
+
+                        const total =
+                            chart.data.datasets[0].data
+                            .reduce((a, b) => a + b, 0);
+
+                        const textColor = isDarkMode() ? "#e2e8f0" : "#000";
+
+                        ctx.font = "bold 28px sans-serif";
+                        ctx.fillStyle = textColor;
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+
+                
+                        ctx.fillText(total, width / 2, height / 2 - 10);
+
+                    
+                        ctx.font = "18px sans-serif";
+                        ctx.fillStyle = textColor;
+
+                        ctx.fillText("TOTAL", width / 2, height / 2 + 18);
+
+                        ctx.restore();
+                    }
+
+                }]
+
+        });
+
+    })
+
+    .catch(err => console.error("Pie chart error:", err));
+}
+// line chart
+function populateMonthDropdown() {
+
+    const select = document.getElementById("monthSelector");
+
+    const months = [
+        "January", "February", "March",
+        "April", "May", "June",
+        "July", "August", "September",
+        "October", "November", "December"
+    ];
+
+    const currentDate = new Date();
+
+    const currentMonth = currentDate.getMonth() + 1;
+
+    const currentYear = currentDate.getFullYear();
+
+    months.forEach((month, index) => {
+
+        const option = document.createElement("option");
+
+        const monthValue = String(index + 1).padStart(2, '0');
+
+        option.value = `${currentYear}-${monthValue}`;
+
+        option.textContent = `${month} ${currentYear}`;
+
+        if ((index + 1) === currentMonth) {
+            option.selected = true;
+        }
+
+        select.appendChild(option);
+
+    });
+
 }
 
 function loadLineChart() {
-    fetch("functions/getAttendanceChart.php", {credentials: "include"})
-         .then(res => res.json())
-        .then(data => {
 
-            const ctx = document.getElementById('lineChart');
+    const selectedMonth =
+        document.getElementById("monthSelector").value;
 
-            if (window.lineChartInstance) {
-                window.lineChartInstance.destroy();
+        window.currentMonth = selectedMonth;
+
+    fetch(`functions/getAttendanceChart.php?month=${selectedMonth}`, {
+        credentials: "include"
+    })
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        const ctx = document.getElementById('lineChart');
+
+        if (window.lineChartInstance) {
+            window.lineChartInstance.destroy();
+        }
+
+        window.currentChartData = data;
+
+        window.lineChartInstance = new Chart(ctx, {
+
+            type: 'line',
+
+            data: {
+
+                labels: data.labels,
+
+                datasets: [
+
+                    {
+                        label: 'Present',
+
+                        data: data.present,
+
+                        borderColor: '#22c55e',
+
+                        backgroundColor: 'transparent',
+
+                        borderWidth: 2,
+
+                        tension: 0.2,
+
+                        pointRadius: 2,
+
+                        pointHoverRadius: 5
+                    },
+
+                    {
+                        label: 'Late',
+
+                        data: data.late,
+
+                        borderColor: '#f59e0b',
+
+                        backgroundColor: 'transparent',
+
+                        borderWidth: 2,
+
+                        tension: 0.2,
+
+                        pointRadius: 2,
+
+                        pointHoverRadius: 5
+                    },
+
+                    {
+                        label: 'Excused',
+
+                        data: data.excused,
+
+                        borderColor: '#3b82f6',
+
+                        backgroundColor: 'transparent',
+
+                        borderWidth: 2,
+
+                        tension: 0.2,
+
+                        pointRadius: 2,
+
+                        pointHoverRadius: 5
+                    },
+
+                    {
+                        label: 'Absent',
+
+                        data: data.absent,
+
+                        borderColor: '#ef4444',
+
+                        backgroundColor: 'transparent',
+
+                        borderWidth: 2,
+
+                        tension: 0.2,
+
+                        pointRadius: 2,
+
+                        pointHoverRadius: 5
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+
+                plugins: {
+
+                    legend: {
+
+                        position: 'top',
+
+                        align: 'start',
+
+                        labels: {
+
+                            color: getChartTextColor(),
+
+                            usePointStyle: true,
+
+                            pointStyle: 'line',
+
+                            padding: 16,
+
+                            font: {
+                                size: 12
+                            }
+
+                        }
+
+                    },
+
+                    tooltip: {
+
+                        backgroundColor: '#111827',
+
+                        titleColor: '#fff',
+
+                        bodyColor: '#d1d5db',
+
+                        borderColor: 'rgba(255,255,255,0.08)',
+
+                        borderWidth: 1
+
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        ticks: {
+                            color: isDarkMode() ? '#cbd5e1' : '#9ca3af'
+                        },
+
+                        grid: {
+                            display: false
+                        }
+
+                    },
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+                            color: isDarkMode() ? '#cbd5e1' : '#9ca3af',
+                            stepSize: 1
+                        },
+
+                        grid: {
+                            color: isDarkMode()
+                                ? 'rgba(255,255,255,0.08)'
+                                : 'rgba(0,0,0,0.20)'
+                        }
+
+                    }
+
+                },
+                layout: {
+                        padding: 0
+                    },
+
             }
 
-            window.lineChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.labels,
-                    datasets: [
-                        {
-                            label: 'Present',
-                            data: data.present,
-                            borderColor: '#22c55e',
-                            backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                            fill: true
-                        },
-                        {
-                            label: 'Late',
-                            data: data.late,
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                            fill: true
-                        },
-                        {
-                            label: 'Absent',
-                            data: data.absent,
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                            fill: true
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    interaction : {
-                        mode :'index',
-                        intersect : false
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
+        });
 
-        })
-        .catch(err => console.error("Line chart error:", err));
+    })
 
+    .catch(err => console.error("Line chart error:", err));
 }
+
+function downloadAttendancePDF() {
+
+    const superID = window.currentSuperID;
+    const month = window.currentMonth || document.getElementById("monthSelector").value;
+
+    if (!superID || !month) {
+        alert("Missing supervisor or month.");
+        return;
+    }
+
+    const url = `functions/download_month_attendance.php?superID=${superID}&month=${month}`;
+
+    window.open(url, "_blank");
+}
+// function loadLineChart() {
+//     fetch("functions/getAttendanceChart.php", {credentials: "include"})
+//          .then(res => res.json())
+//         .then(data => {
+
+//             const ctx = document.getElementById('lineChart');
+
+//             if (window.lineChartInstance) {
+//                 window.lineChartInstance.destroy();
+//             }
+
+//             window.lineChartInstance = new Chart(ctx, {
+//                 type: 'line',
+//                 data: {
+//                     labels: data.labels,
+//                     datasets: [
+//                         {
+//                             label: 'Present',
+//                             data: data.present,
+//                             borderColor: '#22c55e',
+//                             backgroundColor: 'rgba(34, 197, 94, 0.2)',
+//                             fill: true
+//                         },
+//                         {
+//                             label: 'Late',
+//                             data: data.late,
+//                             borderColor: '#f59e0b',
+//                             backgroundColor: 'rgba(245, 158, 11, 0.2)',
+//                             fill: true
+//                         },
+//                         {
+//                             label: 'Absent',
+//                             data: data.absent,
+//                             borderColor: '#ef4444',
+//                             backgroundColor: 'rgba(239, 68, 68, 0.2)',
+//                             fill: true
+//                         }
+//                     ]
+//                 },
+//                 options: {
+//                     responsive: true,
+//                     interaction : {
+//                         mode :'index',
+//                         intersect : false
+//                     },
+//                     plugins: {
+//                         legend: {
+//                             position: 'bottom'
+//                         }
+//                     },
+//                     scales: {
+//                         y: {
+//                             beginAtZero: true
+//                         }
+//                     }
+//                 }
+//             });
+
+//         })
+//         .catch(err => console.error("Line chart error:", err));
+
+// }
 
 function loadTaskProgressChart() {
     fetch("functions/getTaskChart.php", { credentials: "include" })
@@ -291,24 +688,25 @@ function loadTaskProgressChart() {
                 type: 'bar',
                 data: {
                     labels: data.labels,
-                    datasets: [
-                        {
-                            label: 'Task Completion %',
-                            data: data.progress,
-                            backgroundColor: data.progress.map(value => {
-                                if (value >= 80) return '#22c55e';   
-                                if (value >= 50) return '#f59e0b';   
-                                return '#ef4444';                   
-                            }),
-                            borderRadius: 8,
-                            categoryPercentage: 0.6,
-                            barPercentage: 0.7
-                        }
-                    ]
+                    datasets: [{
+                        label: 'Task Completion %',
+                        data: data.progress,
+
+                        backgroundColor: data.progress.map(value => {
+                            if (value >= 80) return '#22c55e';
+                            if (value >= 50) return '#f59e0b';
+                            return '#ef4444';
+                        }),
+
+                        borderRadius: 10,
+                        barThickness: 18
+                    }]
                 },
                 options: {
+
                     responsive: true,
-                     maintainAspectRatio: false,
+
+                    maintainAspectRatio: false,
 
                     interaction: {
                         mode: 'index',
@@ -316,32 +714,61 @@ function loadTaskProgressChart() {
                     },
 
                     plugins: {
+
                         legend: {
                             display: false
                         },
+
                         tooltip: {
+
+                            backgroundColor: '#111827',
+                            titleColor: '#fff',
+                            bodyColor: '#d1d5db',
+
                             callbacks: {
                                 label: function(context) {
-                                    return context.raw + "% completed";
+                                    return context.raw + "%";
                                 }
                             }
                         }
+
                     },
 
                     scales: {
+
+                        x: {
+
+                            ticks: {
+                                color: '#9ca3af',
+                                font: {
+                                    size: 11
+                                }
+                            },
+
+                            grid: {
+                                display: false
+                            }
+
+                        },
+
                         y: {
+
                             beginAtZero: true,
                             max: 100,
+
                             ticks: {
+                                color: '#9ca3af',
                                 callback: value => value + "%"
+                            },
+
+                            grid: {
+                                color: 'rgba(0,0,0,0.20)'
                             }
-                        },
-                        x: {
-                            ticks: {
-                                autoSkip: false
-                            }
+
                         }
+
                     }
+
                 }
             });
 
@@ -378,7 +805,7 @@ function loadStudentProgressChart(studentID) {
                         backgroundColor: ['#059669', '#2563EB']
                     }]
                 },
-                options: {
+                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
@@ -482,6 +909,12 @@ function getRemarkClass(remark) {
         default:
             return "";
     }
+}
+
+// quick actions
+function openCreateTask(){
+    createTask.classList.add("show");
+    overlay.classList.add("show");
 }
 
 
@@ -602,18 +1035,93 @@ function updateTaskStatus(taskID, status) {
     });
 }
 
-function previewImage(src) {
+// function previewImage(src) {
+
+//     const modal = document.getElementById("imagePreviewModal");
+//     const img = document.getElementById("previewImg");
+
+//     const files = src.split(",");
+
+//     const cleanSrc = files[0].trim();
+
+//     img.src = cleanSrc;
+//     modal.style.display = "flex";
+// }
+
+// preview Imgae
+
+
+
+function previewFile(src) {
 
     const modal = document.getElementById("imagePreviewModal");
-    const img = document.getElementById("previewImg");
+    const container = document.getElementById("previewContainer");
 
-    const files = src.split(",");
+    const cleanSrc = src.trim();
+    const safeSrc = encodeURI(cleanSrc);
 
-    const cleanSrc = files[0].trim();
+    const extension = cleanSrc.split('.').pop().toLowerCase();
 
-    img.src = cleanSrc;
+    container.innerHTML = "";
+
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(extension)) {
+
+        container.innerHTML = `
+           <img src="${safeSrc}" style="max-width:100%; max-height:85vh; border-radius:10px; object-fit:contain;">
+        `;
+
+    } 
+    else if (extension === "pdf") {
+
+        container.innerHTML = `
+            <iframe src="${safeSrc}" 
+    style="width:100%;height:80vh;border:none;border-radius:10px;"></iframe>
+
+<p style="margin-top:10px; color:#cbd5e1; font-size:13px;">
+    If the PDF doesn't load,
+    <a href="${safeSrc}" target="_blank">Click here to open file</a>
+</p>
+        `;
+
+    } 
+    else {
+
+        container.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+                    <img src="${safeSrc}" style="max-width:100%; max-height:85vh; border-radius:10px; object-fit:contain;">
+
+                    <a href="${safeSrc}" download 
+                    style="
+                            text-decoration:none;
+                            padding:10px 14px;
+                            background:rgba(34,197,94,0.15);
+                            color:#22c55e;
+                            border-radius:8px;
+                            font-weight:600;
+                            border:1px solid rgba(34,197,94,0.3);
+                    ">
+                        Download Image
+                    </a>
+                </div>
+            `;
+    }
+
     modal.style.display = "flex";
 }
+
+function previewImage(src) {
+    previewFile(src);
+}
+
+document.getElementById("closeImagePreview").addEventListener("click", function () {
+    document.getElementById("imagePreviewModal").style.display = "none";
+});
+
+document.getElementById("imagePreviewModal").addEventListener("click", function (e) {
+    if (e.target.id === "imagePreviewModal") {
+        this.style.display = "none";
+    }
+});
 
 // view task
 function viewTask(taskID) {
@@ -789,17 +1297,6 @@ function closeTaskModal(){
 
 
 // task approvals
-
-
-document.getElementById("closeImagePreview").addEventListener("click", function () {
-    document.getElementById("imagePreviewModal").style.display = "none";
-});
-
-document.getElementById("imagePreviewModal").addEventListener("click", function (e) {
-    if (e.target.id === "imagePreviewModal") {
-        this.style.display = "none";
-    }
-});
 
 closeViewTaskDetails.addEventListener("click", () => {
     overlay.classList.remove("show");
@@ -1230,7 +1727,30 @@ window.addEventListener("DOMContentLoaded", () => {
     loadLineChart();
     loadPieChart();
     loadTaskProgressChart();
+   
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    populateMonthDropdown();
+
+    loadLineChart();
+
+    document
+        .getElementById("monthSelector")
+        .addEventListener("change", loadLineChart);
+
+    document
+        .getElementById("downloadChartBtn")
+        .addEventListener("click", downloadAttendancePDF);
+
+});
+
+document.getElementById("darkModeToggle").addEventListener("click", () => {
+
+     setTimeout(reloadAllCharts, 100);
+});
+
 
 // activity log
 document.addEventListener("DOMContentLoaded", function () {
@@ -1304,8 +1824,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const attendanceFrom = AttendanceDateFromInput.value;
         const attendanceTo = AttendanceDateToInput.value;
 
-        console.log(attendanceFrom, attendanceTo );
-
         fetch("functions/searchStudentAttendance.php", {
             method: "POST",
             headers: {
@@ -1358,5 +1876,26 @@ document.getElementById('openChangePasswordSupervisor').addEventListener('click'
 document.getElementById('backToAccountSettingsSupervisor').addEventListener('click', () => {
     changePasswordModal.classList.remove('show');
     accountModal.classList.add('show');
+});
+
+// dark mode
+toggleBtn.addEventListener("click", () => {
+
+    document.body.classList.toggle("dark-mode");
+
+    if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("theme", "dark");
+    } else {
+        localStorage.setItem("theme", "light");
+    }
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+    }
 });
 

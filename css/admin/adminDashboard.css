@@ -1650,6 +1650,20 @@ background:#eee;
 
 /* Tables */
 
+.report-table-wrapper{
+
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    margin-bottom: 30px;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+}
+
 .table-container {
     width: 99%;
     max-height: 450px;
@@ -2742,33 +2756,113 @@ tbody tr {
     color: #dc2626;
 }
 
+/* preview imgae */
 .image-modal {
-    display: none;
+   display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(10px);
+
     justify-content: center;
     align-items: center;
+
     z-index: 9999;
+    padding: 24px;
 }
 
-#previewImg {
-    max-width: 80%;
-    max-height: 80%;
-    border-radius: 10px;
+#previewContainer {
+    width: 100%;
+    max-width: 900px;
+    max-height: 92vh;
+
+    background: linear-gradient(145deg, #0b1220, #0f172a);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+
+    padding: 16px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+
+    overflow: hidden;
+
+    position: relative;
+}
+
+#previewContainer img {
+    max-width: 100%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+
+#previewContainer iframe {
+    width: 100%;
+    height: 85vh;
+    border: none;
+    border-radius: 12px;
+
+    background: white;
 }
 
 #closeImagePreview {
     position: absolute;
     top: 20px;
-    right: 30px;
-    font-size: 40px;
+    right: 25px;
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 28px;
     color: white;
+
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+
     cursor: pointer;
-    z-index: 10000;
+    transition: 0.2s ease;
+}
+
+#closeImagePreview:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.05);
+}
+
+#previewContainer a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    text-decoration: none;
+    padding: 12px 16px;
+
+    background: rgba(59, 130, 246, 0.18);
+    color: #60a5fa;
+
+    border-radius: 10px;
+    font-weight: 600;
+
+    transition: all 0.2s ease;
+
+    border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+#previewContainer a:hover {
+    background: rgba(59, 130, 246, 0.28);
+    transform: translateY(-2px);
 }
 
 /* supervisor */

@@ -566,24 +566,82 @@ function initSupervisorForm() {
         btn.disabled = !checkbox.checked;
     });
 }
+// preview Image
+// function previewImage(src) {
+//     document.getElementById("previewImg").src = src;
+//     document.getElementById("imagePreviewModal").style.display = "flex";
+// }
 
-function previewImage(src) {
-    document.getElementById("previewImg").src = src;
-    document.getElementById("imagePreviewModal").style.display = "flex";
+function previewFile(src) {
+
+    const modal = document.getElementById("imagePreviewModal");
+    const container = document.getElementById("previewContainer");
+
+    const cleanSrc = src.trim();
+    const safeSrc = encodeURI(cleanSrc);
+
+    const extension = cleanSrc.split('.').pop().toLowerCase();
+
+    container.innerHTML = "";
+
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(extension)) {
+
+        container.innerHTML = `
+           <img src="${safeSrc}" style="max-width:100%; max-height:85vh; border-radius:10px; object-fit:contain;">
+        `;
+
+    } 
+    else if (extension === "pdf") {
+
+        container.innerHTML = `
+            <iframe src="${safeSrc}" 
+    style="width:100%;height:80vh;border:none;border-radius:10px;"></iframe>
+
+<p style="margin-top:10px; color:#cbd5e1; font-size:13px;">
+    If the PDF doesn't load,
+    <a href="${safeSrc}" target="_blank">Click here to open file</a>
+</p>
+        `;
+
+    } 
+    else {
+
+        container.innerHTML = `
+            <a href="${safeSrc}" target="_blank">
+                Download/View File
+            </a>
+        `;
+    }
+
+    modal.style.display = "flex";
 }
 
-document.addEventListener("click", function (e) {
+function previewImage(src) {
+    previewFile(src);
+}
 
-    if (e.target.id === "closeImagePreview") {
-        document.getElementById("imagePreviewModal").style.display = "none";
-        document.getElementById("previewImg").src = "";
-    }
+document.getElementById("closeImagePreview").addEventListener("click", function () {
+    document.getElementById("imagePreviewModal").style.display = "none";
+});
 
+document.getElementById("imagePreviewModal").addEventListener("click", function (e) {
     if (e.target.id === "imagePreviewModal") {
-        document.getElementById("imagePreviewModal").style.display = "none";
-        document.getElementById("previewImg").src = "";
+        this.style.display = "none";
     }
 });
+
+// document.addEventListener("click", function (e) {
+
+//     if (e.target.id === "closeImagePreview") {
+//         document.getElementById("imagePreviewModal").style.display = "none";
+//         document.getElementById("previewImg").src = "";
+//     }
+
+//     if (e.target.id === "imagePreviewModal") {
+//         document.getElementById("imagePreviewModal").style.display = "none";
+//         document.getElementById("previewImg").src = "";
+//     }
+// });
 
 function toggleSection(header) {
     const card = header.parentElement;
@@ -1072,11 +1130,12 @@ function openAddSupervisor() {
 function openRFIDSettings() {
     rfidAttendance.classList.add("show");
     overlay.classList.add("show");
+    loadRfidSettings();
 }
 
-function openRFIDSettings() {
-    window.location.href = "rfidSettings.php";
-}
+// function openRFIDSettings() {
+//     window.location.href = "rfidSettings.php";
+// }
 
 // at risk students
 function loadRiskStudents() {

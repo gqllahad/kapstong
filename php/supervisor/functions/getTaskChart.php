@@ -18,24 +18,35 @@ if (!$superID) {
 
 $sql = "
 SELECT 
-    st.studentID,
+    ss.studentID,
 
-    COUNT(*) AS total_tasks,
+    COUNT(st.taskID) AS total_tasks,
 
-    SUM(CASE 
-        WHEN st.status IN ('SUBMITTED', 'APPROVED') 
-        THEN 1 ELSE 0 
-    END) AS completed_tasks,
+    SUM(
+        CASE 
+            WHEN st.status IN ('SUBMITTED', 'APPROVED') 
+            THEN 1 ELSE 0 
+        END
+    ) AS completed_tasks,
 
-    SUM(CASE 
-        WHEN st.status IN ('NOT STARTED', 'IN PROGRESS', 'REJECTED') 
-        THEN 1 ELSE 0 
-    END) AS pending_tasks
+    SUM(
+        CASE 
+            WHEN st.status IN ('NOT STARTED', 'IN PROGRESS', 'REJECTED') 
+            THEN 1 ELSE 0 
+        END
+    ) AS pending_tasks
 
-FROM student_tasks st
-WHERE st.superID = ?
-GROUP BY st.studentID
-ORDER BY st.studentID ASC
+FROM student_supervisor ss
+
+LEFT JOIN student_tasks st 
+    ON ss.studentID = st.studentID
+    AND st.superID = ss.superID
+
+WHERE ss.superID = ?
+AND ss.status = 'ACTIVE'
+
+GROUP BY ss.studentID
+ORDER BY ss.studentID ASC
 ";
 
 $stmt = $conn->prepare($sql);

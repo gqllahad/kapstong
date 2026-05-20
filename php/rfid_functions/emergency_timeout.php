@@ -3,8 +3,20 @@
 session_start();
 require_once("../kapstongConnection.php");
 require_once("../functions.php");
+header('Content-Type: application/json');
 
 date_default_timezone_set('Asia/Manila');
+
+if (!isset($_SESSION['user_id'])) {
+     echo json_encode([
+        "success" => false,
+        "message" => "UNAUTHORIZED"
+    ]);
+    exit();
+}
+
+$role = $_SESSION['role'] ?? null;
+$superID = $_SESSION['superID'] ?? null;
 
 if (isset($_POST['rfid'])) {
 
@@ -12,7 +24,11 @@ if (isset($_POST['rfid'])) {
     $reason = $_POST['reason'] ?? 'No reason provided';
 
     if (empty($rfid)) {
-        die("⚠️ RFID REQUIRED");
+        echo json_encode([
+        "success" => false,
+        "message" => "RFID REQUIRED"
+    ]);
+    exit();
     }
 
     $stmt = $conn->prepare("
@@ -25,11 +41,40 @@ if (isset($_POST['rfid'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows == 0) {
-        die("❌ RFID NOT REGISTERED");
+       echo json_encode([
+        "success" => false,
+        "message" => "RFID NOT REGISTERED"
+    ]);
+    exit();
     }
 
     $user = $result->fetch_assoc();
     $studentID = $user['studentID'];
+
+    if ($role === "supervisor") {
+
+        $check = $conn->prepare("
+            SELECT 1 
+            FROM student_supervisor
+            WHERE studentID = ?
+            AND superID = ?
+            AND status = 'ACTIVE'
+            LIMIT 1
+        ");
+
+        $check->bind_param("si", $studentID, $superID);
+        $check->execute();
+
+        $res = $check->get_result();
+
+        if ($res->num_rows == 0) {
+            echo json_encode([
+            "success" => false,
+            "message" => "STUDENT NOT ASSIGNED TO YOU"
+        ]);
+        exit();
+        }
+    }
 
     $stmtAttendance = $conn->prepare("
         SELECT * FROM attendance_logs
@@ -43,11 +88,19 @@ if (isset($_POST['rfid'])) {
     $row = $stmtAttendance->get_result()->fetch_assoc();
 
     if (!$row) {
-        die("⚠️ No attendance record found today");
+         echo json_encode([
+        "success" => false,
+        "message" => "NO ATTENDANCE RECORD TODAY"
+    ]);
+    exit();
     }
 
     if ($row['current_state'] == 'TIMED_OUT') {
-        die("⚠️ Already timed out today");
+        echo json_encode([
+        "success" => false,
+        "message" => "ALREADY TIMED OUT TODAY"
+    ]);
+    exit();
     }
 
     $now = date("Y-m-d H:i:s");
@@ -97,6 +150,10 @@ if (isset($_POST['rfid'])) {
 
     $updateProgress->execute();
 
-    echo "✅ Emergency Time Out Successful for {$user['name']}";
+    echo json_encode([
+        "success" => true,
+        "message" => "Emergency Time Out Successful",
+        "student" => $user['name']
+    ]);
 }
 ?>

@@ -13,24 +13,51 @@ function updateClock() {
     el.innerText = now.toLocaleTimeString();
 }
 
-function showModal(message, isSuccess = true) {
-    const modal = document.getElementById("statusModal");
-    const text = document.getElementById("modalText");
-    const icon = document.getElementById("modalIcon");
+function showToast(message, isSuccess = true) {
+    const container = document.getElementById("toastContainer");
 
-    text.innerText = message;
-    if (isSuccess) {
-        icon.innerText = "✅";
-        text.style.color = "#00a86b";
-    } else {
-        icon.innerText = "⚠️";
-        text.style.color = "#e63946";
-    }
+    const toast = document.createElement("div");
+    toast.classList.add("toast", isSuccess ? "success" : "error");
 
-    modal.classList.add("show");
+    const icon = document.createElement("div");
+    icon.classList.add("toast-icon");
+    icon.textContent = isSuccess ? "✓" : "!";
+    
+    const text = document.createElement("div");
+    text.classList.add("toast-message");
+    text.textContent = message;
 
-    setTimeout(closeModal, 2200);
+    toast.appendChild(icon);
+    toast.appendChild(text);
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(-20px)";
+        toast.style.transition = "0.3s ease";
+
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
 }
+
+// function showModal(message, isSuccess = true) {
+//     const modal = document.getElementById("statusModal");
+//     const text = document.getElementById("modalText");
+//     const icon = document.getElementById("modalIcon");
+
+//     text.innerText = message;
+//     if (isSuccess) {
+//         icon.innerText = "✅";
+//         text.style.color = "#00a86b";
+//     } else {
+//         icon.innerText = "⚠️";
+//         text.style.color = "#e63946";
+//     }
+
+//     modal.classList.add("show");
+
+//     setTimeout(closeModal, 2200);
+// }
 
 function closeModal() {
     document.getElementById("statusModal").classList.add("hide");
@@ -240,7 +267,7 @@ input.addEventListener("input", function () {
         data.includes("TIME IN") ||
         data.includes("TIME OUT");
 
-    showModal(data, isSuccess);
+    showToast(data.message || data, isSuccess);
 
     input.value = "";
     input.focus();
@@ -248,7 +275,7 @@ input.addEventListener("input", function () {
     isSubmitting = false;
 })
 .catch(err => {
-    showModal("❌ SERVER ERROR", false);
+    showToast(data.message || data, false);
     isSubmitting = false;
 });
         }
@@ -283,7 +310,7 @@ function toggleDashboard() {
 function submitEmergencyTimeout() {
 
     const rfid = document.getElementById("emergencyRfid").value;
-    const reason = document.getElementById("emergencyReason").value;
+    let reason = document.getElementById("emergencyReason").value;
 
     if (!rfid) return alert("Please enter RFID");
     if (!reason) {
@@ -299,10 +326,15 @@ function submitEmergencyTimeout() {
             "rfid=" + encodeURIComponent(rfid) +
             "&reason=" + encodeURIComponent(reason)
     })
-    .then(res => res.text())
+    .then(res => res.json())
     .then(data => {
         closeEmergencyModal();
         loadAttendance();
+
+        showToast(data.message, data.success);
+    })
+    .catch(err => {
+        showToast("SERVER ERROR", false);
     });
 }
 

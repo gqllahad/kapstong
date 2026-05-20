@@ -118,15 +118,17 @@ requireRole(['ADMIN', 'supervisor']);
 
 </div>
 
-<div id="statusModal" class="modal">
+<!-- <div id="statusModal" class="modal">
     <div class="modal-content">
-        <div class="modal-icon" id="modalIcon">⚠️</div>
+        <div class="modal-icon" id="modalIcon"></div>
 
         <div id="modalText"></div>
         <button onclick="closeModal()">OK</button>
 
     </div>
-</div>
+</div> -->
+
+<div id="toastContainer"></div>
 
 <div id="emergencyModal" class="emergency-modal">
 

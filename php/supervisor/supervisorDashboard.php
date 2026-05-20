@@ -281,7 +281,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                                                 id="viewUploadedFileBtn"
                                                 class="btn-preview"
                                                 style="display:none;"
-                                                onclick="previewImage(document.getElementById('viewUploadedFileBtn').dataset.file)">
+                                                onclick="previewFile(document.getElementById('viewUploadedFileBtn').dataset.file)">
                                                 👁 View File
                                             </button>
 
@@ -487,7 +487,10 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                                     placeholder="🔍 Search student by name, ID, Course or Yearlevel...">
 
                                 <div class="list-box" id="taskStudentList">
-                                    <?php echo renderTaskAssignStudentList($conn, $superID); ?>
+                                    <?php
+                                    $search =  $_POST['search'] ?? '';
+                                    echo renderTaskAssignStudentList($conn, $superID, $search); 
+                                    ?>
                                 </div>
                             </div>
                         </div>
@@ -651,43 +654,115 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                         </div>
                     </div>
 
-                    <div class="card rfid-card" onclick="openRfid()">
-
-                        <div class="card-content">
-                            <div class="card-icon rfid-icon">
-                                        <i class="bi bi-broadcast-pin"></i>
-                                    </div>
-                            <div class="rfid-text">
-                                <h3>RFID Attendance</h3>
-                                <p>Start real-time scanning for student attendance tracking</p>
-                            </div>
-
-                            <h2>
-                                <i class='bx bx-scan'></i>
-                            </h2>
-                        </div>
-
-                    </div>
-
                 </section>
 
                 <section class="dashboard-charts">
+
                     <section class="wrapper line-chart">
-                        <h2>Attendance Trends Over Time</h2>
-                        <canvas id="lineChart"></canvas>
+
+                        <div class="chart-header">
+
+                            <div class="chart-title">
+                                <h2>Attendance Trends</h2>
+                                <p>Track student attendance performance</p>
+                            </div>
+
+                            <div class="chart-actions">
+
+                                <select id="monthSelector"></select>
+
+                                <button id="downloadChartBtn">
+                                    <i class="bi bi-download"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <div class="chart-container">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+
                     </section>
 
-                    <section class="wrapper pie-chart">
+                    
+
+                    <!-- <section class="wrapper pie-chart">
                         <h2>Overall Attendance Distribution</h2>
                         <canvas id="pieChart"></canvas>
-                    </section>
+                    </section> -->
 
+                 
+                        <section class="wrapper pie-chart">
+                            <div class="chart-header">
+                            <div class="chart-title">
+                                <div>
+                                    <h2>Overall Attendance</h2>
+                                    <p>Distribution across all assigned students</p>
+                                </div>
+                            </div>
+                            </div>
+
+                            <div class="pie-container">
+                                <canvas id="pieChart"></canvas>
+                            </div>
+
+                        </section>
+
+                        <section class="quick-action-container">
+                                <div class="quick-action-header">
+                                    <div class="quick-action-title">
+                                        <h2>Quick Actions</h2>
+                                        <p>Instant system tools & shortcuts</p>
+                                    </div>
+                                </div>
+
+                                <div class="quick-action-grid">
+                                    <button onclick="openCreateTask()">
+                                        <i class="bi bi-person-plus-fill"></i>
+                                        <span>Create Task</span>
+                                    </button>
+
+                                    <button onclick="openRfid()">
+                                    <i class="bi bi-broadcast-pin"></i>
+                                        <span>RFID</span>
+                                    </button>
+
+                                    <button id="darkModeToggle" class="dark-toggle">
+                                        <i class="bi bi-moon-fill"></i>
+                                        <span>Darkmode</span>
+                                    </button>
+
+                                    <button onclick="generateReport()">
+                                        <i class="bi bi-bar-chart-fill"></i>
+                                        <span>Reports</span>
+                                    </button>
+
+                                    <button onclick="openStudents()">
+                                        <i class="bi bi-people-fill"></i>
+                                        <span>Students</span>
+                                    </button>
+
+                                    <button onclick="openLogs()">
+                                        <i class="bi bi-journal-text"></i>
+                                        <span>Logs</span>
+                                    </button>
+
+                                </div>
+                            </section>
+                   
                     <section class="wrapper bar-chart">
-                        <h2>Task Completion Overview</h2>
+                        <div class="chart-header">
+                            <div class="chart-title">
+                                <h2>Task Completion Monitoring</h2>
+                                <p>Tracking progress of all assigned students</p>
+                            </div>
+                        </div>
                         <canvas id="barChart"></canvas>
                     </section>
                 </section>
 
+                
                 <div class="dashboard-bottom">
                     <!-- ALERTS -->
                     <div class="alerts-container">
@@ -1105,9 +1180,15 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
              </div>
 
-            <div id="imagePreviewModal" class="image-modal">
+            <!-- <div id="imagePreviewModal" class="image-modal">
                 <span id="closeImagePreview">&times;</span>
                 <img id="previewImg">
+            </div> -->
+
+            <div id="imagePreviewModal" class="image-modal">
+                <span id="closeImagePreview">&times;</span>
+
+                <div id="previewContainer"></div>
             </div>
 
             <hr>
@@ -1124,6 +1205,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 </body>
 <script>
     window.forceChangePassword = <?= json_encode($forceChange) ?>;
+    window.currentSuperID = <?= json_encode($superID); ?>;
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../../js/supervisor/supervisorDashboard.js"></script>

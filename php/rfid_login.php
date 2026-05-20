@@ -56,12 +56,15 @@ $lunchBreakTime = (int)getAttendanceSetting(
 $current_time = date("H:i:s");
 $now = time();
 
+$role = $_SESSION['role'];
+$superID = $_SESSION['superID'] ?? null;
+
 if (isset($_POST['rfid'])) {
 
     $rfid = trim($_POST['rfid']);
 
     if (empty($rfid)) {
-        die("⚠️ RFID CANNOT BE EMPTY");
+        die("RFID CANNOT BE EMPTY");
     }
 
     $stmt = $conn->prepare("
@@ -74,15 +77,32 @@ if (isset($_POST['rfid'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows == 0) {
-        die("❌ RFID NOT REGISTERED");
+        die("RFID not Registered!");
     }
 
     $user = $result->fetch_assoc();
     $studentID = $user['studentID'];
 
-    // $_SESSION['role'] = $user['role'];
-    // $_SESSION['name'] = $user['name'];
-    // $_SESSION['studentID'] = $studentID;
+    if ($role === "supervisor") {
+
+        $check = $conn->prepare("
+            SELECT 1 
+            FROM student_supervisor
+            WHERE studentID = ?
+            AND superID = ?
+            AND status = 'ACTIVE'
+            LIMIT 1
+        ");
+
+        $check->bind_param("si", $studentID, $superID);
+        $check->execute();
+
+        $res = $check->get_result();
+
+        if ($res->num_rows == 0) {
+            die("Student not assigned to you!");
+        }
+    }
 
     $stmtAttendance = $conn->prepare("
         SELECT * FROM attendance_logs
@@ -120,7 +140,7 @@ if (isset($_POST['rfid'])) {
     if ($current_time < $timeInStart ) { //|| $current_time > $invalidScanTime
 
         $_SESSION['status'] =   
-            "⛔ Time-in allowed only between $timeInStart - $lateTime";
+            "Time-in allowed only between $timeInStart - $lateTime";
              echo $_SESSION['status'];
              exit();
     }
@@ -163,7 +183,7 @@ if (isset($_POST['rfid'])) {
 
         $stmtIn->execute();
 
-        $_SESSION['status'] = "✅ TIME IN SUCCESS ($status)";
+        $_SESSION['status'] = "TIME IN SUCCESS ($status)";
         echo $_SESSION['status'];
         exit();
     }
@@ -183,7 +203,7 @@ if (isset($_POST['rfid'])) {
         $stmt->bind_param("si", $remarks, $row['attendanceID']);
         $stmt->execute();
 
-        $_SESSION['status'] = "🍱 LUNCH BREAK STARTED";
+        $_SESSION['status'] = "LUNCH BREAK STARTED";
         echo $_SESSION['status'];
         exit();
     }
@@ -199,7 +219,7 @@ if (isset($_POST['rfid'])) {
             $remaining = ceil($lunchBreakTime - $breakMinutes);
 
             $_SESSION['status'] =
-                "⏳ Lunch break ongoing. Wait {$remaining} minutes.";
+                "Lunch break ongoing. Wait {$remaining} minutes.";
             exit();
         }
 
@@ -215,7 +235,7 @@ if (isset($_POST['rfid'])) {
         $stmt->bind_param("si", $remarks, $row['attendanceID']);
         $stmt->execute();
 
-        $_SESSION['status'] = "✅ RETURNED FROM LUNCH";
+        $_SESSION['status'] = "RETURNED FROM LUNCH";
          echo $_SESSION['status'];
          exit();
     }
@@ -235,7 +255,7 @@ if (isset($_POST['rfid'])) {
         $stmt->bind_param("si", $remarks,$row['attendanceID']);
         $stmt->execute();
 
-        $_SESSION['status'] = "☕ SNACK BREAK STARTED";
+        $_SESSION['status'] = "SNACK BREAK STARTED";
         echo $_SESSION['status'];
         exit();
     }
@@ -251,7 +271,7 @@ if (isset($_POST['rfid'])) {
             $remaining = ceil($snackBreakTime - $breakMinutes);
 
             $_SESSION['status'] =
-                "⏳ Snack break ongoing. Wait {$remaining} minutes.";
+                "Snack break ongoing. Wait {$remaining} minutes.";
 
             exit();
         }
@@ -268,7 +288,7 @@ if (isset($_POST['rfid'])) {
         $stmt->bind_param("si", $remarks, $row['attendanceID']);
         $stmt->execute();
 
-        $_SESSION['status'] = "✅ RETURNED FROM SNACK BREAK";
+        $_SESSION['status'] = "RETURNED FROM SNACK BREAK";
         echo $_SESSION['status'];
         exit();
     }
@@ -289,7 +309,7 @@ if (isset($_POST['rfid'])) {
             $remaining = ceil($MIN_WORK_MINUTES - $workedMinutes);
 
             $_SESSION['status'] =
-                "⚠️ You must work at least {$MIN_WORK_MINUTES} minutes before time out. Wait {$remaining} more minutes.";
+                "You must work at least {$MIN_WORK_MINUTES} minutes before time out. Wait {$remaining} more minutes.";
 
             echo $_SESSION['status'];
             exit();
@@ -351,7 +371,7 @@ if (isset($_POST['rfid'])) {
 
         $updateProgress->execute();
 
-        $_SESSION['status'] = "⛔ TIME OUT SUCCESS ($totalHours hrs).";
+        $_SESSION['status'] = "TIME OUT SUCCESS ($totalHours hrs).";
         echo $_SESSION['status'];
         exit();
     }
@@ -360,12 +380,12 @@ if (isset($_POST['rfid'])) {
       if ($state == 'TIMED_OUT') {
 
         $_SESSION['status'] =
-            "⚠️ You are already timed out today.";
+            "You are already timed out today.";
             echo $_SESSION['status'];
         exit();
     }
 }
-$_SESSION['status'] = "⚠️ Invalid scan action!";
+$_SESSION['status'] = "Invalid scan action!";
 echo $_SESSION['status'];
 exit();
 // echo $_SESSION['status'] ?? "UNKNOWN STATUS";

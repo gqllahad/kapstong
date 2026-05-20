@@ -207,7 +207,6 @@ $studentStatus = $_SESSION['isVerified'];
                         <button id="closeEditModal" class="modal-close">&times;</button>
                     </div>
                     <form action="edit_student_action.php" method="post" class="modal-form">
-
                         <!-- Personal Info -->
                         <div class="form-section">
                             <h4>Personal Information</h4>
@@ -291,26 +290,45 @@ $studentStatus = $_SESSION['isVerified'];
                 <!-- uploads modal -->
                 <div id="uploadModal" class="upload-modal">
                     <div class="modal-header">
-                        <h3>Upload Your Documents</h3>
+                        <h3>Upload Documents</h3>
                         <button id="closeModal" class="modal-close">&times;</button>
                     </div>
                     <form action="upload_documents_action.php" method="post" enctype="multipart/form-data" class="modal-form">
                         <div class="form-group">
-                            <label for="idUpload">Student ID</label>
-                            <input type="file" name="idUpload" id="idUpload">
-                            <div class="file-preview" id="idPreview"></div>
+                            <!-- <label for="idUpload"></label> -->
+                            <div class="info-card">
+                                <div class="card-header" onclick="toggleSection(this)">
+                                    <h4>Student ID</h4>
+                                    <span class="arrow">▼</span>
+                                </div>
+                                <div class="card-body">
+                                <input type="file" name="idUpload" id="idUpload">
+                                <div class="file-preview" id="idPreview"></div>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="form-group">
-                            <label for="regFormUpload">Registration Form</label>
+                            <div class="info-card">
+                                <div class="card-header" onclick="toggleSection(this)">
+                                    <h4>Registration Form</h4>
+                                    <span class="arrow">▼</span>
+                                </div>
+                                <div class="card-body">
+                            <!-- <label for="regFormUpload"></label> -->
                             <input type="file" name="regFormUpload" id="regFormUpload">
                             <div class="file-preview" id="regPreview"></div>
+                            </div>
                         </div>
+                    </div>
+
                         <div class="modal-actions">
                             <button type="submit" class="btn-upload" name="submitDocuments">Upload</button>
                             <button type="button" id="cancelUploadModal" class="btn-edit">Cancel</button>
                         </div>
                     </form>
                 </div>
+    
 
                 <!-- preview uploads modal -->
                 <div id="previewFilesModal" class="upload-modal">
@@ -333,7 +351,23 @@ $studentStatus = $_SESSION['isVerified'];
                             </div>
                             <div class="doc-preview show">
                                 <?php if (!empty($documents['idUpload'])): ?>
-                                    <img src="../../../uploads/student_uploads/<?php echo $studentID . '/' . $documents['idUpload']; ?>" class="preview-img">
+
+                                    <?php
+                                        $file = $documents['idUpload'];
+                                        $filePath = "../../../uploads/student_uploads/$studentID/$file";
+                                    ?>
+
+                                    <div class="file-name-box">
+                                        <p class="file-title">🪪 Student ID</p>
+                                        <p class="file-name"><?php echo $file; ?></p>
+
+                                        <a href="<?php echo $filePath; ?>" target="_blank" class="file-open">
+                                            Open File
+                                        </a>
+                                    </div>
+
+                                <?php else: ?>
+                                    <span class="status missing">No ID uploaded</span>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -350,11 +384,29 @@ $studentStatus = $_SESSION['isVerified'];
                                 <?php endif; ?>
                             </div>
                             <div class="doc-preview show">
-                                <?php if (!empty($documents['regFormUpload'])): ?>
-                                    <img src="../../../uploads/student_uploads/<?php echo $studentID . '/' . $documents['regFormUpload']; ?>" class="preview-img">
-                                <?php endif; ?>
-                            </div>
+                                    <?php if (!empty($documents['regFormUpload'])): ?>
+
+                                        <?php
+                                            $file = $documents['regFormUpload'];
+                                            $filePath = "../../../uploads/student_uploads/$studentID/$file";
+                                            $fileExt = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                                        ?>
+
+                                        <div class="file-name-box">
+                                            <p class="file-title">📄 Registration Form</p>
+                                            <p class="file-name"><?php echo $file; ?></p>
+
+                                            <a href="<?php echo $filePath; ?>" target="_blank" class="file-open">
+                                                Open File
+                                            </a>
+                                        </div>
+
+                                    <?php else: ?>
+                                        <span class="status missing">No file uploaded</span>
+                                    <?php endif; ?>
+                                </div>
                         </div>
+                    </div>
 
                         <?php if ($documents['status'] !== 'APPROVED'): ?>
                             <div class="modal-actions">
@@ -362,7 +414,6 @@ $studentStatus = $_SESSION['isVerified'];
                                 <button class="btn-delete" id="btn-remove-files">Remove Files</button>
                             </div>
                         <?php endif; ?>
-                    </div>
                 </div>
 
             </section>
@@ -457,7 +508,7 @@ $studentStatus = $_SESSION['isVerified'];
 
                                 <?php if (!empty($documents['idUpload'])): ?>
                                     <button class="btn-preview"
-                                        onclick="previewImageUnverified('<?php echo '../../../uploads/student_uploads/' . $studentID . '/' . $documents['idUpload']; ?>')">
+                                        onclick="previewFileUnverified('<?php echo '../../../uploads/student_uploads/' . $studentID . '/' . $documents['idUpload']; ?>')">
                                         View ID
                                     </button>
                                 <?php else: ?>
@@ -470,7 +521,7 @@ $studentStatus = $_SESSION['isVerified'];
 
                                 <?php if (!empty($documents['regFormUpload'])): ?>
                                     <button class="btn-preview"
-                                        onclick="previewImageUnverified('<?php echo '../../../uploads/student_uploads/' . $studentID . '/' . $documents['regFormUpload']; ?>')">
+                                        onclick="previewFileUnverified('<?php echo '../../../uploads/student_uploads/' . $studentID . '/' . $documents['regFormUpload']; ?>')">
                                         View Form
                                     </button>
                                 <?php else: ?>
@@ -483,9 +534,15 @@ $studentStatus = $_SESSION['isVerified'];
 
                 </div>
 
-                <div id="imageUnverifiedPreviewModal" class="image-modal">
+                <!-- <div id="imageUnverifiedPreviewModal" class="image-modal">
                     <span id="closeUnverifiedImagePreview">&times;</span>
                     <img id="previewUnverifiedImg">
+                </div> -->
+
+                <div id="imagePreviewModal" class="image-modal">
+                    <span id="closeImagePreview">&times;</span>
+
+                    <div id="previewContainer"></div>
                 </div>
             </section>
 

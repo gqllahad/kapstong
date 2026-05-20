@@ -1272,10 +1272,16 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
                 <!-- image preview -->
-                <div id="imagePreviewModal" class="image-modal">
+                <!-- <div id="imagePreviewModal" class="image-modal">
                     <span id="closeImagePreview">&times;</span>
                     <img id="previewImg">
-                </div>
+                </div> -->
+
+                   <div id="imagePreviewModal" class="image-modal">
+                        <span id="closeImagePreview">&times;</span>
+
+                        <div id="previewContainer"></div>
+                    </div>
 
             </section>
 
