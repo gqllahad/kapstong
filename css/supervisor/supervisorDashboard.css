@@ -1055,6 +1055,32 @@ transition: opacity 0.3s ease;
     box-shadow: 0 8px 18px rgba(59, 130, 246, 0.12);
 }
 
+.evaluate-btn {
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
+    color: #ffffff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 6px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.evaluate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+}
+
 
 .edit-btn {
     display: inline-flex;
@@ -1289,7 +1315,7 @@ td .view-btn {
 }
 
 
-.create-task-container, .student-progress-container, .student-breakdown-container, .task-edit-container, .student-application-approve,
+.create-task-container, .student-progress-container, .student-breakdown-container, .task-edit-container, .student-application-approve,.student-final-evaluation,
 .task-view, .account-settings-modal{
     position: fixed;
     top: 50%;
@@ -1308,7 +1334,7 @@ td .view-btn {
 }
 
 .create-task-container.show, .student-progress-container.show, .student-breakdown-container.show, .task-edit-container.show, .student-application-approve.show, 
-.task-view.show, .account-settings-modal.show{
+.task-view.show, .account-settings-modal.show, .student-final-evaluation.show{
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
@@ -2643,6 +2669,399 @@ backdrop-filter: blur(18px);
     color: #ef4444;
     transform: scale(1.1);
 }
+
+
+/* final evaluation */
+
+.student-final-evaluation{
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(6px);
+    max-width: 1150px;
+}
+
+.modal-body{
+    width: 100%;
+    max-width: 1150px;
+     max-height: 85vh;
+    overflow-y: auto;
+
+    background: #0f172a;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+
+     padding: 16px;
+    color: #e2e8f0;
+
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+
+.final-section-title {
+    margin: 10px 0 6px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.final-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.final-modal-header h3 {
+    font-size: 20px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.final-modal-close {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+.final-modal-close:hover {
+    color: #fff;
+}
+
+.student-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 10px;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 14px;
+}
+
+.student-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.student-header p {
+    margin: 0;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.recommendation-box {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 12px;
+
+    font-weight: 600;
+    text-align: center;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.evaluation-actions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+
+    padding: 10px 16px;
+    border-radius: 10px;
+
+    color: white;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(16,185,129,0.3);
+}
+
+.skill-card{
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 12px;
+
+    transition:0.2s ease;
+}
+
+.skill-card:hover{
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.05);
+}
+
+.skill-header{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    font-weight:600;
+    color:#e2e8f0;
+    margin-bottom:6px;
+}
+
+.skill-card input[type="range"]{
+    width:100%;
+    accent-color:#3b82f6;
+}
+
+.skill-labels{
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    color:#94a3b8;
+    margin-top:4px;
+}
+.rating-card {
+    background: rgba(255,255,255,0.03);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.rating-card label {
+    font-size: 13px;
+    color: #cbd5e1;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.rating-card input[type="range"] {
+    width: 100%;
+}
+
+.rating-card span {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.task-list-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.task-mini {
+    background: rgba(255,255,255,0.03);
+    padding: 10px;
+    border-radius: 10px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 13px;
+    color: #cbd5e1;
+
+    border-left: 3px solid #3b82f6;
+}
+
+.final-eval-card{
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 14px;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.eval-field label{
+    font-size:12px;
+    color:#94a3b8;
+    margin-bottom:6px;
+    display:block;
+}
+
+.final-eval-card textarea{
+    width:100%;
+    min-height:90px;
+    padding:10px;
+
+    background: rgba(15,23,42,0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius:10px;
+
+    color:#fff;
+    resize:none;
+
+    transition:0.2s;
+}
+
+.final-eval-card textarea:focus{
+    outline:none;
+    border-color:#3b82f6;
+    box-shadow:0 0 0 2px rgba(59,130,246,0.2);
+}
+
+.final-eval-card select{
+    width:100%;
+    padding:10px;
+
+    background: rgba(15,23,42,0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius:10px;
+
+    color:#fff;
+
+    transition:0.2s;
+}
+
+.final-eval-card select:focus{
+    outline:none;
+    border-color:#3b82f6;
+}
+
+
+.evaluation-grid{
+     display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.eval-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.student-header.compact{
+    padding:10px;
+    margin:0;
+}
+
+.final-pill{
+    padding:8px 12px;
+    border-radius:999px;
+    background: linear-gradient(135deg,#2563eb,#06b6d4);
+    color:white;
+    font-weight:700;
+    font-size:13px;
+}
+
+.mini-score-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:6px;
+    font-size:13px;
+    color:#cbd5e1;
+}
+
+.mini-score-grid div{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 8px;
+    background:rgba(255,255,255,0.03);
+    border-radius:8px;
+}
+
+.task-list-compact {
+    max-height: 140px;
+    overflow-y: auto;
+}
+
+.task-list-compact.expanded{
+    max-height:400px;
+    overflow:auto;
+}
+
+.toggle-btn{
+    font-size:12px;
+    background:none;
+    border:none;
+    color:#60a5fa;
+    cursor:pointer;
+}
+
+.soft-skill-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.skill-mini {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    gap: 8px;
+}
+
+.skill-mini label {
+    font-size: 12px;
+    width: 70px;
+    color: #cbd5e1;
+}
+
+.skill-mini input[type="range"] {
+    flex: 1;
+}
+
+.skill-mini span {
+    width: 40px;
+    text-align: right;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.final-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.final-inline textarea {
+    min-height: 70px;
+    padding: 10px 12px;
+    border-radius: 12px;
+
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+
+    color: #fff;
+    resize: none;
+    outline: none;
+    transition: 0.2s;
+}
+
+.final-inline textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+
+.final-inline select {
+    padding: 10px 12px;
+    border-radius: 12px;
+
+    background: rgba(255,255,255,0.03);
+    color: #fff;
+
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+
 
 /* darkmode */
 body.dark-mode {

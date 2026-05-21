@@ -822,7 +822,7 @@ function renderEvaluationList($conn, $superID, $search = '')
         $studentID = $row['studentID'];
 
         $progressData = $conn->query("
-            SELECT required_hours, completed_hours
+            SELECT required_hours, completed_hours, completion_status
             FROM student_progress
             WHERE studentID = '$studentID'
             LIMIT 1
@@ -962,6 +962,7 @@ function renderEvaluationList($conn, $superID, $search = '')
         else if ($finalGrade >= 80) $gradeColor = '#2563EB';
         else if ($finalGrade >= 70) $gradeColor = '#F59E0B';
 
+        $isCompleted = strtoupper($progressData['completion_status'] ?? '') === 'COMPLETED';
         $output .= '
         <tr>
             <td>
@@ -989,7 +990,11 @@ function renderEvaluationList($conn, $superID, $search = '')
                     onclick="viewEvaluationBreakdown(\'' . $studentID . '\')">
                     View
                 </button>
-            </td>
+                
+                '. ($isCompleted? '<button class="evaluate-btn"onclick="openFinalEvaluation(\'' . $studentID . '\')">Final Evaluation</button>': '' ) .'
+                </td>
+
+            
         </tr>';
     }
 
@@ -1148,6 +1153,8 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
             attendance_logs.rfid_uid,
             attendance_logs.studentID,
             attendance_logs.created_at,
+            attendance_logs.emergency_timeout,
+            attendance_logs.emergency_reason,
             ojtstudent.name
         FROM attendance_logs
 
@@ -1231,6 +1238,10 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
                     break;
             };
 
+            $hasEmergency =
+                $row['emergency_timeout'] == 1 ||
+                !empty($row['emergency_reason']);
+
             $output .= "
             <tr>
                 <td><div class='student-id-cell'>
@@ -1247,11 +1258,15 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
                 </td>
                 <td>{$row['total_hours']}</td>
                 <td>{$row['remarks']}</td>
-                <td>
-                    <button class='view-btn'
-                        onclick=\"viewAttendance('{$row['attendanceID']}')\">
-                        View
-                    </button>
+               <td>
+                    " . (
+                        $hasEmergency
+                        ? "<button class='view-btn'
+                                onclick=\"viewAttendance('{$row['attendanceID']}\">
+                                View
+                        </button>"
+                        : "<span style='color:#9CA3AF;'>—</span>"
+                    ) . "
                 </td>
             </tr>";
         }

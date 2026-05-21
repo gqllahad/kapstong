@@ -19,6 +19,9 @@ const closeStudentChart = document.getElementById("closeStudentProgress");
 const studentBreakdown = document.getElementById("student-breakdown-container"); 
 const closeStudentBreakdown = document.getElementById("closeStudentBreakdown");
 
+const studentFinalEvaluation = document.getElementById("student-final-evaluation"); 
+const closeSFinalEvaluation = document.getElementById("closeFinalEvaluation");
+
 const createTask = document.getElementById("create-task-container");
 const createTaskBtn = document.getElementById("create-task-btn"); 
 const closeCreateTask = document.getElementById("closeCreateTaskModal");
@@ -149,6 +152,189 @@ function viewEvaluationBreakdown(studentID){
     setTimeout(() => {
         viewEvaluationReport(studentID);
         }, 200);
+}
+
+function toggleTasks(){
+    const el = document.getElementById("taskList");
+    el.classList.toggle("expanded");
+}
+
+function openFinalEvaluation(studentID){
+       studentFinalEvaluation.classList.add("show");
+    overlay.classList.add("show");
+
+    const content = document.getElementById("finalEvaluationContent");
+
+    document.getElementById("evalLoading").style.display = "block";
+    document.getElementById("evaluationWrapper").style.display = "none";
+
+    fetch("functions/getFinalEvaluation.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "studentID=" + encodeURIComponent(studentID)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (!data.success) {
+            content.innerHTML = "<p>Error loading data</p>";
+            return;
+        }
+
+        const student = data.student;
+        const scores = data.scores;
+        const tasks = data.tasks;
+
+        document.getElementById("evalLoading").style.display = "none";
+        document.getElementById("evaluationWrapper").style.display = "block";
+
+        document.getElementById("evalAvatar").innerText =
+            student.name.charAt(0).toUpperCase();
+
+        document.getElementById("evalName").innerText = student.name;
+        document.getElementById("evalID").innerText = "ID: " + student.studentID;
+
+        document.getElementById("attendanceScore").innerText = scores.attendance + "%";
+        document.getElementById("progressScore").innerText = scores.progress + "%";
+        document.getElementById("taskScore").innerText = scores.tasks + "%";
+        document.getElementById("finalScore").innerText = scores.final + "%";
+
+        let taskHTML = "";
+
+        tasks.forEach(task => {
+
+            let color = "#9CA3AF";
+
+            if (task.status === "APPROVED") color = "#059669";
+            else if (task.status === "SUBMITTED") color = "#3B82F6";
+            else if (task.status === "IN PROGRESS") color = "#F59E0B";
+            else if (task.status === "REJECTED") color = "#EF4444";
+
+            taskHTML += `
+                <div class="task-mini">
+                    <span>${task.title}</span>
+                    <span>${task.score}%</span>
+                </div>
+            `;
+        });
+
+        document.getElementById("taskList").innerHTML = taskHTML;
+
+        let final = scores.final;
+
+        let remark = "";
+        let remarkColor = "";
+
+        if (final >= 90) {
+            remark = "EXCELLENT - Recommended for certification";
+            remarkColor = "#059669";
+        }
+        else if (final >= 80) {
+            remark = "VERY GOOD - Approved";
+            remarkColor = "#2563EB";
+        }
+        else if (final >= 70) {
+            remark = "SATISFACTORY - Passed with remarks";
+            remarkColor = "#F59E0B";
+        }
+        else if (final >= 60) {
+            remark = "NEEDS IMPROVEMENT";
+            remarkColor = "#F97316";
+        }
+        else {
+            remark = "FAILED";
+            remarkColor = "#DC2626";
+        }
+
+        const box = document.getElementById("recommendationBox");
+
+        let title = "";
+        let icon = "";
+        let toneColor = "";
+
+        if (final >= 90) {
+            title = "Outstanding Performance";
+            icon = "🏆";
+            toneColor = "#059669";
+            remark = "Excellent performance. The student demonstrates outstanding competency and is highly recommended for certification and employment consideration.";
+        }
+        else if (final >= 80) {
+            title = "Strong Performance";
+            icon = "✅";
+            toneColor = "#2563EB";
+            remark = "Very good performance. The student meets expectations and shows strong potential for professional work.";
+        }
+        else if (final >= 70) {
+            title = "Satisfactory Performance";
+            icon = "📘";
+            toneColor = "#F59E0B";
+            remark = "Satisfactory performance. The student has met the required standards with minor areas for improvement.";
+        }
+        else if (final >= 60) {
+            title = "Needs Improvement";
+            icon = "⚠️";
+            toneColor = "#F97316";
+            remark = "The student requires improvement in several areas. Continued supervision and guidance are recommended.";
+        }
+        else {
+            title = "At Risk Performance";
+            icon = "🚨";
+            toneColor = "#DC2626";
+            remark = "The student is currently not meeting required performance standards. A structured improvement plan is strongly advised.";
+        }
+
+        box.innerHTML = `
+        <div style="
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 5px solid ${toneColor};
+            padding: 14px;
+            border-radius: 12px;
+        ">
+            <div style="
+                font-size: 14px;
+                font-weight: 700;
+                margin-bottom: 6px;
+                color: ${toneColor};
+            ">
+                ${icon} ${title}
+            </div>
+
+            <div style="
+                font-size: 13px;
+                line-height: 1.5;
+                color: #e2e8f0;
+            ">
+                ${remark}
+            </div>
+        </div>
+    `;
+    })
+    .catch(err => {
+        console.error(err);
+        content.innerHTML = "<p>Something went wrong</p>";
+    });
+
+    function bindSlider(sliderId, valueId) {
+    const slider = document.getElementById(sliderId);
+    const value = document.getElementById(valueId);
+
+    if (!slider || !value) return;
+
+        const update = () => {
+            value.innerText = slider.value + "%";
+        };
+
+        slider.addEventListener("input", update);
+        update();
+    }
+
+    bindSlider("ethicsRating", "ethicsValue");
+    bindSlider("communicationRating", "communicationValue");
+    bindSlider("initiativeRating", "initiativeValue");
+    bindSlider("disciplineRating", "disciplineValue");
 }
 
 // settings
@@ -1529,6 +1715,12 @@ createTaskBtn.addEventListener("click", () => {
 closeStudentBreakdown.addEventListener("click", () => {
     overlay.classList.remove("show");
     studentBreakdown.classList.remove("show");
+});
+
+closeSFinalEvaluation.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    studentFinalEvaluation.classList.remove("show");
+
 });
 
 closeCreateTask.addEventListener("click", () => {

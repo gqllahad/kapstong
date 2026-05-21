@@ -3,10 +3,10 @@
 session_start();
 require_once("../kapstongConnection.php");
 require_once("../functions.php");
+require_once("../sessionTimeout.php");
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
-
 
 if ($_SESSION['role'] !== "supervisor") {
     header("Location: ../trackerMain.php");
@@ -190,7 +190,149 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 </div>
 
                 <div id="reportSummary"></div>
-            </div>
+                </div>
+
+                <!-- final evaluation -->
+                <div class="student-final-evaluation" id="student-final-evaluation">
+                    <div class="final-modal-header">
+                        <h3>Final Evaluation</h3>
+                        <button id="closeFinalEvaluation" class="modal-close">&times;</button>
+                    </div>
+
+                    <div class="modal-body" id="finalEvaluationContent">
+
+                        <div class="loading-state" id="evalLoading">
+                            Loading evaluation...
+                        </div>
+
+                        <div class="evaluation-wrapper" id="evaluationWrapper" style="display:none;">
+
+                            <div class="eval-header">
+                                <div class="student-header compact">
+                                    <div class="student-avatar" id="evalAvatar"></div>
+                                    <div>
+                                        <h3 id="evalName"></h3>
+                                        <p id="evalID"></p>
+                                    </div>
+                                </div>
+
+                                <div class="final-pill" id="finalScore"></div>
+                            </div>
+
+                          <div class="evaluation-grid">
+    
+                            
+                                <div class="eval-card">
+                                    <div class="final-section-title">Performance</div>
+
+                                    <div class="mini-score-grid">
+                                        <div>Attendance <span id="attendanceScore"></span></div>
+                                        <div>Progress <span id="progressScore"></span></div>
+                                        <div>Tasks <span id="taskScore"></span></div>
+                                    </div>
+                                </div>
+
+                    
+                                <div class="eval-card">
+                                    <div class="final-section-title">
+                                        Tasks 
+                                        <button class="toggle-btn" onclick="toggleTasks()">View</button>
+                                    </div>
+
+                                    <div class="task-list-compact collapsed" id="taskList"></div>
+                                </div>
+
+                            </div>
+
+                           <div class="final-section-title">Supervisor Evaluation</div>
+
+                                <div class="soft-skill-grid">
+
+                                    <div class="skill-card">
+                                        <div class="skill-header">
+                                            <span>Work Ethics</span>
+                                            <span id="ethicsValue">0%</span>
+                                        </div>
+                                        <input type="range" min="0" max="100" value="0" id="ethicsRating">
+                                        <div class="skill-labels">
+                                            <span>Poor</span>
+                                            <span>Excellent</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="skill-card">
+                                        <div class="skill-header">
+                                            <span>Communication</span>
+                                            <span id="communicationValue">0%</span>
+                                        </div>
+                                        <input type="range" min="0" max="100" value="0" id="communicationRating">
+                                        <div class="skill-labels">
+                                            <span>Weak</span>
+                                            <span>Strong</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="skill-card">
+                                        <div class="skill-header">
+                                            <span>Initiative</span>
+                                            <span id="initiativeValue">0%</span>
+                                        </div>
+                                        <input type="range" min="0" max="100" value="0" id="initiativeRating">
+                                        <div class="skill-labels">
+                                            <span>Passive</span>
+                                            <span>Proactive</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="skill-card">
+                                        <div class="skill-header">
+                                            <span>Discipline</span>
+                                            <span id="disciplineValue">0%</span>
+                                        </div>
+                                        <input type="range" min="0" max="100" value="0" id="disciplineRating">
+                                        <div class="skill-labels">
+                                            <span>Low</span>
+                                            <span>High</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            <div class="final-section-title">Supervisor Final Evaluation</div>
+
+                           <div class="final-eval-card">
+
+                                <div class="eval-field">
+                                    <label>Overall Remarks</label>
+                                    <textarea id="finalRemarks" placeholder="Write detailed evaluation of student's performance..."></textarea>
+                                </div>
+
+                                <div class="eval-field">
+                                    <label>Final Recommendation</label>
+                                    <select id="finalRecommendation">
+                                        <option value="EXCELLENT">Excellent - Recommended for employment</option>
+                                        <option value="VERY GOOD">Very Good - Approved</option>
+                                        <option value="SATISFACTORY">Satisfactory - Passed</option>
+                                        <option value="NEEDS IMPROVEMENT">Needs Improvement</option>
+                                        <option value="FAILED">Failed</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div class="recommendation-box" id="recommendationBox"></div>
+
+                           <div class="evaluation-actions">
+                                <button class="save-btn" onclick="saveFinalEvaluation()">
+                                    Finalize Evaluation
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             <!-- view approval tasks -->
             <div class="student-application-approve" id="student-application-approve">
@@ -1206,6 +1348,41 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 <script>
     window.forceChangePassword = <?= json_encode($forceChange) ?>;
     window.currentSuperID = <?= json_encode($superID); ?>;
+
+    let inactivityTimer;
+let warningTimer;
+
+const INACTIVE_LIMIT = 600000; 
+const WARNING_TIME = 540000;  
+
+function logoutUser(){
+    window.location.href = "../logoutPhase.php";
+}
+
+function showWarning(){
+    alert("You will be logged out in 1 minute due to inactivity.");
+}
+
+function resetTimer(){
+
+    clearTimeout(inactivityTimer);
+    clearTimeout(warningTimer);
+
+    warningTimer = setTimeout(() => {
+        showWarning();
+    }, WARNING_TIME);
+
+    inactivityTimer = setTimeout(() => {
+        logoutUser();
+    }, INACTIVE_LIMIT);
+}
+
+["click","keypress","scroll","mousemove","touchstart"].forEach(evt => {
+    document.addEventListener(evt, resetTimer);
+});
+
+window.onload = resetTimer;
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../../js/supervisor/supervisorDashboard.js"></script>

@@ -114,15 +114,18 @@ if (isset($_POST['rfid'])) {
             final_time_out = ?,
             current_state = 'TIMED_OUT',
             remarks = ?,
-            status = ?
+            status = ?,
+            emergency_timeout = 1,
+            emergency_reason = ?
         WHERE attendanceID = ?
     ");
 
     $stmt->bind_param(
-        "sssi",
+        "ssssi",
         $now,
         $remarks,
         $status,
+        $reason,
         $row['attendanceID']
     );
 
@@ -131,7 +134,39 @@ if (isset($_POST['rfid'])) {
     $firstIn = strtotime($row['first_time_in']);
     $finalOut = time();
 
-    $workedHours = round(($finalOut - $firstIn) / 3600, 2);
+    $totalSecondsWorked = $finalOut - $firstIn;
+
+    $lunchBreakSeconds = 0;
+
+        if (
+        !empty($row['lunch_break_out']) &&
+        !empty($row['lunch_break_in'])
+    ) {
+
+        $lunchOut = strtotime($row['lunch_break_out']);
+        $lunchIn = strtotime($row['lunch_break_in']);
+
+        $lunchBreakSeconds = $lunchIn - $lunchOut;
+    }
+
+    $snackBreakSeconds = 0;
+
+    if (
+        !empty($row['snack_break_out']) &&
+        !empty($row['snack_break_in'])
+    ) {
+
+        $snackOut = strtotime($row['snack_break_out']);
+        $snackIn = strtotime($row['snack_break_in']);
+
+        $snackBreakSeconds = $snackIn - $snackOut;
+    }
+
+    $finalWorkedSeconds = $totalSecondsWorked - $lunchBreakSeconds - $snackBreakSeconds;
+
+    $workedHours = round($finalWorkedSeconds / 3600, 2);
+
+    $workedHours = max(0, $workedHours);
 
     $updateProgress = $conn->prepare("
         UPDATE student_progress
