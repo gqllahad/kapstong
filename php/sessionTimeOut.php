@@ -16,7 +16,7 @@ if (isset($_SESSION['LAST_ACTIVITY'])) {
         session_unset();
         session_destroy();
 
-        header("Location: logoutPhase.php");
+        header("Location: ../logoutPhase.php");
         exit();
     }
 }

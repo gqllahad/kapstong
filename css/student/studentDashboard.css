@@ -2972,6 +2972,104 @@ transition: opacity 0.3s ease;
     min-width: 110px;
 }
 
+/* inactivity */
+.inactivity-modal{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.inactivity-box{
+    width: 380px;
+    background: #0f172a;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 22px;
+    text-align: center;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+    animation: pop .25s ease;
+}
+
+@keyframes pop{
+    from{transform: scale(0.95); opacity: 0;}
+    to{transform: scale(1); opacity: 1;}
+}
+
+.inactivity-header{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.warning-icon{
+    font-size: 28px;
+}
+
+.inactivity-box h3{
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+}
+
+.inactive-text{
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 10px 0 18px;
+    line-height: 1.4;
+}
+
+.countdown-wrapper{
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 14px;
+    border-radius: 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 6px;
+
+    margin-bottom: 16px;
+}
+
+.countdown-label{
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.countdown-number{
+    font-size: 28px;
+    font-weight: 800;
+    color: #ef4444; 
+    transition: 0.2s ease;
+    text-shadow: 0 0 12px rgba(239,68,68,0.3);
+}
+
+.stay-btn{
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.stay-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(16,185,129,0.3);
+}
+
 
 
 /* media */

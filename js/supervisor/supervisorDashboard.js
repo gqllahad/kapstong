@@ -22,6 +22,9 @@ const closeStudentBreakdown = document.getElementById("closeStudentBreakdown");
 const studentFinalEvaluation = document.getElementById("student-final-evaluation"); 
 const closeSFinalEvaluation = document.getElementById("closeFinalEvaluation");
 
+const studentFinalEvaluationView = document.getElementById("final-evaluation-view"); 
+const closeSFinalEvaluationView = document.getElementById("closeFinalEvaluationView");
+
 const createTask = document.getElementById("create-task-container");
 const createTaskBtn = document.getElementById("create-task-btn"); 
 const closeCreateTask = document.getElementById("closeCreateTaskModal");
@@ -253,64 +256,167 @@ function openFinalEvaluation(studentID){
         let title = "";
         let icon = "";
         let toneColor = "";
+        let recommendation = "";
+        let suggestions = [];
+        let strengths = [];
 
         if (final >= 90) {
+
             title = "Outstanding Performance";
             icon = "🏆";
             toneColor = "#059669";
-            remark = "Excellent performance. The student demonstrates outstanding competency and is highly recommended for certification and employment consideration.";
+
+            recommendation =
+                "The student has demonstrated exceptional professionalism, technical competency, and work discipline throughout the internship period.";
+
+            strengths = [
+                "Consistently completes assigned tasks with high quality",
+                "Shows excellent responsibility and accountability",
+                "Maintains professional communication and teamwork",
+                "Demonstrates initiative and adaptability in the workplace"
+            ];
+
+            suggestions = [
+                "Continue developing leadership capabilities",
+                "Take on advanced technical responsibilities",
+                "Mentor junior trainees when possible"
+            ];
         }
         else if (final >= 80) {
+
             title = "Strong Performance";
             icon = "✅";
             toneColor = "#2563EB";
-            remark = "Very good performance. The student meets expectations and shows strong potential for professional work.";
+
+            recommendation =
+                "The student performed very well and successfully met the internship expectations and requirements.";
+
+            strengths = [
+                "Reliable task completion",
+                "Good communication and collaboration",
+                "Demonstrates positive work ethics",
+                "Shows willingness to learn and improve"
+            ];
+
+            suggestions = [
+                "Improve confidence in decision-making",
+                "Enhance problem-solving under pressure",
+                "Continue refining technical proficiency"
+            ];
         }
         else if (final >= 70) {
+
             title = "Satisfactory Performance";
             icon = "📘";
             toneColor = "#F59E0B";
-            remark = "Satisfactory performance. The student has met the required standards with minor areas for improvement.";
+
+            recommendation =
+                "The student achieved acceptable internship performance with several areas requiring continuous improvement.";
+
+            strengths = [
+                "Completes assigned responsibilities",
+                "Shows basic understanding of workflows",
+                "Maintains attendance and participation"
+            ];
+
+            suggestions = [
+                "Improve consistency in task execution",
+                "Strengthen communication skills",
+                "Develop better time management habits",
+                "Increase initiative in workplace activities"
+            ];
         }
         else if (final >= 60) {
+
             title = "Needs Improvement";
             icon = "⚠️";
             toneColor = "#F97316";
-            remark = "The student requires improvement in several areas. Continued supervision and guidance are recommended.";
+
+            recommendation =
+                "The student requires additional supervision and improvement in several professional and technical areas.";
+
+            strengths = [
+                "Shows willingness to participate",
+                "Demonstrates potential for growth"
+            ];
+
+            suggestions = [
+                "Improve task completion consistency",
+                "Develop stronger workplace discipline",
+                "Increase engagement and communication",
+                "Seek guidance proactively when difficulties arise"
+            ];
         }
         else {
-            title = "At Risk Performance";
+
+            title = "Performance Improvement Required";
             icon = "🚨";
             toneColor = "#DC2626";
-            remark = "The student is currently not meeting required performance standards. A structured improvement plan is strongly advised.";
+
+            recommendation =
+                "The student is currently below the expected internship performance standards and requires structured development support.";
+
+            strengths = [
+                "Has opportunity for professional growth",
+                "Can improve with consistent guidance and mentoring"
+            ];
+
+            suggestions = [
+                "Focus on attendance and punctuality",
+                "Improve completion of assigned tasks",
+                "Develop stronger communication habits",
+                "Participate more actively in workplace responsibilities",
+                "Follow supervisor feedback consistently"
+            ];
         }
 
         box.innerHTML = `
-        <div style="
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-left: 5px solid ${toneColor};
-            padding: 14px;
-            border-radius: 12px;
-        ">
-            <div style="
-                font-size: 14px;
-                font-weight: 700;
-                margin-bottom: 6px;
-                color: ${toneColor};
-            ">
-                ${icon} ${title}
+
+        <div class="evaluation-summary-card">
+
+            <div class="summary-header" style="border-left:5px solid ${toneColor}">
+                <div class="summary-title">
+                    <span class="summary-icon">${icon}</span>
+                    <div>
+                        <h3>${title}</h3>
+                        <p>Supervisor Evaluation Summary</p>
+                    </div>
+                </div>
+
+                <div class="summary-grade" style="background:${toneColor}">
+                    ${final}%
+                </div>
             </div>
 
-            <div style="
-                font-size: 13px;
-                line-height: 1.5;
-                color: #e2e8f0;
-            ">
-                ${remark}
-            </div>
+            <table class="evaluation-table">
+
+                <tr>
+                    <td class="table-label">Recommendation</td>
+                    <td>${recommendation}</td>
+                </tr>
+
+                <tr>
+                    <td class="table-label">Key Strengths</td>
+                    <td>
+                        <ul>
+                            ${strengths.map(item => `<li>${item}</li>`).join("")}
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="table-label">Suggestions</td>
+                    <td>
+                        <ul>
+                            ${suggestions.map(item => `<li>${item}</li>`).join("")}
+                        </ul>
+                    </td>
+                </tr>
+
+            </table>
+
         </div>
-    `;
+        `;
     })
     .catch(err => {
         console.error(err);
@@ -335,6 +441,214 @@ function openFinalEvaluation(studentID){
     bindSlider("communicationRating", "communicationValue");
     bindSlider("initiativeRating", "initiativeValue");
     bindSlider("disciplineRating", "disciplineValue");
+}
+
+function saveFinalEvaluation() {
+
+    const studentID = document.getElementById("evalID").innerText.replace("ID: ", "").trim();
+
+    const attendance = document.getElementById("attendanceScore").innerText.replace("%", "").trim();
+    const progress = document.getElementById("progressScore").innerText.replace("%", "").trim();
+    const tasks = document.getElementById("taskScore").innerText.replace("%", "").trim();
+    const final = document.getElementById("finalScore").innerText.replace("%", "").trim();
+
+    const ethics = document.getElementById("ethicsRating").value;
+    const communication = document.getElementById("communicationRating").value;
+    const initiative = document.getElementById("initiativeRating").value;
+    const discipline = document.getElementById("disciplineRating").value;
+
+    const recommendation = document.getElementById("finalRecommendation").value;
+    const remarks = document.getElementById("finalRemarks").value;
+
+    const box = document.getElementById("recommendationBox");
+
+    const rec_title =
+        box.querySelector("h3")?.innerText || "";
+
+    const rec_text =
+        box.innerText || "";
+
+    fetch("functions/saveFinalEvaluation.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "studentID=" + encodeURIComponent(studentID) +
+            "&attendance=" + encodeURIComponent(attendance) +
+            "&progress=" + encodeURIComponent(progress) +
+            "&tasks=" + encodeURIComponent(tasks) +
+            "&final=" + encodeURIComponent(final) +
+            "&ethics=" + encodeURIComponent(ethics) +
+            "&communication=" + encodeURIComponent(communication) +
+            "&initiative=" + encodeURIComponent(initiative) +
+            "&discipline=" + encodeURIComponent(discipline) +
+            "&recommendation=" + encodeURIComponent(recommendation) +
+            "&remarks=" + encodeURIComponent(remarks) +
+            "&rec_title=" + encodeURIComponent(rec_title) +
+            "&rec_text=" + encodeURIComponent(rec_text)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            showToast("Evaluation saved successfully!", "success");
+
+            studentFinalEvaluation.classList.remove("show");
+            overlay.classList.remove("show");
+
+        } else {
+            showToast("Failed to save evaluation", "error");
+        }
+
+    })
+    .catch(err => {
+         showToast("Server error while saving evaluation", "error");
+    });
+}
+
+function viewFinalReport(studentID) {
+
+    document.getElementById("final-evaluation-view").setAttribute("data-student-id", studentID);
+
+     fetch("functions/getFinalReport.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "studentID=" + encodeURIComponent(studentID)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(!data.success){
+            alert(data.message);
+            return;
+        }
+
+        const e = data.evaluation;
+
+        const modal = document.getElementById("final-evaluation-view");
+        modal.classList.add("show");
+        overlay.classList.add("show");
+
+        document.getElementById("reportStudentName").innerText = e.student_name;
+        document.getElementById("reportStudentID").innerText = e.studentID ;
+
+        document.getElementById("reportFinalScore").innerText = e.final_score + "%";
+
+        document.getElementById("reportAttendance").innerText = e.attendance_score + "%";
+        document.getElementById("reportProgress").innerText = e.progress_score + "%";
+        document.getElementById("reportTasks").innerText = e.task_score + "%";
+
+        document.getElementById("rEthics").innerText = e.ethics_rating;
+        document.getElementById("rCommunication").innerText = e.communication_rating;
+        document.getElementById("rInitiative").innerText = e.initiative_rating;
+        document.getElementById("rDiscipline").innerText = e.discipline_rating;
+
+        document.getElementById("rRecommendationTitle").innerText = e.final_recommendation;
+        document.getElementById("rRecommendationText").innerHTML = formatRecommendationText(cleanRecommendation(e.recommendation_text));
+
+        document.getElementById("rRemarks").innerText = e.final_remarks;
+    }).catch(err => console.error(err));
+    
+}
+
+function cleanRecommendation(text) {
+    return text.replace(/^[A-Z\s]+/g, "").trim();
+}
+
+function formatRecommendationText(text) {
+
+    if (!text) return "";
+
+    const sections = {
+        recommendation: "",
+        strengths: [],
+        suggestions: []
+    };
+
+    let current = "";
+
+    const lines = text.split("\n").map(l => l.trim()).filter(l => l);
+
+    lines.forEach(line => {
+
+        if (/recommendation/i.test(line)) {
+            current = "recommendation";
+            sections.recommendation = line.replace(/recommendation/i, "").trim();
+        }
+        else if (/strengths/i.test(line)) {
+            current = "strengths";
+        }
+        else if (/suggestions/i.test(line)) {
+            current = "suggestions";
+        }
+        else {
+            if (current === "strengths") {
+                sections.strengths.push(line);
+            }
+            else if (current === "suggestions") {
+                sections.suggestions.push(line);
+            }
+            else if (current === "recommendation") {
+                sections.recommendation += " " + line;
+            }
+        }
+    });
+
+    return `
+        <div class="evaluation-summary-view">
+
+            <div class="info-card-view">
+                <div class="info-card-view-header" onclick="toggleSection(this)">
+                    <h4>Recommendation</h4>
+                </div>
+                <div class="info-card-view-body">
+                    <p>${sections.recommendation}</p>
+                </div>
+            </div>
+
+            <div class="info-card-view">
+                <div class="info-card-view-header" onclick="toggleSection(this)" >
+                    <h4>Key Strengths</h4>
+                </div>
+                <div class="info-card-view-body">
+                    <ul>
+                        ${sections.strengths.map(s => `<li>${s}</li>`).join("")}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-card-view">
+                <div class="info-card-view-header" onclick="toggleSection(this)">
+                    <h4>Suggestions</h4>
+                </div>
+                <div class="info-card-view-body">
+                    <ul>
+                        ${sections.suggestions.map(s => `<li>${s}</li>`).join("")}
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    `;
+}
+
+function downloadEvaluationReport() {
+
+    const modal = document.getElementById("final-evaluation-view");
+    const studentID = modal.getAttribute("data-student-id");
+
+    if (!studentID) {
+        alert("Student ID not found");
+        return;
+    }
+
+    window.open(
+        "functions/exportFinalEvaluation.php?studentID=" + encodeURIComponent(studentID),
+        "_blank"
+    );
 }
 
 // settings
@@ -1703,6 +2017,8 @@ overlay.addEventListener("click", () => {
     viewTaskDetails.classList.remove("show");
      accountModal.classList.remove('show');
       changePasswordModal.classList.remove('show');
+      studentFinalEvaluation.classList.remove("show");
+      studentFinalEvaluationView.classList.remove("show");
 });
 
 
@@ -1720,6 +2036,12 @@ closeStudentBreakdown.addEventListener("click", () => {
 closeSFinalEvaluation.addEventListener("click", () => {
     overlay.classList.remove("show");
     studentFinalEvaluation.classList.remove("show");
+
+});
+
+closeSFinalEvaluationView.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    studentFinalEvaluationView.classList.remove("show");
 
 });
 

@@ -334,7 +334,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 </div>
 
-            </div>`
+            </div>
 
             <!-- student application modal -->
             <div class="student-application-view" id="student-application-view">
@@ -1491,6 +1491,31 @@ if ($_SESSION['role'] !== "ADMIN") {
 
              </section>
 
+              <div id="inactivityModal" class="inactivity-modal">
+                <div class="inactivity-box">
+
+                    <div class="inactivity-header">
+                        <div class="warning-icon">⏳</div>
+                        <h3>Session Timeout Warning</h3>
+                    </div>
+
+                    <p class="inactive-text">
+                        You have been inactive for a while. For your security, the system will automatically log you out.
+                    </p>
+
+                    <div class="countdown-wrapper">
+                        <span class="countdown-label">Logging out in</span>
+                        <span id="countdown" class="countdown-number">60</span>
+                        <span class="countdown-label">seconds</span>
+                    </div>
+
+                    <button onclick="stayLoggedIn()" class="stay-btn">
+                        Stay Logged In
+                    </button>
+
+                </div>
+            </div>
+
         </main>
 
     </div>
@@ -1506,23 +1531,64 @@ if ($_SESSION['role'] !== "ADMIN") {
     <script>
 
             let inactivityTimer;
+        let countdownTimer;
+        let countdownValue = 60;
 
-            function resetTimer() {
+        const modal = document.getElementById("inactivityModal");
+        const countdownEl = document.getElementById("countdown");
 
-                clearTimeout(inactivityTimer);
+        function startCountdown() {
 
-                inactivityTimer = setTimeout(() => {
+            countdownValue = 60;
+            countdownEl.innerText = countdownValue;
 
+            modal.style.display = "flex";
+
+            countdownTimer = setInterval(() => {
+
+                countdownValue--;
+                countdownEl.innerText = countdownValue;
+
+                if (countdownValue <= 10) {
+                    countdownEl.style.color = "#dc2626";
+                    countdownEl.style.transform = "scale(1.2)";
+                }
+
+                if (countdownValue <= 0) {
+                    clearInterval(countdownTimer);
                     window.location.href = "../logoutPhase.php";
+                }
 
-                }, 600000);
-            }
+            }, 1000);
+        }
 
-            window.onload = resetTimer;
-            document.onmousemove = resetTimer;
-            document.onkeypress = resetTimer;
-            document.onclick = resetTimer;
-            document.onscroll = resetTimer;
+        function resetTimer() {
+
+            clearTimeout(inactivityTimer);
+            clearInterval(countdownTimer);
+
+            modal.style.display = "none";
+
+            inactivityTimer = setTimeout(() => {
+                startCountdown();
+            }, 600000); 
+        }
+
+        function stayLoggedIn() {
+
+            clearTimeout(inactivityTimer);
+            clearInterval(countdownTimer);
+
+            modal.style.display = "none";
+
+            resetTimer();
+        }
+
+        window.onload = resetTimer;
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        document.onclick = resetTimer;
+        document.onscroll = resetTimer;
     </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

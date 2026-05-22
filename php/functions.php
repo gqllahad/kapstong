@@ -962,7 +962,17 @@ function renderEvaluationList($conn, $superID, $search = '')
         else if ($finalGrade >= 80) $gradeColor = '#2563EB';
         else if ($finalGrade >= 70) $gradeColor = '#F59E0B';
 
+        $evalCheck = $conn->query("
+            SELECT evaluationID
+            FROM final_evaluation
+            WHERE studentID = '$studentID'
+            AND status = 'FINALIZED'
+        ");
+
+        $isEvaluated = $evalCheck && $evalCheck->num_rows > 0;
+
         $isCompleted = strtoupper($progressData['completion_status'] ?? '') === 'COMPLETED';
+
         $output .= '
         <tr>
             <td>
@@ -991,7 +1001,9 @@ function renderEvaluationList($conn, $superID, $search = '')
                     View
                 </button>
                 
-                '. ($isCompleted? '<button class="evaluate-btn"onclick="openFinalEvaluation(\'' . $studentID . '\')">Final Evaluation</button>': '' ) .'
+                '. ($isCompleted && !$isEvaluated? '<button class="evaluate-btn"onclick="openFinalEvaluation(\'' . $studentID . '\')">Final Evaluation</button>': '' ) .'
+
+                '. ($isCompleted && $isEvaluated? ' <button class="report-btn" onclick="viewFinalReport(\'' . $studentID . '\')">Evaluation Report</button>': '' ) .'
                 </td>
 
             
@@ -2741,6 +2753,36 @@ function getStudentAlerts($conn, $studentID)
                 "id" => null
             ];
         }
+    }
+
+    $sqlNotif = "
+        SELECT notificationID, title, message, type, created_at
+        FROM notifications
+        WHERE userID = ?
+        ORDER BY created_at DESC
+        LIMIT 10
+    ";
+
+    $stmtNotif = $conn->prepare($sqlNotif);
+
+    if (!$stmtNotif) {
+        die("Notification SQL Error: " . $conn->error);
+    }
+
+    $stmtNotif->bind_param("s", $studentID);
+    $stmtNotif->execute();
+
+    $notifResult = $stmtNotif->get_result();
+
+    while ($n = $notifResult->fetch_assoc()) {
+
+        $alerts[] = [
+            "type" => "info",
+            "priority" => 5,
+            "message" => $n['title'] . ": " . $n['message'],
+            "action" => "viewNotification",
+            "id" => $n['notificationID']
+        ];
     }
 
     $sqlStage = "

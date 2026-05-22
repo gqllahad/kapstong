@@ -547,6 +547,31 @@ $studentStatus = $_SESSION['isVerified'];
                 </div>
             </section>
 
+             <div id="inactivityModal" class="inactivity-modal">
+                <div class="inactivity-box">
+
+                    <div class="inactivity-header">
+                        <div class="warning-icon">⏳</div>
+                        <h3>Session Timeout Warning</h3>
+                    </div>
+
+                    <p class="inactive-text">
+                        You have been inactive for a while. For your security, the system will automatically log you out.
+                    </p>
+
+                    <div class="countdown-wrapper">
+                        <span class="countdown-label">Logging out in</span>
+                        <span id="countdown" class="countdown-number">60</span>
+                        <span class="countdown-label">seconds</span>
+                    </div>
+
+                    <button onclick="stayLoggedIn()" class="stay-btn">
+                        Stay Logged In
+                    </button>
+
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -558,16 +583,57 @@ $studentStatus = $_SESSION['isVerified'];
      <script>
 
         let inactivityTimer;
+        let countdownTimer;
+        let countdownValue = 60;
+
+        const modal = document.getElementById("inactivityModal");
+        const countdownEl = document.getElementById("countdown");
+
+        function startCountdown() {
+
+            countdownValue = 60;
+            countdownEl.innerText = countdownValue;
+
+            modal.style.display = "flex";
+
+            countdownTimer = setInterval(() => {
+
+                countdownValue--;
+                countdownEl.innerText = countdownValue;
+
+                if (countdownValue <= 10) {
+                    countdownEl.style.color = "#dc2626";
+                    countdownEl.style.transform = "scale(1.2)";
+                }
+
+                if (countdownValue <= 0) {
+                    clearInterval(countdownTimer);
+                    window.location.href = "../logoutPhase.php";
+                }
+
+            }, 1000);
+        }
 
         function resetTimer() {
 
             clearTimeout(inactivityTimer);
+            clearInterval(countdownTimer);
+
+            modal.style.display = "none";
 
             inactivityTimer = setTimeout(() => {
+                startCountdown();
+            }, 600000); 
+        }
 
-                window.location.href = "../../logoutPhase.php";
+        function stayLoggedIn() {
 
-            }, 600000);
+            clearTimeout(inactivityTimer);
+            clearInterval(countdownTimer);
+
+            modal.style.display = "none";
+
+            resetTimer();
         }
 
         window.onload = resetTimer;

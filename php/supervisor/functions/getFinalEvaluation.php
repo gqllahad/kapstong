@@ -74,7 +74,6 @@ while ($t = $taskResult->fetch_assoc()) {
 
     $totalTasks++;
 
-    // STATUS SCORE
     switch ($t['status']) {
         case 'APPROVED': $statusScore = 100; break;
         case 'SUBMITTED': $statusScore = 75; break;
@@ -84,14 +83,12 @@ while ($t = $taskResult->fetch_assoc()) {
         default: $statusScore = 0;
     }
 
-    // SAFE RATING CONVERSION (FINALIZED)
     $ratingScore = 0;
 
     if (!empty($t['rating'])) {
         $ratingScore = convertRatingToScore($t['rating']);
     }
 
-    // FINAL TASK SCORE
     $taskFinal = ($statusScore * 0.6) + ($ratingScore * 0.4);
 
     $taskScoreSum += $taskFinal;

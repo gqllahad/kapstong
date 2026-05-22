@@ -227,7 +227,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                                     <div class="mini-score-grid">
                                         <div>Attendance <span id="attendanceScore"></span></div>
-                                        <div>Progress <span id="progressScore"></span></div>
+                                        <div>Reports <span id="progressScore"></span></div>
                                         <div>Tasks <span id="taskScore"></span></div>
                                     </div>
                                 </div>
@@ -243,6 +243,8 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                                 </div>
 
                             </div>
+
+                            <div class="recommendation-box" id="recommendationBox"></div>
 
                            <div class="final-section-title">Supervisor Evaluation</div>
 
@@ -320,7 +322,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                             </div>
 
-                            <div class="recommendation-box" id="recommendationBox"></div>
+                          
 
                            <div class="evaluation-actions">
                                 <button class="save-btn" onclick="saveFinalEvaluation()">
@@ -333,6 +335,101 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     </div>
 
                 </div>
+
+            <!-- view final evaluation -->
+            <div class="final-evaluation-view" id="final-evaluation-view">
+                <div class="evaluation-view-header">
+                        <h3>Evaluation Report</h3>
+                        <div class="evaluation-header-actions">
+                            <button class="download-report-btn" onclick="downloadEvaluationReport()">
+                                <i class="bi bi-download"></i>
+                            </button>
+
+                            <button id="closeFinalEvaluationView" class="modal-close">&times;</button>
+                        </div>
+                    </div>
+
+                  <div class="evaluation-view-body" id="finalEvaluationReportBody">
+
+                        
+                        <div class="evaluation-hero-view">
+
+                            <div class="evaluation-hero-info-view">
+                                <h2 id="reportStudentName">Student Name</h2>
+                                <p id="reportStudentID">Student ID</p>
+                            </div>
+
+                            <div class="evaluation-score-badge-view" id="reportFinalScore">
+                                0%
+                            </div>
+
+                        </div>
+
+                        <div class="evaluation-metrics-view">
+
+                            <div class="metric-card-view">
+                                <span class="metric-label-view">Attendance</span>
+                                <span class="metric-value-view" id="reportAttendance">0%</span>
+                            </div>
+
+                            <div class="metric-card-view">
+                                <span class="metric-label-view">Reports</span>
+                                <span class="metric-value-view" id="reportProgress">0%</span>
+                            </div>
+
+                            <div class="metric-card-view">
+                                <span class="metric-label-view">Tasks</span>
+                                <span class="metric-value-view" id="reportTasks">0%</span>
+                            </div>
+
+                        </div>
+
+                        <div class="section-title-view">Supervisor Ratings</div>
+
+                        <div class="ratings-grid-view">
+
+                            <div class="rating-item-view">
+                                <span>Work Ethics</span>
+                                <strong id="rEthics">0</strong>
+                            </div>
+
+                            <div class="rating-item-view">
+                                <span>Communication</span>
+                                <strong id="rCommunication">0</strong>
+                            </div>
+
+                            <div class="rating-item-view">
+                                <span>Initiative</span>
+                                <strong id="rInitiative">0</strong>
+                            </div>
+
+                            <div class="rating-item-view">
+                                <span>Discipline</span>
+                                <strong id="rDiscipline">0</strong>
+                            </div>
+
+                        </div>
+
+                                <div class="section-title-view">Final Recommendation</div>
+
+                                <div class="card-view">
+                                    <h4 id="rRecommendationTitle"></h4>
+                                    <p id="rRecommendationText"></p>
+                                </div>
+                            
+                        <div class="section-title-view">Remarks</div>
+
+                        <div class="card-view">
+                            <p id="rRemarks"></p>
+                        </div>
+
+                    </div>
+            </div>
+
+            <!-- download final evaluation -->
+             <!-- <div class="download-final-evaluation" id="download-final-evaluation">
+
+             </div> -->
 
             <!-- view approval tasks -->
             <div class="student-application-approve" id="student-application-approve">
@@ -1233,7 +1330,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             <tr>
                                 <th>Name</th>
                                 <th>Attendance</th>
-                                <th>Progress</th>
+                                <th>Reports</th>
                                 <th>Tasks</th>
                                 <th>Final Grade</th>
                                 <th>Remarks</th>
@@ -1333,6 +1430,31 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 <div id="previewContainer"></div>
             </div>
 
+            <div id="inactivityModal" class="inactivity-modal">
+                <div class="inactivity-box">
+
+                    <div class="inactivity-header">
+                        <div class="warning-icon">⏳</div>
+                        <h3>Session Timeout Warning</h3>
+                    </div>
+
+                    <p class="inactive-text">
+                        You have been inactive for a while. For your security, the system will automatically log you out.
+                    </p>
+
+                    <div class="countdown-wrapper">
+                        <span class="countdown-label">Logging out in</span>
+                        <span id="countdown" class="countdown-number">60</span>
+                        <span class="countdown-label">seconds</span>
+                    </div>
+
+                    <button onclick="stayLoggedIn()" class="stay-btn">
+                        Stay Logged In
+                    </button>
+
+                </div>
+            </div>
+
             <hr>
 
             <!-- FOOTER -->
@@ -1350,38 +1472,64 @@ $superID = getSupervisorIDByUserID($conn, $userID);
     window.currentSuperID = <?= json_encode($superID); ?>;
 
     let inactivityTimer;
-let warningTimer;
+    let countdownTimer;
+    let countdownValue = 60;
 
-const INACTIVE_LIMIT = 600000; 
-const WARNING_TIME = 540000;  
+    const modal = document.getElementById("inactivityModal");
+    const countdownEl = document.getElementById("countdown");
 
-function logoutUser(){
-    window.location.href = "../logoutPhase.php";
-}
+    function startCountdown() {
 
-function showWarning(){
-    alert("You will be logged out in 1 minute due to inactivity.");
-}
+        countdownValue = 60;
+        countdownEl.innerText = countdownValue;
 
-function resetTimer(){
+        modal.style.display = "flex";
 
-    clearTimeout(inactivityTimer);
-    clearTimeout(warningTimer);
+        countdownTimer = setInterval(() => {
 
-    warningTimer = setTimeout(() => {
-        showWarning();
-    }, WARNING_TIME);
+            countdownValue--;
+            countdownEl.innerText = countdownValue;
 
-    inactivityTimer = setTimeout(() => {
-        logoutUser();
-    }, INACTIVE_LIMIT);
-}
+            if (countdownValue <= 10) {
+                countdownEl.style.color = "#dc2626";
+                countdownEl.style.transform = "scale(1.2)";
+            }
 
-["click","keypress","scroll","mousemove","touchstart"].forEach(evt => {
-    document.addEventListener(evt, resetTimer);
-});
+            if (countdownValue <= 0) {
+                clearInterval(countdownTimer);
+                window.location.href = "../logoutPhase.php";
+            }
 
-window.onload = resetTimer;
+        }, 1000);
+    }
+
+    function resetTimer() {
+
+        clearTimeout(inactivityTimer);
+        clearInterval(countdownTimer);
+
+        modal.style.display = "none";
+
+        inactivityTimer = setTimeout(() => {
+            startCountdown();
+        }, 600000); 
+    }
+
+    function stayLoggedIn() {
+
+        clearTimeout(inactivityTimer);
+        clearInterval(countdownTimer);
+
+        modal.style.display = "none";
+
+        resetTimer();
+    }
+
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onclick = resetTimer;
+    document.onscroll = resetTimer;
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
