@@ -135,7 +135,6 @@ tr:nth-child(even) {
 
 </style>
 
-<!-- HEADER WITH LOGO -->
 <table class='header-table'>
 <tr>
     <td width='80'>
@@ -152,7 +151,6 @@ tr:nth-child(even) {
 </tr>
 </table>
 
-<!-- REPORT INFO -->
 <h2>Attendance Report</h2>
 <p>Month: $month</p>
 <p>Supervisor ID: $superID</p>

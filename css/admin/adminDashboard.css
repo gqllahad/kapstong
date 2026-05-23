@@ -482,7 +482,7 @@ background:#eee;
     display: block;
 }
 
-.admin-approval, .admin-preparation, .admin-attendance {
+.admin-approval, .admin-preparation, .admin-attendance, .admin-reports {
     display: none;
     padding: 20px;
 }
@@ -2365,7 +2365,7 @@ tbody tr {
 
 .all-student-modal, .student-application-view, .student-application-approve, .student-application-reject, .supervisor-container
 ,.all-supervisor-modal, .all-unverified-modal, .assign-student-container, .supervisor-view, .ojt-program-container, .department-management-container,.department-management-modal,
-.rfid-attendance-container, .evaluation-settings-container, .requirements-setup-container, .create-course-modal, .view-all-modal, .download-all-student-modal, .download-all-supervisor-modal, .rfid-register-modal{
+.rfid-attendance-container, .evaluation-settings-container, .requirements-setup-container, .create-course-modal, .view-all-modal, .download-all-student-modal, .download-all-supervisor-modal, .rfid-register-modal, .attendance-download-modal, .evaluation-download-modal{
     position: fixed;
     top: 50%;
     left: 50%;
@@ -2384,7 +2384,7 @@ tbody tr {
 
 .all-student-modal.show, .student-application-view.show, .student-application-approve.show, .student-application-reject.show, .supervisor-container.show 
 ,.all-supervisor-modal.show, .all-unverified-modal.show, .assign-student-container.show, .supervisor-view.show, .ojt-program-container.show, .department-management-container.show,.department-management-modal.show,
-.rfid-attendance-container.show, .evaluation-settings-container.show, .requirements-setup-container.show, .create-course-modal.show, .view-all-modal.show, .download-all-student-modal.show, .download-all-supervisor-modal.show, .rfid-register-modal.show{
+.rfid-attendance-container.show, .evaluation-settings-container.show, .requirements-setup-container.show, .create-course-modal.show, .view-all-modal.show, .download-all-student-modal.show, .download-all-supervisor-modal.show, .rfid-register-modal.show, .attendance-download-modal.show, .evaluation-download-modal.show{
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
@@ -2402,7 +2402,6 @@ tbody tr {
 
 /* approval options */
 .approval-section, .reject-section {
-    margin-top: 20px;
     padding: 16px;
     border-top: 1px solid #e5e7eb;
 
@@ -3284,7 +3283,7 @@ tbody tr {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-width: 350px;
+    width: 100%;
 }
 
 .rfid-section label {
@@ -3536,15 +3535,43 @@ tbody tr {
 
 .download-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-
-    margin-bottom: 20px;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+    border-radius: 12px 12px 0 0;
 }
 
-.download-header h3 {
+.download-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon-wrapper {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 18px;
+}
+
+.title-text h2 {
     margin: 0;
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.title-text p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #64748b;
 }
 
 .download-header button {
@@ -3569,6 +3596,58 @@ tbody tr {
 .generate-btn:hover {
     background: #059669;
 }
+
+
+.download-box {
+
+    width: 100%;
+
+    background: #fff;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    animation: popup 0.25s ease;
+}
+
+.download-body {
+
+    padding: 20px;
+
+    display: grid;
+    gap: 15px;
+}
+
+.download-footer {
+
+    padding: 18px 20px;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    border-top: 1px solid #eee;
+}
+
+.confirm-btn {
+
+    padding: 10px 18px;
+
+    border: none;
+    border-radius: 10px;
+
+    cursor: pointer;
+}
+
+
+.confirm-btn {
+
+    background: #2563eb;
+    color: #fff;
+}
+
+
 
 /* inactivity */
 .inactivity-modal{

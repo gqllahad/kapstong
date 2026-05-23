@@ -108,29 +108,6 @@ if (isset($_POST['rfid'])) {
     $remarks = "EMERGENCY TIME OUT: " . $reason;
     $status = "excused";
 
-    $stmt = $conn->prepare("
-        UPDATE attendance_logs
-        SET
-            final_time_out = ?,
-            current_state = 'TIMED_OUT',
-            remarks = ?,
-            status = ?,
-            emergency_timeout = 1,
-            emergency_reason = ?
-        WHERE attendanceID = ?
-    ");
-
-    $stmt->bind_param(
-        "ssssi",
-        $now,
-        $remarks,
-        $status,
-        $reason,
-        $row['attendanceID']
-    );
-
-    $stmt->execute();
-
     $firstIn = strtotime($row['first_time_in']);
     $finalOut = time();
 
@@ -166,7 +143,30 @@ if (isset($_POST['rfid'])) {
 
     $workedHours = round($finalWorkedSeconds / 3600, 2);
 
-    $workedHours = max(0, $workedHours);
+    $stmt = $conn->prepare("
+        UPDATE attendance_logs
+        SET
+            final_time_out = ?,
+            total_hours = ?,
+            current_state = 'TIMED_OUT',
+            remarks = ?,
+            status = ?,
+            emergency_timeout = 1,
+            emergency_reason = ?
+        WHERE attendanceID = ?
+    ");
+
+    $stmt->bind_param(
+        "sdsssi",
+        $now,
+        $workedHours,
+        $remarks,
+        $status,
+        $reason,
+        $row['attendanceID']
+    );
+
+    $stmt->execute();
 
     $updateProgress = $conn->prepare("
         UPDATE student_progress

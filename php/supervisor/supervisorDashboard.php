@@ -107,11 +107,11 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
             <ul class="menu">
                 <li><button id="supervisor-dashboard-btn"><i class="bi bi-house"></i> Home </button></li>
-                <li><button id="supervisor-oversight-btn"><i class="bi bi-journal-text"></i> Task Reviews</button></li>
-                <li><button id="supervisor-students-btn"><i class="bi bi-file-earmark-text"></i>Students</button></li>
+                <li><button id="supervisor-oversight-btn"><i class="bi bi-check2-square"></i> Task Reviews</button></li>
+                <li><button id="supervisor-students-btn"><i class="bi bi-people"></i>Students</button></li>
                 <li><button id="supervisor-attendance-btn"><i class="bi bi-calendar-check"></i> Attendance Log</button></li>
-                <li><button id="supervisor-evaluation-btn"><i class="bi bi-bar-chart-line"></i> Reports / Evaluation</button></li>
-                <li><button id="supervisor-activity-btn"><i class="bi bi-clock-history"></i> Activity Log</button></li>
+                <li><button id="supervisor-evaluation-btn"><i class="bi bi-clipboard-data"></i> Reports / Evaluation</button></li>
+                <li><button id="supervisor-activity-btn"> <i class="bi bi-activity"></i> Activity Log</button></li>
             </ul>
 
         </aside>

@@ -60,9 +60,10 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             <ul class="menu">
                 <li><button id="admin-dashboard-btn"><i class="bi bi-house"></i> Home</button></li>
-                <li><button id="admin-preparation-btn"><i class="bi bi-journal-text"></i> System Configuration</button></li>
-                <li><button id="admin-approval-btn"><i class="bi bi-file-earmark-text"></i>User Management</button></li>
-                <li><button id="admin-attendance-btn"><i class="bi bi-file-earmark-text"></i>Attendance Logs</button></li>
+                <li><button id="admin-preparation-btn"> <i class="bi bi-gear"></i> System Configuration</button></li>
+                <li><button id="admin-approval-btn"><i class="bi bi-people"></i>User Management</button></li>
+                <li><button id="admin-attendance-btn"><i class="bi bi-calendar-check"></i>Attendance Logs</button></li>
+                <li><button id="admin-reports-btn"> <i class="bi bi-graph-up"></i>Reports</button></li>
             </ul>
 
         </aside>
@@ -164,8 +165,24 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <div class="download-content">
 
                     <div class="download-header">
-                        <h3>Download Supervisor PDF</h3>
-                        <button class="modal-close" id="closeAllSupervisorDownloadModal">&times;</button>
+
+                        <div class="download-title">
+
+                            <div class="icon-wrapper">
+                                <i class="bi bi-person-badge"></i>
+                            </div>
+
+                            <div class="title-text">
+                                <h2>Download Supervisor PDF</h2>
+                                <p>Export supervisor records and assigned data into PDF format</p>
+                            </div>
+
+                        </div>
+
+                        <button class="modal-close" id="closeAllSupervisorDownloadModal">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+
                     </div>
 
                     <form action="functions/download_all_supervisor_pdf.php" method="GET">
@@ -193,9 +210,11 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                         </div>
 
-                        <button type="submit" class="generate-btn">
+                          <div class="download-footer">
+                        <button type="submit" class="confirm-btn">
                             Generate PDF
                         </button>
+                        </div>
 
                     </form>
 
@@ -304,8 +323,24 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <div class="download-content">
 
                     <div class="download-header">
-                        <h3>Download Student PDF</h3>
-                        <button class="modal-close" id="closeAllStudentDownloadModal">&times;</button>
+
+                        <div class="download-title">
+
+                            <div class="icon-wrapper">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            </div>
+
+                            <div class="title-text">
+                                <h2>Download Student PDF</h2>
+                                <p>Export selected student records into PDF format</p>
+                            </div>
+
+                        </div>
+
+                        <button class="modal-close" id="closeAllStudentDownloadModal">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+
                     </div>
 
                     <form action="functions/download_all_students_pdf.php" method="GET">
@@ -326,9 +361,11 @@ if ($_SESSION['role'] !== "ADMIN") {
                             </select>
                         </div>
 
-                        <button type="submit" class="generate-btn">
+                        <div class="download-footer">
+                        <button type="submit" class="confirm-btn">
                             Generate PDF
                         </button>
+                        </div>
 
                     </form>
 
@@ -1040,7 +1077,6 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                                 <button id="downloadChartBtn">
                                     <i class="bi bi-download"></i>
-                                    Download CSV
                                 </button>
 
                             </div>
@@ -1157,19 +1193,19 @@ if ($_SESSION['role'] !== "ADMIN") {
                                 <span>Settings</span>
                             </button>
 
-                            <button onclick="generateReport()">
+                            <button onclick="openEvaluationDownloadModal()">
                                 <i class="bi bi-bar-chart-fill"></i>
-                                <span>Reports</span>
+                                <span>Download Reports</span>
                             </button>
 
-                            <button onclick="openStudents()">
+                            <button onclick="openStudentAssign()">
                                 <i class="bi bi-people-fill"></i>
-                                <span>Students</span>
+                                <span>Assign Students</span>
                             </button>
 
-                            <button onclick="openLogs()">
+                            <button onclick="openDownloadModal()">
                                 <i class="bi bi-journal-text"></i>
-                                <span>Logs</span>
+                                <span>Attendance</span>
                             </button>
 
                         </div>
@@ -1402,12 +1438,152 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             </section>
 
+            <!-- Reports  -->
+             <section class="admin-reports" id="admin-reports">
+                    <div class="user-management">
+                        <div class="title-block">
+                                <h2>Student Reports Management</h2>
+                                <p>Monitor, review, and manage attendance records of all OJT students.</p>
+                        </div>
+                          <div class="user-action-btn">
+                            <button class="download-btn" onclick="openEvaluationDownloadModal()">
+                                <i class="bi bi-download"></i>
+                                Download Evaluation
+                            </button>
+                        </div>
+                    </div>
+
+                     <div class="top-bar">
+
+                            <div class="top-header">
+                                <h3 class="table-title">Final Evaluation Records</h3>
+                                <p>Search, filter, and review supervisor evaluations.</p>
+                            </div>
+
+                            <div class="search-filter">
+
+                                <div class="search-container">
+                                    <i class="bi bi-search search-icon"></i>
+
+                                    <input 
+                                        type="text" 
+                                        id="evaluationSearch"
+                                        placeholder="Search by Student ID, Name, or Supervisor"
+                                    >
+                                </div>
+
+                                <div class="filter-group">
+                                    <select id="evaluationCourseFilter">
+                                         <?php echo getProgramOptions($conn); ?>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+
+                            <table>
+
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Supervisor</th>
+                                        <th>Attendance</th>
+                                        <th>Progress</th>
+                                        <th>Tasks</th>
+                                        <th>Final Score</th>
+                                        <th>Ratings</th>
+                                        <th>Recommendation</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="evaluationTableBody"></tbody>
+                                <?php
+                                    $search = $_POST['search'] ?? '';
+                                    $course = $_POST['course'] ?? '';
+                                ?>
+                            </table>
+
+                        </div>
+
+            </section>
+
+
+            <!-- download evaluation  -->
+             <div id="evaluation-download-modal" class="evaluation-download-modal">
+
+                <div class="download-box">
+
+                     <div class="download-header">
+
+                        <div class="download-title">
+
+                            <div class="icon-wrapper">
+                                <i class="bi bi-clipboard-data"></i>
+                            </div>
+
+                            <div class="title-text">
+                                <h2>Download Evaluation Report</h2>
+                                <p>Export final evaluation records of OJT students</p>
+                            </div>
+
+                        </div>
+
+                        <button class="modal-close"
+                            onclick="closeEvaluationDownloadModal()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+
+                    </div>
+
+                    <div class="download-body">
+
+                        <div class="form-group">
+
+                            <label>Course</label>
+                            <select id="downloadCourse">
+                                <?php echo getProgramOptions($conn); ?>
+                            </select>
+
+                         </div>
+
+
+                         <div class="form-group">
+
+                            <label>Supervisor</label>
+                            <select id="downloadSupervisor">
+                                <?php echo getSupervisorOptions($conn); ?>
+                            </select>
+                        </div>
+
+
+                        <div class="modal-actions">
+                            <button class="confirm-btn" onclick="downloadEvaluationPDF()">Download PDF</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
 
             <!-- attendance logs -->
              <section class="admin-attendance" id="admin-attendance">
-               <div class="title-block-bot">
-                    <h2>Student Attendance Management</h2>
-                    <p>Monitor, review, and manage attendance records of all OJT students.</p>
+                 <div class="user-management">
+                    <div class="title-block">
+                        <h2>Student Attendance Management</h2>
+                        <p>Monitor, review, and manage attendance records of all OJT students.</p>
+                    </div>
+
+                        <div class="user-action-btn">
+                            <button class="download-btn" onclick="openDownloadModal()">
+                                <i class="bi bi-download"></i>
+                                Download Attendance Report
+                            </button>
+                        </div>
+                    
                 </div>
 
                 <div class="top-bar">
@@ -1489,7 +1665,124 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </table>
                     </div>
 
-             </section>
+            </section>
+
+             <!-- download attendance modal -->
+              <div id="attendance-download-modal" class="attendance-download-modal">
+
+                    <div class="download-box">
+
+                       <div class="download-header">
+
+                            <div class="download-title">
+
+                                <div class="icon-wrapper">
+                                    <i class="bi bi-download"></i>
+                                </div>
+
+                                <div class="title-text">
+                                    <h2>Download Attendance Report</h2>
+                                    <p>Generate and export attendance data in PDF format</p>
+                                </div>
+
+                            </div>
+
+                            <button class="modal-close" onclick="closeDownloadModal()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+
+                        </div>
+
+                        <div class="download-body">
+
+                            <div class="form-group">
+                                <label>Course</label>
+
+                                <select id="downloadCourse">
+
+                                    <option value="">All Courses</option>
+
+                                    <option value="BSIT">BSIT</option>
+                                    <option value="BSBA">BSBA</option>
+                                    <option value="BSED">BSED</option>
+
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+
+                                <label>Status</label>
+
+                                <select id="downloadStatus">
+
+                                    <option value="">All Status</option>
+                                    <option value="present">Present</option>
+                                    <option value="late">Late</option>
+                                    <option value="excused">Excused</option>
+                                    <option value="absent">Absent</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label>Supervisor</label>
+
+                                <select id="downloadSupervisor">
+
+                                    <option value="">All Supervisors</option>
+
+                                    <?php
+
+                                    $supers = $conn->query("
+                                        SELECT userID, name
+                                        FROM users
+                                        WHERE role = 'supervisor'
+                                        ORDER BY name ASC
+                                    ");
+
+                                    while ($super = $supers->fetch_assoc()) {
+
+                                        echo "
+                                        <option value='{$super['userID']}'>
+                                            {$super['name']}
+                                        </option>
+                                        ";
+                                    }
+
+                                    ?>
+                                </select>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date From</label>
+
+                                <input type="date" id="downloadDateFrom">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date To</label>
+
+                                <input type="date" id="downloadDateTo">
+                            </div>
+
+                        </div>
+
+                        <div class="download-footer">
+
+                            <button class="confirm-btn"
+                                onclick="downloadAttendanceReport()">
+
+                                Download PDF
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
               <div id="inactivityModal" class="inactivity-modal">
                 <div class="inactivity-box">

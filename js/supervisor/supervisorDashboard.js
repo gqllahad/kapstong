@@ -1102,7 +1102,7 @@ function downloadAttendancePDF() {
     const month = window.currentMonth || document.getElementById("monthSelector").value;
 
     if (!superID || !month) {
-        alert("Missing supervisor or month.");
+        showToast("Missing supervisor or month.", "error");
         return;
     }
 

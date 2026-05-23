@@ -63,10 +63,11 @@ $documents = getStudentDocuments($conn, $studentID);
                     <button id="student-dashboard-btn"><i class="bi bi-house"></i> Home Page</button>
                 </li>
                 <li>
-                    <button id="student-tasks-btn"><i class="bi bi-journal-text"></i> My Tasks</button>
+                    <button id="student-tasks-btn"> <i class="bi bi-list-check"></i> My Tasks</button>
                 </li>
-                <li><button id="student-documents-btn"><i class="bi bi-file-earmark-text"></i>My Documents</button></li>
-                <li><button id="student-activity-btn"><i class="bi bi-chat-left-text"></i> Activity logs</button></li>
+                <li><button id="student-documents-btn"> <i class="bi bi-folder2-open"></i>My Documents</button></li>
+                 <li><button id="student-attendance-btn"><i class="bi bi-calendar-check"></i> Attendance logs</button></li>
+                <li><button id="student-activity-btn"><i class="bi bi-activity"></i> Activity logs</button></li>
             </ul>
         </aside>
 
@@ -489,7 +490,7 @@ $documents = getStudentDocuments($conn, $studentID);
             </div>
 
             <!-- attendance modal -->
-             <div class="attendance-container" id="attendance-container">
+             <!-- <div class="attendance-container" id="attendance-container">
                 <div class="modal-header">
                     <h3>Attendance logs</h3>
                     <button id="closeAttendanceViewModal"
@@ -535,18 +536,18 @@ $documents = getStudentDocuments($conn, $studentID);
                             </tr>
                         </thead>
 
-                        <tbody id="attendanceReportBody">
+                        <tbody id="attendanceReportBody"> -->
                              <?php
-                                $category = $_POST['category'] ?? '';
-                                echo renderStudentAttendanceTable($conn, $studentID, $category);
+                                // $category = $_POST['category'] ?? '';
+                                // echo renderStudentAttendanceTable($conn, $studentID, $category);
                                 ?>
-                        </tbody>
+                        <!-- </tbody>
 
                     </table>
 
                  </div>
 
-             </div>
+             </div> -->
 
             <!-- reports -->
             <div class="reports-container" id="reports-container">
@@ -666,10 +667,10 @@ $documents = getStudentDocuments($conn, $studentID);
                         <p>Check announcements from your mentor.</p>
                     </div>
 
-                    <div class="card attendance" id="attendance-btn">
+                    <!-- <div class="card attendance" id="attendance-btn">
                         <h3>Attendance</h3>
                         <p>View your daily time-in and time-out logs.</p>
-                    </div>
+                    </div> -->
 
                     <div class="card submitted-task" id="reports-btn">
                         <h3>Reports</h3>
@@ -903,6 +904,8 @@ $documents = getStudentDocuments($conn, $studentID);
             </section>
 
             <section class="student-activity" id="student-activity">
+              
+                
                 <div class="top-bar">
 
                     <div class="top-header">
@@ -969,6 +972,133 @@ $documents = getStudentDocuments($conn, $studentID);
 
                 </div>
             </section>
+
+            <section class="student-attendance" id="student-attendance">
+
+                <div class="top-bar">
+
+                    <div class="top-header">
+                        <h3 class="table-title">Attendance Logs</h3>
+                        <p>Monitor and review your daily attendance records.</p>
+                    </div>
+
+                    <div class="search-filter">
+
+                        <div class="filter-group">
+                            <i class="bi bi-funnel"></i>
+                            <select id="statusFilter">
+                                <option value="">All Status</option>
+                                <option value="present">Present</option>
+                                <option value="late">Late</option>
+                                <option value="excused">Excused</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <input type="date" id="attendanceDateFrom" title="From date">
+                            <input type="date" id="attendanceDateTo" title="To date">
+                        </div>
+
+                        <div class="filter-group">
+                            <button class="download-btn" onclick="openAttendanceDownloadModal()">
+                                <i class="bi bi-download"></i>
+                                Download Report
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+              <div class="table-container-attendance">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time In</th>
+                                <th>Breaks</th>
+                                <th>Time Out</th>
+                                <th>Status</th>
+                                <th>Hours</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="attendanceReportBody">
+                             <?php
+                                $category = $_POST['category'] ?? '';
+                                 $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
+                                $dateToAttendance = $_POST['dateToAttendance'] ?? '';
+                                echo renderStudentAttendanceTable($conn, $studentID, $category, $dateFromAttendance, $dateToAttendance);
+                                ?>
+                        </tbody>
+                    </table>
+                 </div>
+
+            </section>
+
+            <!-- download attendance -->
+             <div class="download-attendance-modal" id="download-attendance-modal">
+                <div class="download-box">
+
+                    <div class="download-header">
+
+                        <div class="download-title">
+
+                            <div class="icon-wrapper">
+                                <i class="bi bi-calendar2-check"></i>
+                            </div>
+
+                            <div class="title-text">
+                                <h2>Download Attendance Report</h2>
+                                <p>Filter and export attendance records as PDF</p>
+                            </div>
+
+                        </div>
+
+                        <button class="modal-close" onclick="closeAttendanceDownloadModal()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+
+                    </div>
+
+                    <div class="download-body">
+
+                        <div class="form-group">
+                            <label><i class="bi bi-funnel"></i> Status</label>
+                            <select id="downloadStatus">
+                                <option value="">All Status</option>
+                                <option value="present">Present</option>
+                                <option value="late">Late</option>
+                                <option value="excused">Excused</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="bi bi-calendar-event"></i> Date From</label>
+                            <input type="date" id="downloadDateFrom">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="bi bi-calendar-event-fill"></i> Date To</label>
+                            <input type="date" id="downloadDateTo">
+                        </div>
+
+                    </div>
+
+                    <div class="download-footer">
+
+                        <button class="confirm-btn" onclick="downloadAttendanceReport()">
+                            <i class="bi bi-download"></i>
+                            Download PDF
+                        </button>
+
+                    </div>
+
+                </div>
+             </div>
 
 
 

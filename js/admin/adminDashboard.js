@@ -13,11 +13,13 @@ const adminDashboardBtn = document.getElementById('admin-dashboard-btn');
 const adminApprovalBtn = document.getElementById('admin-approval-btn');
 const adminPreparationBtn = document.getElementById('admin-preparation-btn');
 const adminAttendanceBtn = document.getElementById('admin-attendance-btn');
+const adminReportsBtn = document.getElementById('admin-reports-btn');
 
 const adminDashboard = document.getElementById('admin-dashboard');
 const adminApproval = document.getElementById('admin-approval');
 const adminPreparation = document.getElementById('admin-preparation');
 const adminAttendance = document.getElementById('admin-attendance');
+const adminReports = document.getElementById('admin-reports');
 
 // colors
 const statusColors = {
@@ -871,31 +873,18 @@ function loadLineChart() {
 
 function downloadChartCSV() {
 
-    const data = window.currentChartData;
+      const selectedMonth =
+        document.getElementById("monthSelector").value;
 
-    if (!data) return;
+    if (!selectedMonth) {
+        alert("Missing month.");
+        return;
+    }
 
-    let csv = "Date,Attendance\n";
+    const url =
+        `../../php/admin/functions/download_line_attendance.php?month=${selectedMonth}`;
 
-    data.labels.forEach((label, index) => {
-        csv += `${label},${data.values[index]}\n`;
-    });
-
-    const blob = new Blob([csv], {
-        type: 'text/csv'
-    });
-
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-
-    a.href = url;
-
-    a.download = "attendance-report.csv";
-
-    a.click();
-
-    window.URL.revokeObjectURL(url);
+    window.open(url, "_blank");
 
 }
 
@@ -1131,6 +1120,11 @@ function openRFIDSettings() {
     rfidAttendance.classList.add("show");
     overlay.classList.add("show");
     loadRfidSettings();
+}
+
+function openStudentAssign(){
+    AssignStudent.classList.add("show");
+    overlay.classList.add("show");
 }
 
 // function openRFIDSettings() {
@@ -1840,6 +1834,7 @@ adminDashboardBtn.addEventListener("click", () => {
     adminApproval.style.display = "none";
     adminPreparation.style.display = "none";
     adminAttendance.style.display = "none";
+    adminReports.style.display = "none";
 
 });
 
@@ -1850,6 +1845,7 @@ adminApprovalBtn.addEventListener("click", () => {
     adminDashboard.style.display = "none";
     adminPreparation.style.display = "none";
     adminAttendance.style.display = "none";
+    adminReports.style.display = "none";
 });
 
 adminPreparationBtn.addEventListener("click", () => {
@@ -1859,6 +1855,7 @@ adminPreparationBtn.addEventListener("click", () => {
     adminDashboard.style.display = "none";
     adminApproval.style.display = "none";
     adminAttendance.style.display = "none";
+    adminReports.style.display = "none";
 
 });
 
@@ -1868,8 +1865,20 @@ adminAttendanceBtn.addEventListener("click", () => {
     adminPreparation.style.display = "none";
     adminDashboard.style.display = "none";
     adminApproval.style.display = "none";
+    adminReports.style.display = "none";
 
 })
+
+adminReportsBtn.addEventListener("click", () => {
+    adminReports.style.display = "block";
+
+    adminPreparation.style.display = "none";
+    adminDashboard.style.display = "none";
+    adminApproval.style.display = "none";
+    adminAttendance.style.display = "none";
+
+})
+
 
 document.getElementById("approvalSearch").addEventListener("keyup", function () {
     clearTimeout(searchTimer);
@@ -1930,6 +1939,8 @@ overlay.addEventListener('click', () => {
       downloadAllStudent.classList.remove("show")
       downloadAllSupervisor.classList.remove("show")
       rfidRegister.classList.remove("show");
+      document.getElementById("attendance-download-modal").classList.remove("show");
+      document.getElementById("evaluation-download-modal").classList.remove("show");
 });
 
 allStudentBtn.addEventListener("click", () => {
@@ -2371,6 +2382,52 @@ document.getElementById("assign-btn").addEventListener("click", function () {
 
 });
 
+// attendance download
+function openDownloadModal() {
+
+    document
+        .getElementById("attendance-download-modal")
+        .classList.add("show");
+        overlay.classList.add("show");
+}
+
+function closeDownloadModal() {
+    document
+        .getElementById("attendance-download-modal")
+        .classList.remove("show");
+    overlay.classList.remove("show");
+}
+
+function downloadAttendanceReport() {
+
+    const course =
+        document.getElementById("downloadCourse").value;
+
+    const status =
+        document.getElementById("downloadStatus").value;
+
+    const superID =
+        document.getElementById("downloadSupervisor").value;
+
+    const dateFrom =
+        document.getElementById("downloadDateFrom").value;
+
+    const dateTo =
+        document.getElementById("downloadDateTo").value;
+
+    const url =
+        `functions/download_attendance_report.php?` +
+        `course=${encodeURIComponent(course)}` +
+        `&status=${encodeURIComponent(status)}` +
+        `&superID=${encodeURIComponent(superID)}` +
+        `&dateFrom=${encodeURIComponent(dateFrom)}` +
+        `&dateTo=${encodeURIComponent(dateTo)}`;
+
+    window.open(url, "_blank");
+
+    closeDownloadModal();
+}
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const searchInput = document.getElementById("studentAttendanceSearch");
@@ -2431,6 +2488,62 @@ document.addEventListener("DOMContentLoaded", function () {
     courseFilter.addEventListener("change", fetchAdminAttendance);
 
     fetchAdminAttendance();
+});
+
+
+
+
+
+// evaluation
+function openEvaluationDownloadModal() {
+    document.getElementById("evaluation-download-modal").classList.add("show");
+    overlay.classList.add("show");
+}
+
+function closeEvaluationDownloadModal() {
+    document.getElementById("evaluation-download-modal").classList.remove("show");
+    overlay.classList.remove("show");
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("evaluationSearch");
+    const courseFilter = document.getElementById("evaluationCourseFilter");
+    const tableBody = document.getElementById("evaluationTableBody");
+
+    if (!searchInput || !tableBody || !courseFilter) return;
+
+    let timer;
+
+    function fetchEvaluations() {
+
+        const search = searchInput.value;
+        const course = courseFilter.value;
+
+        fetch("functions/searchEvaluation.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "search=" + encodeURIComponent(search) +
+                "&course=" + encodeURIComponent(course)
+        })
+        .then(res => res.text())
+        .then(data => {
+            tableBody.innerHTML = data;
+        })
+        .catch(err => console.error("Evaluation fetch error:", err));
+    }
+
+    searchInput.addEventListener("keyup", function () {
+        clearTimeout(timer);
+        timer = setTimeout(fetchEvaluations, 300);
+    });
+
+    courseFilter.addEventListener("change", fetchEvaluations);
+
+    fetchEvaluations();
 });
 
 
@@ -2530,6 +2643,8 @@ closeRfidRegister.addEventListener("click", () => {
     rfidRegister.classList.remove("show");
     allStudent.classList.add("show");
 });
+
+
 
 
 

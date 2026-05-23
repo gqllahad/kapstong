@@ -87,9 +87,19 @@ requireRole(['ADMIN', 'supervisor']);
             </div>
         </div>
 
-        <div class="dashboard-status">
-            <span class="live-dot"></span>
-            <span>LIVE</span>
+       
+
+        <div class="dashboard-actions">
+
+             <div class="dashboard-status">
+                <span class="live-dot"></span>
+                <span>LIVE</span>
+            </div>
+
+            <button class="download-btn" onclick="downloadTodayAttendance()">
+                <i class='bx bx-download'></i>
+            </button>
+
         </div>
 
     </div>

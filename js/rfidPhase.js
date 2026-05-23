@@ -307,6 +307,14 @@ function toggleDashboard() {
     }
 }
 
+function downloadTodayAttendance() {
+
+    window.open(
+        "../php/rfid_functions/download_today_attendance.php",
+        "_blank"
+    );
+}
+
 function submitEmergencyTimeout() {
 
     const rfid = document.getElementById("emergencyRfid").value;

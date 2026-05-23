@@ -900,6 +900,37 @@ input:focus {
     font-size: 14px;
 }
 
+/* download */
+.dashboard-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.download-btn{
+    border:none;
+    background:#2563eb;
+    color:#fff;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    font-weight:600;
+    transition:0.2s ease;
+}
+
+.download-btn:hover{
+    background:#1d4ed8;
+    transform:translateY(-2px);
+}
+
+
+/* toast */
+
 #toastContainer {
     position: fixed;
     top: 20px;

@@ -83,6 +83,33 @@ if (isset($_POST['rfid'])) {
     $user = $result->fetch_assoc();
     $studentID = $user['studentID'];
 
+
+    $progressCheck = $conn->prepare("
+        SELECT completion_status, completed_hours, required_hours
+        FROM student_progress
+        WHERE studentID = ?
+        LIMIT 1
+    ");
+
+    $progressCheck->bind_param("s", $studentID);
+    $progressCheck->execute();
+
+    $progressData = $progressCheck->get_result()->fetch_assoc();
+
+    if ($progressData) {
+
+        $status = strtoupper($progressData['completion_status']);
+
+        if ($status === 'COMPLETED') {
+
+            $_SESSION['status'] =
+                "OJT already completed. Attendance is no longer allowed.";
+
+            echo $_SESSION['status'];
+            exit();
+        }
+    }
+
     if ($role === "supervisor") {
 
         $check = $conn->prepare("

@@ -53,11 +53,13 @@ const studentDashboardBtn = document.getElementById("student-dashboard-btn");
 const studentTasksBtn = document.getElementById("student-tasks-btn");
 const studentDocumentsBtn = document.getElementById("student-documents-btn");
 const studentActivityBtn = document.getElementById("student-activity-btn");
+const studentAttendanceBtn = document.getElementById("student-attendance-btn");
 
 const studentDashboard = document.getElementById("student-dashboard");
 const studentTasks = document.getElementById("student-tasks");
 const studentDocuments = document.getElementById("student-documents");
 const studentActivity = document.getElementById("student-activity");
+const studentAttendance = document.getElementById("student-attendance");
 
 // unverified Students
 
@@ -1604,6 +1606,8 @@ if(studentDashboardBtn){
         studentTasks.style.display = "none";
         studentDocuments.style.display = "none";
         studentActivity.style.display = "none";
+        studentAttendance.style.display = "none";
+
         studentDashboard.style.display = "block";
 
     });
@@ -1615,6 +1619,8 @@ if(studentTasksBtn){
         studentDashboard.style.display = "none";
         studentDocuments.style.display = "none";
         studentActivity.style.display = "none";
+        studentAttendance.style.display = "none";
+
         studentTasks.style.display = "block";
         
     });
@@ -1725,6 +1731,7 @@ if(studentDocumentsBtn){
         studentDashboard.style.display = "none";
         studentTasks.style.display = "none";
         studentActivity.style.display = "none";
+        studentAttendance.style.display = "none";
 
         studentDocuments.style.display = "block";
         
@@ -1736,6 +1743,7 @@ if(studentActivityBtn){
         studentDashboard.style.display = "none";
         studentTasks.style.display = "none";
         studentDocuments.style.display = "none";
+        studentAttendance.style.display = "none";
 
         studentActivity.style.display = "block";
 
@@ -1793,6 +1801,93 @@ if(studentActivityBtn){
         });
 }
 
+if(studentAttendanceBtn){
+    studentAttendanceBtn.addEventListener("click", () => {
+        studentDashboard.style.display = "none";
+        studentTasks.style.display = "none";
+        studentDocuments.style.display = "none";
+        studentActivity.style.display = "none";
+
+        studentAttendance.style.display = "block";
+
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const statusFilter = document.getElementById("statusFilter");
+        const dateFrom = document.getElementById("attendanceDateFrom");
+        const dateTo = document.getElementById("attendanceDateTo");
+        const tableBody = document.getElementById("attendanceReportBody");
+
+        let timer;
+
+        function fetchStudentAttendance() {
+
+            const category = statusFilter.value;
+            const from = dateFrom.value;
+            const to = dateTo.value;
+
+            fetch("student_functions/searchStudentAttendance.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body:
+                    "category=" + encodeURIComponent(category) +
+                    "&dateFromAttendance=" + encodeURIComponent(from) +
+                    "&dateToAttendance=" + encodeURIComponent(to)
+            })
+            .then(res => res.text())
+            .then(data => {
+                tableBody.innerHTML = data;
+            })
+            .catch(err => console.error("Student attendance error:", err));
+        }
+
+        statusFilter.addEventListener("change", fetchStudentAttendance);
+        dateFrom.addEventListener("change", fetchStudentAttendance);
+        dateTo.addEventListener("change", fetchStudentAttendance);
+
+        fetchStudentAttendance();
+    });
+
+    function openAttendanceDownloadModal() {
+        const modal = document.getElementById("download-attendance-modal");
+
+        if (!modal) return;
+
+        modal.classList.add("show");
+        overlay.classList.add("show");
+    }
+
+    function closeAttendanceDownloadModal() {
+        const modal = document.getElementById("download-attendance-modal");
+
+        if (!modal) return;
+
+        modal.classList.remove("show");
+        overlay.classList.remove("show");
+    }
+
+    function downloadAttendanceReport() {
+        const status = document.getElementById("statusFilter").value;
+        const from = document.getElementById("attendanceDateFrom").value;
+        const to = document.getElementById("attendanceDateTo").value;
+
+        const url =
+            `student_functions/download_attendance_student.php?` +
+            `status=${encodeURIComponent(status)}` +
+            `&dateFrom=${encodeURIComponent(from)}` +
+            `&dateTo=${encodeURIComponent(to)}`;
+
+        window.open(url, "_blank");
+
+        closeAttendanceDownloadModal();
+    }
+
+}
+
+
 if(verifiedPreview){
     verifiedPreview.addEventListener("click", () => {
         document.getElementById("imagePreviewModal").style.display = "none";
@@ -1827,6 +1922,7 @@ overlay.addEventListener('click', () => {
     attendanceCard?.classList.remove("show");
      reportCard?.classList.remove("show");
      document.getElementById("reportFormPanel")?.classList.remove("show");
+     document.getElementById("download-attendance-modal")?.classList.remove("show");
 
     if (editForm) editForm.reset();
 });

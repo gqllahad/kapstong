@@ -1528,7 +1528,9 @@ function renderAssignSupervisorList($conn, $search = '')
                 supervisor.name,
                 supervisor.email,
                 supervisor.number,
-                supervisor.department
+                supervisor.department,
+                supervisor.company_name,
+                supervisor.position
             FROM supervisor
             $where
             ORDER BY supervisor.date_created DESC";
@@ -1545,7 +1547,7 @@ function renderAssignSupervisorList($conn, $search = '')
                 data-id="' . $row['superID'] . '">
 
                 <strong>' . $row['name'] . '</strong>
-                <span>' . $row['superID'] . ' • ' . $row['department'] . '</span>
+                <span>' . $row['company_name'] . ' • ' . $row['position'] . ' • ' . $row['department'] . ' </span>
 
             </div>';
         }
@@ -1861,6 +1863,167 @@ function renderActivityLogTable($conn, $search = '', $module = '', $dateFrom = '
 
     return $output;
 }
+
+
+// admin final evaluation
+function renderAdminFinalEvaluation($conn, $search = '', $course = '', $superID = '') {
+
+    $sql = "
+    SELECT 
+        fe.evaluationID,
+        fe.studentID,
+        fe.superID,
+        fe.attendance_score,
+        fe.progress_score,
+        fe.task_score,
+        fe.final_score,
+        fe.ethics_rating,
+        fe.communication_rating,
+        fe.initiative_rating,
+        fe.discipline_rating,
+        fe.final_recommendation,
+        fe.final_remarks,
+        fe.status,
+        fe.created_at,
+
+        o.name AS student_name,
+        o.course,
+        o.yearLevel,
+
+        s.name AS supervisor_name
+
+    FROM final_evaluation fe
+
+    LEFT JOIN ojtstudent o
+        ON o.studentID = fe.studentID
+
+    LEFT JOIN users s
+    ON s.userID = fe.superID
+
+    WHERE fe.status = 'FINALIZED'
+";
+
+    $params = [];
+    $types = "";
+
+    if (!empty($search)) {
+
+        $sql .= " AND (
+            fe.studentID LIKE ? OR
+            o.name LIKE ? OR
+            o.course LIKE ? OR
+            s.name LIKE ?
+        )";
+
+        $like = "%$search%";
+
+        $params[] = $like; 
+        $params[] = $like; 
+        $params[] = $like;
+        $params[] = $like; 
+
+        $types .= "ssss";
+    }
+
+    if (!empty($course)) {
+        $sql .= " AND o.course = ?";
+        $params[] = $course;
+        $types .= "s";
+    }
+
+    $sql .= "
+        ORDER BY fe.created_at DESC
+    ";
+
+    $stmt = $conn->prepare($sql);
+
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $output = '';
+
+    if ($result->num_rows > 0) {
+
+        while ($row = $result->fetch_assoc()) {
+
+            $status = strtolower($row['status']);
+
+            $color = match ($status) {
+                'finalized' => '#059669',
+                'incomplete' => '#F59E0B',
+                default => '#9CA3AF'
+            };
+
+            $output .= "
+            <tr>
+
+                <td>
+                    <div class='student-name-cell'>
+                        <div class='student-avatar'>
+                            " . strtoupper(substr($row['student_name'], 0, 1)) . "
+                        </div>
+
+                        <div class='student-info'>
+                            <span class='student-name'>{$row['student_name']}</span>
+                            <small class='student-id'>{$row['studentID']}</small>
+                        </div>
+                    </div>
+                </td>
+
+                <td>{$row['supervisor_name']}</td>
+
+                <td>{$row['attendance_score']}</td>
+                <td>{$row['progress_score']}</td>
+                <td>{$row['task_score']}</td>
+
+                <td><b>{$row['final_score']}</b></td>
+
+                <td>
+                    E: {$row['ethics_rating']} |
+                    C: {$row['communication_rating']} |
+                    I: {$row['initiative_rating']} |
+                    D: {$row['discipline_rating']}
+                </td>
+
+                <td>{$row['final_recommendation']}</td>
+
+                <td>
+                    <span class='status-pill'
+                        style='background: {$color}15;
+                               color: {$color};
+                               border: 1px solid {$color}30;'>
+                        " . ucfirst($row['status']) . "
+                    </span>
+                </td>
+
+                <td>" . date('F d, Y', strtotime($row['created_at'])) . "</td>
+
+            </tr>";
+        }
+
+    } else {
+
+        $output .= "
+        <tr>
+            <td colspan='10' style='text-align:center;padding:15px;'>
+                No evaluation records found
+            </td>
+        </tr>";
+    }
+
+    return $output;
+}
+
+
+
+
+
+
+
 // function renderActivityLogTable($conn, $search = '', $module = '')
 // {
 //     $sql = "
@@ -2863,16 +3026,20 @@ function getStudentAlerts($conn, $studentID)
 }
 
 // student attendance card
-function renderStudentAttendanceTable($conn, $studentID, $category = ''){
+function renderStudentAttendanceTable($conn,$studentID,$category = '',$dateFrom = '',$dateTo = '') {
+
     $sql = "
         SELECT 
             log_date,
             first_time_in,
             final_time_out,
+            lunch_break_out,
+            lunch_break_in,
+            snack_break_out,
+            snack_break_in,
             status,
             total_hours,
-            remarks,
-            current_state
+            remarks
         FROM attendance_logs
         WHERE studentID = ?
     ";
@@ -2886,14 +3053,21 @@ function renderStudentAttendanceTable($conn, $studentID, $category = ''){
         $types .= "s";
     }
 
+    if (!empty($dateFrom)) {
+        $sql .= " AND log_date >= ?";
+        $params[] = $dateFrom;
+        $types .= "s";
+    }
+
+    if (!empty($dateTo)) {
+        $sql .= " AND log_date <= ?";
+        $params[] = $dateTo;
+        $types .= "s";
+    }
+
     $sql .= " ORDER BY log_date DESC";
 
     $stmt = $conn->prepare($sql);
-
-    if (!$stmt) {
-        die("SQL Error: " . $conn->error);
-    }
-
     $stmt->bind_param($types, ...$params);
     $stmt->execute();
 
@@ -2905,73 +3079,98 @@ function renderStudentAttendanceTable($conn, $studentID, $category = ''){
 
         while ($row = $result->fetch_assoc()) {
 
-         $status = strtolower($row['status']);
+            $status = strtolower($row['status']);
 
-        switch ($status) {
-            case 'present':
-                $color = '#059669';
-                break;
-            case 'late':
-                $color = '#F59E0B';
-                break;
-            case 'absent':
-                $color = '#EF4444';
-                break;
-            case 'excused':
-                $color = '#3B82F6';
-                break;
-            default:
-                $color = '#9CA3AF';
-                break;
-        }
+            $color = match ($status) {
+                'present' => '#059669',
+                'late' => '#F59E0B',
+                'absent' => '#EF4444',
+                'excused' => '#3B82F6',
+                default => '#9CA3AF'
+            };
 
-            $timeIn = !empty($row['first_time_in'])
-            ? date('h:i A', strtotime($row['first_time_in']))
-            : '--';
+            $timeIn = $row['first_time_in']
+                ? date('h:i A', strtotime($row['first_time_in']))
+                : '--';
 
-        $timeOut = !empty($row['final_time_out'])
-            ? date('h:i A', strtotime($row['final_time_out']))
-            : '--';
+            $timeOut = $row['final_time_out']
+                ? date('h:i A', strtotime($row['final_time_out']))
+                : '--';
 
-        $hours = !empty($row['total_hours'])
-            ? number_format($row['total_hours'], 2)
-            : '0.00';
+            $breaks = "";
+
+            if ($row['lunch_break_out'] || $row['lunch_break_in']) {
+                $breaks .= "Lunch: "
+                    . ($row['lunch_break_out'] ? date('h:i A', strtotime($row['lunch_break_out'])) : '--')
+                    . " - "
+                    . ($row['lunch_break_in'] ? date('h:i A', strtotime($row['lunch_break_in'])) : '--')
+                    . "<br>";
+            }
+
+            if ($row['snack_break_out'] || $row['snack_break_in']) {
+                $breaks .= "Snack: "
+                    . ($row['snack_break_out'] ? date('h:i A', strtotime($row['snack_break_out'])) : '--')
+                    . " - "
+                    . ($row['snack_break_in'] ? date('h:i A', strtotime($row['snack_break_in'])) : '--');
+            }
+
+            if ($breaks === "") {
+                $breaks = "<span style='color:#94a3b8;'>No breaks</span>";
+            }
+
+            $hours = number_format($row['total_hours'] ?? 0, 2);
 
             $output .= "
-        <tr>
+            <tr>
 
-            <td>" . date('F d, Y', strtotime($row['log_date'])) . "</td>
+                <td>
+                    <div class='date-cell'>
+                        <i class='bi bi-calendar3'></i>
+                        " . date('M d, Y', strtotime($row['log_date'])) . "
+                    </div>
+                </td>
 
-            <td>{$timeIn}</td>
+                <td>{$timeIn}</td>
 
-            <td>{$timeOut}</td>
+                <td class='break-cell'>{$breaks}</td>
 
-            <td>
-                <span class='status-pill' 
-                    style='background: {$color}15;
-                           color: {$color};
-                           border: 1px solid {$color}30;'>
-                    " . ucfirst($row['status']) . "
-                </span>
-            </td>
+                <td>{$timeOut}</td>
 
-            <td>{$hours}</td>
+                <td>
+                    <span class='status-pill'
+                        style='background: {$color}15;
+                               color: {$color};
+                               border: 1px solid {$color}30;'>
+                        " . ucfirst($status) . "
+                    </span>
+                </td>
 
-            <td>" . htmlspecialchars($row['remarks']) . "</td>
-        </tr>";
+                <td>
+                    <strong>{$hours} hrs</strong>
+                </td>
+
+                <td class='remarks-cell'>
+                    " . ($row['remarks']
+                        ? htmlspecialchars($row['remarks'])
+                        : "<span style='color:#94a3b8;'>No remarks</span>") . "
+                </td>
+
+            </tr>";
         }
 
     } else {
 
         $output .= "
         <tr>
-            <td colspan='6' style='text-align:center;'>No attendance found</td>
+            <td colspan='7' class='empty-state'>
+                <i class='bi bi-inbox'></i>
+                <p>No attendance records found</p>
+            </td>
         </tr>";
     }
 
     return $output;
 }
-
 
 // student reports
 function renderReports($conn, $studentID)
@@ -3114,5 +3313,50 @@ function renderProgressHeader($conn, $studentID)
         </div>
 
     </div>
-    ";
+    "; 
+}
+
+function getProgramOptions($conn) {
+
+    $sql = "SELECT prg_acro, prg_name 
+            FROM program 
+            WHERE status = 'ACTIVE'
+            ORDER BY prg_acro ASC";
+
+    $result = $conn->query($sql);
+
+    $html = '<option value="">All Courses</option>';
+
+    while ($row = $result->fetch_assoc()) {
+
+        $html .= "
+            <option value='{$row['prg_acro']}'>
+                {$row['prg_acro']} - {$row['prg_name']}
+            </option>
+        ";
+    }
+
+    return $html;
+}
+
+function getSupervisorOptions($conn) {
+
+    $sql = "SELECT superID, name, company_name 
+            FROM supervisor
+            ORDER BY name ASC";
+
+    $result = $conn->query($sql);
+
+    $html = '<option value="">All Supervisors</option>';
+
+    while ($row = $result->fetch_assoc()) {
+
+        $html .= "
+            <option value='{$row['superID']}'>
+                {$row['name']} - {$row['company_name']}
+            </option>
+        ";
+    }
+
+    return $html;
 }
