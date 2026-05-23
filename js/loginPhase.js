@@ -1,9 +1,14 @@
 const reveals = document.querySelectorAll(".scroll-reveal");
 const signUp = document.getElementById("ls-switch");
 
-// designs
-const text = "Granby OJT Tracking System";
-let index = 0;
+// landings
+const heroRight = document.querySelector(".hero-right");
+const heroLeft = document.querySelector(".hero-left");
+const heroTag = document.querySelector(".hero-tag");
+const heroTitle = document.querySelector(".hero-title");
+const heroDesc = document.querySelector(".hero-desc");
+const heroButtons = document.querySelector(".hero-buttons");
+const heroStats = document.querySelector(".hero-stats");
 
 // loading
 const form = document.getElementById("loginForm");
@@ -25,15 +30,6 @@ const loginPass = document.getElementById("loginPassword");
 
 // functions
 
-function type() {
-  if (index < text.length) {
-    document.querySelector(".typing-text").textContent += text.charAt(index);
-    index++;
-    setTimeout(type, 80);
-  } else {
-    document.querySelector(".typing-text").style.borderRight = "none";
-  }
-}
 
 function revealOnScroll() {
   const windowHeight = window.innerHeight;
@@ -134,9 +130,35 @@ if (modalLoginError) {
     }, 2000);
 }
 
+window.addEventListener("load", () => {
+
+  const items = [
+    heroRight,
+    heroLeft,
+    heroTitle,
+    heroTag,
+    heroDesc,
+    heroButtons,
+    heroStats
+  ];
+
+  items.forEach(el => {
+    if (el) el.classList.add("preload");
+  });
+
+  setTimeout(() => {
+     heroRight?.classList.add("animate-in");
+     setTimeout(() => {heroLeft?.classList.add("animate-up");},400);
+     setTimeout(() => {heroTag?.classList.add("animate-in-left");},700);
+     setTimeout(() => {heroTitle?.classList.add("animate-up");},1200);
+     setTimeout(() => { heroDesc?.classList.add("animate-up-delay1");},1700);
+     setTimeout(() => {heroButtons?.classList.add("animate-up-delay2");},2200);
+
+  }, 200);
+
+});
 
 window.addEventListener("scroll", revealOnScroll);
-window.addEventListener("load", type);
 
 window.addEventListener("DOMContentLoaded", revealOnScroll);
 

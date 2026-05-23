@@ -25,7 +25,7 @@ if (isset($_GET['success'])) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Granby Tracking System</title>
+  <title>Granby Monitoring System</title>
   <link rel="icon" type="image/png" href="../kapstongImage/logo.jpg">
   <link rel="stylesheet" href="../css/loginPhase.css" />
   <link
@@ -61,9 +61,9 @@ if (isset($_GET['success'])) {
     <div class="container">
       <h1 class="logo-text">
         <img src="../kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
-        <div>
-          <div>OJT</div>
-          <small>Tracking System Granby</small>
+        <div class="header-title">
+          <div>Granby</div>
+          <small>OJT Monitoring System </small>
         </div>
       </h1>
       <nav class="nav">
@@ -95,48 +95,47 @@ if (isset($_GET['success'])) {
 
   <div class="hero-overlay"></div>
 
-  <div class="container scroll-reveal hero-content">
+  <div class="container hero-grid">
 
-    <span class="hero-tag">
-      RFID-Powered Attendance Monitoring
-    </span>
+    <div class="hero-left scroll-reveal">
 
-    <h1 class="typing-text">
-    </h1>
+      <span class="hero-tag">
+        RFID-Powered Attendance Monitoring
+      </span>
 
-    <p class="hero-desc active">
-      A modern web-based platform designed to simplify attendance monitoring,
-      RFID tracking, and OJT management for students, coordinators, and administrators
-      with real-time and secure record handling.
-    </p>
+      <h1 class="hero-title">
+        Granby OJT <br>
+        <span>Monitoring System</span>
+      </h1>
 
-    <div class="hero-buttons">
+      <p class="hero-desc">
+          A modern web-based platform designed to simplify attendance monitoring,
+          RFID tracking, and OJT management for students, coordinators, and administrators
+          with real-time and secure record handling.
+      </p>
 
-      <button class="primary-btn">
-       <a href="rfid_test.php">Get Started</a> 
-      </button>
+      <div class="hero-buttons">
 
-      <button class="secondary-btn">
-        Learn More
-      </button>
+        <button class="primary-btn">
+          Get Started
+        </button>
+
+
+      </div>
+
+     
 
     </div>
 
-    <div class="hero-stats">
+    <div class="hero-right">
 
-      <div class="stat-card">
-        <h3>RFID</h3>
-        <p>Smart Attendance</p>
-      </div>
+      <div class="rfid-visual">
 
-      <div class="stat-card">
-        <h3>Real-Time</h3>
-        <p>Monitoring System</p>
-      </div>
+        <div class="glow-circle"></div>
+        <img src="../kapstongImage/Gemini_Generated_Image_2p2ovf2p2ovf2p2o.png" alt="System Symbol" class="hero-symbol">
+        <!-- <div class="floating-card card1"></div>
+        <div class="floating-card card2"></div> -->
 
-      <div class="stat-card">
-        <h3>Secure</h3>
-        <p>Data Management</p>
       </div>
 
     </div>
@@ -220,7 +219,7 @@ if (isset($_GET['success'])) {
       id="sign-container"
       style="text-align: left; margin: 0 5%">
 
-      <span class="hero-tag">
+      <span class="section-tag">
          Student & Administrator Login
       </span>
       
@@ -231,8 +230,10 @@ if (isset($_GET['success'])) {
 
     <form id="loginForm" action="starts.php" method="POST">
       <div class="login-container scroll-reveal">
-        <img src="../kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
-        <h2>Sign In</h2>
+        <div class="login-header">
+          <h2>Secure Login</h2>
+          <p>OJT Monitoring System Access Portal</p>
+        </div>
         <div class="login-inner-container">
           <div class="login-box">
             <input type="email" name="loginEmail" id="loginEmail" placeholder=" " required />

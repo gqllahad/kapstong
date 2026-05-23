@@ -877,7 +877,7 @@ function downloadChartCSV() {
         document.getElementById("monthSelector").value;
 
     if (!selectedMonth) {
-        alert("Missing month.");
+        showToast("Missing month.", "warning");
         return;
     }
 

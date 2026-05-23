@@ -39,8 +39,9 @@ if ($_SESSION['role'] !== "ADMIN") {
 <body>
     <header class="navbar">
 
-        <div class="logo">
-            <h2>OJT SYSTEM</h2>
+        <div class="header-title">
+            <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
+            <h1>Administrator Dashboard</h1>
         </div>
 
         <button id="menuToggle">☰</button>

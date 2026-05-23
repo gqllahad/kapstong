@@ -136,11 +136,34 @@ let allTasks = [];
 let selectedFiles = [];
 let reportFiles = [];
 
+let selectedFile = null;
+const reportFileInput = document.getElementById("reportFile");
+const submitReports = document.getElementById("submit-report");
+
 // unverified
 
 // functions
 
 // unverified
+
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+
+    toast.style.background =
+        type === "success" ? "#28a745" :
+        type === "error" ? "#dc3545" :
+        type === "warning" ? "#ffc107" :
+        "#333";
+
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+};
+
 
 window.previewImage = function(src) {
     // const modal = document.getElementById("imagePreviewModal");
@@ -325,7 +348,6 @@ function handleFilePreview(inputElem, previewElem) {
         const fileType = file.type;
         const fileName = file.name.toLowerCase();
 
-        // IMAGE
         if (fileType.startsWith('image/')) {
             const img = document.createElement('img');
             img.src = URL.createObjectURL(file);
@@ -333,7 +355,6 @@ function handleFilePreview(inputElem, previewElem) {
             previewElem.appendChild(img);
         }
 
-        // PDF
         else if (fileType === 'application/pdf') {
             const iframe = document.createElement('iframe');
             iframe.src = URL.createObjectURL(file);
@@ -346,7 +367,6 @@ function handleFilePreview(inputElem, previewElem) {
             previewElem.appendChild(iframe);
         }
 
-        // DOC / DOCX
         else if (
             fileType === 'application/msword' ||
             fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
@@ -379,10 +399,9 @@ function handleFilePreview(inputElem, previewElem) {
 
             previewElem.appendChild(icon);
         }
-
-        // INVALID FILE
+        
         else {
-            alert('Unsupported file type!');
+            showToast("Unsupported file type!", "warning");
             inputElem.value = '';
         }
     });
@@ -686,21 +705,46 @@ function openStageModal(){
     reportCard.classList.add("show");
 }
 
+// reports
+
+if(submitReports){
+submitReports.addEventListener("click", () =>{
+    submitReport();
+});
+}
+
+if(reportCard){
+reportFileInput.addEventListener("change", function (e) {
+
+    selectedFile = e.target.files[0];
+
+    renderReportFile();
+});
+}
+
 function openReportForm(reportType, stageID) {
 
     document.getElementById("reportFormPanel").classList.add("show");
+
     reportCard.classList.remove("show");
 
-   document.getElementById("report_type").value = reportType;
-    document.getElementById("stageID").value = stageID;
+    document.getElementById("report_type").value =
+        reportType;
+
+    document.getElementById("stageID").value =
+        stageID;
 
     const titles = {
+
         "ORIENTATION_REPORT": "Orientation Report",
+
         "WEEKLY_REPORT": "Weekly Training Report",
+
         "FINAL_REPORT": "Final Internship Report"
     };
 
     const stages = {
+
         1: "Orientation",
         2: "Training",
         3: "Deployment",
@@ -718,78 +762,242 @@ function openReportForm(reportType, stageID) {
 
     document.getElementById("stageLabel").innerText =
         stages[stageID];
+}
 
-        document.getElementById("reportFile").addEventListener("change", function (e) {
-
-        const files = Array.from(e.target.files);
-
-        files.forEach(file => {
-
-            if (!reportFiles.some(f => f.name === file.name)) {
-                reportFiles.push(file);
-            }
-
-        });
-
-        renderReportFiles();
-    });
-} //inigo
-
-function renderReportFiles() {
+function renderReportFile() {
 
     const container = document.getElementById("reportFilePreview");
+
     container.innerHTML = "";
 
-    reportFiles.forEach((file, index) => {
+    if (!selectedFile) return;
 
-        const chip = document.createElement("div");
-        chip.className = "file-chip";
+    const chip = document.createElement("div");
 
-        chip.innerHTML = `
-            <span title="${file.name}">
-                ${file.name}
-            </span>
+    chip.className = "file-chip";
 
-            <button type="button" onclick="removeReportFile(${index})">
-                ×
-            </button>
-        `;
+    chip.innerHTML = `
+    
+        <span title="${selectedFile.name}">
+            ${selectedFile.name}
+        </span>
 
-        container.appendChild(chip);
+        <button
+            type="button"
+            onclick="removeReportFile()">
+
+            ×
+
+        </button>
+    `;
+
+    container.appendChild(chip);
+}
+
+function removeReportFile() {
+
+    selectedFile = null;
+
+    reportFileInput.value = "";
+
+    renderReportFile();
+}
+
+function submitReport() {
+
+    const report_type = document.getElementById("report_type").value;
+    const stageID = document.getElementById("stageID").value;
+    const title = document.getElementById("reportTitle").value.trim();
+    const content = document.getElementById("reportContent").value.trim();
+
+    if (title === "") {
+
+        showToast("Report title is required.", "warning");
+
+        return;
+    }
+
+    if (content === "") {
+
+        showToast("Report content is required.", "warning");
+
+        return;
+    }
+
+    submitReport.disabled = true;
+
+    submitReport.innerText = "Submitting...";
+
+    const formData = new FormData();
+
+    formData.append("report_type", report_type);
+
+    formData.append("stageID", stageID);
+
+    formData.append("title", title);
+
+    formData.append("content", content);
+
+    if (selectedFile) {
+
+        formData.append(
+            "attachment",
+            selectedFile
+        );
+    }
+
+    fetch("student_functions/submitReports.php", {
+
+        method: "POST",
+
+        body: formData
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        submitReport.disabled = false;
+
+        submitReport.innerText = "Submit Report";
+
+        if (data.status === "success") {
+
+            showToast(data.message, "success");
+
+            resetReportForm();
+
+        } else {
+
+            showToast(data.message, "warning");
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        submitReport.disabled = false;
+
+        submitReport.innerText = "Submit Report";
+
+        showToast("Upload failed.", "error");
     });
 }
 
-function removeReportFile(index) {
-    reportFiles.splice(index, 1);
-    renderReportFiles();
+function resetReportForm() {
+
+    document.getElementById("reportTitle").value = "";
+
+    document.getElementById("reportContent").value = "";
+
+    document.getElementById("report_type").value = "";
+
+    document.getElementById("stageID").value = "";
+
+    selectedFile = null;
+
+    reportFileInput.value = "";
+
+    renderReportFile();
+
+    closeReportForm();
 }
 
-function syncReportFilesToInput() {
+// function openReportForm(reportType, stageID) {
 
-    const dt = new DataTransfer();
+//     document.getElementById("reportFormPanel").classList.add("show");
+//     reportCard.classList.remove("show");
 
-    reportFiles.forEach(file => dt.items.add(file));
+//    document.getElementById("report_type").value = reportType;
+//     document.getElementById("stageID").value = stageID;
 
-    document.getElementById("reportFile").files = dt.files;
-}
+//     const titles = {
+//         "ORIENTATION_REPORT": "Orientation Report",
+//         "WEEKLY_REPORT": "Weekly Training Report",
+//         "FINAL_REPORT": "Final Internship Report"
+//     };
+
+//     const stages = {
+//         1: "Orientation",
+//         2: "Training",
+//         3: "Deployment",
+//         4: "Final"
+//     };
+
+//     document.getElementById("formTitle").innerText =
+//         "Submit " + titles[reportType];
+
+//     document.getElementById("reportTitle").value =
+//         titles[reportType];
+
+//     document.getElementById("reportTypeLabel").innerText =
+//         titles[reportType];
+
+//     document.getElementById("stageLabel").innerText =
+//         stages[stageID];
+
+//         document.getElementById("reportFile").addEventListener("change", function (e) {
+
+//         const files = Array.from(e.target.files);
+
+//         files.forEach(file => {
+
+//             if (!reportFiles.some(f => f.name === file.name)) {
+//                 reportFiles.push(file);
+//             }
+
+//         });
+
+//         renderReportFiles();
+//     });
+// }
+
+// function renderReportFiles() {
+
+//     const container = document.getElementById("reportFilePreview");
+//     container.innerHTML = "";
+
+//     reportFiles.forEach((file, index) => {
+
+//         const chip = document.createElement("div");
+//         chip.className = "file-chip";
+
+//         chip.innerHTML = `
+//             <span title="${file.name}">
+//                 ${file.name}
+//             </span>
+
+//             <button type="button" onclick="removeReportFile(${index})">
+//                 ×
+//             </button>
+//         `;
+
+//         container.appendChild(chip);
+//     });
+// }
+
+// function removeReportFile(index) {
+//     reportFiles.splice(index, 1);
+//     renderReportFiles();
+// }
+
+// function syncReportFilesToInput() {
+
+//     const dt = new DataTransfer();
+
+//     reportFiles.forEach(file => dt.items.add(file));
+
+//     document.getElementById("reportFile").files = dt.files;
+// }
 
 function closeReportForm() {
     document.getElementById("reportFormPanel").classList.remove("show");
     reportCard.classList.add("show");
 }
 
-// attendance card
-// function loadStudentAttendanceTable(studentID) {
 
-//     fetch("student_functions/getStudentAttendanceTable.php?studentID=" + studentID, {
-//         credentials: "include"
-//     })
-//     .then(res => res.text())
-//     .then(data => {
-//         document.getElementById("attendanceReportBody").innerHTML = data;
-//     })
-//     .catch(err => console.error("Attendance load error:", err));
-// }
 
 function renderTasks(filter) {
     const container = document.getElementById("taskList");
@@ -1398,7 +1606,7 @@ editForm.addEventListener('submit', function (e) {
     }
 
     if (!changed) {
-        alert("No changes were made.");
+        showToast("No changes were made.", "warning");
         e.preventDefault();
         return;
     }
@@ -1673,7 +1881,7 @@ if(studentTasksBtn){
         console.log(data);
 
         if (data.status === "success") {
-            alert(data.message);
+            showToast(data.message, "success");
 
             selectedFiles = [];
             renderFilePreview();
@@ -1685,7 +1893,7 @@ if(studentTasksBtn){
 
             loadTasks();
         } else {
-            alert(data.message);
+            showToast(data.message, "warning");
         }
     });
 });

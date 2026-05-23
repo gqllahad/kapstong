@@ -47,7 +47,10 @@ $studentStatus = $_SESSION['isVerified'];
 <body>
 
     <header class="navbar">
-        <h1>OJT Student Dashboard</h1>
+        <div class="header-title">
+            <img src="../../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
+            <h1>Student Dashboard</h1>
+        </div>
         <button id="menuToggle">☰</button>
         <nav class="profile-menu" id="profileMenu" hidden>
             <a id="openProfilePendingBtn">Profile</a>

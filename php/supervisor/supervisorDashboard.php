@@ -69,7 +69,11 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
     <!-- navbar -->
     <header class="navbar">
-        <h1>Supervisor Dashboard</h1>
+        <div class="header-title">
+            <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
+            <h1>Supervisor Dashboard</h1>
+        </div>
+         
         <button id="menuToggle">☰</button>
         <nav class="profile-menu" id="profileMenu" hidden>
             <a id="openProfileBtn">Profile</a>
@@ -120,7 +124,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
         <main class="content">
             
             <div id="overlay" class="overlay"></div>
-            <div id="toast-container"></div>
+            <div id="toast"></div>
 
             <!-- modals -->
 

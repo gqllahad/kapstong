@@ -94,6 +94,28 @@ transition: margin-left 0.8s ease;
     cursor: pointer;
 }
 
+.header-title{
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.header-title h1{
+    font-size: 20px;
+}
+
+.logo-img {
+    /* width: 45px;
+    height: 45px;
+    object-fit: contain; */
+    width: 40px;    
+    height: 40px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
 .profile-menu {
     position: absolute;
     top: 60px;
@@ -1576,7 +1598,7 @@ background:#eee;
 .quick-action-grid button {
     all: unset;
 
-    height: 90px;
+    height: 140px;
 
     background: #ffffff;
 

@@ -46,7 +46,11 @@ $documents = getStudentDocuments($conn, $studentID);
 <body data-student-id="<?= $studentID ?>">
 
     <header class="navbar">
-        <h1>OJT Student Dashboard</h1>
+        <div class="header-title">
+            <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
+            <h1>Student Dashboard</h1>
+        </div>
+        
         <button id="menuToggle">☰</button>
         <nav class="profile-menu" id="profileMenu" hidden>
             <a id="openProfileBtn">Profile</a>
@@ -74,6 +78,7 @@ $documents = getStudentDocuments($conn, $studentID);
         <main class="content">
 
             <div id="overlay" class="overlay"></div>
+            <div id="toast"></div>
 
             <!-- profile modal -->
             <div class="profile-modal" id="profileModal">
@@ -578,10 +583,10 @@ $documents = getStudentDocuments($conn, $studentID);
                         <small id="formSubtitle">Fill out the required details below</small>
                     </div>
 
-                    <button onclick="closeReportForm()" class="close-btn">×</button>
+                    <button onclick="closeReportForm()" class="close-btn">&times;</button>
                 </div>
 
-                <div class="form-body">
+                <div class="form-body"  id="reportForm">
                     <input type="hidden" id="report_type" name="report_type">
                     <input type="hidden" id="stageID" name="stageID">
 
@@ -624,7 +629,7 @@ $documents = getStudentDocuments($conn, $studentID);
                     <div class="field">
                         <label>Attachment (optional)</label>
 
-                        <input type="file" id="reportFile" multiple hidden>
+                        <input type="file" id="reportFile" hidden>
 
                         <button type="button"
                             class="upload-btn"
@@ -639,7 +644,7 @@ $documents = getStudentDocuments($conn, $studentID);
                         </small>
                     </div>
 
-                    <button class="submit-btn">
+                    <button class="submit-btn" id="submit-report">
                         Submit Report
                     </button>
 
