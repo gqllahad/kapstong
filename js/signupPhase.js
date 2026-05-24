@@ -29,6 +29,19 @@ const telInput = document.querySelector('input[name="signTel"]');
 const form = document.getElementById("signupForm");
 const loadingScreen = document.getElementById("loadingScreen");
 
+// address
+// const barangayData = {
+
+// Tanza: ["Sahud-Ulan","Capipisa","Biga","Julugan","Calibuyo","Halayhay"],
+// Rosario: [ "Bagbag", "Kanluran", "Ligtong",  "Wawa",  "Sapa"  ],
+// Naic: [ "Bucana","Ibayo Silangan","Labac", "Muzon"],
+// Bacoor: ["Alima","Talaba", "Zapote","Niog"]
+//     };
+
+// const citySelect = document.getElementById("citySelect");
+// const barangayList = document.getElementById("barangays");
+// const barangayInput = document.getElementById("barangayInput");
+
 
 // functions vanilla java
 function updateStepper() {
@@ -412,6 +425,29 @@ studentEmail1.addEventListener("input", () => {
       })
       .catch(err => console.error(err));
 });
+
+
+//  citySelect.addEventListener("change", function () {
+
+//         const selectedCity = this.value;
+
+//         barangayList.innerHTML = "";
+//         barangayInput.value = "";
+
+//         if (barangayData[selectedCity]) {
+
+//             barangayData[selectedCity].forEach(barangay => {
+
+//                 const option = document.createElement("option");
+//                 option.value = barangay;
+
+//                 barangayList.appendChild(option);
+
+//             });
+//         }
+//     });
+
+//     console.log(barangayInput);
 
 // studentEmail1.addEventListener("blur", checkEmail);
 

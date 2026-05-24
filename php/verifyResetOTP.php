@@ -163,7 +163,5 @@ function startCooldown() {
     }, 1000);
 }
 
-
-
 </script>
 </html>

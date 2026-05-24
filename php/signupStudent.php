@@ -99,45 +99,21 @@ require_once("functions.php");
                         <input type="hidden" name="province" value="Cavite">
 
                         <div class="sign-box trios">
-                            <select name="city" required>
+                            <select name="city" id="citySelect" required>
                                 <option value="" disabled selected hidden>Select City...</option>
                                 <option value="Tanza">Tanza</option>
-                                <option value="Trece Martires">Trece Martires</option>
-                                <option value="Dasmariñas">Dasmariñas</option>
-                                <option value="Bacoor">Bacoor</option>
-                                <option value="Imus">Imus</option>
-                                <option value="General Trias">General Trias</option>
-                                <option value="Silang">Silang</option>
-                                <option value="Kawit">Kawit</option>
                                 <option value="Rosario">Rosario</option>
-                                <option value="Noveleta">Noveleta</option>
                                 <option value="Naic">Naic</option>
-                                <option value="Ternate">Ternate</option>
-                                <option value="Maragondon">Maragondon</option>
-                                <option value="Indang">Indang</option>
-                                <option value="Alfonso">Alfonso</option>
-                                <option value="Amadeo">Amadeo</option>
-                                <option value="Tagaytay">Tagaytay</option>
-                                <option value="Mendez">Mendez</option>
-                                <option value="General Emilio Aguinaldo">General Emilio Aguinaldo</option>
-                                <option value="Magallanes">Magallanes</option>
+                                <option value="Bacoor">Bacoor</option>
                             </select>
                             <span>City / Municipality</span>
                         </div>
 
                         <div class="sign-box trios">
-                            <input name="barangay" type="text" list="barangays" placeholder="" required />
+                            <input name="barangay" id="barangayInput" type="text" list="barangays" placeholder="" required />
                             <span>Barangay</span>
 
-                            <datalist id="barangays">
-                                <option value="Sahud-ulan"></option>
-                                <option value="Capipisa"></option>
-                                <option value="Biga"></option>
-                                <option value="Julugan"></option>
-                                <option value="Calibuyo"></option>
-                                <option value="Halayhay"></option>
-                                <option value="Rosario"></option>
-                            </datalist>
+                            <datalist id="barangays"></datalist>
                         </div>
 
                         <div class="sign-box trios">
@@ -246,6 +222,65 @@ require_once("functions.php");
     </div>
 
 </body>
+<script>
+    const barangayData = {
+
+        Tanza: [
+            "Sahud-Ulan",
+            "Capipisa",
+            "Biga",
+            "Julugan",
+            "Calibuyo",
+            "Halayhay"
+        ],
+
+        Rosario: [
+            "Bagbag",
+            "Kanluran",
+            "Ligtong",
+            "Wawa",
+            "Sapa"
+        ],
+
+        Naic: [
+            "Bucana",
+            "Ibayo Silangan",
+            "Labac",
+            "Muzon"
+        ],
+
+        Bacoor: [
+            "Alima",
+            "Talaba",
+            "Zapote",
+            "Niog"
+        ]
+    };
+
+    const citySelect = document.getElementById("citySelect");
+    const barangayList = document.getElementById("barangays");
+    const barangayInput = document.getElementById("barangayInput");
+
+    citySelect.addEventListener("change", function () {
+
+        const selectedCity = this.value;
+
+        barangayList.innerHTML = "";
+        barangayInput.value = "";
+
+        if (barangayData[selectedCity]) {
+
+            barangayData[selectedCity].forEach(barangay => {
+
+                const option = document.createElement("option");
+                option.value = barangay;
+
+                barangayList.appendChild(option);
+
+            });
+        }
+    });
+</script>
 <script src="../js/signupPhase.js"></script>
 
 </html>
