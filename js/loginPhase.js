@@ -14,6 +14,7 @@ const heroStats = document.querySelector(".hero-stats");
 const form = document.getElementById("loginForm");
 const loginLoadingScreen = document.getElementById("loginLoadingnScreen");
 const loadingScreen = document.getElementById("loadingScreen");
+const forgotLoadingScreen = document.getElementById("forgotLoadingScreen");
 
 // Invaded logins
 const invaderLogin = document.getElementById("invaderLogin");
@@ -27,6 +28,10 @@ const modalSignSuccess = document.getElementById("signSuccess");
 
 const loginEmail = document.getElementById("loginEmail");
 const loginPass = document.getElementById("loginPassword");
+
+// reset password
+const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+
 
 // functions
 
@@ -52,6 +57,8 @@ signUp.addEventListener("click", () => {
   }, 1000);
   
 });
+
+
 
 // login invader
 if (invaderLogin && modalInvader) {
@@ -89,6 +96,20 @@ if(modalSignSuccess){
 // login
 form.addEventListener("submit" ,function () {
     loginLoadingScreen.classList.add("show");
+});
+
+forgotPasswordLink.addEventListener("click", (e) => {
+
+    e.preventDefault();
+
+    forgotLoadingScreen.classList.add("show");
+
+    setTimeout(() => {
+
+        window.location.href ="forgotPassword.php";
+
+    }, 1000);
+
 });
 
 // incorrect login

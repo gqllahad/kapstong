@@ -4,6 +4,7 @@ include("kapstongConnection.php");
 $invaderLogin = false;
 $wrongPassword = false;
 $successSignUp = false;
+$successForget = false;
 
 if (isset($_GET['error'])) {
   $invaderLogin = true;
@@ -15,6 +16,10 @@ if (isset($_GET['warning'])) {
 
 if (isset($_GET['success'])) {
   $successSignUp = true;
+}
+
+if (isset($_GET['success_forget'])) {
+  $successForget = true;
 }
 
 ?>
@@ -84,6 +89,13 @@ if (isset($_GET['success'])) {
     <?php if ($successSignUp): ?>
       <div class="signSuccess-box" id="signSuccess">
         <p>✅ Account Created Successfully!</p>
+      </div>
+
+    <?php endif; ?>
+
+    <?php if ($successForget): ?>
+      <div class="signSuccess-box" id="signSuccess">
+        <p>✅ Account Password Successfully Resetted!</p>
       </div>
 
     <?php endif; ?>
@@ -246,7 +258,13 @@ if (isset($_GET['success'])) {
           </div>
         </div>
 
-        <div class="login-forget">Forgot Password?</div>
+       <div class="login-forget">
+
+            <a href="#" id="forgotPasswordLink">
+                Forgot Password?
+            </a>
+
+        </div>
 
         <div class="login-button">
           <input
@@ -328,7 +346,13 @@ if (isset($_GET['success'])) {
         </div>
         <p>Logging in..</p>
     </div>
-
+      
+    <div id="forgotLoadingScreen" class="loading-screen">
+        <div class="logo-loader">
+          <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
+        </div>
+        <p>Redirecting..</p>
+    </div>
 
 </body>
 
