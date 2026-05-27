@@ -51,41 +51,41 @@ require_once("functions.php");
 
                     <div class="form-inputs">
 
-                        <div class="sign-box trios lastName">
+                        <div class="sign-box trios lastName required-field">
                             <input name="lastName" class="name-input" type="text" placeholder=" " required />
                             <span>Last name</span>
                             <p class="name-warning">Only letters are allowed.</p>
                         </div>
-                        <div class="sign-box trios firstName"> <input name="firstName" class="name-input" type="text" placeholder=" " required />
+                        <div class="sign-box trios firstName required-field"> <input name="firstName" class="name-input" type="text" placeholder=" " required />
                             <span>First name</span>
                             <p class="name-warning">Only letters are allowed.</p>
                         </div>
 
-                        <div class="sign-box trios middleName"> <input name="middleName" class="name-input" type="text" placeholder=" " required />
+                        <div class="sign-box trios middleName"> <input name="middleName" class="name-input" type="text" placeholder=" " />
                             <span>Middle name</span>
                             <p class="name-warning">Only letters are allowed.</p>
                         </div>
 
-                        <div class="sign-box duos studentEmail">
-                            <input name="signEmail" type="email" class="full" id="studentEmail" placeholder=" " required  /> <!-- pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" -->
+                        <div class="sign-box duos studentEmail required-field">
+                            <input name="signEmail" type="email" class="full" id="studentEmail" placeholder=" " required /> <!-- pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" -->
                             <span>Email</span>
                             <p id="studentEmail-warning" style="color:red; display:none; font-weight : 600; font-size: 0.5rem;">Email already been used!</p>
                         </div>
 
                         <input type="hidden" name="rawTel" id="rawTel">
 
-                        <div class="sign-box duos studentMobile">
+                        <div class="sign-box duos studentMobile required-field">
                             <input name="signTel" type="tel" class="duos" maxlength="14" required placeholder=" " />
                             <span> Mobile Number </span>
                         </div>
 
-                        <div class="sign-box duos birthdate">
+                        <div class="sign-box duos birthdate required-field">
                             <input name="signBirth" type="date" max="2008-03-26" required />
                             <span> Birth date </span>
                             <p class="birth-warning">You must be at least 15 years old.</p>
                         </div>
 
-                        <div class="sign-box duos">
+                        <div class="sign-box duos required-field">
 
                             <select name="gender" required>
                                 <option value="" disabled selected hidden>Select you gender...</option>
@@ -98,7 +98,7 @@ require_once("functions.php");
 
                         <input type="hidden" name="province" value="Cavite">
 
-                        <div class="sign-box trios">
+                        <div class="sign-box trios required-field">
                             <select name="city" id="citySelect" required>
                                 <option value="" disabled selected hidden>Select City...</option>
                                 <option value="Tanza">Tanza</option>
@@ -109,7 +109,7 @@ require_once("functions.php");
                             <span>City / Municipality</span>
                         </div>
 
-                        <div class="sign-box trios">
+                        <div class="sign-box trios required-field">
                             <input name="barangay" id="barangayInput" type="text" list="barangays" placeholder="" required />
                             <span>Barangay</span>
 
@@ -117,7 +117,7 @@ require_once("functions.php");
                         </div>
 
                         <div class="sign-box trios">
-                            <input name="street" type="text" placeholder="" required />
+                            <input name="street" type="text" placeholder="" />
                             <span>Street / House No.</span>
                         </div>
 
@@ -130,19 +130,19 @@ require_once("functions.php");
                     <h3>Step 2: Academic Information</h3>
                     <hr>
                     <div class="form-inputs">
-                        <div class="sign-box duos studentID"> <input name="studentID" id="studentID1" type="text" required />
+                        <div class="sign-box duos studentID required-field"> <input name="studentID" id="studentID1" type="text" required />
                             <span>Student ID </span>
                             <p id="studentID-warning" style="color:red; display:none; font-weight : 600; font-size: 0.6rem;">Student ID already taken!</p>
                         </div>
 
-                        <div class="sign-box duos">
+                        <div class="sign-box duos required-field">
                             <select name="signCourse" id="signCourse" required>
                                 <option value="" disabled selected hidden></option>
                             </select>
                             <span>Program</span>
                         </div>
 
-                        <div class="sign-box trios">
+                        <div class="sign-box duos required-field">
                             <select name="signLevel" required>
                                 <option value="" disabled selected hidden></option>
                                 <option value="1st year">1st Year</option>
@@ -153,11 +153,9 @@ require_once("functions.php");
                             <span>Year Level</span>
                         </div>
 
-                        <div class="sign-box trios"> <input name="signSY" type="text" id="academic-year" readonly />
-                            <span>Academic Year</span>
-                        </div>
+                        <input name="signSY" type="text" id="academic-year" hidden />
 
-                        <div class="sign-box trios">
+                        <div class="sign-box duos required-field">
                             <select name="signSemester" required>
                                 <option value="" disabled selected hidden></option>
                                 <option value="1st semester">1st Semester</option>
@@ -186,13 +184,13 @@ require_once("functions.php");
                             <span>Email </span>
                         </div>
 
-                        <div class="sign-box duos"> <input name="signPassword" id="passwordInput" placeholder=" " type="password" required />
+                        <div class="sign-box duos required-field"> <input name="signPassword" id="passwordInput" placeholder=" " type="password" required />
 
                             <i class="toggle-pass" onclick="togglePassword('passwordInput', this)">👁</i>
                             <span>Password</span>
                         </div>
 
-                        <div class="sign-box duos"> <input name="signConfirmPassword" id="confirmPasswordInput" placeholder=" " type="password" required />
+                        <div class="sign-box duos required-field"> <input name="signConfirmPassword" id="confirmPasswordInput" placeholder=" " type="password" required />
                             <span> Confirm Password</span>
                             <i class="toggle-pass" onclick="togglePassword('confirmPasswordInput', this)">👁</i>
                         </div>
@@ -261,7 +259,7 @@ require_once("functions.php");
     const barangayList = document.getElementById("barangays");
     const barangayInput = document.getElementById("barangayInput");
 
-    citySelect.addEventListener("change", function () {
+    citySelect.addEventListener("change", function() {
 
         const selectedCity = this.value;
 

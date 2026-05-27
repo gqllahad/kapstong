@@ -50,22 +50,24 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
 <body>
 
-<?php if (isset($_SESSION['success'])): ?>
-<script>
-    window.addEventListener("DOMContentLoaded", function () {
-        showToast("<?= $_SESSION['success'] ?>", "success");
-    });
-</script>
-<?php unset($_SESSION['success']); endif; ?>
+    <?php if (isset($_SESSION['success'])): ?>
+        <script>
+            window.addEventListener("DOMContentLoaded", function() {
+                showToast("<?= $_SESSION['success'] ?>", "success");
+            });
+        </script>
+    <?php unset($_SESSION['success']);
+    endif; ?>
 
 
-<?php if (isset($_SESSION['error'])): ?>
-<script>
-    window.addEventListener("DOMContentLoaded", function () {
-        showToast("<?= $_SESSION['error'] ?>", "error");
-    });
-</script>
-<?php unset($_SESSION['error']); endif; ?>
+    <?php if (isset($_SESSION['error'])): ?>
+        <script>
+            window.addEventListener("DOMContentLoaded", function() {
+                showToast("<?= $_SESSION['error'] ?>", "error");
+            });
+        </script>
+    <?php unset($_SESSION['error']);
+    endif; ?>
 
     <!-- navbar -->
     <header class="navbar">
@@ -73,7 +75,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
             <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
             <h1>Supervisor Dashboard</h1>
         </div>
-         
+
         <button id="menuToggle">☰</button>
         <nav class="profile-menu" id="profileMenu" hidden>
             <a id="openProfileBtn">Profile</a>
@@ -86,10 +88,10 @@ $superID = getSupervisorIDByUserID($conn, $userID);
     <div id="forcePasswordOverlay" style="display:none;">
         <div class="force-box">
             <div class="force-modal-header">
-                    <h2>⚠️ Change Password Required</h2>
-                    <p>You must change your password before continuing.</p>
-                      <a href="../logoutPhase.php" class="force-modal-close-profile">&times;</a>
-                </div>
+                <h2>⚠️ Change Password Required</h2>
+                <p>You must change your password before continuing.</p>
+                <a href="../logoutPhase.php" class="force-modal-close-profile">&times;</a>
+            </div>
 
             <form action="functions/settings.php" method="POST">
                 <input type="hidden" name="userID" value="<?= $_SESSION['user_id']; ?>">
@@ -122,13 +124,13 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
         <!-- CONTENT -->
         <main class="content">
-            
+
             <div id="overlay" class="overlay"></div>
             <div id="toast"></div>
 
             <!-- modals -->
 
-             <!-- Account settings modal (SUPERVISOR) -->
+            <!-- Account settings modal (SUPERVISOR) -->
             <div class="account-settings-modal" id="account-settings-supervisor">
                 <div class="modal-header">
                     <h3>Account Settings</h3>
@@ -194,244 +196,244 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 </div>
 
                 <div id="reportSummary"></div>
+            </div>
+
+            <!-- final evaluation -->
+            <div class="student-final-evaluation" id="student-final-evaluation">
+                <div class="final-modal-header">
+                    <h3>Final Evaluation</h3>
+                    <button id="closeFinalEvaluation" class="modal-close">&times;</button>
                 </div>
 
-                <!-- final evaluation -->
-                <div class="student-final-evaluation" id="student-final-evaluation">
-                    <div class="final-modal-header">
-                        <h3>Final Evaluation</h3>
-                        <button id="closeFinalEvaluation" class="modal-close">&times;</button>
+                <div class="modal-body" id="finalEvaluationContent">
+
+                    <div class="loading-state" id="evalLoading">
+                        Loading evaluation...
                     </div>
 
-                    <div class="modal-body" id="finalEvaluationContent">
+                    <div class="evaluation-wrapper" id="evaluationWrapper" style="display:none;">
 
-                        <div class="loading-state" id="evalLoading">
-                            Loading evaluation...
+                        <div class="eval-header">
+                            <div class="student-header compact">
+                                <div class="student-avatar" id="evalAvatar"></div>
+                                <div>
+                                    <h3 id="evalName"></h3>
+                                    <p id="evalID"></p>
+                                </div>
+                            </div>
+
+                            <div class="final-pill" id="finalScore"></div>
                         </div>
 
-                        <div class="evaluation-wrapper" id="evaluationWrapper" style="display:none;">
+                        <div class="evaluation-grid">
 
-                            <div class="eval-header">
-                                <div class="student-header compact">
-                                    <div class="student-avatar" id="evalAvatar"></div>
-                                    <div>
-                                        <h3 id="evalName"></h3>
-                                        <p id="evalID"></p>
-                                    </div>
+
+                            <div class="eval-card">
+                                <div class="final-section-title">Performance</div>
+
+                                <div class="mini-score-grid">
+                                    <div>Attendance <span id="attendanceScore"></span></div>
+                                    <div>Reports <span id="progressScore"></span></div>
+                                    <div>Tasks <span id="taskScore"></span></div>
                                 </div>
-
-                                <div class="final-pill" id="finalScore"></div>
                             </div>
 
-                          <div class="evaluation-grid">
-    
-                            
-                                <div class="eval-card">
-                                    <div class="final-section-title">Performance</div>
 
-                                    <div class="mini-score-grid">
-                                        <div>Attendance <span id="attendanceScore"></span></div>
-                                        <div>Reports <span id="progressScore"></span></div>
-                                        <div>Tasks <span id="taskScore"></span></div>
-                                    </div>
+                            <div class="eval-card">
+                                <div class="final-section-title">
+                                    Tasks
+                                    <button class="toggle-btn" onclick="toggleTasks()">View</button>
                                 </div>
 
-                    
-                                <div class="eval-card">
-                                    <div class="final-section-title">
-                                        Tasks 
-                                        <button class="toggle-btn" onclick="toggleTasks()">View</button>
-                                    </div>
-
-                                    <div class="task-list-compact collapsed" id="taskList"></div>
-                                </div>
-
-                            </div>
-
-                            <div class="recommendation-box" id="recommendationBox"></div>
-
-                           <div class="final-section-title">Supervisor Evaluation</div>
-
-                                <div class="soft-skill-grid">
-
-                                    <div class="skill-card">
-                                        <div class="skill-header">
-                                            <span>Work Ethics</span>
-                                            <span id="ethicsValue">0%</span>
-                                        </div>
-                                        <input type="range" min="0" max="100" value="0" id="ethicsRating">
-                                        <div class="skill-labels">
-                                            <span>Poor</span>
-                                            <span>Excellent</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="skill-card">
-                                        <div class="skill-header">
-                                            <span>Communication</span>
-                                            <span id="communicationValue">0%</span>
-                                        </div>
-                                        <input type="range" min="0" max="100" value="0" id="communicationRating">
-                                        <div class="skill-labels">
-                                            <span>Weak</span>
-                                            <span>Strong</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="skill-card">
-                                        <div class="skill-header">
-                                            <span>Initiative</span>
-                                            <span id="initiativeValue">0%</span>
-                                        </div>
-                                        <input type="range" min="0" max="100" value="0" id="initiativeRating">
-                                        <div class="skill-labels">
-                                            <span>Passive</span>
-                                            <span>Proactive</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="skill-card">
-                                        <div class="skill-header">
-                                            <span>Discipline</span>
-                                            <span id="disciplineValue">0%</span>
-                                        </div>
-                                        <input type="range" min="0" max="100" value="0" id="disciplineRating">
-                                        <div class="skill-labels">
-                                            <span>Low</span>
-                                            <span>High</span>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            <div class="final-section-title">Supervisor Final Evaluation</div>
-
-                           <div class="final-eval-card">
-
-                                <div class="eval-field">
-                                    <label>Overall Remarks</label>
-                                    <textarea id="finalRemarks" placeholder="Write detailed evaluation of student's performance..."></textarea>
-                                </div>
-
-                                <div class="eval-field">
-                                    <label>Final Recommendation</label>
-                                    <select id="finalRecommendation">
-                                        <option value="EXCELLENT">Excellent - Recommended for employment</option>
-                                        <option value="VERY GOOD">Very Good - Approved</option>
-                                        <option value="SATISFACTORY">Satisfactory - Passed</option>
-                                        <option value="NEEDS IMPROVEMENT">Needs Improvement</option>
-                                        <option value="FAILED">Failed</option>
-                                    </select>
-                                </div>
-
-                            </div>
-
-                          
-
-                           <div class="evaluation-actions">
-                                <button class="save-btn" onclick="saveFinalEvaluation()">
-                                    Finalize Evaluation
-                                </button>
+                                <div class="task-list-compact collapsed" id="taskList"></div>
                             </div>
 
                         </div>
 
+                        <div class="recommendation-box" id="recommendationBox"></div>
+
+                        <div class="final-section-title">Supervisor Evaluation</div>
+
+                        <div class="soft-skill-grid">
+
+                            <div class="skill-card">
+                                <div class="skill-header">
+                                    <span>Work Ethics</span>
+                                    <span id="ethicsValue">0%</span>
+                                </div>
+                                <input type="range" min="0" max="100" value="0" id="ethicsRating">
+                                <div class="skill-labels">
+                                    <span>Poor</span>
+                                    <span>Excellent</span>
+                                </div>
+                            </div>
+
+                            <div class="skill-card">
+                                <div class="skill-header">
+                                    <span>Communication</span>
+                                    <span id="communicationValue">0%</span>
+                                </div>
+                                <input type="range" min="0" max="100" value="0" id="communicationRating">
+                                <div class="skill-labels">
+                                    <span>Weak</span>
+                                    <span>Strong</span>
+                                </div>
+                            </div>
+
+                            <div class="skill-card">
+                                <div class="skill-header">
+                                    <span>Initiative</span>
+                                    <span id="initiativeValue">0%</span>
+                                </div>
+                                <input type="range" min="0" max="100" value="0" id="initiativeRating">
+                                <div class="skill-labels">
+                                    <span>Passive</span>
+                                    <span>Proactive</span>
+                                </div>
+                            </div>
+
+                            <div class="skill-card">
+                                <div class="skill-header">
+                                    <span>Discipline</span>
+                                    <span id="disciplineValue">0%</span>
+                                </div>
+                                <input type="range" min="0" max="100" value="0" id="disciplineRating">
+                                <div class="skill-labels">
+                                    <span>Low</span>
+                                    <span>High</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="final-section-title">Supervisor Final Evaluation</div>
+
+                        <div class="final-eval-card">
+
+                            <div class="eval-field">
+                                <label>Overall Remarks</label>
+                                <textarea id="finalRemarks" placeholder="Write detailed evaluation of student's performance..."></textarea>
+                            </div>
+
+                            <div class="eval-field">
+                                <label>Final Recommendation</label>
+                                <select id="finalRecommendation">
+                                    <option value="EXCELLENT">Excellent - Recommended for employment</option>
+                                    <option value="VERY GOOD">Very Good - Approved</option>
+                                    <option value="SATISFACTORY">Satisfactory - Passed</option>
+                                    <option value="NEEDS IMPROVEMENT">Needs Improvement</option>
+                                    <option value="FAILED">Failed</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="evaluation-actions">
+                            <button class="save-btn" onclick="saveFinalEvaluation()">
+                                Finalize Evaluation
+                            </button>
+                        </div>
+
                     </div>
 
                 </div>
+
+            </div>
 
             <!-- view final evaluation -->
             <div class="final-evaluation-view" id="final-evaluation-view">
                 <div class="evaluation-view-header">
-                        <h3>Evaluation Report</h3>
-                        <div class="evaluation-header-actions">
-                            <button class="download-report-btn" onclick="downloadEvaluationReport()">
-                                <i class="bi bi-download"></i>
-                            </button>
+                    <h3>Evaluation Report</h3>
+                    <div class="evaluation-header-actions">
+                        <button class="download-report-btn" onclick="downloadEvaluationReport()">
+                            <i class="bi bi-download"></i>
+                        </button>
 
-                            <button id="closeFinalEvaluationView" class="modal-close">&times;</button>
-                        </div>
+                        <button id="closeFinalEvaluationView" class="modal-close">&times;</button>
                     </div>
+                </div>
 
-                  <div class="evaluation-view-body" id="finalEvaluationReportBody">
+                <div class="evaluation-view-body" id="finalEvaluationReportBody">
 
-                        
-                        <div class="evaluation-hero-view">
 
-                            <div class="evaluation-hero-info-view">
-                                <h2 id="reportStudentName">Student Name</h2>
-                                <p id="reportStudentID">Student ID</p>
-                            </div>
+                    <div class="evaluation-hero-view">
 
-                            <div class="evaluation-score-badge-view" id="reportFinalScore">
-                                0%
-                            </div>
-
+                        <div class="evaluation-hero-info-view">
+                            <h2 id="reportStudentName">Student Name</h2>
+                            <p id="reportStudentID">Student ID</p>
                         </div>
 
-                        <div class="evaluation-metrics-view">
-
-                            <div class="metric-card-view">
-                                <span class="metric-label-view">Attendance</span>
-                                <span class="metric-value-view" id="reportAttendance">0%</span>
-                            </div>
-
-                            <div class="metric-card-view">
-                                <span class="metric-label-view">Reports</span>
-                                <span class="metric-value-view" id="reportProgress">0%</span>
-                            </div>
-
-                            <div class="metric-card-view">
-                                <span class="metric-label-view">Tasks</span>
-                                <span class="metric-value-view" id="reportTasks">0%</span>
-                            </div>
-
-                        </div>
-
-                        <div class="section-title-view">Supervisor Ratings</div>
-
-                        <div class="ratings-grid-view">
-
-                            <div class="rating-item-view">
-                                <span>Work Ethics</span>
-                                <strong id="rEthics">0</strong>
-                            </div>
-
-                            <div class="rating-item-view">
-                                <span>Communication</span>
-                                <strong id="rCommunication">0</strong>
-                            </div>
-
-                            <div class="rating-item-view">
-                                <span>Initiative</span>
-                                <strong id="rInitiative">0</strong>
-                            </div>
-
-                            <div class="rating-item-view">
-                                <span>Discipline</span>
-                                <strong id="rDiscipline">0</strong>
-                            </div>
-
-                        </div>
-
-                                <div class="section-title-view">Final Recommendation</div>
-
-                                <div class="card-view">
-                                    <h4 id="rRecommendationTitle"></h4>
-                                    <p id="rRecommendationText"></p>
-                                </div>
-                            
-                        <div class="section-title-view">Remarks</div>
-
-                        <div class="card-view">
-                            <p id="rRemarks"></p>
+                        <div class="evaluation-score-badge-view" id="reportFinalScore">
+                            0%
                         </div>
 
                     </div>
+
+                    <div class="evaluation-metrics-view">
+
+                        <div class="metric-card-view">
+                            <span class="metric-label-view">Attendance</span>
+                            <span class="metric-value-view" id="reportAttendance">0%</span>
+                        </div>
+
+                        <div class="metric-card-view">
+                            <span class="metric-label-view">Reports</span>
+                            <span class="metric-value-view" id="reportProgress">0%</span>
+                        </div>
+
+                        <div class="metric-card-view">
+                            <span class="metric-label-view">Tasks</span>
+                            <span class="metric-value-view" id="reportTasks">0%</span>
+                        </div>
+
+                    </div>
+
+                    <div class="section-title-view">Supervisor Ratings</div>
+
+                    <div class="ratings-grid-view">
+
+                        <div class="rating-item-view">
+                            <span>Work Ethics</span>
+                            <strong id="rEthics">0</strong>
+                        </div>
+
+                        <div class="rating-item-view">
+                            <span>Communication</span>
+                            <strong id="rCommunication">0</strong>
+                        </div>
+
+                        <div class="rating-item-view">
+                            <span>Initiative</span>
+                            <strong id="rInitiative">0</strong>
+                        </div>
+
+                        <div class="rating-item-view">
+                            <span>Discipline</span>
+                            <strong id="rDiscipline">0</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="section-title-view">Final Recommendation</div>
+
+                    <div class="card-view">
+                        <h4 id="rRecommendationTitle"></h4>
+                        <p id="rRecommendationText"></p>
+                    </div>
+
+                    <div class="section-title-view">Remarks</div>
+
+                    <div class="card-view">
+                        <p id="rRemarks"></p>
+                    </div>
+
+                </div>
             </div>
 
             <!-- download final evaluation -->
-             <!-- <div class="download-final-evaluation" id="download-final-evaluation">
+            <!-- <div class="download-final-evaluation" id="download-final-evaluation">
 
              </div> -->
 
@@ -732,7 +734,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                                 <div class="list-box" id="taskStudentList">
                                     <?php
                                     $search =  $_POST['search'] ?? '';
-                                    echo renderTaskAssignStudentList($conn, $superID, $search); 
+                                    echo renderTaskAssignStudentList($conn, $superID, $search);
                                     ?>
                                 </div>
                             </div>
@@ -794,10 +796,10 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
             <!-- supervisor dashboard -->
             <section class="supervisor-dashboard" id="supervisor-dashboard">
-                <div class="title-block-bot">
+                <!-- <div class="title-block-bot">
                     <h2>Supervisor Dashboard</h2>
                     <p>Monitor student OJT progress and pending tasks</p>
-                </div>
+                </div> -->
 
                 <!-- cards -->
                 <section class="cards">
@@ -928,72 +930,72 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                     </section>
 
-                    
+
 
                     <!-- <section class="wrapper pie-chart">
                         <h2>Overall Attendance Distribution</h2>
                         <canvas id="pieChart"></canvas>
                     </section> -->
 
-                 
-                        <section class="wrapper pie-chart">
-                            <div class="chart-header">
+
+                    <section class="wrapper pie-chart">
+                        <div class="chart-header">
                             <div class="chart-title">
                                 <div>
                                     <h2>Overall Attendance</h2>
                                     <p>Distribution across all assigned students</p>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="pie-container">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+
+                    </section>
+
+                    <section class="quick-action-container">
+                        <div class="quick-action-header">
+                            <div class="quick-action-title">
+                                <h2>Quick Actions</h2>
+                                <p>Instant system tools & shortcuts</p>
                             </div>
+                        </div>
 
-                            <div class="pie-container">
-                                <canvas id="pieChart"></canvas>
-                            </div>
+                        <div class="quick-action-grid">
+                            <button onclick="openCreateTask()">
+                                <i class="bi bi-person-plus-fill"></i>
+                                <span>Create Task</span>
+                            </button>
 
-                        </section>
+                            <button onclick="openRfid()">
+                                <i class="bi bi-broadcast-pin"></i>
+                                <span>RFID</span>
+                            </button>
 
-                        <section class="quick-action-container">
-                                <div class="quick-action-header">
-                                    <div class="quick-action-title">
-                                        <h2>Quick Actions</h2>
-                                        <p>Instant system tools & shortcuts</p>
-                                    </div>
-                                </div>
+                            <button id="darkModeToggle" class="dark-toggle">
+                                <i class="bi bi-moon-fill"></i>
+                                <span>Darkmode</span>
+                            </button>
 
-                                <div class="quick-action-grid">
-                                    <button onclick="openCreateTask()">
-                                        <i class="bi bi-person-plus-fill"></i>
-                                        <span>Create Task</span>
-                                    </button>
+                            <button onclick="generateReport()">
+                                <i class="bi bi-bar-chart-fill"></i>
+                                <span>Reports</span>
+                            </button>
 
-                                    <button onclick="openRfid()">
-                                    <i class="bi bi-broadcast-pin"></i>
-                                        <span>RFID</span>
-                                    </button>
+                            <button onclick="openStudents()">
+                                <i class="bi bi-people-fill"></i>
+                                <span>Students</span>
+                            </button>
 
-                                    <button id="darkModeToggle" class="dark-toggle">
-                                        <i class="bi bi-moon-fill"></i>
-                                        <span>Darkmode</span>
-                                    </button>
+                            <button onclick="openLogs()">
+                                <i class="bi bi-journal-text"></i>
+                                <span>Logs</span>
+                            </button>
 
-                                    <button onclick="generateReport()">
-                                        <i class="bi bi-bar-chart-fill"></i>
-                                        <span>Reports</span>
-                                    </button>
+                        </div>
+                    </section>
 
-                                    <button onclick="openStudents()">
-                                        <i class="bi bi-people-fill"></i>
-                                        <span>Students</span>
-                                    </button>
-
-                                    <button onclick="openLogs()">
-                                        <i class="bi bi-journal-text"></i>
-                                        <span>Logs</span>
-                                    </button>
-
-                                </div>
-                            </section>
-                   
                     <section class="wrapper bar-chart">
                         <div class="chart-header">
                             <div class="chart-title">
@@ -1005,7 +1007,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     </section>
                 </section>
 
-                
+
                 <div class="dashboard-bottom">
                     <!-- ALERTS -->
                     <div class="alerts-container">
@@ -1155,14 +1157,14 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                             <div class="filter-group">
 
-                            <select id="taskStatusFilter">
-                                <option value="">All Status</option>
-                                <option value="NOT STARTED">Not started</option>
-                                <option value="IN PROGRESS">In progress</option>
-                                <option value="SUBMITTED">Submitted</option>
-                                <option value="REJECTED">Rejected</option>
-                                <option value="APPROVED">Approved</option>
-                            </select>
+                                <select id="taskStatusFilter">
+                                    <option value="">All Status</option>
+                                    <option value="NOT STARTED">Not started</option>
+                                    <option value="IN PROGRESS">In progress</option>
+                                    <option value="SUBMITTED">Submitted</option>
+                                    <option value="REJECTED">Rejected</option>
+                                    <option value="APPROVED">Approved</option>
+                                </select>
 
                             </div>
 
@@ -1251,12 +1253,12 @@ $superID = getSupervisorIDByUserID($conn, $userID);
             </section>
 
             <!-- student attendances -->
-             <section class="supervisor-attendance" id="supervisor-attendance">
-                    <div class="title-block-bot">
-                        <h2>Student Attendance</h2>
-                        <p>Monitor student attendance records and time logs.</p>
-                    </div>
-                  <div class="top-bar">
+            <section class="supervisor-attendance" id="supervisor-attendance">
+                <div class="title-block-bot">
+                    <h2>Student Attendance</h2>
+                    <p>Monitor student attendance records and time logs.</p>
+                </div>
+                <div class="top-bar">
 
                     <div class="top-header">
                         <h3 class="table-title">Attendance</h3>
@@ -1267,11 +1269,10 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                         <div class="search-container">
                             <i class="bi bi-search search-icon"></i>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 id="studentAttendanceSearch"
-                                placeholder="Search by Student ID, Name, or RFID"
-                            >
+                                placeholder="Search by Student ID, Name, or RFID">
                         </div>
 
                         <div class="filter-group">
@@ -1294,32 +1295,32 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     </div>
                 </div>
 
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>RFID</th>
-                                    <th>Date</th>
-                                    <th>Time in</th>
-                                    <th>Time out</th>
-                                    <th>Status</th>
-                                    <th>Total hours</th>
-                                    <th>Remarks</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>RFID</th>
+                                <th>Date</th>
+                                <th>Time in</th>
+                                <th>Time out</th>
+                                <th>Status</th>
+                                <th>Total hours</th>
+                                <th>Remarks</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
 
-                            <tbody id="studentAttendanceBody">
-                                <?php
-                                $search = $_POST['search'] ?? '';
-                                $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
-                                $dateToAttendance = $_POST['dateToAttendance'] ?? '';
-                                echo renderStudentMainAttendance($conn, $superID, $search, $dateFromAttendance, $dateToAttendance);
-                                ?>
-                            </tbody>
-                        </table>
-                    </div>
-             </section>
+                        <tbody id="studentAttendanceBody">
+                            <?php
+                            $search = $_POST['search'] ?? '';
+                            $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
+                            $dateToAttendance = $_POST['dateToAttendance'] ?? '';
+                            echo renderStudentMainAttendance($conn, $superID, $search, $dateFromAttendance, $dateToAttendance);
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
             <!-- reports evaluation -->
             <section class="supervisor-evaluation" id="supervisor-evaluation">
@@ -1353,7 +1354,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
             </section>
 
             <!-- activity logs -->
-             <div class="supervisor-activity" id="supervisor-activity">
+            <div class="supervisor-activity" id="supervisor-activity">
                 <div class="top-bar">
 
                     <div class="top-header">
@@ -1421,7 +1422,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                 </div>
 
-             </div>
+            </div>
 
             <!-- <div id="imagePreviewModal" class="image-modal">
                 <span id="closeImagePreview">&times;</span>
@@ -1516,7 +1517,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
         inactivityTimer = setTimeout(() => {
             startCountdown();
-        }, 600000); 
+        }, 600000);
     }
 
     function stayLoggedIn() {
@@ -1534,8 +1535,8 @@ $superID = getSupervisorIDByUserID($conn, $userID);
     document.onkeypress = resetTimer;
     document.onclick = resetTimer;
     document.onscroll = resetTimer;
-
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../../js/supervisor/supervisorDashboard.js"></script>
+
 </html>

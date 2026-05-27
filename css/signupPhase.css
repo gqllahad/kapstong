@@ -30,24 +30,18 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: linear-gradient(
+    /* background: linear-gradient(
         135deg,
         var(--bg-primary),
         var(--sec-primary)
-    );
+    ); */
+    background: #111827;
     color: var(--dark);
     line-height: 1.6;
     padding-top: 72px;
     overflow-x: hidden;
     text-align: center;
     width: 100%;
-
-    background: linear-gradient(
-    135deg,
-    #f0f7ff 0%,
-    #e6f0ff 50%,
-    #dbeafe 100%
-  );
 
   margin: 0;         
 }
@@ -60,12 +54,14 @@ body {
     text-align: center;
     width: 100%;
     padding: 0 15px;
+   
 }
 
 .content {
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
+  
 }
 
 .sign-logo {
@@ -181,22 +177,32 @@ hr {
 }
 
 /* inputs */
-.gender-group{
-  color: var(--front-text);
+
+
+.required-field span::after{
+    content: " *";
+    color: #EF4444;
 }
 
 .sign-box{
-    margin: 20px 0;
+    /* margin: 20px 0;
     position: relative;
     width: 100%;
     min-width: unset;
     background: transparent;
     border-radius: 10px;
-    box-sizing: border-box;   
+    box-sizing: border-box;    */
+    margin: 0 0 1rem 0;
+    position: relative;
+    width: 100%;
+    min-width: unset;
+    background: transparent;
+    border-radius: 10px;
+    box-sizing: border-box;
 }
 
 .sign-box span{
-    position: absolute;
+    /* position: absolute;
     color: var(--front-text);
     top: 50%;
     left: 7%;
@@ -205,11 +211,21 @@ hr {
     font-size: 1rem;
     font-weight: 600;
     padding: 0 4px;
+    transition: 0.3s ease; */
+     position: absolute;
+    left: 14px;
+    color: #8A98BC;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 0.9rem;
+    padding: 0 4px;
     transition: 0.3s ease;
+    background: transparent;
 }
 
 .sign-box input, .sign-box select{
-    width: 100%;
+    /* width: 100%;
     min-width: unset;
     height: 50px;
     background: var(--light);
@@ -219,7 +235,19 @@ hr {
     text-align: left;
     padding-left: 14px;
     font-size: 1.1rem;
+    outline: none; */
+    width: 100%;
+    height: 50px;
+    background: #0d1224;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 11px;
+    box-sizing: border-box;
+    text-align: left;
+    padding-left: 14px;
+    font-size: 0.95rem;
     outline: none;
+    color: #E8EDF8;
+    transition: border-color 0.2s ease;
 }
 
 .sign-box.lastName input{
@@ -227,47 +255,78 @@ hr {
 }
 
 .sign-box.birthdate input:not(:placeholder-shown) ~ span {
-    color: var(--front-text);
-    transform: translate(-20px, -55px);
+    font-size: 0.75rem;
+    color: #3B82F6;
+    font-weight: 600;
+    background: #111827;
+    padding: 0 6px;
+    transform: translate(-4px, -38px);
 }
 
 .sign-box input:not([type="date"]):focus ~ span,
-.sign-box input:not([type="date"]):valid ~ span,
 .sign-box input:not([type="date"]):not(:placeholder-shown) ~ span{
-    transform: translate(-20px, -55px);
+    /* transform: translate(-20px, -55px);
     font-size: 1rem;
-    color: var(--primary);
+    color: var(--primary); */
+     transform: translate(-4px, -38px);
+    font-size: 0.75rem;
+    color: #3B82F6;
+    font-weight: 600;
+    background: #111827;
+    padding: 0 6px;
 }
 
 .sign-box input[type="date"]:focus ~ span,
 .sign-box input[type="date"].has-value ~ span {
-    transform: translate(-20px, -55px);
+    /* transform: translate(-20px, -55px);
     font-size: 1rem;
-    color: var(--primary);
+    color: var(--primary); */
+     transform: translate(-4px, -38px);
+    font-size: 0.75rem;
+    color: #3B82F6;
+    font-weight: 600;
+    background: #111827;
+    padding: 0 6px;
 }
 
 .sign-box select:focus ~ span,
 .sign-box select:not([value=""]) ~ span {
-    transform: translate(-20px, -55px);
+    /* transform: translate(-20px, -55px);
     font-size: 1rem;
-    color: var(--front-text);
+    color: var(--front-text); */
+    transform: translate(-4px, -38px);
+    font-size: 0.75rem;
+    color: #3B82F6;
+    font-weight: 600;
+    background: #111827;
+    padding: 0 6px;
 }
 
 .sign-box select:focus ~ span,
 .sign-box select.has-value ~ span {
-    transform: translate(-20px, -55px);
+    /* transform: translate(-20px, -55px);
     font-size: 1rem;
-    color: var(--primary);
+    color: var(--primary); */
+    transform: translate(-4px, -38px);
+    font-size: 0.75rem;
+    color: #3B82F6;
+    font-weight: 600;
+    background: #111827;
+    padding: 0 6px;
 }
 
-.sign-box input:focus, .sign-box input:valid, .sign-box select:focus, .sign-box select:valid {
+.sign-box input:focus, .sign-box select:focus, .sign-box select:valid {
     border: 1px solid var(--primary);
 }
 
 .sign-box.studentID.id-taken span, .sign-box.studentEmail.email-taken span, .sign-box.lastName.name-error span, .sign-box.firstName.name-error span, .sign-box.middleName.name-error span,.sign-box.studentMobile.errorMobile span{
-    transform: translate(-20px, -55px);
+    /* transform: translate(-20px, -55px);
     font-size: 1rem;
+    color: var(--declined-color); */
+    transform: translate(-4px, -38px);
+    font-size: 0.75rem;
     color: var(--declined-color);
+    background: #111827;
 }
 
 .sign-box.studentEmail.email-taken input, .sign-box.studentID.id-taken input {
@@ -275,7 +334,7 @@ hr {
 }
 
  .sign-box.username span{
-    transform: translate(-5px, -50px);
+    transform: translate(-4px, -38px);
     font-size: 1rem;
     color: var(--primary);
 }
@@ -285,7 +344,7 @@ hr {
 }
 
 .password-wrapper input {
-    padding-right: 40px; /* space for icon */
+    padding-right: 40px; 
 }
 
 .toggle-pass {
@@ -311,27 +370,6 @@ hr {
     color: var(--primary);
     font-weight: 600;
     font-size: 1.3rem;
-}
-
-.gender-options {
-    display: flex;
-    justify-content : center;
-    gap: 2rem; 
-}
-
-.gender-option {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.8rem;
-    cursor: pointer;
-    font-size: 1.3rem;
-    margin: 2% 0;
-}
-
-.gender-option input[type="radio"] {
-    width: 20px;
-    height: 20px;
 }
 
 /* quick notif */
@@ -396,12 +434,13 @@ hr {
 
 .sign-box.birth-error input {
     border: 1px solid var(--declined-color);
-    background-color: #fff5f5;
+    color: var(--declined-color);
+    background: #111827;
 }
 
 .sign-box.tel-error input {
     border: 1px solid var(--declined-color);
-    background-color: #fff5f5;
+    background: #111827;
 }
 
 .next-button, .back-button {
@@ -441,40 +480,88 @@ hr {
 .loading-screen {
     position: fixed;
     inset: 0;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(6px);
-
+    background: rgba(10, 15, 30, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+ 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
+ 
     z-index: 99999;
-
+ 
     opacity: 0;
     pointer-events: none;
-    transition: 0.3s ease;
+    transition: opacity 0.3s ease;
 }
-
+ 
 .loading-screen.show {
     opacity: 1;
     pointer-events: all;
 }
-
-.loader {
-    width: 55px;
-    height: 55px;
-    border: 5px solid #dbeafe;
-    border-top: 5px solid #2563eb;
-    border-radius: 50%;
-    animation: spin 0.9s linear infinite;
-    margin-bottom: 15px;
+ 
+.logo-loader {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-
+ 
+.logo-loader::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.06);
+    border-top: 3px solid #F5C518;
+    border-right: 3px solid rgba(245, 197, 24, 0.3);
+    animation: spin 1s linear infinite;
+}
+ 
+.logo-img-loading {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    object-fit: cover;
+    z-index: 2;
+    background: #0d1224;
+    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+ 
 .loading-screen p {
-    font-size: 1rem;
-    color: #2563eb;
+    font-size: 0.875rem;
+    color: #8A98BC;
     font-weight: 600;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-top: 18px;
+    letter-spacing: 0.5px;
+}
+ 
+.loading-dots {
+    display: inline-flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+ 
+.loading-dots span {
+    width: 5px;
+    height: 5px;
+    background: #F5C518;
+    border-radius: 50%;
+    animation: dotBounce 1.2s ease-in-out infinite;
+}
+ 
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+ 
+@keyframes dotBounce {
+    0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+    40%            { opacity: 1;    transform: scale(1.2); }
 }
 
 /* animations */

@@ -4,9 +4,9 @@ session_start();
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '../PHPMailer/src/PHPMailer.php';
-require '../PHPMailer/src/SMTP.php';
-require '../PHPMailer/src/Exception.php';
+require '../../PHPMailer/src/PHPMailer.php';
+require '../../PHPMailer/src/SMTP.php';
+require '../../PHPMailer/src/Exception.php';
 
 header('Content-Type: application/json');
 
@@ -54,7 +54,6 @@ try {
         "status" => "success",
         "message" => "OTP resent successfully"
     ]);
-
 } catch (Exception $e) {
 
     echo json_encode([
@@ -62,4 +61,3 @@ try {
         "message" => "Failed to send OTP"
     ]);
 }
-?>

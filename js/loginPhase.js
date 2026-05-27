@@ -106,7 +106,7 @@ forgotPasswordLink.addEventListener("click", (e) => {
 
     setTimeout(() => {
 
-        window.location.href ="forgotPassword.php";
+        window.location.href ="forgot_password_function/forgotPassword.php";
 
     }, 1000);
 

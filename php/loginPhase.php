@@ -34,9 +34,8 @@ if (isset($_GET['success_forget'])) {
   <link rel="icon" type="image/png" href="../kapstongImage/logo.jpg">
   <link rel="stylesheet" href="../css/loginPhase.css" />
   <link
-  href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
-  rel='stylesheet'
->
+    href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
+    rel='stylesheet'>
   <meta name="description" content="Kapstong for you and me!" />
 </head>
 
@@ -105,136 +104,194 @@ if (isset($_GET['success_forget'])) {
 
   <section class="log-start" id="log-start">
 
-  <div class="hero-overlay"></div>
+    <div class="hero-overlay"></div>
 
-  <div class="container hero-grid">
+    <div class="container hero-grid">
 
-    <div class="hero-left scroll-reveal">
+      <div class="hero-left scroll-reveal">
 
-      <span class="hero-tag">
-        RFID-Powered Attendance Monitoring
-      </span>
+        <span class="hero-tag">
+          RFID-Powered Attendance Monitoring
+        </span>
 
-      <h1 class="hero-title">
-        Granby OJT <br>
-        <span>Monitoring System</span>
-      </h1>
+        <h1 class="hero-title">
+          Granby OJT <br>
+          <span>Monitoring System</span>
+        </h1>
 
-      <p class="hero-desc">
+        <p class="hero-desc">
           A modern web-based platform designed to simplify attendance monitoring,
           RFID tracking, and OJT management for students, coordinators, and administrators
           with real-time and secure record handling.
-      </p>
+        </p>
 
-      <div class="hero-buttons">
+        <div class="hero-buttons">
 
-        <button class="primary-btn">
-          Get Started
-        </button>
+          <button class="primary-btn">
+            Get Started
+          </button>
 
 
-      </div>
+        </div>
 
-     
 
-    </div>
-
-    <div class="hero-right">
-
-      <div class="rfid-visual">
-
-        <div class="glow-circle"></div>
-        <img src="../kapstongImage/Gemini_Generated_Image_2p2ovf2p2ovf2p2o.png" alt="System Symbol" class="hero-symbol">
-        <!-- <div class="floating-card card1"></div>
-        <div class="floating-card card2"></div> -->
 
       </div>
 
+      <!-- <div class="hero-right">
+
+        <div class="rfid-visual">
+
+          <div class="glow-circle"></div>
+          <img src="../kapstongImage/Gemini_Generated_Image_2p2ovf2p2ovf2p2o.png" alt="System Symbol" class="hero-symbol">
+          <div class="floating-card card1"></div>
+        <div class="floating-card card2"></div>
+
+        </div>
+
+      </div> -->
+
+      <div class="hero-right">
+
+        <div class="rfid-visual">
+
+          <div class="glow-circle"></div>
+
+          <div class="rfid-card">
+
+            <div class="card-noise"></div>
+
+            <div class="card-top">
+
+              <div class="brand">
+
+                <div class="logo">
+                  <img src="../kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
+                </div>
+
+
+              </div>
+
+              <div class="card-middle">
+
+                <div class="student-id">
+                  <small>Student Access</small>
+
+                  <h4>Peter Parker</h4>
+                  <h3>GRB-2026-0001</h3>
+                </div>
+
+              </div>
+
+              <div class="rfid-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+
+            </div>
+
+
+
+            <div class="card-bottom">
+
+              <div class="blue-strip"></div>
+
+              <span>ACCESS • CONNECT • SECURE</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
 
-  </div>
-
-</section>
+  </section>
 
   <hr />
 
   <section class="log-hows" id="log-hows">
-  <div class="container scroll-reveal">
+    <div class="hows-overlay"></div>
+    <div class="container scroll-reveal">
 
-    <span class="section-tag">System Workflow</span>
 
-    <h2>How the OJT Tracking System Works</h2>
+      <span class="section-tag">System Workflow</span>
 
-    <p class="how-subtitle">
-      The system streamlines student attendance and OJT monitoring through
-      RFID technology, providing a faster and more reliable workflow for
-      administrators, coordinators, and students.
-    </p>
+      <h1>How the OJT Monitoring System <br> Works</h1>
 
-    <div class="how-container">
+      <p class="how-subtitle">
+        The system streamlines student attendance and OJT monitoring through
+        RFID technology, providing a faster and more reliable workflow for
+        administrators, coordinators, and students.
+      </p>
 
-      <div class="how-individual">
+      <div class="how-container">
 
-        <div class="step-number">01</div>
+        <div class="how-individual">
 
-        <div class="how-image register"></div>
+          <div class="step-number">01</div>
 
-        <h3>RFID Student Registration</h3>
+          <div class="how-image register"></div>
 
-        <p class="how-text">
-          Students are registered into the system with their assigned RFID cards
-          and verified OJT information for secure attendance monitoring.
-        </p>
+          <h3>RFID Student Registration</h3>
+
+          <p class="how-text">
+            Students are registered into the system with their assigned RFID cards
+            and verified OJT information for secure attendance monitoring.
+          </p>
+
+        </div>
+
+        <div class="how-individual">
+
+          <div class="step-number">02</div>
+
+          <div class="how-image progress"></div>
+
+          <h3>Real-Time Attendance Tracking</h3>
+
+          <p class="how-text">
+            Students scan their RFID cards to automatically record attendance,
+            time-in, and time-out activities in real time.
+          </p>
+
+        </div>
+
+        <div class="how-individual">
+
+          <div class="step-number">03</div>
+
+          <div class="how-image reports"></div>
+
+          <h3>Monitoring & Reports</h3>
+
+          <p class="how-text">
+            Coordinators and administrators can monitor student records,
+            evaluate attendance, and generate performance reports efficiently.
+          </p>
+
+        </div>
 
       </div>
-
-      <div class="how-individual">
-
-        <div class="step-number">02</div>
-
-        <div class="how-image progress"></div>
-
-        <h3>Real-Time Attendance Tracking</h3>
-
-        <p class="how-text">
-          Students scan their RFID cards to automatically record attendance,
-          time-in, and time-out activities in real time.
-        </p>
-
-      </div>
-
-      <div class="how-individual">
-
-        <div class="step-number">03</div>
-
-        <div class="how-image reports"></div>
-
-        <h3>Monitoring & Reports</h3>
-
-        <p class="how-text">
-          Coordinators and administrators can monitor student records,
-          evaluate attendance, and generate performance reports efficiently.
-        </p>
-
-      </div>
-
     </div>
-  </div>
-</section>
+  </section>
 
   <hr />
 
   <section class="log-container" id="log-container">
 
-    <div
+    <!-- <div
       class="container scroll-reveal"
       id="sign-container"
       style="text-align: left; margin: 0 5%">
 
       <span class="section-tag">
-         Student & Administrator Login
+        Student & Administrator Login
       </span>
-      
+
       <h1>Don't have an account?</h1>
       <p>If your an OJT student, Signup now!</p>
       <button id="ls-switch" class="ls-switch">Sign Up</button>
@@ -258,11 +315,11 @@ if (isset($_GET['success_forget'])) {
           </div>
         </div>
 
-       <div class="login-forget">
+        <div class="login-forget">
 
-            <a href="#" id="forgotPasswordLink">
-                Forgot Password?
-            </a>
+          <a href="#" id="forgotPasswordLink">
+            Forgot Password?
+          </a>
 
         </div>
 
@@ -275,84 +332,173 @@ if (isset($_GET['success_forget'])) {
         </div>
 
       </div>
+    </form> -->
+
+    <div
+      class="container scroll-reveal"
+      id="sign-container"
+      style="text-align: left; margin: 0 5%">
+
+      <!-- <span class="section-tag-login">
+        <span class="section-tag-dot"></span>
+        OJT Monitoring System
+      </span> -->
+
+      <h1>New here?<br>Join <span>Granby</span><br>OJT System.</h1>
+
+      <p>Create your student account to start tracking your OJT hours, attendance, and performance — all in one place.</p>
+
+      <ul class="sign-feature-list">
+        <li class="sign-feature-item">
+          <span class="sign-feature-icon"><i class='bx bx-wifi'></i></span>
+          RFID tap-to-log attendance
+        </li>
+        <li class="sign-feature-item">
+          <span class="sign-feature-icon"><i class='bx bx-time-five'></i></span>
+          Automatic time-in &amp; time-out
+        </li>
+        <li class="sign-feature-item">
+          <span class="sign-feature-icon"><i class='bx bx-bar-chart-alt-2'></i></span>
+          Live performance tracking
+        </li>
+      </ul>
+
+      <div class="sign-divider"></div>
+
+      <div class="sign-cta-row">
+        <button id="ls-switch" class="ls-switch">Create account</button>
+        <p class="sign-cta-note">
+          OJT students only.<br>
+          <span>Free</span> &mdash; takes 2 minutes.
+        </p>
+      </div>
+
+    </div>
+
+    <form id="loginForm" action="starts.php" method="POST">
+      <div class="login-container scroll-reveal">
+
+        <div class="login-header">
+          <h2>Welcome back</h2>
+          <p>OJT Monitoring System Access Portal</p>
+        </div>
+
+        <div class="login-inner-container">
+
+          <div class="login-box">
+            <input type="email" name="loginEmail" id="loginEmail" placeholder=" " required />
+            <span>Email address</span>
+          </div>
+
+          <div class="login-box">
+            <input type="password" name="loginPassword" id="loginPassword" placeholder=" " required />
+            <span>Password</span>
+          </div>
+
+        </div>
+
+        <div class="login-forget">
+          <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+        </div>
+
+        <div class="login-button">
+          <input
+            type="submit"
+            value="Sign In"
+            class="login-submit"
+            name="login-submit" />
+        </div>
+
+      </div>
     </form>
   </section>
 
   <hr />
 
   <section class="log-about" id="log-about">
-  <div class="about-container container">
+    <div class="about-overlay"></div>
+    <div class="about-container container">
 
-    <span class="about-tag">RFID-Powered Monitoring System</span>
 
-    <h2>OJT Tracking and Attendance System</h2>
+      <span class="about-tag">RFID-Powered Monitoring System</span>
 
-    <p class="about-description">
-      The OJT Tracking System is a modern attendance and monitoring platform
-      designed to simplify the management of On-the-Job Training students through
-      RFID technology. The system enables fast, accurate, and contactless attendance
-      recording by allowing students to scan their RFID cards upon arrival and departure.
-    </p>
+      <h1>OJT Monitoring <br>& Attendance System</h1>
 
-    <p class="about-description">
-      This system helps coordinators and administrators efficiently monitor student
-      attendance, track training records, and reduce manual errors commonly found in
-      traditional attendance methods. With a centralized database and real-time tracking,
-      the platform improves reliability, security, and overall management of OJT activities.
-    </p>
+      <p class="about-description">
+        The OJT Tracking System is a modern attendance and monitoring platform
+        designed to simplify the management of On-the-Job Training students through
+        RFID technology. The system enables fast, accurate, and contactless attendance
+        recording by allowing students to scan their RFID cards upon arrival and departure.
+      </p>
 
-    <div class="about-features">
+      <p class="about-description">
+        This system helps coordinators and administrators efficiently monitor student
+        attendance, track training records, and reduce manual errors commonly found in
+        traditional attendance methods. With a centralized database and real-time tracking,
+        the platform improves reliability, security, and overall management of OJT activities.
+      </p>
 
-      <div class="feature-card">
-        <i class="bx bx-scan"></i>
-        <h3>RFID Attendance</h3>
-        <p>
-          Fast and automated attendance logging using RFID technology.
-        </p>
-      </div>
+      <div class="about-features">
 
-      <div class="feature-card">
-        <i class="bx bx-time-five"></i>
-        <h3>Real-Time Monitoring</h3>
-        <p>
-          Track student attendance records and time logs instantly.
-        </p>
-      </div>
+        <div class="feature-card">
+          <i class="bx bx-scan"></i>
+          <h3>RFID Attendance</h3>
+          <p>
+            Fast and automated attendance logging using RFID technology.
+          </p>
+        </div>
 
-      <div class="feature-card">
-        <i class="bx bx-data"></i>
-        <h3>Centralized Records</h3>
-        <p>
-          Securely manage attendance data and OJT information in one system.
-        </p>
+        <div class="feature-card">
+          <i class="bx bx-time-five"></i>
+          <h3>Real-Time Monitoring</h3>
+          <p>
+            Track student attendance records and time logs instantly.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <i class="bx bx-data"></i>
+          <h3>Centralized Records</h3>
+          <p>
+            Securely manage attendance data and OJT information in one system.
+          </p>
+        </div>
+
       </div>
 
     </div>
+  </section>
 
+
+  <div id="loadingScreen" class="loading-screen">
+    <div class="logo-loader">
+      <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
+    </div>
+    <p>Signing up..</p>
+    <div class="loading-dots">
+      <span></span><span></span><span></span>
+    </div>
   </div>
-</section>
 
+  <div id="loginLoadingnScreen" class="loading-screen">
+    <div class="logo-loader">
+      <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
+    </div>
+    <p>Logging in..</p>
+    <div class="loading-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
 
-    <div id="loadingScreen" class="loading-screen">
-        <div class="logo-loader">
-          <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
-        </div>
-        <p>Signing up..</p>
+  <div id="forgotLoadingScreen" class="loading-screen">
+    <div class="logo-loader">
+      <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
     </div>
-
-    <div id="loginLoadingnScreen" class="loading-screen">
-        <div class="logo-loader">
-          <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
-        </div>
-        <p>Logging in..</p>
+    <p>Redirecting..</p>
+    <div class="loading-dots">
+      <span></span><span></span><span></span>
     </div>
-      
-    <div id="forgotLoadingScreen" class="loading-screen">
-        <div class="logo-loader">
-          <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
-        </div>
-        <p>Redirecting..</p>
-    </div>
+  </div>
 
 </body>
 

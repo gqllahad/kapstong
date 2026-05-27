@@ -257,7 +257,7 @@ document.addEventListener("DOMContentLoaded", function() {
     fetch('getCourses.php')
         .then(res => res.json())
         .then(data => {
-            courseSelect.innerHTML = '<option value="">Select Course</option>';
+            courseSelect.innerHTML = '';
 
             if (data.acro && data.values) {
                 data.acro.forEach((acro, index) => {
@@ -354,7 +354,7 @@ document.querySelectorAll('[id^="prev"]').forEach(btn => {
 
 confirmPasswordInput.addEventListener("focus", () => {
     if (!passwordInput.value) {
-        showToast("Passwords do not match!", 3000);
+        showToast("Input Password First!", 3000);
         passwordInput.focus();
     }
 });
