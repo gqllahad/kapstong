@@ -184,11 +184,9 @@ if (isset($_POST['signupForm'])) {
     $birth = $_POST['signBirth'];
 
     $province = $_POST['province'];
-    $city = $_POST['city'];
-    $barangay = $_POST['barangay'];
-    $street = $_POST['street'] ?? '-';
+    $city = $_POST['signAddress'];
 
-    $fullAddress = $street . " " . $barangay . " " . $city . ", " . $province;
+    $fullAddress = $city . ", " . $province;
 
     // Academic Information
     $course = $_POST['signCourse'];
@@ -229,8 +227,6 @@ if (isset($_POST['signupForm'])) {
 
         "province" => $province,
         "city" => $city,
-        "barangay" => $barangay,
-        "street" => $street,
         "fullAddress" => $fullAddress,
 
         "course" => $course,

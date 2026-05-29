@@ -59,7 +59,6 @@ echo json_encode([
     "progress" => $progress,
     "student_note" => $row['student_note'],
     "supervisor_feedback" => $row['supervisor_feedback'],
-    "rating" => $row['rating'],
     "submission_file" => $row['submission_file'],
     "studentID" => $row['studentID'],
     "completed_at" => $row['completed_at']

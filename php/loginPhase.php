@@ -154,7 +154,7 @@ if (isset($_GET['success_forget'])) {
       <div class="hero-right">
 
         <div class="rfid-visual">
-
+          <div class="platform-shadow"></div>
           <div class="glow-circle"></div>
 
           <div class="rfid-card">
@@ -204,6 +204,7 @@ if (isset($_GET['success_forget'])) {
           </div>
 
         </div>
+
 
       </div>
 
@@ -283,66 +284,10 @@ if (isset($_GET['success_forget'])) {
 
   <section class="log-container" id="log-container">
 
-    <!-- <div
-      class="container scroll-reveal"
-      id="sign-container"
-      style="text-align: left; margin: 0 5%">
-
-      <span class="section-tag">
-        Student & Administrator Login
-      </span>
-
-      <h1>Don't have an account?</h1>
-      <p>If your an OJT student, Signup now!</p>
-      <button id="ls-switch" class="ls-switch">Sign Up</button>
-    </div>
-
-    <form id="loginForm" action="starts.php" method="POST">
-      <div class="login-container scroll-reveal">
-        <div class="login-header">
-          <h2>Secure Login</h2>
-          <p>OJT Monitoring System Access Portal</p>
-        </div>
-        <div class="login-inner-container">
-          <div class="login-box">
-            <input type="email" name="loginEmail" id="loginEmail" placeholder=" " required />
-            <span>Email</span>
-          </div>
-
-          <div class="login-box">
-            <input type="password" name="loginPassword" id="loginPassword" placeholder=" " required />
-            <span>Password</span>
-          </div>
-        </div>
-
-        <div class="login-forget">
-
-          <a href="#" id="forgotPasswordLink">
-            Forgot Password?
-          </a>
-
-        </div>
-
-        <div class="login-button">
-          <input
-            type="submit"
-            value="Login"
-            class="login-submit"
-            name="login-submit" />
-        </div>
-
-      </div>
-    </form> -->
-
     <div
       class="container scroll-reveal"
       id="sign-container"
       style="text-align: left; margin: 0 5%">
-
-      <!-- <span class="section-tag-login">
-        <span class="section-tag-dot"></span>
-        OJT Monitoring System
-      </span> -->
 
       <h1>New here?<br>Join <span>Granby</span><br>OJT System.</h1>
 

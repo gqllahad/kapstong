@@ -41,7 +41,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
     <title>Supervisor Dashboard</title>
 
     <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
-    <link rel="stylesheet" href="../../css/supervisor/supervisorDashboard.css">
+    <link rel="stylesheet" href="../../css/supervisor/supervisorDashboard2.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 
@@ -70,7 +70,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
     endif; ?>
 
     <!-- navbar -->
-    <header class="navbar">
+    <!-- <header class="navbar">
         <div class="header-title">
             <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
             <h1>Supervisor Dashboard</h1>
@@ -83,12 +83,12 @@ $superID = getSupervisorIDByUserID($conn, $userID);
             <hr style="width: 75%; text-align: left;">
             <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
-    </header>
+    </header> -->
 
     <div id="forcePasswordOverlay" style="display:none;">
         <div class="force-box">
             <div class="force-modal-header">
-                <h2>⚠️ Change Password Required</h2>
+                <h2><i class="bi bi-exclamation-triangle"></i> Change Password Required</h2>
                 <p>You must change your password before continuing.</p>
                 <a href="../logoutPhase.php" class="force-modal-close-profile">&times;</a>
             </div>
@@ -120,6 +120,37 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 <li><button id="supervisor-activity-btn"> <i class="bi bi-activity"></i> Activity Log</button></li>
             </ul>
 
+            <div class="sidebar-profile">
+
+                <div class="profile-left">
+                    <div class="profile-avatar">
+                        M
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">MADRIGAL</span>
+                        <small>Supervisor</small>
+                    </div>
+                </div>
+                <button id="menuToggle" class="profile-trigger">
+                    ☰
+                </button>
+
+                <nav class="profile-menu" id="profileMenu" hidden>
+                    <a id="openProfileBtn">
+                        <i class="bi bi-person"></i>
+                        Profile
+                    </a>
+                    <a id="openAccountSettingsBtn">
+                        <i class="bi bi-gear"></i>
+                        Account Settings
+                    </a>
+                    <hr>
+                    <a href="../logoutPhase.php">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </a>
+                </nav>
+            </div>
         </aside>
 
         <!-- CONTENT -->
@@ -559,11 +590,6 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                                         <label>Supervisor Feedback</label>
                                         <p id="modalSupervisorFeedback"></p>
                                     </div>
-
-                                    <div class="info-item" id="ratingSection" style="display:none;">
-                                        <label>Supervisor Rating</label>
-                                        <p id="modalSupervisorRating"></p>
-                                    </div>
                                 </div>
                             </div>
 
@@ -598,7 +624,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             <canvas id="attendanceChart"></canvas>
                         </div>
 
-                        <div class="table-container-attendance" style="max-height: 175px; overflow-y: auto; margin-top: 15px;">
+                        <div class="table-container-attendance">
 
                             <table>
                                 <thead>
@@ -662,7 +688,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                     <div class="card-body">
                         <div class="task-guidelines">
-                            <h4>📌 Task Creation Guidelines</h4>
+                            <h4><i class="bi bi-pin-angle"></i> Task Creation Guidelines</h4>
                             <ul>
                                 <li>✔ Be specific — clearly state what the student must submit</li>
                                 <li>✔ Include expected output (PDF, report, screenshot, etc.)</li>
@@ -723,7 +749,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                         <div class="card-body">
                             <div class="assign-section">
-                                <h4>👨‍🎓 Assign Students</h4>
+                                <h4><i class="bi bi-people"></i> Assign Students</h4>
                                 <p>Select one or multiple students for this task</p>
 
                                 <input
@@ -816,7 +842,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                         <div class="card-content">
                             <div>
                                 <h3>Total Assigned Students</h3>
-                                <p>Students currently handled by this supervisor</p>
+                                <p>Students currently handled by supervisor</p>
 
                                 <span class="trend">
                                     ▲ <?= $totalAssignedTrend ?> this week
@@ -1025,7 +1051,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                                     <li class="alert-item <?= $alert['type'] ?>">
 
-                                        ⚠️ <?= htmlspecialchars($alert['message']) ?>
+                                        <i class="bi bi-exclamation-triangle"></i> <?= htmlspecialchars($alert['message']) ?>
 
                                         <button class="alert-btn"
                                             onclick="<?= $alert['action'] ? $alert['action'] . '(' . $alert['id'] . ')' : '' ?>">
@@ -1040,7 +1066,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                                 ?>
 
                                 <li class="alert-item success">
-                                    ✅ No issues detected. All students are active.
+                                    <i class="bi bi-check-circle"></i> No issues detected. All students are active.
                                 </li>
 
                             <?php endif; ?>
@@ -1062,7 +1088,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             ?>
 
                                     <li class="activity-item <?= $act['type'] ?>">
-                                        🧾 <?= htmlspecialchars($act['message']) ?>
+                                        <i class="bi bi-app-indicator"></i> <?= htmlspecialchars($act['message']) ?>
                                         <small><?= $act['time'] ?></small>
                                     </li>
 
@@ -1070,7 +1096,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                             else: ?>
 
                                 <li class="activity-item success">
-                                    ✅ No recent activity
+                                    <i class="bi bi-check-circle"></i> No recent activity
                                 </li>
 
                             <?php endif; ?>
@@ -1091,14 +1117,14 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                     <div class="create-section-container">
                         <button class="create-btn" id="create-task-btn">
-                            <span class="icon">📅</span>
+                            <span class="icon"><i class="bi bi-calendar-week"></i></span>
                             <span class="text">Create Task</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- PENDING APPROVALS -->
-                <div style="background:white; padding:20px; border-radius:12px; margin-bottom:30px;">
+                <div>
                     <div class="top-bar">
 
                         <div class="top-header">
@@ -1140,7 +1166,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 </div>
 
 
-                <div style="background:white; padding:20px; border-radius:12px; margin-bottom:30px;">
+                <div>
                     <div class="top-bar">
 
                         <div class="top-header">
@@ -1209,7 +1235,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 </div>
 
                 <!-- STUDENT PROGRESS -->
-                <div style="background:white; padding:20px; border-radius:12px; margin-bottom:30px;">
+                <div>
                     <div class="top-bar">
 
                         <div class="top-header">
@@ -1439,7 +1465,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 <div class="inactivity-box">
 
                     <div class="inactivity-header">
-                        <div class="warning-icon">⏳</div>
+                        <div class="warning-icon"><i class="bi bi-hourglass-bottom"></i></div>
                         <h3>Session Timeout Warning</h3>
                     </div>
 

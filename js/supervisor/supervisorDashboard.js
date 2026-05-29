@@ -1503,19 +1503,11 @@ function previewTask(taskID) {
 function updateTaskStatus(taskID, status) {
 
     const feedback = document.getElementById("supervisorFeedback")?.value.trim() || "";
-    const rating = document.getElementById("supervisorRating")?.value || "";
     
     if (status === "REJECTED" && !feedback) {
         showToast("Please provide supervisor feedback before rejecting the task.", "warning");
         return;
     }
-
-    if (status === "APPROVED" && !rating) {
-        showToast("Please select a rating first.", "warning");
-        return;
-    }
-
-    if (!confirm("Are you sure?")) return;
 
     fetch("functions/updateTaskStatus.php", {
         method: "POST",
@@ -1524,10 +1516,18 @@ function updateTaskStatus(taskID, status) {
         },
         body: "taskID=" + encodeURIComponent(taskID) +
               "&status=" + encodeURIComponent(status) +
-              "&supervisor_feedback=" + encodeURIComponent(feedback) +
-              "&rating=" + encodeURIComponent(rating)
+              "&supervisor_feedback=" + encodeURIComponent(feedback)
+              
     })
-    .then(res => res.json())
+    .then(async res => {
+
+    const text = await res.text();
+
+    console.log("RAW RESPONSE:");
+    console.log(text);
+
+    return JSON.parse(text);
+})
     .then(data => {
         
         showToast(data.message, "success");
@@ -1537,6 +1537,9 @@ function updateTaskStatus(taskID, status) {
             studentApplicationApprove.classList.remove("show");
             location.reload();
         }
+    }).catch(err => {
+        console.error(err);
+        showToast("Something went wrong", "error");
     });
 }
 
@@ -1743,12 +1746,8 @@ function viewTask(taskID) {
             document.getElementById("modalSupervisorFeedback").innerText =
                 data.supervisor_feedback ? data.supervisor_feedback : "No supervisor feedback";
 
-            document.getElementById("modalSupervisorRating").innerText =
-                data.rating ? data.rating : "No rating provided";
-
             document.getElementById("studentNoteSection").style.display = "block";
             document.getElementById("supervisorFeedbackSection").style.display = "block";
-            document.getElementById("ratingSection").style.display = "block";
         });
 }
 
