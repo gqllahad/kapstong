@@ -26,6 +26,21 @@ $forceChange = $rowForce['mustChangePassword'];
 
 $superID = getSupervisorIDByUserID($conn, $userID);
 
+$supervisorName = $_SESSION['name'] ?? 'Supervisor';
+
+$nameParts = explode(' ', trim($supervisorName));
+
+$initial = '';
+
+foreach ($nameParts as $part) {
+
+    $initial .= strtoupper(substr($part, 0, 1));
+
+    if (strlen($initial) >= 2) {
+        break;
+    }
+}
+
 ?>
 
 
@@ -124,10 +139,10 @@ $superID = getSupervisorIDByUserID($conn, $userID);
 
                 <div class="profile-left">
                     <div class="profile-avatar">
-                        M
+                        <?= $initial ?>
                     </div>
                     <div class="profile-info">
-                        <span class="profile-name">MADRIGAL</span>
+                        <span class="profile-name"><?= htmlspecialchars($supervisorName) ?></span>
                         <small>Supervisor</small>
                     </div>
                 </div>
@@ -733,6 +748,7 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                                 <input
                                     type="date"
                                     name="due_date"
+                                    id="due_date"
                                     required>
                             </div>
                         </div>
@@ -818,6 +834,22 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                     </button>
 
                 </form>
+            </div>
+
+            <!-- delete modal -->
+            <div id="deleteModal" class="modal-overlay">
+                <div class="modal-box">
+
+                    <h3>Delete Task</h3>
+
+                    <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+
+                    <div class="modal-actions">
+                        <button id="cancelDeleteBtn" class="btn-cancel">Cancel</button>
+                        <button id="confirmDeleteBtn" class="btn-danger">Delete</button>
+                    </div>
+
+                </div>
             </div>
 
             <!-- supervisor dashboard -->
@@ -955,14 +987,6 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                         </div>
 
                     </section>
-
-
-
-                    <!-- <section class="wrapper pie-chart">
-                        <h2>Overall Attendance Distribution</h2>
-                        <canvas id="pieChart"></canvas>
-                    </section> -->
-
 
                     <section class="wrapper pie-chart">
                         <div class="chart-header">
@@ -1124,11 +1148,20 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 </div>
 
                 <!-- PENDING APPROVALS -->
-                <div>
+                <div class="table-view" id="task-submit-table">
+                    <div class="table-switcher">
+                        <button class="tab-btn active" data-tab="manage" onclick="showManageTable()">
+                            Task Management
+                        </button>
+
+                        <button class="tab-btn" data-tab="submitted" onclick="showSubmittedTable()">
+                            Student Submission
+                        </button>
+                    </div>
                     <div class="top-bar">
 
                         <div class="top-header">
-                            <h3 class="table-title">Submitted Reports</h3>
+                            <h3 class="table-title">Submissions</h3>
                             <p>Search and review students waiting for approval.</p>
                         </div>
 
@@ -1166,7 +1199,16 @@ $superID = getSupervisorIDByUserID($conn, $userID);
                 </div>
 
 
-                <div>
+                <div class="table-view show" id="task-manage-table">
+                    <div class="table-switcher">
+                        <button class="tab-btn active" data-tab="manage" onclick="showManageTable()">
+                            Task Management
+                        </button>
+
+                        <button class="tab-btn" data-tab="submitted" onclick="showSubmittedTable()">
+                            Student Submission
+                        </button>
+                    </div>
                     <div class="top-bar">
 
                         <div class="top-header">

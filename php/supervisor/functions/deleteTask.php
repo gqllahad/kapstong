@@ -1,6 +1,10 @@
 <?php
 require_once("../../auth/supervisor_auth.php");
 require_once("../../kapstongConnection.php");
+require_once("../../functions.php");
+
+header('Content-Type: application/json');
+
 
 // if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'supervisor') {
 //     http_response_code(403);
@@ -8,7 +12,11 @@ require_once("../../kapstongConnection.php");
 //     exit;
 // }
 
+
+
 $taskID = $_POST['taskID'] ?? '';
+
+error_log("Received taskID: " . $taskID);
 
 if (empty($taskID)) {
     echo json_encode([
@@ -74,7 +82,7 @@ if ($stmt->execute()) {
     ");
 
     $log->bind_param(
-        "isssssss",
+        "isssssis",
         $userID,
         $role,
         $action,
@@ -91,7 +99,6 @@ if ($stmt->execute()) {
         "status" => "success",
         "message" => "Task deleted successfully"
     ]);
-
 } else {
     echo json_encode([
         "status" => "error",

@@ -87,7 +87,9 @@ const toggleBtn = document.getElementById("darkModeToggle");
 // current month
 window.currentMonth = null;
 
-
+// task swtich
+const taskManage = document.getElementById("task-manage-table");
+const taskSubmit = document.getElementById("task-submit-table");
 
 // functions
 
@@ -112,6 +114,13 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".sidebar").style.pointerEvents = "none";
         document.querySelector(".content").style.pointerEvents = "none";
     }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const today = new Date().toISOString().split("T")[0];
+
+    document.getElementById("due_date").setAttribute("min", today);
 });
 
 document.addEventListener("keydown", e => {
@@ -1431,7 +1440,7 @@ function viewEvaluationReport(studentID) {
             document.getElementById("reportSummary").innerHTML = `
                 <div class="report-card">
 
-                    <h2>📊 Student Evaluation Report</h2>
+                    <h2><i class="bi bi-bar-chart-fill"></i> Student Evaluation Report</h2>
 
                     <div class="eval-grid">
 
@@ -1771,10 +1780,21 @@ function editTask(taskID) {
 
 // delete task
 function deleteTask(taskID) {
+const modal = document.getElementById("deleteModal");
 
-    if (!confirm("Are you sure you want to delete this task?")) {
-        return;
-    }
+modal.classList.add("show");
+overlay.classList.add("show");
+
+document.getElementById("cancelDeleteBtn").onclick = () => {
+    const modal = document.getElementById("deleteModal");
+
+      modal.classList.remove("show");
+      overlay.classList.remove("show");
+};
+
+document.getElementById("confirmDeleteBtn").onclick = () => {
+
+    if (!taskID) return;
 
     const formData = new FormData();
     formData.append("taskID", taskID);
@@ -1785,11 +1805,65 @@ function deleteTask(taskID) {
     })
     .then(res => res.json())
     .then(data => {
-        showToast(data.message, "success");
+
+        showToast(data.message, data.status);
 
         if (data.status === "success") {
-            location.reload();
-        }
+        reloadTaskTable();
+    }
+    });
+
+    modal.classList.remove("show");
+    overlay.classList.remove("show");
+};
+
+    // if (!confirm("Are you sure you want to delete this task?")) {
+    //     return;
+    // }
+
+    // const formData = new FormData();
+    // formData.append("taskID", taskID);
+
+    // fetch("functions/deleteTask.php", {
+    //     method: "POST",
+    //     body: formData
+    // })
+    // .then(res => res.json())
+    // .then(data => {
+    //     showToast(data.message, "success");
+
+    //     if (data.status === "success") {
+    //         location.reload();
+    //     }
+    // });
+}
+
+function reloadTaskTable() {
+
+    const formData = new FormData();
+
+    formData.append(
+        "search",
+        document.getElementById("assignedTaskSearch").value
+    );
+
+    formData.append(
+        "status",
+        document.getElementById("taskStatusFilter").value
+    );
+
+    formData.append(
+        "deadline",
+        document.getElementById("dateDeadline").value
+    );
+
+    fetch("functions/searchTask.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.text())
+    .then(html => {
+        document.getElementById("assignedTaskBody").innerHTML = html;
     });
 }
 
@@ -1798,14 +1872,40 @@ function closeTaskModal(){
     overlay.classList.remove("show");
 }
 
-
-
-// task approvals
-
 closeViewTaskDetails.addEventListener("click", () => {
     overlay.classList.remove("show");
     viewTaskDetails.classList.remove("show");
 });
+
+// task switch
+function setActiveTab(tabName) {
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+
+        btn.classList.toggle(
+            "active",
+            btn.dataset.tab === tabName
+        );
+    });
+}
+function showManageTable() {
+
+    taskSubmit.classList.remove("show");
+    taskManage.classList.add("show");
+
+    setActiveTab("manage");
+}
+
+function showSubmittedTable() {
+
+    taskManage.classList.remove("show");
+    taskSubmit.classList.add("show");
+
+    setActiveTab("submitted");
+}
+
+
+
 
 
 // profile menu
@@ -1850,6 +1950,7 @@ superOversightBtn.addEventListener("click", () => {
     superEvaluation.style.display = "none";
     superActivity.style.display = "none";
     superAttendance.style.display = "none";
+
 });
 
 superStudentsBtn.addEventListener("click", () => {
@@ -2069,7 +2170,7 @@ closeStudentChart.addEventListener("click", () => {
 
 
 // assigning task to students
-document.getElementById("taskStudentList").addEventListener("click", function (e) {
+studentList.addEventListener("click", function (e) {
 
     const item = e.target.closest(".task-student-item");
 
@@ -2122,6 +2223,7 @@ document.getElementById("taskStudentSearch").addEventListener("keyup", function 
     }, 300);
 });
 
+
 document.getElementById("createTaskForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -2140,23 +2242,56 @@ document.getElementById("createTaskForm").addEventListener("submit", function (e
         formData.append("studentIDs[]", id);
     });
 
-    fetch("functions/createAndAssignTask.php", {
-        method: "POST",
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        showToast(data.message,"success");
+    console.log(selectedTaskStudentIDs, selectedSupervisorID);
 
-        if (data.status === "success") {
-            location.reload();
-        }
-    })
-    .catch(err => {
-        showToast("Something went wrong.", "error")
-    });
+    fetch("functions/createAndAssignTask.php", {
+    method: "POST",
+    body: formData
+})
+.then(async res => {
+    const text = await res.text();
+    console.log("Raw response:", text);
+    return JSON.parse(text);
+})
+.then(data => {
+
+    if (data.status === "success") {
+        reloadApprovalReportTable();
+        reloadTaskTable();
+        document.getElementById("createTaskForm").reset();
+
+        selectedTaskStudentIDs = [];
+        
+        createTask.classList.remove("show");
+        overlay.classList.remove("show");
+
+        showToast(data.message, "success");
+    }
+})
+.catch(err => {
+    console.error(err);
+    showToast("Something went wrong.", "error");
+});
     
 });
+
+function reloadApprovalReportTable() {
+
+    const search = document.getElementById("reportApprovalSearch")?.value || "";
+
+    fetch("functions/searchApprovalReport.php", {
+        method: "POST",
+        headers: {
+            "Content-Type":
+                "application/x-www-form-urlencoded"
+        },
+        body: "search=" + encodeURIComponent(search)
+    })
+    .then(res => res.text())
+    .then(html => {
+        document.getElementById("approvalReportBody").innerHTML = html;
+    });
+}
 
 // edit tasks
 document.getElementById("editTaskForm").addEventListener("submit", function (e) {

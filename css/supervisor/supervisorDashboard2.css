@@ -920,7 +920,7 @@ body.dark-mode #monthSelector {
 .pie-chart {
   background: var(--surface-card);
   border: 1px solid var(--surface-border);
-  border-top: 3px solid var(--accent);
+  border-left: 3px solid var(--accent);
   border-radius: var(--r-xl);
   padding: 22px;
   box-shadow: var(--shadow-sm);
@@ -964,7 +964,7 @@ body.dark-mode .pie-chart h2 {
   padding: 22px;
   background: var(--surface-card);
   border: 1px solid var(--surface-border);
-  border-right: 3px solid var(--accent);
+  border-left: 3px solid var(--accent);
   border-radius: var(--r-xl);
   box-shadow: var(--shadow-sm);
   transition:
@@ -1928,6 +1928,67 @@ body.dark-mode .modal-close {
   color: var(--gray-400);
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  padding: 30px 25px;
+  width: 90%;
+  max-width: 350px;
+  z-index: 1001;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.modal-box {
+  padding: 20px;
+  border-radius: 12px;
+  width: 320px;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #ccc;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.btn-danger {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #e74c3c;
+  color: white;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+body.dark-mode .modal-overlay {
+  background: var(--surface-subtle);
+  color: var(--gray-400);
+}
+
 /* ══════════════════════════════════════════════════════════════
    FORM ELEMENTS INSIDE MODALS
 ══════════════════════════════════════════════════════════════ */
@@ -2768,6 +2829,97 @@ body.dark-mode .doc-title {
   border: none;
   color: #60a5fa;
   cursor: pointer;
+}
+
+.task-submit-table,
+.task-manage-table {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.task-manage-table.show,
+.task-submit-table.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.table-view {
+  display: none;
+}
+
+.table-view.show {
+  display: block;
+}
+
+.table-switcher {
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.tab-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.6);
+  color: #444;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.tab-btn:hover {
+  border-color: rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.9);
+  color: #111;
+  transform: translateY(-1px);
+}
+
+.tab-btn.active {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  color: #1d4ed8;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.08);
+}
+
+body.dark-mode .table-switcher {
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  width: fit-content;
+}
+
+body.dark-mode .tab-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: #b5b5b5;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(6px);
+}
+
+body.dark-mode .tab-btn:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+body.dark-mode .tab-btn.active {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 /* ══════════════════════════════════════════════════════════════
