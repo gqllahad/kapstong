@@ -1356,6 +1356,7 @@ body.dark-mode td {
 .student-name-cell {
   display: flex;
   align-items: center;
+  margin: 0;
   gap: 10px;
 }
 .student-avatar {
@@ -1371,6 +1372,14 @@ body.dark-mode td {
   font-size: 13px;
   flex-shrink: 0;
 }
+
+.student-info {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  gap: 10px;
+}
+
 body.dark-mode .student-avatar {
   background: var(--navy-700);
   color: var(--navy-100);
@@ -1559,7 +1568,9 @@ body.dark-mode .filter-group input[type="date"] {
 
 /* Section wrapper around tables */
 .supervisor-oversight > div,
-.supervisor-students > div {
+.supervisor-students > div,
+.supervisor-evaluation > div,
+.supervisor-attendance > div {
   background: var(--surface-card);
   border: 1px solid var(--surface-border);
   border-radius: var(--r-xl);
@@ -2832,14 +2843,16 @@ body.dark-mode .doc-title {
 }
 
 .task-submit-table,
-.task-manage-table {
+.task-manage-table,
+.evaluation-table {
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease-in-out;
 }
 
 .task-manage-table.show,
-.task-submit-table.show {
+.task-submit-table.show,
+.evaluation-table.show {
   opacity: 1;
   visibility: visible;
 }

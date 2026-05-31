@@ -1155,7 +1155,11 @@ foreach ($nameParts as $part) {
                         </button>
 
                         <button class="tab-btn" data-tab="submitted" onclick="showSubmittedTable()">
-                            Student Submission
+                            Task Submission
+                        </button>
+
+                        <button class="tab-btn" data-tab="self" onclick="showSelfTable()">
+                            Self-Initiated Tasks
                         </button>
                     </div>
                     <div class="top-bar">
@@ -1198,7 +1202,7 @@ foreach ($nameParts as $part) {
                     </div>
                 </div>
 
-
+                <!-- Task Management -->
                 <div class="table-view show" id="task-manage-table">
                     <div class="table-switcher">
                         <button class="tab-btn active" data-tab="manage" onclick="showManageTable()">
@@ -1206,7 +1210,11 @@ foreach ($nameParts as $part) {
                         </button>
 
                         <button class="tab-btn" data-tab="submitted" onclick="showSubmittedTable()">
-                            Student Submission
+                            Task Submission
+                        </button>
+
+                        <button class="tab-btn" data-tab="self" onclick="showSelfTable()">
+                            Self-Initiated Tasks
                         </button>
                     </div>
                     <div class="top-bar">
@@ -1262,6 +1270,79 @@ foreach ($nameParts as $part) {
                                 $status = $_POST['status'] ?? '';
                                 $deadline = $_POST['deadline'] ?? '';
                                 echo renderTaskManagementList($conn, $superID, $search, $status, $deadline);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Self Tasks -->
+                <div class="table-view" id="task-self-table">
+                    <div class="table-switcher">
+                        <button class="tab-btn active" data-tab="manage" onclick="showManageTable()">
+                            Task Management
+                        </button>
+
+                        <button class="tab-btn" data-tab="submitted" onclick="showSubmittedTable()">
+                            Task Submission
+                        </button>
+
+                        <button class="tab-btn" data-tab="self" onclick="showSelfTable()">
+                            Self-Initiated Tasks
+                        </button>
+                    </div>
+                    <div class="top-bar">
+
+                        <div class="top-header">
+                            <h3 class="table-title">Self-Initiated tasks</h3>
+                            <p>Search and review student self-tasks.</p>
+                        </div>
+
+                        <div class="search-filter">
+                            <div class="search-container">
+                                <i class="bi bi-search search-icon"></i>
+                                <input type="text" id="selfSearch"
+                                    placeholder="Search by ID or Name...">
+                            </div>
+
+                            <div class="filter-group">
+
+                                <select id="selfStatusFilter">
+                                    <option value="">All Status</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="REJECTED">Rejected</option>
+                                    <option value="APPROVED">Approved</option>
+                                </select>
+
+                            </div>
+
+                            <div class="filter-group">
+                                <input type="date" id="selfDate" title="From date">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Activity Title</th>
+                                    <th>Student</th>
+                                    <th>Date Performed</th>
+                                    <th>Hours</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="selfTaskBody">
+                                <?php
+                                $selfSearch = $_POST['search'] ?? '';
+                                $selfStatus = $_POST['status'] ?? '';
+                                $selfDate = $_POST['date'] ?? '';
+                                echo renderSelfTaskList($conn, $superID, $selfSearch, $selfStatus, $selfDate);
                                 ?>
                             </tbody>
                         </table>
@@ -1326,67 +1407,81 @@ foreach ($nameParts as $part) {
                     <h2>Student Attendance</h2>
                     <p>Monitor student attendance records and time logs.</p>
                 </div>
-                <div class="top-bar">
 
-                    <div class="top-header">
-                        <h3 class="table-title">Attendance</h3>
-                        <p>Search and review student attendance records.</p>
+                <!-- inigo -->
+                <div class="table-view show" id="attendance-table">
+                    <div class="table-switcher">
+                        <button class="tab-btn active" data-tab="attendance">
+                            Attendance logs
+                        </button>
+
+                        <button class="tab-btn" data-tab="calendar">
+                            Attendance Calendar
+                        </button>
                     </div>
 
-                    <div class="search-filter">
+                    <div class="top-bar">
 
-                        <div class="search-container">
-                            <i class="bi bi-search search-icon"></i>
-                            <input
-                                type="text"
-                                id="studentAttendanceSearch"
-                                placeholder="Search by Student ID, Name, or RFID">
+                        <div class="top-header">
+                            <h3 class="table-title">Attendance</h3>
+                            <p>Search and review student attendance records.</p>
                         </div>
 
-                        <div class="filter-group">
+                        <div class="search-filter">
 
-                            <select id="attendanceStatusFilter">
-                                <option value="">All Status</option>
-                                <option value="present">Present</option>
-                                <option value="late">Late</option>
-                                <option value="absent">Absent</option>
-                                <option value="excused">Excused</option>
-                            </select>
+                            <div class="search-container">
+                                <i class="bi bi-search search-icon"></i>
+                                <input
+                                    type="text"
+                                    id="studentAttendanceSearch"
+                                    placeholder="Search by RFID">
+                            </div>
+
+                            <div class="filter-group">
+
+                                <select id="attendanceStatusFilter">
+                                    <option value="">All Status</option>
+                                    <option value="present">Present</option>
+                                    <option value="late">Late</option>
+                                    <option value="absent">Absent</option>
+                                    <option value="excused">Excused</option>
+                                </select>
+
+                            </div>
+
+                            <div class="filter-group">
+                                <input type="date" id="attendanceDateFrom" title="From date">
+                                <input type="date" id="attendanceDateTo" title="To date">
+                            </div>
 
                         </div>
-
-                        <div class="filter-group">
-                            <input type="date" id="attendanceDateFrom" title="From date">
-                            <input type="date" id="attendanceDateTo" title="To date">
-                        </div>
-
                     </div>
-                </div>
 
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>RFID</th>
-                                <th>Date</th>
-                                <th>Time in</th>
-                                <th>Time out</th>
-                                <th>Status</th>
-                                <th>Total hours</th>
-                                <th>Remarks</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>RFID</th>
+                                    <th>Date</th>
+                                    <th>Time in</th>
+                                    <th>Time out</th>
+                                    <th>Status</th>
+                                    <th>Total hours</th>
+                                    <th>Remarks</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
 
-                        <tbody id="studentAttendanceBody">
-                            <?php
-                            $search = $_POST['search'] ?? '';
-                            $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
-                            $dateToAttendance = $_POST['dateToAttendance'] ?? '';
-                            echo renderStudentMainAttendance($conn, $superID, $search, $dateFromAttendance, $dateToAttendance);
-                            ?>
-                        </tbody>
-                    </table>
+                            <tbody id="studentAttendanceBody">
+                                <?php
+                                $search = $_POST['search'] ?? '';
+                                $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
+                                $dateToAttendance = $_POST['dateToAttendance'] ?? '';
+                                echo renderStudentMainAttendance($conn, $superID, $search, $dateFromAttendance, $dateToAttendance);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
@@ -1394,29 +1489,72 @@ foreach ($nameParts as $part) {
             <section class="supervisor-evaluation" id="supervisor-evaluation">
                 <div class="title-block-bot">
                     <h2>Reports & Evaluation</h2>
-                    <p>Monitor Students performance and attendance.</p>
+                    <p>Monitor Students reports and evaluations.</p>
                 </div>
 
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Attendance</th>
-                                <th>Reports</th>
-                                <th>Tasks</th>
-                                <th>Final Grade</th>
-                                <th>Remarks</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
 
-                        <tbody id="evaluationBody">
-                            <?php
-                            echo renderEvaluationList($conn, $superID);
-                            ?>
-                        </tbody>
-                    </table>
+                <div class="table-view show" id="evaluation-table">
+                    <div class="table-switcher">
+                        <button class="tab-btn active" data-tab="evaluation">
+                            Evaluations
+                        </button>
+
+                        <button class="tab-btn" data-tab="reports">
+                            Reports
+                        </button>
+                    </div>
+
+                    <div class="top-bar">
+
+                        <div class="top-header">
+                            <h3 class="table-title">Evaluations</h3>
+                            <p>Review student performance, progress, and final evaluation results.</p>
+                        </div>
+
+                        <div class="search-filter">
+
+                            <div class="search-container">
+                                <i class="bi bi-search search-icon"></i>
+                                <input
+                                    type="text"
+                                    id="reportsSearch"
+                                    placeholder="Search by Student ID, or Name">
+                            </div>
+
+                            <div class="filter-group">
+
+                                <select id="reportsCourseFilter">
+                                    <?php echo getProgramOptions($conn); ?>
+                                </select>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Attendance</th>
+                                    <th>Reports</th>
+                                    <th>Tasks</th>
+                                    <th>Final Grade</th>
+                                    <th>Remarks</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="evaluationBody">
+                                <?php
+                                $reportsSearch = $_POST['search'] ?? '';
+                                $reportsCourse = $_POST['course'] ?? '';
+                                echo renderEvaluationList($conn, $superID, $reportsSearch, $reportsCourse);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
             </section>

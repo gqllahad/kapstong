@@ -759,36 +759,69 @@ function renderStudentProgressList($conn, $superID, $search = '')
 
 // evaluations (sueprvisor)
 
-function renderEvaluationList($conn, $superID, $search = '')
+function renderEvaluationList($conn, $superID, $search = '', $reportsCourse = '')
 {
+
+
     $where = "
-        WHERE ss.superID = '$superID'
-        AND ss.status = 'ACTIVE'
-    ";
+    WHERE ss.superID = ?
+    AND ss.status = 'ACTIVE'
+";
+
+    $params = [$superID];
+    $types = "i";
 
     if (!empty($search)) {
-        $where .= " AND (
-            u.studentID LIKE '%$search%' OR
-            u.name LIKE '%$search%'
-        )";
+
+        $where .= "
+        AND (
+            u.studentID LIKE ?
+            OR u.name LIKE ?
+        )
+    ";
+
+        $like = "%{$search}%";
+
+        $types .= "ss";
+        $params[] = $like;
+        $params[] = $like;
+    }
+
+    if (!empty($reportsCourse)) {
+
+        $where .= "
+        AND ojt.course = ?
+    ";
+
+        $types .= "s";
+        $params[] = $reportsCourse;
     }
 
     $sql = "
-        SELECT 
-            u.studentID,
-            u.name
-        FROM student_supervisor ss
-        INNER JOIN users u 
-            ON ss.studentID = u.studentID
-        $where
-        ORDER BY u.name ASC
-    ";
+    SELECT
+        u.studentID,
+        u.name,
+        ojt.course
+    FROM student_supervisor ss
+    INNER JOIN ojtstudent ojt
+        ON ss.studentID = ojt.studentID
+    INNER JOIN users u
+        ON ss.studentID = u.studentID
+    $where
+    ORDER BY u.name ASC
+";
 
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare($sql);
 
-    if (!$result) {
-        return "<tr><td colspan='8'>SQL Error: " . $conn->error . "</td></tr>";
+    if (!$stmt) {
+        return "<tr><td colspan='8'>Prepare Error: {$conn->error}</td></tr>";
     }
+
+    $stmt->bind_param($types, ...$params);
+
+    $stmt->execute();
+
+    $result = $stmt->get_result();
 
     $output = '';
 
@@ -953,8 +986,11 @@ function renderEvaluationList($conn, $superID, $search = '')
                         <div class="student-avatar">
                             ' . strtoupper(substr($row['name'], 0, 1)) . '
                         </div>
-
-                        <span>' . $row['name'] . '</span>
+                        
+                        <div class="student-info">
+                            <span>' . $row['name'] . '</span>
+                            <small>' . $row['studentID'] . ' - ' . $row['course'] . '</small>
+                        </div>
                     </div>
             </td>
 
@@ -988,6 +1024,129 @@ function renderEvaluationList($conn, $superID, $search = '')
         <tr>
             <td colspan="8" style="text-align:center;padding:15px;">
                 No students found
+            </td>
+        </tr>';
+    }
+
+    return $output;
+}
+
+// supervisor student-self task
+function renderSelfTaskList($conn, $superID, $search = '', $status = '', $date = '')
+{
+    $where = "
+        WHERE 
+            sst.superID = '$superID'
+    ";
+
+    if (!empty($search)) {
+        $where .= " AND (
+            sst.studentID LIKE '%$search%' OR
+            ojtstudent.name LIKE '%$search%' OR
+            sst.title LIKE '%$search%'
+        )";
+    }
+
+    if (!empty($status)) {
+        $where .= " AND sst.status = '$status'";
+    }
+
+    if (!empty($date)) {
+        $where .= " AND sst.activity_date = '$date'";
+    }
+
+    $sql = "
+        SELECT 
+            sst.selfTaskID,
+            sst.title,
+            sst.activity_date,
+            sst.hours_spent,
+            sst.status,
+            sst.studentID,
+            ojtstudent.name
+        FROM student_self_tasks sst
+
+        INNER JOIN ojtstudent 
+            ON ojtstudent.studentID = sst.studentID
+
+        $where
+
+        ORDER BY sst.activity_date DESC
+    ";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $status = $row['status'];
+
+            switch ($status) {
+                case 'APPROVED':
+                    $color = '#059669';
+                    break;
+                case 'REJECTED':
+                    $color = '#DC2626';
+                    break;
+                default:
+                    $color = '#2563EB';
+                    break;
+            }
+
+            $output .= '
+            <tr>
+                <td>
+                    <strong>' . $row['title'] . '</strong>
+                </td>
+
+                <td>
+                    <div class="student-name-cell">
+                        <div class="student-avatar">
+                            ' . strtoupper(substr($row['name'], 0, 1)) . '
+                        </div>
+                        <span>' . $row['name'] . '</span>
+                        <small>' . $row['studentID'] . '</small>
+                    </div>
+                </td>
+
+                <td>' . date('F d, Y', strtotime($row['activity_date'])) . '</td>
+
+                <td>' . $row['hours_spent'] . ' hrs</td>
+
+                <td>
+                    <span class="status-pill" style="
+                        background: ' . $color . '20;
+                        color: ' . $color . ';
+                        border: 1px solid ' . $color . '40;
+                    ">
+                        ' . $status . '
+                    </span>
+                </td>
+
+                <td>
+                    <button class="view-btn" onclick="viewSelfTask(' . $row['selfTaskID'] . ')">
+                        View
+                    </button>
+
+                    ' . ($status === 'PENDING' ? '
+                        <button class="approve-btn" onclick="approveSelfTask(' . $row['selfTaskID'] . ')">
+                            Approve
+                        </button>
+
+                        <button class="reject-btn" onclick="rejectSelfTask(' . $row['selfTaskID'] . ')">
+                            Reject
+                        </button>
+                    ' : '') . '
+                </td>
+            </tr>';
+        }
+    } else {
+        $output .= '
+        <tr>
+            <td colspan="6" style="text-align:center;padding:15px;font-weight:500;">
+                No self-initiated tasks found
             </td>
         </tr>';
     }
