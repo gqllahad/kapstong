@@ -206,7 +206,7 @@ body {
 
 .layout {
   display: flex;
-  min-height: 90vh;
+  min-height: 100vh;
 }
 
 /* SIDEBAR */
@@ -305,10 +305,6 @@ body {
   font-size: 13px;
   color: #474b53;
 }
-
-/* .sidebar li a:hover{
-background:#f0f0f0;
-} */
 
 /* CONTENT */
 

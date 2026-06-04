@@ -39,13 +39,13 @@ $documents = getStudentDocuments($conn, $studentID);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
     <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
-    <link rel="stylesheet" href="../../css/student/studentDashboard.css">
+    <link rel="stylesheet" href="../../css/student/studentDashboard2.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 
 <body data-student-id="<?= $studentID ?>">
 
-    <header class="navbar">
+    <!-- <header class="navbar">
         <div class="header-title">
             <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
             <h1>Student Dashboard</h1>
@@ -58,7 +58,7 @@ $documents = getStudentDocuments($conn, $studentID);
             <hr style="width: 75%; text-align: left;">
             <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
-    </header>
+    </header> -->
 
     <div class="layout">
         <aside class="sidebar">
@@ -74,7 +74,7 @@ $documents = getStudentDocuments($conn, $studentID);
                 <li><button id="student-activity-btn"><i class="bi bi-activity"></i> Activity logs</button></li>
             </ul>
 
-            <!-- <div class="sidebar-profile">
+            <div class="sidebar-profile">
 
                 <div class="profile-left">
                     <div class="profile-avatar">
@@ -98,13 +98,17 @@ $documents = getStudentDocuments($conn, $studentID);
                         <i class="bi bi-gear"></i>
                         Account Settings
                     </a>
+                    <a id="darkModeToggle" class="dark-toggle">
+                        <i class="bi bi-moon-fill"></i>
+                        Dark Mode
+                    </a>
                     <hr>
                     <a href="../logoutPhase.php">
                         <i class="bi bi-box-arrow-right"></i>
                         Logout
                     </a>
                 </nav>
-            </div> -->
+            </div>
         </aside>
 
         <main class="content">

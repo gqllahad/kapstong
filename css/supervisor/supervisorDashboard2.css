@@ -1582,9 +1582,6 @@ body.dark-mode .filter-group input[type="date"] {
     border-color 0.35s;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   USER MANAGEMENT ROW
-══════════════════════════════════════════════════════════════ */
 .user-management {
   display: flex;
   justify-content: space-between;
