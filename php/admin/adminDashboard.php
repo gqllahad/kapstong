@@ -29,7 +29,7 @@ if ($_SESSION['role'] !== "ADMIN") {
     <title>Admin Dashboard</title>
     <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
 
-    <link rel="stylesheet" href="../../css/admin/adminDashboard.css">
+    <link rel="stylesheet" href="../../css/admin/adminDashboard2.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 
@@ -37,7 +37,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
 
 <body>
-    <header class="navbar">
+    <!-- <header class="navbar">
 
         <div class="header-title">
             <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
@@ -51,7 +51,7 @@ if ($_SESSION['role'] !== "ADMIN") {
             <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
 
-    </header>
+    </header> -->
 
     <!--  MAIN LAYOUT -->
     <div class="layout">
@@ -66,6 +66,34 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <li><button id="admin-attendance-btn"><i class="bi bi-calendar-check"></i>Attendance Logs</button></li>
                 <li><button id="admin-reports-btn"> <i class="bi bi-graph-up"></i>Reports</button></li>
             </ul>
+
+            <div class="sidebar-profile">
+
+                <div class="profile-left">
+                    <div class="profile-avatar">
+                        A
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">Admin</span>
+                        <small>Administrator</small>
+                    </div>
+                </div>
+                <button id="menuToggle" class="profile-trigger">
+                    ☰
+                </button>
+
+                <nav class="profile-menu" id="profileMenu" hidden>
+                    <a id="openAccountSettingsBtn">
+                        <i class="bi bi-gear"></i>
+                        Account Settings
+                    </a>
+                    <hr>
+                    <a href="../logoutPhase.php">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </a>
+                </nav>
+            </div>
 
         </aside>
 
@@ -735,27 +763,25 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="late_time">Late threshold</label>
-                        <input type="time" id="late_time" name="late_time">
-                    </div>
 
-                    <div class="form-group">
-                        <label for="allowed_late_minutes">
-                            Allowed Late Minutes
-                        </label>
+                    <div class="time-row">
+                        <div class="form-group">
+                            <label for="late_time">Late threshold</label>
+                            <input type="time" id="late_time" name="late_time">
+                        </div>
 
-                        <input
-                            type="number"
-                            id="allowed_late_minutes"
-                            name="allowed_late_minutes"
-                            placeholder="e.g. 15"
-                            min="0">
+                        <div class="form-group">
+                            <label for="allowed_late_minutes">
+                                Allowed Late Minutes
+                            </label>
 
-                        <small style="margin:10px;">
-                            Students arriving after the allowed minutes
-                            will automatically be marked late.
-                        </small>
+                            <input
+                                type="number"
+                                id="allowed_late_minutes"
+                                name="allowed_late_minutes"
+                                placeholder="e.g. 15"
+                                min="0">
+                        </div>
                     </div>
 
                     <div class="rfid-actions">
