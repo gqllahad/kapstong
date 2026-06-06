@@ -152,6 +152,9 @@ let timer;
 
 let isReassignMode = false;
 
+// toggle
+const toggleBtn = document.getElementById("darkModeToggle");
+
 // Functions 
 
 // open rfid
@@ -176,6 +179,27 @@ function showToast(message, type = "success") {
     setTimeout(() => {
         toast.classList.remove("show");
     }, 3000);
+}
+
+// reload charts
+function reloadAllCharts() {
+
+    if (window.lineChartInstance) {
+        window.lineChartInstance.destroy();
+    }
+
+    if (window.pieChartInstance) {
+        window.pieChartInstance.destroy();
+    }
+
+    if (window.barChartInstance) {
+        window.barChartInstance.destroy();
+    }
+
+    loadBarChart();
+
+    loadLineChart();
+    loadPieChart();
 }
 
 function viewUser(studentID, source) {
@@ -1000,113 +1024,423 @@ function populateMonthDropdown() {
 
 
 // pie chart
+// function loadPieChart() {
+//     fetch("../../php/admin/functions/getDonutChartData.php")
+//         .then(res => res.json())
+//         .then(data => {
+
+//             const ctx = document.getElementById('pieChart');
+
+//             if (window.pieChartInstance) {
+//                 window.pieChartInstance.destroy();
+//             }
+
+//             const colors = {
+//                  Present: "#3b82f6",
+//                 Late: "#93c5fd",
+//                 Absent: "#1d4ed8",
+//                 Excused: "#bfdbfe"
+//             };
+
+//             window.pieChartInstance = new Chart(ctx, {
+//                 type: 'doughnut',
+//                 data: {
+//                     labels: data.labels,
+//                     datasets: [{
+//                         data: data.values,
+//                         backgroundColor: data.labels.map(l => colors[l] || "#94a3b8"),
+//                         borderWidth: 0
+//                     }]
+//                 },
+//                 options: {
+
+//                     responsive: true,
+//                     maintainAspectRatio: false,
+
+//                     layout: {
+//                         padding: 10
+//                     },
+
+//                     plugins: {
+
+//                         legend: {
+//                             display: false
+//                         },
+
+//                         tooltip: {
+
+//                             backgroundColor: '#111827',
+
+//                             padding: 12,
+
+//                             titleColor: '#fff',
+//                             bodyColor: '#fff',
+
+//                             borderColor: 'rgba(255,255,255,0.08)',
+//                             borderWidth: 1,
+
+//                             callbacks: {
+//                                 label: function(context) {
+//                                     return `${context.label}: ${context.raw}`;
+//                                 }
+//                             }
+//                         }
+
+//                     },
+
+//                     cutout: '72%'
+//                 }
+//             });
+
+//         let existing = document.querySelector(".chart-empty-message");
+
+//         if (existing) {
+//             existing.remove();
+//         }
+
+//         if (data.empty) {
+
+//             const message = document.createElement("p");
+
+//             message.className = "chart-empty-message";
+
+//             message.textContent =
+//                 "No Attendance Overview available yet.";
+
+//             ctx.parentNode.appendChild(message);
+//         }
+
+//         })
+//         .catch(err => console.error("Donut chart error:", err));
+// }
+
+// doughnut chart health score
+// function loadHealthScore() {
+
+//     fetch("../../php/admin/functions/getAttendanceHealthScore.php")
+//         .then(res => res.json())
+//         .then(data => {
+
+//             document.getElementById("health-score").innerText = data.score + "%";
+
+//             const total =
+//                 Number(data.present) +
+//                 Number(data.late) +
+//                 Number(data.absent) +
+//                 Number(data.excused);
+
+//             document.getElementById("total-attendance").innerText =
+//                 total + " Records";
+//         });
+// }
+
 function loadPieChart() {
+ 
+    const ctx          = document.getElementById('pieChart');
+    const wrapper      = ctx?.closest('.pie-canvas-wrapper') ?? ctx?.parentNode;
+    const healthEl     = document.getElementById('health-score');
+    const totalEl      = document.getElementById('total-attendance');
+ 
+    /* ── destroy old instance ────────────────────────────────── */
+    if (window.pieChartInstance) {
+        window.pieChartInstance.destroy();
+        window.pieChartInstance = null;
+    }
+ 
+    /* ── remove any old empty overlay ───────────────────────── */
+    _removePieEmpty(wrapper);
+ 
     fetch("../../php/admin/functions/getDonutChartData.php")
         .then(res => res.json())
         .then(data => {
-
-            const ctx = document.getElementById('pieChart');
-
-            if (window.pieChartInstance) {
-                window.pieChartInstance.destroy();
+ 
+            /* ── decide if truly empty ───────────────────────── */
+            const hasData = !data.empty &&
+                            Array.isArray(data.values) &&
+                            data.values.some(v => Number(v) > 0);
+ 
+            if (!hasData) {
+                _showPieEmpty(ctx, wrapper, healthEl, totalEl);
+                return;
             }
-
+ 
+            /* ── colour map ──────────────────────────────────── */
             const colors = {
-                 Present: "#3b82f6",
-                Late: "#93c5fd",
-                Absent: "#1d4ed8",
-                Excused: "#bfdbfe"
+                Present: "#3b82f6",
+                Late:    "#93c5fd",
+                Absent:  "#1d4ed8",
+                Excused: "#bfdbfe",
             };
-
+ 
             window.pieChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: data.labels,
                     datasets: [{
                         data: data.values,
-                        backgroundColor: data.labels.map(l => colors[l] || "#94a3b8"),
-                        borderWidth: 0
+                        backgroundColor: data.labels.map(l => colors[l] ?? "#94a3b8"),
+                        borderWidth: 0,
+                        hoverOffset: 6,
                     }]
                 },
                 options: {
-
                     responsive: true,
                     maintainAspectRatio: false,
-
-                    layout: {
-                        padding: 10
+ 
+                    animation: {
+                        animateRotate: true,
+                        duration: 700,
+                        easing: 'easeInOutQuart',
                     },
-
+ 
+                    layout: { padding: 10 },
+ 
                     plugins: {
-
-                        legend: {
-                            display: false
-                        },
-
+                        legend: { display: false },
+ 
                         tooltip: {
-
                             backgroundColor: '#111827',
-
                             padding: 12,
-
                             titleColor: '#fff',
                             bodyColor: '#fff',
-
                             borderColor: 'rgba(255,255,255,0.08)',
                             borderWidth: 1,
-
                             callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: ${context.raw}`;
+                                label: function(ctx) {
+                                    const total = ctx.dataset.data.reduce((a, b) => a + Number(b), 0);
+                                    const pct   = total > 0
+                                        ? Math.round((Number(ctx.raw) / total) * 100)
+                                        : 0;
+                                    return ` ${ctx.label}: ${ctx.raw}  (${pct}%)`;
                                 }
                             }
                         }
-
                     },
-
+ 
                     cutout: '72%'
                 }
             });
-
-        let existing = document.querySelector(".chart-empty-message");
-
-        if (existing) {
-            existing.remove();
-        }
-
-        if (data.empty) {
-
-            const message = document.createElement("p");
-
-            message.className = "chart-empty-message";
-
-            message.textContent =
-                "No Attendance Overview available yet.";
-
-            ctx.parentNode.appendChild(message);
-        }
-
+ 
         })
-        .catch(err => console.error("Donut chart error:", err));
+        .catch(err => {
+            console.error("Donut chart error:", err);
+            _showPieEmpty(ctx, wrapper, healthEl, totalEl, true);
+        });
 }
-
-// doughnut chart health score
+ 
+/* ── health score ─────────────────────────────────────────────── */
 function loadHealthScore() {
-
+ 
+    const healthEl = document.getElementById("health-score");
+    const totalEl  = document.getElementById("total-attendance");
+ 
+    /* optimistic placeholder */
+    if (healthEl) healthEl.innerText = "—%";
+    if (totalEl)  totalEl.innerText  = "—";
+ 
     fetch("../../php/admin/functions/getAttendanceHealthScore.php")
         .then(res => res.json())
         .then(data => {
-
-            document.getElementById("health-score").innerText = data.score + "%";
-
+ 
             const total =
-                Number(data.present) +
-                Number(data.late) +
-                Number(data.absent) +
-                Number(data.excused);
-
-            document.getElementById("total-attendance").innerText =
-                total + " Records";
+                Number(data.present  ?? 0) +
+                Number(data.late     ?? 0) +
+                Number(data.absent   ?? 0) +
+                Number(data.excused  ?? 0);
+ 
+            if (total === 0) {
+                /* ── empty state ─────────────────────────────── */
+                if (healthEl) {
+                    healthEl.innerText = "N/A";
+                    healthEl.style.fontSize  = "22px";
+                    healthEl.style.color     = "var(--gray-400)";
+                }
+                if (totalEl) {
+                    totalEl.innerText = "No records yet";
+                    totalEl.style.fontSize = "13px";
+                    totalEl.style.color    = "var(--gray-400)";
+                }
+                return;
+            }
+ 
+            /* ── normal state ────────────────────────────────── */
+            const score = Number(data.score ?? 0);
+ 
+            if (healthEl) {
+                healthEl.innerText         = score + "%";
+                healthEl.style.fontSize    = "";     /* reset */
+                healthEl.style.color       = _scoreColor(score);
+            }
+            if (totalEl) {
+                totalEl.innerText       = total + " Records";
+                totalEl.style.fontSize  = "";
+                totalEl.style.color     = "";
+            }
+        })
+        .catch(err => {
+            console.error("Health score error:", err);
+            if (healthEl) healthEl.innerText = "Err";
+            if (totalEl)  totalEl.innerText  = "—";
+        });
+}
+ 
+/* ══════════════════════════════════════════════════════════════
+   PRIVATE HELPERS
+══════════════════════════════════════════════════════════════ */
+ 
+/** Return a colour for the health-score number */
+function _scoreColor(score) {
+    if (score >= 80) return "var(--success)";
+    if (score >= 60) return "var(--warning)";
+    return "var(--danger)";
+}
+ 
+/** Remove any existing empty-state overlay from the pie wrapper */
+function _removePieEmpty(wrapper) {
+    if (!wrapper) return;
+    const old = wrapper.querySelector(".pie-empty-state");
+    if (old) old.remove();
+}
+ 
+/**
+ * Hide the real canvas, show a centred empty-state card inside
+ * the same wrapper, and reset the summary labels.
+ *
+ * @param {HTMLElement} ctx       - the <canvas> element
+ * @param {HTMLElement} wrapper   - the .pie-canvas-wrapper parent
+ * @param {HTMLElement} healthEl  - #health-score
+ * @param {HTMLElement} totalEl   - #total-attendance
+ * @param {boolean}     isError   - show error copy instead of "no data"
+ */
+function _showPieEmpty(ctx, wrapper, healthEl, totalEl, isError = false) {
+ 
+    /* hide canvas so it doesn't leave a ghost */
+    if (ctx) ctx.style.visibility = "hidden";
+ 
+    /* inject overlay */
+    if (wrapper) {
+        _removePieEmpty(wrapper);
+ 
+        const overlay = document.createElement("div");
+        overlay.className = "pie-empty-state";
+        overlay.innerHTML = isError
+            ? `<i class="bi bi-wifi-off"></i>
+               <span>Could not load data</span>`
+            : `<i class="bi bi-chart-pie"></i>
+               <span>No attendance records<br>for the last 7 days</span>`;
+        wrapper.appendChild(overlay);
+    }
+ 
+    /* reset summary cards */
+    if (healthEl) {
+        healthEl.innerText       = "N/A";
+        healthEl.style.fontSize  = "22px";
+        healthEl.style.color     = "var(--gray-400)";
+    }
+    if (totalEl) {
+        totalEl.innerText       = "No records yet";
+        totalEl.style.fontSize  = "13px";
+        totalEl.style.color     = "var(--gray-400)";
+    }
+ 
+    /* restore canvas visibility once data arrives next time */
+    if (ctx) {
+        /* watch for the next loadPieChart() call which will remove
+           the overlay and restore the canvas before redrawing */
+        ctx.addEventListener("pieChartRestored", () => {
+            ctx.style.visibility = "";
+        }, { once: true });
+    }
+}
+ 
+/* make sure canvas visibility is restored before drawing */
+const _origLoadPieChart = loadPieChart;   // guard against double-wrap
+function loadPieChart() {                 // re-declare to wrap restore step
+ 
+    const ctx     = document.getElementById('pieChart');
+    const wrapper = ctx?.closest('.pie-canvas-wrapper') ?? ctx?.parentNode;
+ 
+    /* restore canvas if it was hidden by a previous empty state */
+    if (ctx) ctx.style.visibility = "";
+    _removePieEmpty(wrapper);
+ 
+    if (window.pieChartInstance) {
+        window.pieChartInstance.destroy();
+        window.pieChartInstance = null;
+    }
+ 
+    const healthEl = document.getElementById('health-score');
+    const totalEl  = document.getElementById('total-attendance');
+ 
+    fetch("../../php/admin/functions/getDonutChartData.php")
+        .then(res => res.json())
+        .then(data => {
+ 
+            const hasData = !data.empty &&
+                            Array.isArray(data.values) &&
+                            data.values.some(v => Number(v) > 0);
+ 
+            if (!hasData) {
+                _showPieEmpty(ctx, wrapper, healthEl, totalEl);
+                return;
+            }
+ 
+            const colors = {
+                Present: "#3b82f6",
+                Late:    "#93c5fd",
+                Absent:  "#1d4ed8",
+                Excused: "#bfdbfe",
+            };
+ 
+            window.pieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                        backgroundColor: data.labels.map(l => colors[l] ?? "#94a3b8"),
+                        borderWidth: 0,
+                        hoverOffset: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        animateRotate: true,
+                        duration: 700,
+                        easing: 'easeInOutQuart',
+                    },
+                    layout: { padding: 10 },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#111827',
+                            padding: 12,
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(255,255,255,0.08)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(ctx) {
+                                    const total = ctx.dataset.data
+                                        .reduce((a, b) => a + Number(b), 0);
+                                    const pct = total > 0
+                                        ? Math.round((Number(ctx.raw) / total) * 100)
+                                        : 0;
+                                    return ` ${ctx.label}: ${ctx.raw}  (${pct}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '72%'
+                }
+            });
+ 
+        })
+        .catch(err => {
+            console.error("Donut chart error:", err);
+            _showPieEmpty(ctx, wrapper, healthEl, totalEl, true);
         });
 }
 
@@ -1219,89 +1553,359 @@ function loadRiskStudents() {
         });
 }
 
-function loadAllRiskStudents() {
+// function loadAllRiskStudents() {
 
+//     fetch("../../php/admin/functions/getAllAtRiskStudent.php")
+//         .then(res => res.json())
+//         .then(data => {
+
+//             const container = document.getElementById("all-risk-list");
+
+//             container.innerHTML = "";
+
+//             data.forEach(student => {
+
+//                 const progress = parseFloat(student.progress_percent);
+
+//                 let badgeClass = "track";
+//                 let badgeText = "ON TRACK";
+//                 let progressClass = "good";
+
+//                 if (progress < 75) {
+//                     badgeClass = "behind";
+//                     badgeText = "BEHIND";
+//                     progressClass = "low";
+//                 }
+//                 else if (progress < 90) {
+//                     badgeClass = "soon";
+//                     badgeText = "DUE SOON";
+//                     progressClass = "medium";
+//                 }
+
+//                 container.innerHTML += `
+//                     <div class="task-item">
+
+//                         <div class="student-top">
+
+//                             <div class="student-info">
+//                                 <strong>${student.name}</strong>
+//                                 <span class="student-role">
+//                                     ${student.role}
+//                                 </span>
+//                             </div>
+
+//                             <span class="status-badge ${badgeClass}">
+//                                 ${badgeText}
+//                             </span>
+
+//                         </div>
+
+//                         <div class="progress-wrapper">
+
+//                             <div class="progress-label">
+//                                 <span>
+//                                     ${student.completed_hours} / 
+//                                     ${student.required_hours} Hours
+//                                 </span>
+
+//                                 <span>
+//                                     ${progress}%
+//                                 </span>
+//                             </div>
+
+//                             <div class="progress-bar">
+//                                <div 
+//                                     class="progress-fill ${progressClass}"
+//                                     style="width:${student.progress_percent}%">
+//                                 </div>
+//                             </div>
+
+//                         <div class="student-meta">
+//                             <span class="meta-pill">
+//                                 Absents: ${student.absents}
+//                             </span>
+
+//                             <span class="meta-pill">
+//                                 Lates: ${student.lates}
+//                             </span>
+
+//                             <span class="meta-pill">
+//                                 ${student.overdue_tasks} Overdue Tasks
+//                             </span>
+//                         </div>
+
+//                     </div>
+//                 `;
+//             });
+//         });
+// }
+
+function _riskConfig(risk) {
+    const map = {
+        CRITICAL: { cls: "risk-critical", icon: "bi-exclamation-octagon-fill", label: "CRITICAL" },
+        HIGH:     { cls: "risk-high",     icon: "bi-exclamation-triangle-fill", label: "HIGH RISK" },
+        MEDIUM:   { cls: "risk-medium",   icon: "bi-dash-circle-fill",          label: "MEDIUM"   },
+        LOW:      { cls: "risk-low",      icon: "bi-info-circle-fill",          label: "LOW RISK" },
+    };
+    return map[risk] || map.LOW;
+}
+ 
+function _progressConfig(status) {
+    const map = {
+        "ON TRACK": { cls: "prog-track",  barCls: "bar-track",  icon: "bi-check-circle-fill"  },
+        "DUE SOON": { cls: "prog-soon",   barCls: "bar-soon",   icon: "bi-clock-fill"         },
+        "BEHIND":   { cls: "prog-behind", barCls: "bar-behind", icon: "bi-x-circle-fill"      },
+    };
+    return map[status] || map["BEHIND"];
+}
+ 
+function _initials(name) {
+    return name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
+}
+ 
+function _lastSeenLabel(days) {
+    if (days === null || days === undefined) return "No record";
+    if (days === 0) return "Today";
+    if (days === 1) return "Yesterday";
+    return `${days}d ago`;
+}
+ 
+function _attendanceBar(rate) {
+    const col = rate >= 80 ? "#10b981" : rate >= 60 ? "#f59e0b" : "#ef4444";
+    return `
+        <div class="att-bar-track">
+            <div class="att-bar-fill" style="width:${rate}%; background:${col};"></div>
+        </div>`;
+}
+ 
+/* ── main renderer ───────────────────────────────────────────── */
+function loadAllRiskStudents() {
+ 
+    const container = document.getElementById("all-risk-list");
+    container.innerHTML = `
+        <div class="risk-loading">
+            <div class="risk-spinner"></div>
+            <span>Loading intern data…</span>
+        </div>`;
+ 
     fetch("../../php/admin/functions/getAllAtRiskStudent.php")
         .then(res => res.json())
         .then(data => {
-
-            const container = document.getElementById("all-risk-list");
-
+ 
             container.innerHTML = "";
-
-            data.forEach(student => {
-
-                const progress = parseFloat(student.progress_percent);
-
-                let badgeClass = "track";
-                let badgeText = "ON TRACK";
-                let progressClass = "good";
-
-                if (progress < 75) {
-                    badgeClass = "behind";
-                    badgeText = "BEHIND";
-                    progressClass = "low";
-                }
-                else if (progress < 90) {
-                    badgeClass = "soon";
-                    badgeText = "DUE SOON";
-                    progressClass = "medium";
-                }
-
+ 
+            if (!data.length) {
+                container.innerHTML = `
+                    <div class="risk-empty">
+                        <i class="bi bi-shield-check"></i>
+                        <p>All interns are on track — no at-risk students found.</p>
+                    </div>`;
+                return;
+            }
+ 
+            /* ── summary header ─────────────────────────── */
+            const critical = data.filter(s => s.risk === "CRITICAL").length;
+            const high     = data.filter(s => s.risk === "HIGH").length;
+            const medium   = data.filter(s => s.risk === "MEDIUM").length;
+            const low      = data.filter(s => s.risk === "LOW").length;
+ 
+            container.innerHTML = `
+                <div class="risk-summary-bar">
+                    <div class="rsb-item rsb-critical">
+                        <span class="rsb-count">${critical}</span>
+                        <span class="rsb-label">Critical</span>
+                    </div>
+                    <div class="rsb-item rsb-high">
+                        <span class="rsb-count">${high}</span>
+                        <span class="rsb-label">High</span>
+                    </div>
+                    <div class="rsb-item rsb-medium">
+                        <span class="rsb-count">${medium}</span>
+                        <span class="rsb-label">Medium</span>
+                    </div>
+                    <div class="rsb-item rsb-low">
+                        <span class="rsb-count">${low}</span>
+                        <span class="rsb-label">Low</span>
+                    </div>
+                    <div class="rsb-total">
+                        <span class="rsb-count">${data.length}</span>
+                        <span class="rsb-label">Total flagged</span>
+                    </div>
+                </div>`;
+ 
+            /* ── student cards ───────────────────────────── */
+            data.forEach(s => {
+ 
+                const rc  = _riskConfig(s.risk);
+                const pc  = _progressConfig(s.progress_status);
+                const ini = _initials(s.name);
+                const pct = parseFloat(s.progress_percent);
+ 
+                const taskPct = s.total_tasks > 0
+                    ? Math.round((s.completed_tasks / s.total_tasks) * 100)
+                    : 0;
+ 
+                const card = document.createElement("div");
+                card.className = `ris-card ${rc.cls}`;
+ 
+                card.innerHTML = `
+ 
+                    <!-- top row -->
+                    <div class="ris-top">
+ 
+                        <div class="ris-avatar">${ini}</div>
+ 
+                        <div class="ris-identity">
+                            <strong class="ris-name">${s.name}</strong>
+                            <span class="ris-meta">${s.course} · ${s.yearLevel} · ID: ${s.studentID}</span>
+                        </div>
+ 
+                        <div class="ris-badges">
+                            <span class="ris-risk-badge ${rc.cls}">
+                                <i class="bi ${rc.icon}"></i>
+                                ${rc.label}
+                            </span>
+                            <span class="ris-score-badge" title="Risk score">${s.risk_score}/100</span>
+                        </div>
+ 
+                    </div>
+ 
+                    <!-- progress row -->
+                    <div class="ris-progress-row">
+ 
+                        <div class="ris-prog-header">
+                            <span class="ris-prog-label">
+                                <i class="bi ${pc.icon} ${pc.cls}"></i>
+                                ${s.progress_status}
+                            </span>
+                            <span class="ris-prog-hours">${s.completed_hours} / ${s.required_hours} hrs</span>
+                            <span class="ris-prog-pct">${pct}%</span>
+                        </div>
+ 
+                        <div class="ris-bar-track">
+                            <div class="ris-bar-fill ${pc.barCls}" style="width:${pct}%"></div>
+                        </div>
+ 
+                    </div>
+ 
+                    <!-- stats grid -->
+                    <div class="ris-stats">
+ 
+                        <div class="ris-stat absent ${s.absents >= 3 ? 'stat-warn' : ''}">
+                            <i class="bi bi-calendar-x-fill"></i>
+                            <div>
+                                <span class="stat-val">${s.absents}</span>
+                                <span class="stat-key">Absents</span>
+                            </div>
+                            ${s.recent_absents > 0 ? `<span class="stat-recent">+${s.recent_absents} this week</span>` : ""}
+                        </div>
+ 
+                        <div class="ris-stat late ${s.lates >= 5 ? 'stat-warn' : ''}">
+                            <i class="bi bi-clock-history"></i>
+                            <div>
+                                <span class="stat-val">${s.lates}</span>
+                                <span class="stat-key">Late</span>
+                            </div>
+                        </div>
+ 
+                        <div class="ris-stat task ${s.overdue_tasks >= 1 ? 'stat-warn' : ''}">
+                            <i class="bi bi-clipboard-x-fill"></i>
+                            <div>
+                                <span class="stat-val">${s.overdue_tasks}</span>
+                                <span class="stat-key">Overdue</span>
+                            </div>
+                        </div>
+ 
+                        <div class="ris-stat tasks-done">
+                            <i class="bi bi-clipboard-check-fill"></i>
+                            <div>
+                                <span class="stat-val">${s.completed_tasks}<span class="stat-of">/${s.total_tasks}</span></span>
+                                <span class="stat-key">Tasks done</span>
+                            </div>
+                        </div>
+ 
+                        <div class="ris-stat attendance">
+                            <i class="bi bi-person-check-fill"></i>
+                            <div>
+                                <span class="stat-val">${s.attendance_rate}%</span>
+                                <span class="stat-key">Attendance</span>
+                                ${_attendanceBar(s.attendance_rate)}
+                            </div>
+                        </div>
+ 
+                        <div class="ris-stat last-seen">
+                            <i class="bi bi-calendar2-week-fill"></i>
+                            <div>
+                                <span class="stat-val">${_lastSeenLabel(s.days_since_last_seen)}</span>
+                                <span class="stat-key">Last seen</span>
+                            </div>
+                        </div>
+ 
+                    </div>
+ 
+                `;
+ 
+                container.appendChild(card);
+            });
+        })
+        .catch(err => {
+            container.innerHTML = `
+                <div class="risk-empty risk-error">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <p>Failed to load student data.</p>
+                </div>`;
+            console.error("Risk student fetch error:", err);
+        });
+}
+ 
+/* ── also update the mini dashboard widget ───────────────────── */
+function loadRiskStudents() {
+ 
+    fetch("../../php/admin/functions/getAtRiskStudents.php")
+        .then(res => res.json())
+        .then(data => {
+ 
+            const container = document.getElementById("risk-list");
+            container.innerHTML = "";
+ 
+            if (!data.length) {
+                container.innerHTML = `<p class="chart-empty-message">No at-risk students right now.</p>`;
+                return;
+            }
+ 
+            data.forEach(s => {
+ 
+                const pct = parseFloat(s.progress_percent);
+                const rc  = _riskConfig(s.risk || (pct < 50 ? "HIGH" : pct < 75 ? "MEDIUM" : "LOW"));
+ 
+                let badgeClass = "track", badgeText = "ON TRACK";
+                if (pct < 75)      { badgeClass = "behind"; badgeText = "BEHIND"; }
+                else if (pct < 90) { badgeClass = "soon";   badgeText = "DUE SOON"; }
+ 
                 container.innerHTML += `
                     <div class="task-item">
-
                         <div class="student-top">
-
                             <div class="student-info">
-                                <strong>${student.name}</strong>
-                                <span class="student-role">
-                                    ${student.role}
-                                </span>
+                                <strong>${s.name}</strong>
+                                <span class="student-role">${s.course ?? s.role ?? ""}</span>
                             </div>
-
-                            <span class="status-badge ${badgeClass}">
-                                ${badgeText}
-                            </span>
-
+                            <span class="status-badge ${badgeClass}">${badgeText}</span>
                         </div>
-
                         <div class="progress-wrapper">
-
                             <div class="progress-label">
-                                <span>
-                                    ${student.completed_hours} / 
-                                    ${student.required_hours} Hours
-                                </span>
-
-                                <span>
-                                    ${progress}%
-                                </span>
+                                <span>${s.completed_hours} / ${s.required_hours} Hours</span>
+                                <span>${pct}%</span>
                             </div>
-
                             <div class="progress-bar">
-                               <div 
-                                    class="progress-fill ${progressClass}"
-                                    style="width:${student.progress_percent}%">
-                                </div>
+                                <div class="progress-fill" style="width:${pct}%"></div>
                             </div>
-
-                        <div class="student-meta">
-                            <span class="meta-pill">
-                                Absents: ${student.absents}
-                            </span>
-
-                            <span class="meta-pill">
-                                Lates: ${student.lates}
-                            </span>
-
-                            <span class="meta-pill">
-                                ${student.overdue_tasks} Overdue Tasks
-                            </span>
                         </div>
-
-                    </div>
-                `;
+                        <div class="student-meta">
+                            <span class="meta-pill"><i class="bi bi-calendar-x"></i> ${s.absents} Absents</span>
+                            <span class="meta-pill"><i class="bi bi-clock"></i> ${s.lates} Lates</span>
+                            <span class="meta-pill"><i class="bi bi-clipboard-x"></i> ${s.overdue_tasks} Overdue</span>
+                        </div>
+                    </div>`;
             });
         });
 }
@@ -1786,6 +2390,36 @@ document.addEventListener("click", (e) => {
         profileMenu.hidden = true;
     }
 });
+
+// darkmode
+document.getElementById("darkModeToggle").addEventListener("click", () => {
+
+    profileMenu.hidden = true;
+    
+     setTimeout(reloadAllCharts, 100);
+});
+
+toggleBtn.addEventListener("click", () => {
+
+    document.body.classList.toggle("dark-mode");
+
+    if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("theme", "dark");
+    } else {
+        localStorage.setItem("theme", "light");
+    }
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+    }
+});
+
+
 
 document.addEventListener("click", function (e) {
 

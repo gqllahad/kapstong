@@ -159,6 +159,10 @@ foreach ($nameParts as $part) {
                         <i class="bi bi-gear"></i>
                         Account Settings
                     </a>
+                    <a id="darkModeToggle" class="dark-toggle">
+                        <i class="bi bi-moon-fill"></i>
+                        Dark Mode
+                    </a>
                     <hr>
                     <a href="../logoutPhase.php">
                         <i class="bi bi-box-arrow-right"></i>
@@ -1023,10 +1027,10 @@ foreach ($nameParts as $part) {
                                 <span>RFID</span>
                             </button>
 
-                            <button id="darkModeToggle" class="dark-toggle">
+                            <!-- <button id="darkModeToggle" class="dark-toggle">
                                 <i class="bi bi-moon-fill"></i>
                                 <span>Darkmode</span>
-                            </button>
+                            </button> -->
 
                             <button onclick="generateReport()">
                                 <i class="bi bi-bar-chart-fill"></i>

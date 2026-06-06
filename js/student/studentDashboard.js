@@ -2315,6 +2315,7 @@ if(toggleBtn){
 
     toggleBtn.addEventListener("click", () => {
 
+        profileMenu.hidden = true;
      setTimeout(reloadAllCharts, 100);
 });
 

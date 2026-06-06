@@ -29,9 +29,8 @@ if ($_SESSION['role'] !== "ADMIN") {
     <title>Admin Dashboard</title>
     <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
 
-    <link rel="stylesheet" href="../../css/admin/adminDashboard2.css">
+    <link rel="stylesheet" href="../../css/admin/adminDashboard3.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
 
 </head>
 
@@ -86,6 +85,10 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <a id="openAccountSettingsBtn">
                         <i class="bi bi-gear"></i>
                         Account Settings
+                    </a>
+                    <a id="darkModeToggle" class="dark-toggle">
+                        <i class="bi bi-moon-fill"></i>
+                        Dark Mode
                     </a>
                     <hr>
                     <a href="../logoutPhase.php">

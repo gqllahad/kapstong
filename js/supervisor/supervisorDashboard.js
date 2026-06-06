@@ -2412,6 +2412,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.getElementById("darkModeToggle").addEventListener("click", () => {
 
+    profileMenu.hidden = true;
+
      setTimeout(reloadAllCharts, 100);
 });
 
