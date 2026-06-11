@@ -433,49 +433,50 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <div id="formMessage" style="margin-bottom:10px; font-weight:bold;"></div>
                     <form id="createSupervisorForm" method="POST">
 
-                        <div class="input-group">
-                            <label>Full Name</label>
-                            <input type="text" name="name" placeholder="Enter full name" required>
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>Full Name</label>
+                                <input type="text" name="name" placeholder="Enter full name" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Email Address</label>
+                                <input type="email" name="email" placeholder="Enter email address" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Mobile Number</label>
+                                <input type="text" name="mobile" placeholder="09XXXXXXXXX" maxlength="11" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Department</label>
+                                <select name="department" required>
+                                    <?php echo renderSelectOptions($conn, 'department'); ?>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Company Name</label>
+                                <input type="text" name="company" placeholder="Enter company name" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Position</label>
+                                <input type="text" name="position" placeholder="e.g. HR Manager / Team Lead">
+                            </div>
+
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="confirmCreateSupervisor">
+                                <label for="confirmCreateSupervisor">
+                                    I confirm that this supervisor will be added to the system.
+                                </label>
+                            </div>
+
+                            <button type="submit" name="createSupervisor" id="createSupervisorBtn" disabled class="primary-btn">
+                                Create Supervisor
+                            </button>
                         </div>
-
-                        <div class="input-group">
-                            <label>Email Address</label>
-                            <input type="email" name="email" placeholder="Enter email address" required>
-                        </div>
-
-                        <div class="input-group">
-                            <label>Mobile Number</label>
-                            <input type="text" name="mobile" placeholder="09XXXXXXXXX" maxlength="11" required>
-                        </div>
-
-                        <div class="input-group">
-                            <label>Department</label>
-                            <select name="department" required>
-                                <?php echo renderSelectOptions($conn, 'department'); ?>
-                            </select>
-                        </div>
-
-                        <div class="input-group">
-                            <label>Company Name</label>
-                            <input type="text" name="company" placeholder="Enter company name" required>
-                        </div>
-
-                        <div class="input-group">
-                            <label>Position</label>
-                            <input type="text" name="position" placeholder="e.g. HR Manager / Team Lead">
-                        </div>
-
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="confirmCreateSupervisor">
-                            <label for="confirmCreateSupervisor">
-                                I confirm that this supervisor will be added to the system.
-                            </label>
-                        </div>
-
-                        <button type="submit" name="createSupervisor" id="createSupervisorBtn" disabled class="primary-btn">
-                            Create Supervisor
-                        </button>
-
                     </form>
                 </div>
             </div>
@@ -528,28 +529,30 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 <div class="ojt-program-body">
 
+
                     <div class="current-ojt-card" id="activeOJTContainer">
                         <?php echo renderActiveOJTCard($conn); ?>
                     </div>
 
-                    <div class="form-group">
-                        <label>Academic Year</label>
-                        <input type="text" id="academicYear" placeholder="e.g. 2026 - 2027" pattern="\d{4}\s*-\s*\d{4}">
-                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Academic Year</label>
+                            <input type="text" id="academicYear" placeholder="e.g. 2026 - 2027" pattern="\d{4}\s*-\s*\d{4}">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Required OJT Hours</label>
-                        <input type="number" id="requiredHours" placeholder="e.g. 600">
-                    </div>
+                        <div class="form-group">
+                            <label>Required OJT Hours</label>
+                            <input type="number" id="requiredHours" placeholder="e.g. 600">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="status">
-                            <option value="ACTIVE">Active</option>
-                            <option value="INACTIVE">Inactive</option>
-                        </select>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="status">
+                                <option value="ACTIVE">Active</option>
+                                <option value="INACTIVE">Inactive</option>
+                            </select>
+                        </div>
                     </div>
-
                     <div class="ojt-actions">
                         <button type="button" onclick="saveOJTSettings()" class="save-btn">
                             Save Setup
@@ -570,39 +573,41 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <div class="department-body">
 
                     <input type="hidden" id="program_id">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Program Name</label>
+                            <input
+                                type="text"
+                                id="prg_name"
+                                placeholder="e.g. Bachelor of Science in Information Technology">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Program Name</label>
-                        <input
-                            type="text"
-                            id="prg_name"
-                            placeholder="e.g. Bachelor of Science in Information Technology">
+                        <div class="form-group">
+                            <label>Program Code</label>
+                            <input
+                                type="text"
+                                id="prg_acro"
+                                placeholder="e.g. BSIT">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Department Name</label>
+                            <select id="prg_department" onchange="updateDepartmentCode()">
+                                <?php echo renderDepartmentOptions($conn); ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Department Code</label>
+                            <input
+                                type="text"
+                                id="prg_department_code"
+                                placeholder="e.g. CCS"
+                                readonly>
+                        </div>
+
+
                     </div>
-
-                    <div class="form-group">
-                        <label>Program Code</label>
-                        <input
-                            type="text"
-                            id="prg_acro"
-                            placeholder="e.g. BSIT">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Department Name</label>
-                        <select id="prg_department" onchange="updateDepartmentCode()">
-                            <?php echo renderDepartmentOptions($conn); ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Department Code</label>
-                        <input
-                            type="text"
-                            id="prg_department_code"
-                            placeholder="e.g. CCS"
-                            readonly>
-                    </div>
-
                     <div class="form-group">
                         <label>Status</label>
                         <select id="prg_status">
@@ -610,7 +615,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <option value="INACTIVE">Inactive</option>
                         </select>
                     </div>
-
                     <div class="department-actions">
                         <button class="save-btn" onclick="updateProgram()">
                             Save Program
@@ -678,25 +682,26 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
                 <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Program Name</label>
+                            <input type="text" id="prg_name_create" placeholder="e.g. Bachelor of Science in Information Technology">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Program Name</label>
-                        <input type="text" id="prg_name_create" placeholder="e.g. Bachelor of Science in Information Technology">
-                    </div>
+                        <div class="form-group">
+                            <label>Program Acronym</label>
+                            <input type="text" id="prg_acro_create" placeholder="e.g. BSIT">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Program Acronym</label>
-                        <input type="text" id="prg_acro_create" placeholder="e.g. BSIT">
-                    </div>
+                        <div class="form-group">
+                            <label>Department</label>
+                            <input type="text" id="prg_department_create" placeholder="e.g. College of Computing">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Department</label>
-                        <input type="text" id="prg_department_create" placeholder="e.g. College of Computing">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Department Code</label>
-                        <input type="text" id="prg_department_code_create" placeholder="e.g. CCIS">
+                        <div class="form-group">
+                            <label>Department Code</label>
+                            <input type="text" id="prg_department_code_create" placeholder="e.g. CCIS">
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -706,6 +711,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <option value="INACTIVE">INACTIVE</option>
                         </select>
                     </div>
+
 
                     <div class="modal-actions">
                         <button type="button" onclick="saveCourse()" class="save-btn">
@@ -849,36 +855,49 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 <div class="requirements-body">
 
+
+
                     <div class="form-group">
                         <label>Requirement Name</label>
                         <input type="text" placeholder="e.g. Resume / CV">
                     </div>
+                    <div class="form-grid">
 
-                    <div class="form-group">
-                        <label>Requirement Type</label>
-                        <select>
-                            <option value="DOCUMENT">Document</option>
-                            <option value="FORM">Form</option>
-                            <option value="REPORT">Report</option>
-                            <option value="OTHER">Other</option>
-                        </select>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Submission Stage</label>
-                        <select>
-                            <option value="PRE-OJT">Pre-OJT</option>
-                            <option value="DURING-OJT">During OJT</option>
-                            <option value="POST-OJT">Post-OJT</option>
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label>Requirement Type</label>
+                            <select>
+                                <option value="DOCUMENT">Document</option>
+                                <option value="FORM">Form</option>
+                                <option value="REPORT">Report</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label>Required?</label>
-                        <select>
-                            <option value="YES">Yes (Required)</option>
-                            <option value="NO">No (Optional)</option>
-                        </select>
+                        <div class="form-group">
+                            <label>Submission Stage</label>
+                            <select>
+                                <option value="PRE-OJT">Pre-OJT</option>
+                                <option value="DURING-OJT">During OJT</option>
+                                <option value="POST-OJT">Post-OJT</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Required?</label>
+                            <select>
+                                <option value="YES">Yes (Required)</option>
+                                <option value="NO">No (Optional)</option>
+                            </select>
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label>Deadline (if applicable)</label>
+                            <input type="date">
+                        </div>
+
                     </div>
 
                     <div class="form-group">
@@ -886,14 +905,8 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <textarea placeholder="Provide instructions for students..."></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label>Deadline (if applicable)</label>
-                        <input type="date">
-                    </div>
-
                     <div class="requirements-actions">
                         <button class="save-btn">Add Requirement</button>
-                        <button class="cancel-btn">Cancel</button>
                     </div>
 
                 </div>
@@ -1719,37 +1732,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                     </div>
 
                     <div class="download-body">
-
-                        <div class="form-group">
-                            <label>Course</label>
-
-                            <select id="downloadCourse">
-
-                                <option value="">All Courses</option>
-
-                                <option value="BSIT">BSIT</option>
-                                <option value="BSBA">BSBA</option>
-                                <option value="BSED">BSED</option>
-
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-
-                            <label>Status</label>
-
-                            <select id="downloadStatus">
-
-                                <option value="">All Status</option>
-                                <option value="present">Present</option>
-                                <option value="late">Late</option>
-                                <option value="excused">Excused</option>
-                                <option value="absent">Absent</option>
-
-                            </select>
-
-                        </div>
-
                         <div class="form-group">
 
                             <label>Supervisor</label>
@@ -1781,16 +1763,51 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                         </div>
 
-                        <div class="form-group">
-                            <label>Date From</label>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Course</label>
 
-                            <input type="date" id="downloadDateFrom">
-                        </div>
+                                <select id="downloadCourse">
 
-                        <div class="form-group">
-                            <label>Date To</label>
+                                    <option value="">All Courses</option>
 
-                            <input type="date" id="downloadDateTo">
+                                    <option value="BSIT">BSIT</option>
+                                    <option value="BSBA">BSBA</option>
+                                    <option value="BSED">BSED</option>
+
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+
+                                <label>Status</label>
+
+                                <select id="downloadStatus">
+
+                                    <option value="">All Status</option>
+                                    <option value="present">Present</option>
+                                    <option value="late">Late</option>
+                                    <option value="excused">Excused</option>
+                                    <option value="absent">Absent</option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label>Date From</label>
+
+                                <input type="date" id="downloadDateFrom">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date To</label>
+
+                                <input type="date" id="downloadDateTo">
+                            </div>
+
                         </div>
 
                     </div>

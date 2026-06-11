@@ -799,12 +799,19 @@ function loadBarChart() {
 
 function loadLineChart() {
 
-    const selectedMonth =
-        document.getElementById("monthSelector").value;
+    const selectedMonth = document.getElementById("monthSelector").value;
 
     fetch(`../../php/admin/functions/getLineChartData.php?month=${selectedMonth}`)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error("Server error: " + res.status);
+            return res.json();
+        })
         .then(data => {
+
+            if (!data.labels || !data.values || data.labels.length === 0) {
+                showToast("No attendance data for this month.", "info");
+                return;
+            }
 
             const ctx = document.getElementById('lineChart');
 
@@ -815,84 +822,72 @@ function loadLineChart() {
             window.currentChartData = data;
 
             window.lineChartInstance = new Chart(ctx, {
-
                 type: 'line',
-
                 data: {
                     labels: data.labels,
-
                     datasets: [{
                         label: 'Attendance Records',
                         data: data.values,
-
                         borderColor: '#60a5fa',
                         backgroundColor: 'rgba(96,165,250,0.15)',
-
                         fill: true,
                         tension: 0.4,
-
                         pointRadius: 4,
                         pointHoverRadius: 6,
                         borderWidth: 3
                     }]
                 },
-
                 options: {
-
                     responsive: true,
                     maintainAspectRatio: false,
-
                     interaction: {
                         mode: 'index',
                         intersect: false
                     },
-
                     plugins: {
-
                         legend: {
                             display: true,
                             position: 'bottom',
-                            labels: {
-                                color: '#fff'
+                            labels: { color: '#fff' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                 title: (items) => 'Period: ' + items[0].label,
+                                label: (item) => ` ${item.parsed.y} attendance records`
                             }
                         }
-
                     },
-
                     scales: {
-
                         x: {
                             ticks: {
-                                color: '#9ca3af'
+                                color: '#9ca3af',
+                                maxRotation: 30  
                             },
                             grid: {
-                                 color: 'rgba(0,0,0,0.08)',
-                                    drawBorder: false
+                                color: 'rgba(0,0,0,0.08)',
+                                drawBorder: false
                             }
                         },
-
                         y: {
                             beginAtZero: true,
-
                             ticks: {
-                                color: '#9ca3af'
+                                color: '#9ca3af',
+                                precision: 0  
                             },
-
                             grid: {
-                                 color: 'rgba(0,0,0,0.08)',
+                                color: 'rgba(0,0,0,0.08)',
                                 drawBorder: false
                             }
                         }
-
                     }
-
                 }
-
             });
 
         })
-        .catch(err => console.error("Line chart error:", err));
-
+        .catch(err => {
+            console.error("Line chart error:", err);
+            showToast("Failed to load chart data.", "error");
+        });
 }
 
 function downloadChartCSV() {
@@ -1140,21 +1135,18 @@ function loadPieChart() {
     const wrapper      = ctx?.closest('.pie-canvas-wrapper') ?? ctx?.parentNode;
     const healthEl     = document.getElementById('health-score');
     const totalEl      = document.getElementById('total-attendance');
- 
-    /* ── destroy old instance ────────────────────────────────── */
+
     if (window.pieChartInstance) {
         window.pieChartInstance.destroy();
         window.pieChartInstance = null;
     }
  
-    /* ── remove any old empty overlay ───────────────────────── */
     _removePieEmpty(wrapper);
  
     fetch("../../php/admin/functions/getDonutChartData.php")
         .then(res => res.json())
         .then(data => {
  
-            /* ── decide if truly empty ───────────────────────── */
             const hasData = !data.empty &&
                             Array.isArray(data.values) &&
                             data.values.some(v => Number(v) > 0);
@@ -1164,7 +1156,6 @@ function loadPieChart() {
                 return;
             }
  
-            /* ── colour map ──────────────────────────────────── */
             const colors = {
                 Present: "#3b82f6",
                 Late:    "#93c5fd",
@@ -1228,13 +1219,11 @@ function loadPieChart() {
         });
 }
  
-/* ── health score ─────────────────────────────────────────────── */
 function loadHealthScore() {
  
     const healthEl = document.getElementById("health-score");
     const totalEl  = document.getElementById("total-attendance");
  
-    /* optimistic placeholder */
     if (healthEl) healthEl.innerText = "—%";
     if (totalEl)  totalEl.innerText  = "—";
  
@@ -1249,7 +1238,7 @@ function loadHealthScore() {
                 Number(data.excused  ?? 0);
  
             if (total === 0) {
-                /* ── empty state ─────────────────────────────── */
+    
                 if (healthEl) {
                     healthEl.innerText = "N/A";
                     healthEl.style.fontSize  = "22px";
@@ -1263,12 +1252,11 @@ function loadHealthScore() {
                 return;
             }
  
-            /* ── normal state ────────────────────────────────── */
             const score = Number(data.score ?? 0);
  
             if (healthEl) {
                 healthEl.innerText         = score + "%";
-                healthEl.style.fontSize    = "";     /* reset */
+                healthEl.style.fontSize    = "";   
                 healthEl.style.color       = _scoreColor(score);
             }
             if (totalEl) {
@@ -1284,18 +1272,13 @@ function loadHealthScore() {
         });
 }
  
-/* ══════════════════════════════════════════════════════════════
-   PRIVATE HELPERS
-══════════════════════════════════════════════════════════════ */
  
-/** Return a colour for the health-score number */
 function _scoreColor(score) {
     if (score >= 80) return "var(--success)";
     if (score >= 60) return "var(--warning)";
     return "var(--danger)";
 }
  
-/** Remove any existing empty-state overlay from the pie wrapper */
 function _removePieEmpty(wrapper) {
     if (!wrapper) return;
     const old = wrapper.querySelector(".pie-empty-state");
@@ -1312,12 +1295,11 @@ function _removePieEmpty(wrapper) {
  * @param {HTMLElement} totalEl   - #total-attendance
  * @param {boolean}     isError   - show error copy instead of "no data"
  */
+
 function _showPieEmpty(ctx, wrapper, healthEl, totalEl, isError = false) {
  
-    /* hide canvas so it doesn't leave a ghost */
     if (ctx) ctx.style.visibility = "hidden";
  
-    /* inject overlay */
     if (wrapper) {
         _removePieEmpty(wrapper);
  
@@ -1331,7 +1313,6 @@ function _showPieEmpty(ctx, wrapper, healthEl, totalEl, isError = false) {
         wrapper.appendChild(overlay);
     }
  
-    /* reset summary cards */
     if (healthEl) {
         healthEl.innerText       = "N/A";
         healthEl.style.fontSize  = "22px";
@@ -1343,24 +1324,19 @@ function _showPieEmpty(ctx, wrapper, healthEl, totalEl, isError = false) {
         totalEl.style.color     = "var(--gray-400)";
     }
  
-    /* restore canvas visibility once data arrives next time */
     if (ctx) {
-        /* watch for the next loadPieChart() call which will remove
-           the overlay and restore the canvas before redrawing */
         ctx.addEventListener("pieChartRestored", () => {
             ctx.style.visibility = "";
         }, { once: true });
     }
 }
  
-/* make sure canvas visibility is restored before drawing */
-const _origLoadPieChart = loadPieChart;   // guard against double-wrap
-function loadPieChart() {                 // re-declare to wrap restore step
+const _origLoadPieChart = loadPieChart;   
+function loadPieChart() {                
  
     const ctx     = document.getElementById('pieChart');
     const wrapper = ctx?.closest('.pie-canvas-wrapper') ?? ctx?.parentNode;
  
-    /* restore canvas if it was hidden by a previous empty state */
     if (ctx) ctx.style.visibility = "";
     _removePieEmpty(wrapper);
  

@@ -731,7 +731,7 @@ h5 {
 /* Line chart */
 .line-chart {
   border-left: 3px solid var(--accent);
-  min-height: 420px;
+  min-height: 120px;
   position: relative;
 }
 
@@ -820,7 +820,7 @@ h5 {
 
 #lineChart {
   width: 100% !important;
-  height: 480px !important;
+  height: 310px !important;
 }
 
 /* Pie chart card */
@@ -956,34 +956,34 @@ h5 {
 }
 
 .pie-empty-state {
-    position: absolute;
-    inset: 0;
- 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
- 
-    background: var(--surface-subtle);
-    border: 1.5px dashed var(--surface-border);
-    border-radius: var(--r-xl);
- 
-    animation: fadeSlide .3s var(--ease) both;
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  background: var(--surface-subtle);
+  border: 1.5px dashed var(--surface-border);
+  border-radius: var(--r-xl);
+
+  animation: fadeSlide 0.3s var(--ease) both;
 }
- 
+
 .pie-empty-state i {
-    font-size: 36px;
-    color: var(--gray-300);
-    opacity: .7;
+  font-size: 36px;
+  color: var(--gray-300);
+  opacity: 0.7;
 }
- 
+
 .pie-empty-state span {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-400);
-    text-align: center;
-    line-height: 1.55;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-align: center;
+  line-height: 1.55;
 }
 
 #health-score {
@@ -1951,7 +1951,7 @@ td {
   visibility: hidden;
   transition: all 0.3s var(--ease);
   max-height: 90vh;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 /* Show state */
@@ -2939,9 +2939,6 @@ body.dark-mode .att-bar-track {
 }
 
 .assign-footer {
-  padding: 14px 20px;
-  border-top: 1px solid var(--surface-border);
-  background: var(--surface-subtle);
   display: flex;
   justify-content: flex-end;
 }
@@ -3097,9 +3094,9 @@ body.dark-mode .att-bar-track {
 }
 
 .criteria-box {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
   padding: 10px;
   border: 1px solid var(--surface-border);
   border-radius: var(--r-md);
@@ -4363,10 +4360,6 @@ body.dark-mode .list-item.selected-supervisor {
   background: rgba(16, 185, 129, 0.12);
   border-left-color: var(--success);
 }
-body.dark-mode .assign-footer {
-  background: var(--surface-subtle);
-  border-top-color: var(--surface-border);
-}
 
 /* ── Download modals ─────────────────────────────────────────── */
 body.dark-mode .download-box,
@@ -4499,4 +4492,12 @@ body.dark-mode .footer {
   background: var(--surface-card);
   border-top-color: var(--surface-border);
   color: var(--gray-500);
+}
+
+/* form grid */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
