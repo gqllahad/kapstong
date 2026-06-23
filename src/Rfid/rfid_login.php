@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-require_once("kapstongConnection.php");
-require_once("functions.php");
+require_once("../Shared/kapstongConnection.php");
+require_once("../Shared/functions.php");
 
 date_default_timezone_set('Asia/Manila');
 

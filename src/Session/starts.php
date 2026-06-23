@@ -3,12 +3,12 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '../PHPMailer/src/PHPMailer.php';
-require '../PHPMailer/src/SMTP.php';
-require '../PHPMailer/src/Exception.php';
+require '../../PHPMailer/src/PHPMailer.php';
+require '../../PHPMailer/src/SMTP.php';
+require '../../PHPMailer/src/Exception.php';
 
-require_once("kapstongConnection.php");
-require_once("functions.php");
+require_once("../Shared/kapstongConnection.php");
+require_once("../Shared/functions.php");
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -175,7 +175,7 @@ if (isset($_POST['signupForm'])) {
     $email = filter_var($_POST['signEmail'], FILTER_VALIDATE_EMAIL);
 
     if (!$email) {
-        header("Location: signupStudent.php?error=Invalid+email");
+        header("Location: ../Signup/signupStudent.php?error=Invalid+email");
         exit();
     }
 
@@ -209,7 +209,7 @@ if (isset($_POST['signupForm'])) {
     $sqlCheck->close();
 
     if ($checkCount > 0) {
-        header("Location: signupStudent.php?error=ID+Already+Exists.");
+        header("Location: ../Signup/signupStudent.php?error=ID+Already+Exists.");
         exit();
     }
 
@@ -276,11 +276,11 @@ if (isset($_POST['signupForm'])) {
 
         $mail->send();
 
-        header('Location: verifyOTP.php');
+        header('Location: ../Otp/verifyOTP.php');
         exit();
     } catch (Exception $e) {
 
-        header("Location: signupStudent.php?error=OTP+Email+Failed");
+        header("Location: ../Signup/signupStudent.php?error=OTP+Email+Failed");
         exit();
     }
 };

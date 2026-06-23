@@ -1,5 +1,5 @@
 <?php
-require_once("../kapstongConnection.php");
+require_once("../Shared/kapstongConnection.php");
 
 $invalidEmail = false;
 
@@ -23,7 +23,7 @@ if (isset($_GET['error'])) {
 
     <link
         rel="stylesheet"
-        href="../../css/loginPhase.css">
+        href="../../public/css/loginPhase.css">
 
 </head>
 
@@ -55,7 +55,7 @@ if (isset($_GET['error'])) {
                 <section class="sign-logo">
 
                     <img
-                        src="../../kapstongImage/logo.jpg"
+                        src="../../public/kapstongImage/logo.jpg"
                         alt="logo"
                         id="logoRedirect">
 
@@ -103,19 +103,19 @@ if (isset($_GET['error'])) {
 
     <div id="backLoadingScreen" class="loading-screen">
         <div class="logo-loader">
-            <img src="../../kapstongImage/logo.jpg" class="logo-img-loading">
+            <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
         </div>
         <p>Going back..</p>
     </div>
 
     <div id="submitLoadingScreen" class="loading-screen">
         <div class="logo-loader">
-            <img src="../../kapstongImage/logo.jpg" class="logo-img-loading">
+            <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
         </div>
         <p>Verifying..</p>
     </div>
 
 </body>
-<script src="../../js/resetPassword.js"></script>
+<script src="../../public/js/resetPassword.js"></script>
 
 </html>

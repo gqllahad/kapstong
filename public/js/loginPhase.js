@@ -53,7 +53,7 @@ signUp.addEventListener("click", () => {
   loadingScreen.classList.add("show");
 
   setTimeout(()=>{
-    window.location.href = "signupStudent.php";
+    window.location.href = "../Signup/signupStudent.php";
   }, 1000);
   
 });
@@ -106,7 +106,7 @@ forgotPasswordLink.addEventListener("click", (e) => {
 
     setTimeout(() => {
 
-        window.location.href ="forgot_password_function/forgotPassword.php";
+        window.location.href ="../Password/forgotPassword.php";
 
     }, 1000);
 

@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once("../kapstongConnection.php");
+require_once("../../Shared/kapstongConnection.php");
 
 if(!isset($_SESSION['verified_reset'])) {
     header("Location: forgotPassword.php");
@@ -34,7 +34,7 @@ if(isset($_POST['newPassword'], $_POST['confirmPassword'])) {
 
     session_destroy();
 
-    header("Location: ../loginPhase.php?success_forget=Password+Updated!");
+    header("Location: ../Session/loginPhase.php?success_forget=Password+Updated!");
     exit();
 }
 ?>

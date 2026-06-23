@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-require_once("kapstongConnection.php");
-require_once("functions.php");
+require_once("../Shared/kapstongConnection.php");
+require_once("../Shared/functions.php");
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
@@ -20,7 +20,7 @@ $isVerified = $_SESSION['isVerified'] ?? null;
 switch ($role) {
 
     case "ADMIN":
-        header("Location: admin/adminDashboard.php");
+        header("Location: ../admin/adminDashboard.php");
         exit();
 
     case "student":
@@ -28,11 +28,11 @@ switch ($role) {
             header("Location: student/subStudent/pendingStudentDashboard.php");
             exit();
         }
-        header("Location: student/studentDashboard.php");
+        header("Location: ../student/studentDashboard.php");
         exit();
 
     case "supervisor":
-        header("Location: supervisor/supervisorDashboard.php");
+        header("Location: ../supervisor/supervisorDashboard.php");
         exit();
 
     default:

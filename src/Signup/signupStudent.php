@@ -1,6 +1,6 @@
 <?php
 
-require_once("functions.php");
+require_once("../Shared/functions.php");
 
 ?>
 
@@ -12,8 +12,8 @@ require_once("functions.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signup Tracking System</title>
-    <link rel="icon" type="image/png" href="../kapstongImage/logo.jpg">
-    <link rel="stylesheet" href="../css/signupPhase.css?v=123"> <!-- ?v=123 (for mobile not working) -->
+    <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
+    <link rel="stylesheet" href="../../public/css/signupPhase.css?v=123"> <!-- ?v=123 (for mobile not working) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 
@@ -527,6 +527,6 @@ require_once("functions.php");
     </div> -->
 
 </body>
-<script src="../js/signupPhase.js"></script>
+<script src="../../public/js/signupPhase.js"></script>
 
 </html>

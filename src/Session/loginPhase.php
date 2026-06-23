@@ -1,5 +1,5 @@
 <?php
-include("kapstongConnection.php");
+include("../Shared/kapstongConnection.php");
 
 $invaderLogin = false;
 $wrongPassword = false;
@@ -31,8 +31,8 @@ if (isset($_GET['success_forget'])) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Granby Monitoring System</title>
-  <link rel="icon" type="image/png" href="../kapstongImage/logo.jpg">
-  <link rel="stylesheet" href="../css/loginPhase.css" />
+  <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
+  <link rel="stylesheet" href="../../public/css/loginPhase.css" />
   <link
     href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
     rel='stylesheet'>
@@ -417,7 +417,7 @@ if (isset($_GET['success_forget'])) {
 
   <div id="loadingScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
     </div>
     <p>Signing up..</p>
     <div class="loading-dots">
@@ -427,7 +427,7 @@ if (isset($_GET['success_forget'])) {
 
   <div id="loginLoadingnScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
     </div>
     <p>Logging in..</p>
     <div class="loading-dots">
@@ -437,7 +437,7 @@ if (isset($_GET['success_forget'])) {
 
   <div id="forgotLoadingScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
     </div>
     <p>Redirecting..</p>
     <div class="loading-dots">
@@ -447,6 +447,6 @@ if (isset($_GET['success_forget'])) {
 
 </body>
 
-<script src="../js/loginPhase.js"></script>
+<script src="../../public/js/loginPhase.js"></script>
 
 </html>

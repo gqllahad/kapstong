@@ -21,7 +21,7 @@ unset($_SESSION['reset_password_error']);
 
     <title>Create New Password</title>
 
-    <link rel="stylesheet" href="../../css/loginPhase.css">
+    <link rel="stylesheet" href="../../public/css/loginPhase.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
 </head>
@@ -95,13 +95,13 @@ unset($_SESSION['reset_password_error']);
 
     <div id="resetLoadingScreen" class="loading-screen">
         <div class="logo-loader">
-            <img src="../../kapstongImage/logo.jpg" class="logo-img-loading">
+            <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
         </div>
         <p>Loading..</p>
     </div>
 
 </body>
 
-<script src="../../js/resetPasswordValidation.js"></script>
+<script src="../../public/js/resetPasswordValidation.js"></script>
 
 </html>

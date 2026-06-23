@@ -11,9 +11,9 @@
 //     die("Connection Failed : " . $conn->connect_error);
 // }
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
 $dotenv->load();
 
 $conn = new mysqli(
@@ -27,3 +27,5 @@ $conn = new mysqli(
 if ($conn->connect_error) {
     die("Connection Failed: " . $conn->connect_error);
 }
+
+var_dump($_ENV['DB_HOST']);
