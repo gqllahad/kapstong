@@ -1,460 +1,362 @@
-const steps = document.querySelectorAll('.step');
-const formSteps = document.querySelectorAll('.form-step');
-const progressFill = document.querySelector('.progress-fill');
+ let current = 0;
+    const totalSteps = 4;
+    const steps = ['step1', 'step2', 'step3', 'step4'];
+    const dots = [0, 1, 2, 3].map(i => document.getElementById('dot' + i));
+    const lbls = [0, 1, 2, 3].map(i => document.getElementById('lbl' + i));
+    const fill = document.getElementById('progressFill');
+    let genderVal = 'Male';
+    const form = document.getElementById('signupForm');
+    const loadingScreen = document.getElementById('loadingOverlay');
 
-let currentStep = 0;
-
-// next student ID 
-const nextButtonStep1 = document.getElementById("next1");
-const nextButtonStep2 = document.getElementById("next2");
-
-// Account details variables
-const studentIDStep2 = document.getElementById("studentID1");
-const studentIDStep3 = document.getElementById("studentID2");
-
-const studentEmail1 = document.getElementById("studentEmail");
-const studentEmail2 = document.getElementById("studentEmail2");
-
-const warningText = document.getElementById("studentID-warning");
-const warningTextEmail = document.getElementById("studentEmail-warning");
-
-const passwordInput = document.getElementById("passwordInput");
-const confirmPasswordInput = document.getElementById("confirmPasswordInput");
-
-// validations element
-const birthInputs = document.querySelectorAll('input[name="signBirth"]');
-const telInput = document.querySelector('input[name="signTel"]');
-
-// loading
-const form = document.getElementById("signupForm");
-const loadingScreen = document.getElementById("loadingScreen");
-
-// address
-// const barangayData = {
-
-// Tanza: ["Sahud-Ulan","Capipisa","Biga","Julugan","Calibuyo","Halayhay"],
-// Rosario: [ "Bagbag", "Kanluran", "Ligtong",  "Wawa",  "Sapa"  ],
-// Naic: [ "Bucana","Ibayo Silangan","Labac", "Muzon"],
-// Bacoor: ["Alima","Talaba", "Zapote","Niog"]
-//     };
-
-// const citySelect = document.getElementById("citySelect");
-// const barangayList = document.getElementById("barangays");
-// const barangayInput = document.getElementById("barangayInput");
-
-
-// functions vanilla java
-function updateStepper() {
-  steps.forEach((step, index) => {
-     step.classList.remove("active","completed");
-
-    if(index < currentStep){
-        step.classList.add("completed");
-        step.textContent = "✔";
+    function goTo(n) {
+        document.getElementById(steps[current]).classList.remove('active');
+        current = n;
+        document.getElementById(steps[current]).classList.add('active');
+        updateStepper();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     }
 
-    if(index === currentStep){
-        step.classList.add("active");
-        step.textContent = index + 1;
-    }
-  });
-
-  formSteps.forEach((form, index) => {
-    form.classList.toggle('active', index === currentStep);
-  });
-
-  let progress = (currentStep) / (steps.length - 1) * 100;
-  progressFill.style.width = progress + "%";
-
-}
-
-function validateStep(stepIndex) {
-    const currentForm = formSteps[stepIndex];
-    const inputs = currentForm.querySelectorAll("input[required]");
-
-    for (let input of inputs) {
-        if (!input.checkValidity()) {
-                input.reportValidity(); 
-                return false;
+    function updateStepper() {
+        dots.forEach((d, i) => {
+            d.className = 'step-dot';
+            lbls[i].className = 'step-label';
+            if (i < current) {
+                d.classList.add('completed');
+                d.textContent = '✔';
+                lbls[i].classList.add('completed');
+            } else if (i === current) {
+                d.classList.add('active');
+                d.textContent = i < 3 ? i + 1 : '✦';
+                lbls[i].classList.add('active');
+            } else {
+                d.textContent = i < 3 ? i + 1 : '✦';
             }
+        });
+        fill.style.width = (current / (totalSteps - 1) * 100) + '%';
     }
 
-    if (stepIndex === 2) { 
-        if (confirmPasswordInput.value !== passwordInput.value) {
-            showToast("Passwords do not match!", 3000);
-            confirmPasswordInput.value = "";
-            confirmPasswordInput.focus();
+    // Gender
+    document.querySelectorAll('#genderSeg .seg-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            document.querySelectorAll('#genderSeg .seg-btn').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            genderVal = b.dataset.val;
+            document.getElementById('genderHidden').value = genderVal;
+        });
+    });
+
+    // Name
+    document.querySelectorAll('.name-input').forEach(inp => {
+        inp.addEventListener('input', function() {
+            this.value = this.value.toUpperCase().replace(/[^A-Z\s]/g, '');
+        });
+    });
+
+    // Mobile
+    const telIn = document.getElementById('signTel');
+    telIn.addEventListener('input', function() {
+        let d = this.value.replace(/\D/g, '');
+        if (d.length > 11) d = d.slice(0, 11);
+        let fmt = '';
+        for (let i = 0; i < d.length; i++) {
+            fmt += d[i];
+            if (i === 1 || i === 4 || i === 7) fmt += ' ';
+        }
+        this.value = fmt.trim();
+        const fld = document.getElementById('f-mobile');
+        if (d.length === 11 && d.startsWith('09')) {
+            fld.classList.remove('error');
+            fld.classList.add('valid');
+        } else if (d.length > 0) {
+            fld.classList.add('error');
+            fld.classList.remove('valid');
+        } else {
+            fld.classList.remove('error', 'valid');
+        }
+    });
+
+    // Email
+    const emailIn = document.getElementById('signEmail');
+    emailIn.addEventListener('input', function() {
+        const email = emailIn.value.trim();
+        const fld = document.getElementById('f-email');
+        const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value);
+        if (!this.value) {
+            fld.classList.remove('error', 'valid');
+            return;
+        }
+
+        fetch(`checkStudentID.php?email=${encodeURIComponent(email)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.exists) {
+                    fld.classList.add('error');
+                    fld.classList.remove('valid');
+                    return;
+                }
+            })
+            .catch(err => console.error(err));
+
+        fld.classList.toggle('error', !ok);
+        fld.classList.toggle('valid', ok);
+        document.getElementById('email_ro').value = this.value;
+    });
+
+    // Selects
+    document.querySelectorAll('.field-select').forEach(sel => {
+        sel.addEventListener('change', function() {
+            this.classList.add('has-val');
+        });
+    });
+
+    // Password strength
+    const pwIn = document.getElementById('passwordInput');
+    pwIn.addEventListener('input', function() {
+        const v = this.value;
+        const sw = document.getElementById('strengthWrap');
+        if (!v) {
+            sw.style.display = 'none';
+            return;
+        }
+        sw.style.display = 'block';
+        let score = 0;
+        if (v.length >= 8) score++;
+        if (/[A-Z]/.test(v)) score++;
+        if (/[0-9]/.test(v)) score++;
+        if (/[^A-Za-z0-9]/.test(v)) score++;
+        const bars = ['sb1', 'sb2', 'sb3', 'sb4'].map(id => document.getElementById(id));
+        const clsMap = ['weak', 'weak', 'medium', 'strong'];
+        const labelMap = ['Too short', 'Weak', 'Moderate', 'Strong'];
+        const colorMap = ['var(--accent-rose)', 'var(--accent-rose)', '#f6ad55', 'var(--accent-emerald)'];
+        bars.forEach((b, i) => {
+            b.className = 'strength-bar';
+            if (i < score) b.classList.add(clsMap[score - 1] || 'weak');
+        });
+        const lbl = document.getElementById('strengthLabel');
+        lbl.textContent = labelMap[score - 1] || 'Too short';
+        lbl.style.color = colorMap[score - 1] || 'var(--text-muted)';
+    });
+
+    // Confirm password
+    const cpwIn = document.getElementById('confirmPw');
+    cpwIn.addEventListener('input', function() {
+        const badge = document.getElementById('matchBadge');
+        const fld = document.getElementById('f-cpw');
+        if (!this.value) {
+            badge.style.display = 'none';
+            fld.classList.remove('error', 'valid');
+            return;
+        }
+        badge.style.display = 'flex';
+        if (this.value === pwIn.value) {
+            badge.className = 'match-badge matched';
+            badge.innerHTML = '<i class="ti ti-check" style="font-size:12px;"></i> Passwords match';
+            fld.classList.remove('error');
+            fld.classList.add('valid');
+        } else {
+            badge.className = 'match-badge mismatch';
+            badge.innerHTML = '<i class="ti ti-x" style="font-size:12px;"></i> Passwords do not match';
+            fld.classList.add('error');
+            fld.classList.remove('valid');
+        }
+    });
+
+    // password
+    function togglePw(id, btn) {
+        const inp = document.getElementById(id);
+        const icon = btn.querySelector('i');
+        if (inp.type === 'password') {
+            inp.type = 'text';
+            icon.className = 'ti ti-eye-off';
+        } else {
+            inp.type = 'password';
+            icon.className = 'ti ti-eye';
+        }
+    }
+
+    // studentID
+    document.getElementById('studentID').addEventListener('input', function() {
+
+        const fld = document.getElementById('f-studentID');
+
+        const studentID = document.getElementById('studentID').value.trim();
+        if (studentID === "") return;
+
+        fetch(`checkStudentID.php?id=${encodeURIComponent(studentID)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.exists) {
+                    fld.classList.add('error');
+                    fld.classList.remove('valid');
+                    return;
+                }
+            })
+            .catch(err => console.error(err));
+
+        fld.classList.remove('error');
+        fld.classList.add('valid');
+        document.getElementById('studentID_ro').value = this.value;
+    });
+
+    // courses
+    document.addEventListener("DOMContentLoaded", function() {
+        const courseSelect = document.getElementById('signCourse');
+
+        fetch('getCourses.php')
+            .then(res => res.json())
+            .then(data => {
+                courseSelect.innerHTML = '<option value="" disabled selected hidden></option>';
+
+                if (data.acro && data.values) {
+                    data.acro.forEach((acro, index) => {
+
+                        const option = document.createElement('option');
+                        option.value = acro;
+                        option.textContent = data.values[index];
+                        courseSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(err => console.error("Error loading courses:", err));
+    });
+
+    // Academic year
+    function getAcademicYear() {
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = today.getMonth() + 1;
+        return m >= 6 ? y + '-' + (y + 1) : (y - 1) + '-' + y;
+    }
+    document.getElementById('academic-year').value = getAcademicYear();
+
+    // Validations
+    function validateStep1() {
+        if (!document.getElementById('lastName').value.trim()) {
+            showToast('Last name is required');
             return false;
         }
+        if (!document.getElementById('firstName').value.trim()) {
+            showToast('First name is required');
+            return false;
+        }
+        const email = document.getElementById('signEmail').value.trim();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showToast('Enter a valid email address');
+            return false;
+        }
+        const tel = document.getElementById('signTel').value.replace(/\D/g, '');
+        if (tel.length !== 11 || !tel.startsWith('09')) {
+            showToast('Enter a valid 11-digit mobile number starting with 09');
+            return false;
+        }
+        if (!document.getElementById('signBirth').value) {
+            showToast('Birthdate is required');
+            return false;
+        }
+        if (!document.getElementById('signAddress').value.trim()) {
+            showToast('Address is required');
+            return false;
+        }
+        return true;
     }
 
-    return true; 
-}
+    function validateStep2() {
+        if (!document.getElementById('studentID').value.trim()) {
+            showToast('Student ID is required');
+            return false;
+        }
+        if (!document.getElementById('signCourse').value) {
+            showToast('Please select a program');
+            return false;
+        }
+        if (!document.getElementById('signLevel').value) {
+            showToast('Please select year level');
+            return false;
+        }
+        if (!document.getElementById('signSemester').value) {
+            showToast('Please select semester');
+            return false;
+        }
+        return true;
+    }
 
-// Name error handling
-document.querySelectorAll('.name-input').forEach(input => {
+    function validateStep3() {
+        if (pwIn.value.length < 8) {
+            showToast('Password must be at least 8 characters');
+            return false;
+        }
+        if (pwIn.value !== cpwIn.value) {
+            showToast('Passwords do not match');
+            return false;
+        }
+        return true;
+    }
 
-    input.addEventListener("input", function () {
+    function buildConfirm() {
+        const courseEl = document.getElementById('signCourse');
+        const courseText = courseEl.options[courseEl.selectedIndex]?.text || '';
+        const rows = [
+            ['Full Name', [document.getElementById('firstName').value, document.getElementById('middleName').value, document.getElementById('lastName').value].filter(Boolean).join(' ')],
+            ['Email', document.getElementById('signEmail').value],
+            ['Mobile', document.getElementById('signTel').value],
+            ['Sex', genderVal],
+            ['Birthdate', document.getElementById('signBirth').value],
+            ['Address', document.getElementById('signAddress').value],
+            ['Student ID', document.getElementById('studentID').value],
+            ['Program', courseText],
+            ['Year Level', document.getElementById('signLevel').value],
+            ['Semester', document.getElementById('signSemester').value],
+            ['Academic Year', getAcademicYear()],
+        ];
+        document.getElementById('confirmGrid').innerHTML = rows.map(([l, v]) =>
+            `<div class="confirm-row"><span class="confirm-label">${l}</span><span class="confirm-val">${v||'—'}</span></div>`
+        ).join('');
+    }
 
-        this.value = this.value.toUpperCase();
-
-        const regex = /^[A-Z\s]*$/;
-        const parent = this.parentElement;
-        const warning = parent.querySelector(".name-warning");
-
-        if (!regex.test(this.value)) {
-            parent.classList.add("name-error");
-            warning.style.display = "block";
-            this.setCustomValidity("Invalid characters");
-            nextButtonStep1.disabled = true;
-        } else {
-            parent.classList.remove("name-error");
-            warning.style.display = "none";
-            this.setCustomValidity("");
-            nextButtonStep1.disabled = false;
+    // nav
+    document.getElementById('next1').addEventListener('click', () => {
+        if (validateStep1()) goTo(1);
+    });
+    document.getElementById('next2').addEventListener('click', () => {
+        if (validateStep2()) goTo(2);
+    });
+    document.getElementById('next3').addEventListener('click', () => {
+        if (validateStep3()) {
+            buildConfirm();
+            goTo(3);
         }
     });
-});
 
-// birthdate error handling
+    document.getElementById('prev2').addEventListener('click', () => goTo(0));
+    document.getElementById('prev3').addEventListener('click', () => goTo(1));
+    document.getElementById('prev4').addEventListener('click', () => goTo(2));
 
-document.querySelectorAll("input[type='date']").forEach(input => {
-    if (input.value !== "") {
-        input.classList.add("has-value");
-    }
+    document.getElementById('signupForm').addEventListener('submit', function() {
+        showToast('Account created successfully! Welcome aboard.');
 
-    input.addEventListener("change", function () {
-        this.classList.toggle("has-value", this.value !== "");
+        setTimeout(() => {
+            loadingScreen.classList.add("show");
+        }, 5500);
     });
-});
 
-birthInputs.forEach(input => {
-    input.addEventListener("input", function () {
-        const parent = this.parentElement;
-        const warning = parent.querySelector(".birth-warning");
+    // document.getElementById('submitBtn').addEventListener('click', () => {
 
-        const value = this.value;
+    //     document.getElementById('loadingOverlay').classList.add('show');
 
-        const birthDate = new Date(value);
-        if (!value || isNaN(birthDate.getTime())) {
-            parent.classList.add("birth-error");
-            warning.textContent = "Please enter a valid date.";
-            warning.style.display = "block";
-            this.setCustomValidity("Invalid date");
-            nextButtonStep1.disabled = true;
-            return;
-        }
+    //     setTimeout(() => {
+    //         document.getElementById('loadingOverlay').classList.remove('show');
+    //         showToast('Account created successfully! Welcome aboard.');
+    //         document.getElementById('signupForm').submit();
 
-        if (birthDate.getFullYear() < 1900) {
-            parent.classList.add("birth-error");
-            warning.textContent = "Year is too far in the past.";
-            warning.style.display = "block";
-            this.setCustomValidity("Year too old");
-            nextButtonStep1.disabled = true;
-            return;
-        }
+    //     }, 2500);
+    // });
 
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-
-        if (age < 15) {
-            parent.classList.add("birth-error");
-            warning.textContent = "You must be at least 18 years old.";
-            warning.style.display = "block";
-            this.setCustomValidity("You must be at least 18 years old.");
-            nextButtonStep1.disabled = true;
-        } else {
-            parent.classList.remove("birth-error");
-            warning.style.display = "none";
-            this.setCustomValidity("");
-            nextButtonStep1.disabled = false;
-        }
-    });
-});
-
-// address handling
-document.querySelectorAll("select").forEach(select => {
-    select.addEventListener("change", function () {
-        if (this.value !== "") {
-            this.classList.add("has-value");
-        } else {
-            this.classList.remove("has-value");
-        }
-    });
-});
-
-// mobile number error handling
-
-telInput.addEventListener("input", function() {
-    const parent = this.parentElement;
-    let warning = parent.querySelector(".tel-warning");
-    const value = this.value.trim();
-
-    
-
-    if (!warning) {
-        warning = document.createElement("p");
-        warning.classList.add("tel-warning");
-        warning.style.color = "var(--declined-color)";
-        warning.style.fontSize = "0.6rem";
-        warning.style.fontWeight = "600";
-        warning.style.display = "none";
-        parent.appendChild(warning);
+    function showToast(msg, dur = 3000) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), dur);
     }
-
-    let digits = this.value.replace(/\D/g, "");
-
-    document.getElementById("rawTel").value = digits;
-
-    if (digits.length > 11) digits = digits.slice(0, 11);
-
-    if (!digits.startsWith("09")) {
-        parent.classList.add("tel-error");
-        warning.textContent = "Mobile number must start with 09";
-        warning.style.display = "block";
-        this.setCustomValidity("Invalid mobile number");
-        nextButtonStep1.disabled = true;
-        return;
-    } else {
-        parent.classList.remove("tel-error");
-        warning.style.display = "none";
-        this.setCustomValidity("");
-        nextButtonStep1.disabled = false;
-    }
-
-    let formatted = "";
-    for (let i = 0; i < digits.length; i++) {
-        formatted += digits[i];
-        if (i === 1 || i === 4 || i === 7) formatted += " ";
-    }
-
-    this.value = formatted.trim();
-
-    if (digits.length !== 11) {
-        parent.classList.add("tel-error");
-        warning.textContent = "Enter a valid mobile number";
-        warning.style.display = "block";
-        warning.parentElement.classList.add("errorMobile");
-        this.setCustomValidity("Invalid mobile number");
-        nextButtonStep1.disabled = true;
-    } else {
-        parent.classList.remove("tel-error");
-        warning.style.display = "none";
-         warning.parentElement.classList.remove("errorMobile");
-        this.setCustomValidity("");
-        nextButtonStep1.disabled = false;
-    }
-});
-
-// manage courses
-document.addEventListener("DOMContentLoaded", function() {
-    const courseSelect = document.getElementById('signCourse');
-
-    fetch('getCourses.php')
-        .then(res => res.json())
-        .then(data => {
-            courseSelect.innerHTML = '<option value="">Select Course</option>';
-
-            if (data.acro && data.values) {
-                data.acro.forEach((acro, index) => {
-                    const option = document.createElement('option');
-                    option.value = acro;
-                    option.textContent = data.values[index];
-                    courseSelect.appendChild(option);
-                });
-            }
-        })
-        .catch(err => console.error("Error loading courses:", err));
-});
-
-// academic year
-function getAcademicYear() {
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1;
-
-    let startYear, endYear;
-
-    if (currentMonth >= 6) {
-        startYear = currentYear;
-        endYear = currentYear + 1;
-    } else {
-        startYear = currentYear - 1;
-        endYear = currentYear;
-    }
-
-    return startYear + "-" + endYear;
-};
-
-document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("academic-year").value = getAcademicYear();
-});
-
-// toggle passwords
-function togglePassword(inputId, icon) {
-    const input = document.getElementById(inputId);
-
-    if (input.type === "password") {
-        input.type = "text";
-        icon.textContent = "Show"; 
-    } else {
-        input.type = "password";
-        icon.textContent = "Hide";
-    }
-};
-
-// toast
-function showToast(message, duration = 2500) {
-    const toast = document.getElementById("toast");
-
-    toast.innerHTML = message; 
-    const timerBar = document.createElement("div");
-    timerBar.classList.add("toast-timer");
-    toast.appendChild(timerBar);
-
-    toast.classList.add("show");
-
-    timerBar.style.transition = `width ${duration}ms linear`;
-    setTimeout(() => {
-        timerBar.style.width = "0%";
-    }, 10); 
-
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, duration);
-};
-
-
-//Next
-document.querySelectorAll('[id^="next"]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (validateStep(currentStep)) { 
-        if (currentStep < formSteps.length - 1) {
-            currentStep++;
-            updateStepper();
-        }
-    }
-  });
-});
-
-// Back
-document.querySelectorAll('[id^="prev"]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (currentStep > 0) {
-      currentStep--;
-      updateStepper();
-    }
-  });
-});
-
-
-confirmPasswordInput.addEventListener("focus", () => {
-    if (!passwordInput.value) {
-        showToast("Passwords do not match!", 3000);
-        passwordInput.focus();
-    }
-});
-
-// loading
-form.addEventListener("submit", function () {
-    loadingScreen.classList.add("show");
-});
-
-
-// STUDENT CHECK
-studentIDStep2.addEventListener("input", () => {
-    studentIDStep3.value = studentIDStep2.value;
-
-    const studentID = studentIDStep2.value.trim();
-    if(studentID === "") return;
-
-    fetch(`checkStudentID.php?id=${encodeURIComponent(studentID)}`)
-      .then(res => res.json())
-      .then(data => {
-          if(data.exists) {
-              warningText.style.display = "block";
-              studentIDStep2.setCustomValidity("Student ID already taken!");
-              studentIDStep2.parentElement.classList.add("id-taken");
-              nextButtonStep2.disabled = true;
-          } else {
-              warningText.style.display = "none";
-              studentIDStep2.setCustomValidity(""); 
-              studentIDStep2.parentElement.classList.remove("id-taken");
-              nextButtonStep2.disabled = false;
-          }
-      })
-      .catch(err => console.error(err));
-});
-
-
-studentEmail1.addEventListener("input", () => {
-    studentEmail2.value = studentEmail1.value;
-
-    const studentEmail = studentEmail1.value.trim();
-    if(studentEmail === "") return;
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.(com|net|org|edu|ph|gov)$/;
-
-    if (!emailRegex.test(studentEmail)) {
-        warningTextEmail.style.display = "block";
-        warningTextEmail.textContent = "Enter a valid email address (e.g., example@gmail.com)";
-        studentEmail1.setCustomValidity("Invalid email format");
-        studentEmail1.parentElement.classList.add("email-taken");
-        nextButtonStep1.disabled = true;
-        return;
-    }
-
-    fetch(`checkStudentID.php?email=${encodeURIComponent(studentEmail)}`)
-      .then(res => res.json())
-      .then(data => {
-          if(data.exists) {
-              warningTextEmail.style.display = "block";
-              studentEmail1.setCustomValidity("Email already been used!");
-              studentEmail1.parentElement.classList.add("email-taken");
-              nextButtonStep1.disabled = true;
-          } else {
-              warningTextEmail.style.display = "none";
-              studentEmail1.setCustomValidity(""); 
-              studentEmail1.parentElement.classList.remove("email-taken");
-              nextButtonStep1.disabled = false;
-          }
-      })
-      .catch(err => console.error(err));
-});
-
-
-//  citySelect.addEventListener("change", function () {
-
-//         const selectedCity = this.value;
-
-//         barangayList.innerHTML = "";
-//         barangayInput.value = "";
-
-//         if (barangayData[selectedCity]) {
-
-//             barangayData[selectedCity].forEach(barangay => {
-
-//                 const option = document.createElement("option");
-//                 option.value = barangay;
-
-//                 barangayList.appendChild(option);
-
-//             });
-//         }
-//     });
-
-//     console.log(barangayInput);
-
-// studentEmail1.addEventListener("blur", checkEmail);
-
-// 1995215248
-
-
-// document.getElementById('signupForm').addEventListener('submit', (e) => {
-//   e.preventDefault();
-//   alert("Form submitted!");
-// });

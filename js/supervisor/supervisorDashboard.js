@@ -87,7 +87,10 @@ const toggleBtn = document.getElementById("darkModeToggle");
 // current month
 window.currentMonth = null;
 
-
+// task swtich
+const taskManage = document.getElementById("task-manage-table");
+const taskSubmit = document.getElementById("task-submit-table");
+const taskSelf = document.getElementById("task-self-table");
 
 // functions
 
@@ -112,6 +115,13 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".sidebar").style.pointerEvents = "none";
         document.querySelector(".content").style.pointerEvents = "none";
     }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const today = new Date().toISOString().split("T")[0];
+
+    document.getElementById("due_date").setAttribute("min", today);
 });
 
 document.addEventListener("keydown", e => {
@@ -1431,7 +1441,7 @@ function viewEvaluationReport(studentID) {
             document.getElementById("reportSummary").innerHTML = `
                 <div class="report-card">
 
-                    <h2>📊 Student Evaluation Report</h2>
+                    <h2><i class="bi bi-bar-chart-fill"></i> Student Evaluation Report</h2>
 
                     <div class="eval-grid">
 
@@ -1503,19 +1513,11 @@ function previewTask(taskID) {
 function updateTaskStatus(taskID, status) {
 
     const feedback = document.getElementById("supervisorFeedback")?.value.trim() || "";
-    const rating = document.getElementById("supervisorRating")?.value || "";
     
     if (status === "REJECTED" && !feedback) {
         showToast("Please provide supervisor feedback before rejecting the task.", "warning");
         return;
     }
-
-    if (status === "APPROVED" && !rating) {
-        showToast("Please select a rating first.", "warning");
-        return;
-    }
-
-    if (!confirm("Are you sure?")) return;
 
     fetch("functions/updateTaskStatus.php", {
         method: "POST",
@@ -1524,10 +1526,18 @@ function updateTaskStatus(taskID, status) {
         },
         body: "taskID=" + encodeURIComponent(taskID) +
               "&status=" + encodeURIComponent(status) +
-              "&supervisor_feedback=" + encodeURIComponent(feedback) +
-              "&rating=" + encodeURIComponent(rating)
+              "&supervisor_feedback=" + encodeURIComponent(feedback)
+              
     })
-    .then(res => res.json())
+    .then(async res => {
+
+    const text = await res.text();
+
+    console.log("RAW RESPONSE:");
+    console.log(text);
+
+    return JSON.parse(text);
+})
     .then(data => {
         
         showToast(data.message, "success");
@@ -1537,6 +1547,9 @@ function updateTaskStatus(taskID, status) {
             studentApplicationApprove.classList.remove("show");
             location.reload();
         }
+    }).catch(err => {
+        console.error(err);
+        showToast("Something went wrong", "error");
     });
 }
 
@@ -1743,12 +1756,8 @@ function viewTask(taskID) {
             document.getElementById("modalSupervisorFeedback").innerText =
                 data.supervisor_feedback ? data.supervisor_feedback : "No supervisor feedback";
 
-            document.getElementById("modalSupervisorRating").innerText =
-                data.rating ? data.rating : "No rating provided";
-
             document.getElementById("studentNoteSection").style.display = "block";
             document.getElementById("supervisorFeedbackSection").style.display = "block";
-            document.getElementById("ratingSection").style.display = "block";
         });
 }
 
@@ -1772,10 +1781,21 @@ function editTask(taskID) {
 
 // delete task
 function deleteTask(taskID) {
+const modal = document.getElementById("deleteModal");
 
-    if (!confirm("Are you sure you want to delete this task?")) {
-        return;
-    }
+modal.classList.add("show");
+overlay.classList.add("show");
+
+document.getElementById("cancelDeleteBtn").onclick = () => {
+    const modal = document.getElementById("deleteModal");
+
+      modal.classList.remove("show");
+      overlay.classList.remove("show");
+};
+
+document.getElementById("confirmDeleteBtn").onclick = () => {
+
+    if (!taskID) return;
 
     const formData = new FormData();
     formData.append("taskID", taskID);
@@ -1786,11 +1806,65 @@ function deleteTask(taskID) {
     })
     .then(res => res.json())
     .then(data => {
-        showToast(data.message, "success");
+
+        showToast(data.message, data.status);
 
         if (data.status === "success") {
-            location.reload();
-        }
+        reloadTaskTable();
+    }
+    });
+
+    modal.classList.remove("show");
+    overlay.classList.remove("show");
+};
+
+    // if (!confirm("Are you sure you want to delete this task?")) {
+    //     return;
+    // }
+
+    // const formData = new FormData();
+    // formData.append("taskID", taskID);
+
+    // fetch("functions/deleteTask.php", {
+    //     method: "POST",
+    //     body: formData
+    // })
+    // .then(res => res.json())
+    // .then(data => {
+    //     showToast(data.message, "success");
+
+    //     if (data.status === "success") {
+    //         location.reload();
+    //     }
+    // });
+}
+
+function reloadTaskTable() {
+
+    const formData = new FormData();
+
+    formData.append(
+        "search",
+        document.getElementById("assignedTaskSearch").value
+    );
+
+    formData.append(
+        "status",
+        document.getElementById("taskStatusFilter").value
+    );
+
+    formData.append(
+        "deadline",
+        document.getElementById("dateDeadline").value
+    );
+
+    fetch("functions/searchTask.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.text())
+    .then(html => {
+        document.getElementById("assignedTaskBody").innerHTML = html;
     });
 }
 
@@ -1799,14 +1873,51 @@ function closeTaskModal(){
     overlay.classList.remove("show");
 }
 
-
-
-// task approvals
-
 closeViewTaskDetails.addEventListener("click", () => {
     overlay.classList.remove("show");
     viewTaskDetails.classList.remove("show");
 });
+
+// task switch
+function setActiveTab(tabName) {
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+
+        btn.classList.toggle(
+            "active",
+            btn.dataset.tab === tabName
+        );
+    });
+}
+function showManageTable() {
+
+    taskSubmit.classList.remove("show");
+    taskSelf.classList.remove("show");
+    taskManage.classList.add("show");
+
+    setActiveTab("manage");
+}
+
+function showSubmittedTable() {
+
+    taskManage.classList.remove("show");
+    taskSelf.classList.remove("show");
+    taskSubmit.classList.add("show");
+
+    setActiveTab("submitted");
+}
+
+function showSelfTable() {
+
+    taskManage.classList.remove("show");
+    taskSubmit.classList.remove("show");
+    taskSelf.classList.add("show");
+
+    setActiveTab("self");
+}
+
+
+
 
 
 // profile menu
@@ -1851,6 +1962,7 @@ superOversightBtn.addEventListener("click", () => {
     superEvaluation.style.display = "none";
     superActivity.style.display = "none";
     superAttendance.style.display = "none";
+
 });
 
 superStudentsBtn.addEventListener("click", () => {
@@ -2070,7 +2182,7 @@ closeStudentChart.addEventListener("click", () => {
 
 
 // assigning task to students
-document.getElementById("taskStudentList").addEventListener("click", function (e) {
+studentList.addEventListener("click", function (e) {
 
     const item = e.target.closest(".task-student-item");
 
@@ -2123,6 +2235,7 @@ document.getElementById("taskStudentSearch").addEventListener("keyup", function 
     }, 300);
 });
 
+
 document.getElementById("createTaskForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -2141,23 +2254,56 @@ document.getElementById("createTaskForm").addEventListener("submit", function (e
         formData.append("studentIDs[]", id);
     });
 
-    fetch("functions/createAndAssignTask.php", {
-        method: "POST",
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        showToast(data.message,"success");
+    console.log(selectedTaskStudentIDs, selectedSupervisorID);
 
-        if (data.status === "success") {
-            location.reload();
-        }
-    })
-    .catch(err => {
-        showToast("Something went wrong.", "error")
-    });
+    fetch("functions/createAndAssignTask.php", {
+    method: "POST",
+    body: formData
+})
+.then(async res => {
+    const text = await res.text();
+    console.log("Raw response:", text);
+    return JSON.parse(text);
+})
+.then(data => {
+
+    if (data.status === "success") {
+        reloadApprovalReportTable();
+        reloadTaskTable();
+        document.getElementById("createTaskForm").reset();
+
+        selectedTaskStudentIDs = [];
+        
+        createTask.classList.remove("show");
+        overlay.classList.remove("show");
+
+        showToast(data.message, "success");
+    }
+})
+.catch(err => {
+    console.error(err);
+    showToast("Something went wrong.", "error");
+});
     
 });
+
+function reloadApprovalReportTable() {
+
+    const search = document.getElementById("reportApprovalSearch")?.value || "";
+
+    fetch("functions/searchApprovalReport.php", {
+        method: "POST",
+        headers: {
+            "Content-Type":
+                "application/x-www-form-urlencoded"
+        },
+        body: "search=" + encodeURIComponent(search)
+    })
+    .then(res => res.text())
+    .then(html => {
+        document.getElementById("approvalReportBody").innerHTML = html;
+    });
+}
 
 // edit tasks
 document.getElementById("editTaskForm").addEventListener("submit", function (e) {
@@ -2266,6 +2412,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.getElementById("darkModeToggle").addEventListener("click", () => {
 
+    profileMenu.hidden = true;
+
      setTimeout(reloadAllCharts, 100);
 });
 
@@ -2320,7 +2468,7 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchLogs();
 });
 
-// supervisor attendance
+// supervisor search
 document.addEventListener("DOMContentLoaded", function () {
 
     const searchInput = document.getElementById("studentAttendanceSearch");
@@ -2373,6 +2521,103 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetchAttendance();
 });
+
+// self task search
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("selfSearch");
+    const statusFilter = document.getElementById("selfStatusFilter");
+    const dateInput = document.getElementById("selfDate");
+    
+    const tableBody = document.getElementById("selfTaskBody");
+
+    
+
+    if (!searchInput || !statusFilter || !tableBody || !dateInput) return;
+
+    let timer;
+
+    function fetchSelfTask() {
+
+        const search = searchInput.value;
+        const status = statusFilter.value;
+        const date = dateInput.value;
+
+        fetch("functions/searchSelfTask.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "search=" + encodeURIComponent(search) +
+                "&status=" + encodeURIComponent(status) + 
+                "&date=" + encodeURIComponent(date)
+        })
+        .then(res => res.text())
+        .then(data => {
+            tableBody.innerHTML = data;
+        })
+        .catch(err => {
+            console.error("Attendance fetch error:", err);
+        });
+    }
+
+    searchInput.addEventListener("keyup", function () {
+        clearTimeout(timer);
+        timer = setTimeout(fetchSelfTask, 300);
+    });
+
+    statusFilter.addEventListener("change", fetchSelfTask);
+    dateInput.addEventListener("change", fetchSelfTask);
+
+    fetchSelfTask();
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("reportsSearch");
+    const courseFilter = document.getElementById("reportsCourseFilter");
+    const tableBody = document.getElementById("evaluationBody");
+
+    if (!searchInput || !tableBody || !courseFilter) return;
+
+    let timer;
+
+    function fetchReports() {
+
+        const search = searchInput.value;
+        const course = courseFilter.value;
+
+        fetch("functions/searchStudentReports.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "search=" + encodeURIComponent(search) +
+                "&course=" + encodeURIComponent(course)
+        })
+        .then(res => res.text())
+        .then(data => {
+            tableBody.innerHTML = data;
+        })
+        .catch(err => {
+            console.error("Reports fetch error:", err);
+        });
+    }
+
+    searchInput.addEventListener("keyup", function () {
+        clearTimeout(timer);
+        timer = setTimeout(fetchReports, 300);
+    });
+
+    courseFilter.addEventListener("change", fetchReports);
+
+    fetchReports();
+});
+
+
+
 
 
 // settings

@@ -15,7 +15,7 @@ logoRedirect.addEventListener("click", () => {
 
     setTimeout(() => {
 
-        window.location.href = "loginPhase.php";
+        window.location.href = "../loginPhase.php";
 
     }, 1000);
 
@@ -43,7 +43,7 @@ if (invalidEmail && modalInvader) {
   });
 
   setTimeout(() => {
-    window.location.href = "forgotPassword.php";
+    window.location.href = "forgot_password_function/forgotPassword.php";
   },1500);
 }
 

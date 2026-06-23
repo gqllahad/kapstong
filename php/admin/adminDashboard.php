@@ -29,15 +29,14 @@ if ($_SESSION['role'] !== "ADMIN") {
     <title>Admin Dashboard</title>
     <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
 
-    <link rel="stylesheet" href="../../css/admin/adminDashboard.css">
+    <link rel="stylesheet" href="../../css/admin/adminDashboard3.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
 
 </head>
 
 
 <body>
-    <header class="navbar">
+    <!-- <header class="navbar">
 
         <div class="header-title">
             <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
@@ -51,7 +50,7 @@ if ($_SESSION['role'] !== "ADMIN") {
             <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
 
-    </header>
+    </header> -->
 
     <!--  MAIN LAYOUT -->
     <div class="layout">
@@ -66,6 +65,38 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <li><button id="admin-attendance-btn"><i class="bi bi-calendar-check"></i>Attendance Logs</button></li>
                 <li><button id="admin-reports-btn"> <i class="bi bi-graph-up"></i>Reports</button></li>
             </ul>
+
+            <div class="sidebar-profile">
+
+                <div class="profile-left">
+                    <div class="profile-avatar">
+                        A
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">Admin</span>
+                        <small>Administrator</small>
+                    </div>
+                </div>
+                <button id="menuToggle" class="profile-trigger">
+                    ☰
+                </button>
+
+                <nav class="profile-menu" id="profileMenu" hidden>
+                    <a id="openAccountSettingsBtn">
+                        <i class="bi bi-gear"></i>
+                        Account Settings
+                    </a>
+                    <a id="darkModeToggle" class="dark-toggle">
+                        <i class="bi bi-moon-fill"></i>
+                        Dark Mode
+                    </a>
+                    <hr>
+                    <a href="../logoutPhase.php">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </a>
+                </nav>
+            </div>
 
         </aside>
 
@@ -161,7 +192,7 @@ if ($_SESSION['role'] !== "ADMIN") {
             </div>
 
             <!-- download supervisor data -->
-             <div class="download-all-supervisor-modal" id="download-all-supervisor-modal">
+            <div class="download-all-supervisor-modal" id="download-all-supervisor-modal">
 
                 <div class="download-content">
 
@@ -211,10 +242,10 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                         </div>
 
-                          <div class="download-footer">
-                        <button type="submit" class="confirm-btn">
-                            Generate PDF
-                        </button>
+                        <div class="download-footer">
+                            <button type="submit" class="confirm-btn">
+                                Generate PDF
+                            </button>
                         </div>
 
                     </form>
@@ -233,7 +264,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <i class="bi bi-download"></i>
                             Download All
                         </button>
-                    <button id="closeAllStudentModal" class="modal-close">&times;</button>
+                        <button id="closeAllStudentModal" class="modal-close">&times;</button>
                     </div>
                 </div>
 
@@ -270,7 +301,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
 
             <!-- student rfid register -->
-             <div class="rfid-register-modal" id="rfid-register-modal">
+            <div class="rfid-register-modal" id="rfid-register-modal">
                 <div class="rfid-register-content">
 
                     <div class="modal-header">
@@ -287,7 +318,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <input type="hidden" id="rfidStudentID">
 
                         <div class="rfid-icon">
-                             <i class="bi bi-person-vcard"></i>
+                            <i class="bi bi-person-vcard"></i>
                         </div>
 
                         <h2 class="rfid-title">
@@ -316,10 +347,10 @@ if ($_SESSION['role'] !== "ADMIN") {
                     </div>
 
                 </div>
-             </div>
+            </div>
 
             <!-- download students data -->
-             <div class="download-all-student-modal" id="download-all-student-modal">
+            <div class="download-all-student-modal" id="download-all-student-modal">
 
                 <div class="download-content">
 
@@ -350,7 +381,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <label>Course</label>
 
                             <select name="course">
-                                 <?php echo renderSelectOptions($conn, 'program'); ?>
+                                <?php echo renderSelectOptions($conn, 'program'); ?>
                             </select>
                         </div>
 
@@ -358,14 +389,14 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <label>Year Level</label>
 
                             <select name="year">
-                               <?php echo renderSelectOptions($conn, 'year'); ?>
+                                <?php echo renderSelectOptions($conn, 'year'); ?>
                             </select>
                         </div>
 
                         <div class="download-footer">
-                        <button type="submit" class="confirm-btn">
-                            Generate PDF
-                        </button>
+                            <button type="submit" class="confirm-btn">
+                                Generate PDF
+                            </button>
                         </div>
 
                     </form>
@@ -402,49 +433,50 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <div id="formMessage" style="margin-bottom:10px; font-weight:bold;"></div>
                     <form id="createSupervisorForm" method="POST">
 
-                        <div class="input-group">
-                            <label>Full Name</label>
-                            <input type="text" name="name" placeholder="Enter full name" required>
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>Full Name</label>
+                                <input type="text" name="name" placeholder="Enter full name" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Email Address</label>
+                                <input type="email" name="email" placeholder="Enter email address" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Mobile Number</label>
+                                <input type="text" name="mobile" placeholder="09XXXXXXXXX" maxlength="11" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Department</label>
+                                <select name="department" required>
+                                    <?php echo renderSelectOptions($conn, 'department'); ?>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Company Name</label>
+                                <input type="text" name="company" placeholder="Enter company name" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Position</label>
+                                <input type="text" name="position" placeholder="e.g. HR Manager / Team Lead">
+                            </div>
+
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="confirmCreateSupervisor">
+                                <label for="confirmCreateSupervisor">
+                                    I confirm that this supervisor will be added to the system.
+                                </label>
+                            </div>
+
+                            <button type="submit" name="createSupervisor" id="createSupervisorBtn" disabled class="primary-btn">
+                                Create Supervisor
+                            </button>
                         </div>
-
-                        <div class="input-group">
-                            <label>Email Address</label>
-                            <input type="email" name="email" placeholder="Enter email address" required>
-                        </div>
-
-                        <div class="input-group">
-                            <label>Mobile Number</label>
-                            <input type="text" name="mobile" placeholder="09XXXXXXXXX" maxlength="11" required>
-                        </div>
-
-                        <div class="input-group">
-                            <label>Department</label>
-                            <select name="department" required>
-                                <?php echo renderSelectOptions($conn, 'department'); ?>
-                            </select>
-                        </div>
-
-                        <div class="input-group">
-                            <label>Company Name</label>
-                            <input type="text" name="company" placeholder="Enter company name" required>
-                        </div>
-
-                        <div class="input-group">
-                            <label>Position</label>
-                            <input type="text" name="position" placeholder="e.g. HR Manager / Team Lead">
-                        </div>
-
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="confirmCreateSupervisor">
-                            <label for="confirmCreateSupervisor">
-                                I confirm that this supervisor will be added to the system.
-                            </label>
-                        </div>
-
-                        <button type="submit" name="createSupervisor" id="createSupervisorBtn" disabled class="primary-btn">
-                            Create Supervisor
-                        </button>
-
                     </form>
                 </div>
             </div>
@@ -497,28 +529,30 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 <div class="ojt-program-body">
 
+
                     <div class="current-ojt-card" id="activeOJTContainer">
                         <?php echo renderActiveOJTCard($conn); ?>
                     </div>
 
-                    <div class="form-group">
-                        <label>Academic Year</label>
-                        <input type="text" id="academicYear" placeholder="e.g. 2026 - 2027"  pattern="\d{4}\s*-\s*\d{4}">
-                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Academic Year</label>
+                            <input type="text" id="academicYear" placeholder="e.g. 2026 - 2027" pattern="\d{4}\s*-\s*\d{4}">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Required OJT Hours</label>
-                        <input type="number" id="requiredHours" placeholder="e.g. 600">
-                    </div>
+                        <div class="form-group">
+                            <label>Required OJT Hours</label>
+                            <input type="number" id="requiredHours" placeholder="e.g. 600">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="status">
-                            <option value="ACTIVE">Active</option>
-                            <option value="INACTIVE">Inactive</option>
-                        </select>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="status">
+                                <option value="ACTIVE">Active</option>
+                                <option value="INACTIVE">Inactive</option>
+                            </select>
+                        </div>
                     </div>
-
                     <div class="ojt-actions">
                         <button type="button" onclick="saveOJTSettings()" class="save-btn">
                             Save Setup
@@ -539,39 +573,41 @@ if ($_SESSION['role'] !== "ADMIN") {
                 <div class="department-body">
 
                     <input type="hidden" id="program_id">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Program Name</label>
+                            <input
+                                type="text"
+                                id="prg_name"
+                                placeholder="e.g. Bachelor of Science in Information Technology">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Program Name</label>
-                        <input
-                            type="text"
-                            id="prg_name"
-                            placeholder="e.g. Bachelor of Science in Information Technology">
+                        <div class="form-group">
+                            <label>Program Code</label>
+                            <input
+                                type="text"
+                                id="prg_acro"
+                                placeholder="e.g. BSIT">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Department Name</label>
+                            <select id="prg_department" onchange="updateDepartmentCode()">
+                                <?php echo renderDepartmentOptions($conn); ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Department Code</label>
+                            <input
+                                type="text"
+                                id="prg_department_code"
+                                placeholder="e.g. CCS"
+                                readonly>
+                        </div>
+
+
                     </div>
-
-                    <div class="form-group">
-                        <label>Program Code</label>
-                        <input
-                            type="text"
-                            id="prg_acro"
-                            placeholder="e.g. BSIT">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Department Name</label>
-                        <select id="prg_department" onchange="updateDepartmentCode()">
-                            <?php echo renderDepartmentOptions($conn); ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Department Code</label>
-                        <input
-                            type="text"
-                            id="prg_department_code"
-                            placeholder="e.g. CCS"
-                            readonly>
-                    </div>
-
                     <div class="form-group">
                         <label>Status</label>
                         <select id="prg_status">
@@ -579,7 +615,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <option value="INACTIVE">Inactive</option>
                         </select>
                     </div>
-
                     <div class="department-actions">
                         <button class="save-btn" onclick="updateProgram()">
                             Save Program
@@ -597,26 +632,26 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
 
-            <div class="user-management">
-                <div class="search-filter">
+                <div class="user-management">
+                    <div class="search-filter">
 
-                    <div class="search-container">
+                        <div class="search-container">
 
-                        <i class="bi bi-funnel search-icon"></i>
+                            <i class="bi bi-funnel search-icon"></i>
 
-                        <select id="departmentFilter" onchange="filterPrograms(this.value)">
-                            <?php echo renderDepartmentOptions($conn); ?>
-                        </select>
+                            <select id="departmentFilter" onchange="filterPrograms(this.value)">
+                                <?php echo renderDepartmentOptions($conn); ?>
+                            </select>
+
+                        </div>
 
                     </div>
-
-                </div>
                     <button class="assign-student-btn" onclick="openCreateCourseModal()">
                         <span class="icon">+</span>
                         <span class="text">Create Course</span>
                     </button>
                 </div>
-                
+
 
                 <div class="table-container">
                     <table>
@@ -646,26 +681,27 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <button id="closeCreateCourseModal" class="modal-close">&times;</button>
                 </div>
 
-                 <div class="modal-body">
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Program Name</label>
+                            <input type="text" id="prg_name_create" placeholder="e.g. Bachelor of Science in Information Technology">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Program Name</label>
-                        <input type="text" id="prg_name_create" placeholder="e.g. Bachelor of Science in Information Technology">
-                    </div>
+                        <div class="form-group">
+                            <label>Program Acronym</label>
+                            <input type="text" id="prg_acro_create" placeholder="e.g. BSIT">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Program Acronym</label>
-                        <input type="text" id="prg_acro_create" placeholder="e.g. BSIT">
-                    </div>
+                        <div class="form-group">
+                            <label>Department</label>
+                            <input type="text" id="prg_department_create" placeholder="e.g. College of Computing">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Department</label>
-                        <input type="text" id="prg_department_create" placeholder="e.g. College of Computing">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Department Code</label>
-                        <input type="text" id="prg_department_code_create" placeholder="e.g. CCIS">
+                        <div class="form-group">
+                            <label>Department Code</label>
+                            <input type="text" id="prg_department_code_create" placeholder="e.g. CCIS">
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -675,6 +711,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <option value="INACTIVE">INACTIVE</option>
                         </select>
                     </div>
+
 
                     <div class="modal-actions">
                         <button type="button" onclick="saveCourse()" class="save-btn">
@@ -704,7 +741,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </select>
                     </div>
 
-                     <div class="time-row">
+                    <div class="time-row">
                         <div class="form-group">
                             <label>Morning Time In</label>
                             <input type="time" id="morning_time_in" name="morning_time_in">
@@ -718,12 +755,11 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <input
                                 type="time"
                                 id="morning_time_out"
-                                name="morning_time_out"
-                            >
+                                name="morning_time_out">
                         </div>
                     </div>
 
-                     <div class="time-row">
+                    <div class="time-row">
 
                         <div class="form-group">
                             <label for="afternoon_time_in">Afternoon Time In</label>
@@ -736,31 +772,28 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="late_time">Late threshold</label>
-                        <input type="time" id="late_time" name="late_time">
+
+                    <div class="time-row">
+                        <div class="form-group">
+                            <label for="late_time">Late threshold</label>
+                            <input type="time" id="late_time" name="late_time">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="allowed_late_minutes">
+                                Allowed Late Minutes
+                            </label>
+
+                            <input
+                                type="number"
+                                id="allowed_late_minutes"
+                                name="allowed_late_minutes"
+                                placeholder="e.g. 15"
+                                min="0">
+                        </div>
                     </div>
 
-                     <div class="form-group">
-                        <label for="allowed_late_minutes">
-                            Allowed Late Minutes
-                        </label>
-
-                        <input
-                            type="number"
-                            id="allowed_late_minutes"
-                            name="allowed_late_minutes"
-                            placeholder="e.g. 15"
-                            min="0"
-                        >
-
-                        <small style="margin:10px;">
-                            Students arriving after the allowed minutes
-                            will automatically be marked late.
-                        </small>
-                    </div>
-
-                   <div class="rfid-actions">
+                    <div class="rfid-actions">
                         <button type="button" class="save-btn" onclick="saveRfidSettings()">
                             Save Settings
                         </button>
@@ -822,36 +855,49 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 <div class="requirements-body">
 
+
+
                     <div class="form-group">
                         <label>Requirement Name</label>
                         <input type="text" placeholder="e.g. Resume / CV">
                     </div>
+                    <div class="form-grid">
 
-                    <div class="form-group">
-                        <label>Requirement Type</label>
-                        <select>
-                            <option value="DOCUMENT">Document</option>
-                            <option value="FORM">Form</option>
-                            <option value="REPORT">Report</option>
-                            <option value="OTHER">Other</option>
-                        </select>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Submission Stage</label>
-                        <select>
-                            <option value="PRE-OJT">Pre-OJT</option>
-                            <option value="DURING-OJT">During OJT</option>
-                            <option value="POST-OJT">Post-OJT</option>
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label>Requirement Type</label>
+                            <select>
+                                <option value="DOCUMENT">Document</option>
+                                <option value="FORM">Form</option>
+                                <option value="REPORT">Report</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label>Required?</label>
-                        <select>
-                            <option value="YES">Yes (Required)</option>
-                            <option value="NO">No (Optional)</option>
-                        </select>
+                        <div class="form-group">
+                            <label>Submission Stage</label>
+                            <select>
+                                <option value="PRE-OJT">Pre-OJT</option>
+                                <option value="DURING-OJT">During OJT</option>
+                                <option value="POST-OJT">Post-OJT</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Required?</label>
+                            <select>
+                                <option value="YES">Yes (Required)</option>
+                                <option value="NO">No (Optional)</option>
+                            </select>
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label>Deadline (if applicable)</label>
+                            <input type="date">
+                        </div>
+
                     </div>
 
                     <div class="form-group">
@@ -859,14 +905,8 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <textarea placeholder="Provide instructions for students..."></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label>Deadline (if applicable)</label>
-                        <input type="date">
-                    </div>
-
                     <div class="requirements-actions">
                         <button class="save-btn">Add Requirement</button>
-                        <button class="cancel-btn">Cancel</button>
                     </div>
 
                 </div>
@@ -880,9 +920,9 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
 
                 <div class="view-all-container">
-                        <div id="all-risk-list" class="risk-list"></div>
+                    <div id="all-risk-list" class="risk-list"></div>
                 </div>
-            
+
 
             </div>
 
@@ -905,16 +945,16 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                         <div class="card-content">
 
-                        <div class="card-left">
+                            <div class="card-left">
 
                                 <div class="card-top">
-                                     <div class="card-icon">
+                                    <div class="card-icon">
                                         <i class="bi bi-person-badge-fill"></i>
                                     </div>
 
                                     <div>
-                                         <h3>UNVERIFIED STUDENT</h3>
-                                         <p>Awaiting verification</p>
+                                        <h3>UNVERIFIED STUDENT</h3>
+                                        <p>Awaiting verification</p>
                                     </div>
                                 </div>
 
@@ -928,14 +968,14 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </div>
                     </div>
 
-                
+
                     <div class="card students">
 
                         <?php
-                            $pendingStudents = countPendingStudents($conn);
-                            $pendingTrend = getTrend($conn, 'student', 'PENDING');
-                            $pendingBadge = getBadge($pendingStudents);
-                            ?>
+                        $pendingStudents = countPendingStudents($conn);
+                        $pendingTrend = getTrend($conn, 'student', 'PENDING');
+                        $pendingBadge = getBadge($pendingStudents);
+                        ?>
 
                         <span class="card-badge"><?= $pendingBadge ?></span>
 
@@ -984,8 +1024,8 @@ if ($_SESSION['role'] !== "ADMIN") {
                                     </div>
 
                                     <div>
-                                         <h3>STUDENTS</h3>
-                                         <p>Total number of verified and active students.</p>
+                                        <h3>STUDENTS</h3>
+                                        <p>Total number of verified and active students.</p>
                                     </div>
                                 </div>
 
@@ -1018,7 +1058,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                                     </div>
 
                                     <div>
-                                         <h3>SUPERVISORS</h3>
+                                        <h3>SUPERVISORS</h3>
                                         <p>Total number of verified supervisors.</p>
                                     </div>
                                 </div>
@@ -1178,14 +1218,14 @@ if ($_SESSION['role'] !== "ADMIN") {
                             </div>
                         </div>
 
-                         <div class="quick-action-grid">
+                        <div class="quick-action-grid">
                             <button onclick="openAddSupervisor()">
                                 <i class="bi bi-person-plus-fill"></i>
                                 <span>Add Supervisor</span>
                             </button>
 
                             <button onclick="openRfid()">
-                               <i class="bi bi-broadcast-pin"></i>
+                                <i class="bi bi-broadcast-pin"></i>
                                 <span>RFID</span>
                             </button>
 
@@ -1213,7 +1253,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                     </section>
 
                 </section>
-                 
+
             </section>
 
             <!-- application approvals -->
@@ -1315,11 +1355,11 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <img id="previewImg">
                 </div> -->
 
-                   <div id="imagePreviewModal" class="image-modal">
-                        <span id="closeImagePreview">&times;</span>
+                <div id="imagePreviewModal" class="image-modal">
+                    <span id="closeImagePreview">&times;</span>
 
-                        <div id="previewContainer"></div>
-                    </div>
+                    <div id="previewContainer"></div>
+                </div>
 
             </section>
 
@@ -1341,7 +1381,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                     <div class="create-section-container">
                         <button class="create-btn" id="department-management-btn">
-                             <i class="bi bi-building icon"></i>
+                            <i class="bi bi-building icon"></i>
                             <span class="text">Department Management</span>
                         </button>
                     </div>
@@ -1440,85 +1480,84 @@ if ($_SESSION['role'] !== "ADMIN") {
             </section>
 
             <!-- Reports  -->
-             <section class="admin-reports" id="admin-reports">
-                    <div class="user-management">
-                        <div class="title-block">
-                                <h2>Student Reports Management</h2>
-                                <p>Monitor, review, and manage attendance records of all OJT students.</p>
-                        </div>
-                          <div class="user-action-btn">
-                            <button class="download-btn" onclick="openEvaluationDownloadModal()">
-                                <i class="bi bi-download"></i>
-                                Download Evaluation
-                            </button>
-                        </div>
+            <section class="admin-reports" id="admin-reports">
+                <div class="user-management">
+                    <div class="title-block">
+                        <h2>Student Reports Management</h2>
+                        <p>Monitor, review, and manage attendance records of all OJT students.</p>
+                    </div>
+                    <div class="user-action-btn">
+                        <button class="download-btn" onclick="openEvaluationDownloadModal()">
+                            <i class="bi bi-download"></i>
+                            Download Evaluation
+                        </button>
+                    </div>
+                </div>
+
+                <div class="top-bar">
+
+                    <div class="top-header">
+                        <h3 class="table-title">Final Evaluation Records</h3>
+                        <p>Search, filter, and review supervisor evaluations.</p>
                     </div>
 
-                     <div class="top-bar">
+                    <div class="search-filter">
 
-                            <div class="top-header">
-                                <h3 class="table-title">Final Evaluation Records</h3>
-                                <p>Search, filter, and review supervisor evaluations.</p>
-                            </div>
+                        <div class="search-container">
+                            <i class="bi bi-search search-icon"></i>
 
-                            <div class="search-filter">
-
-                                <div class="search-container">
-                                    <i class="bi bi-search search-icon"></i>
-
-                                    <input 
-                                        type="text" 
-                                        id="evaluationSearch"
-                                        placeholder="Search by Student ID, Name, or Supervisor"
-                                    >
-                                </div>
-
-                                <div class="filter-group">
-                                    <select id="evaluationCourseFilter">
-                                         <?php echo getProgramOptions($conn); ?>
-                                    </select>
-                                </div>
-
-                            </div>
+                            <input
+                                type="text"
+                                id="evaluationSearch"
+                                placeholder="Search by Student ID, Name, or Supervisor">
                         </div>
 
-                        <div class="table-container">
-
-                            <table>
-
-                                <thead>
-                                    <tr>
-                                        <th>Student</th>
-                                        <th>Supervisor</th>
-                                        <th>Attendance</th>
-                                        <th>Progress</th>
-                                        <th>Tasks</th>
-                                        <th>Final Score</th>
-                                        <th>Ratings</th>
-                                        <th>Recommendation</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="evaluationTableBody"></tbody>
-                                <?php
-                                    $search = $_POST['search'] ?? '';
-                                    $course = $_POST['course'] ?? '';
-                                ?>
-                            </table>
-
+                        <div class="filter-group">
+                            <select id="evaluationCourseFilter">
+                                <?php echo getProgramOptions($conn); ?>
+                            </select>
                         </div>
+
+                    </div>
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Supervisor</th>
+                                <th>Attendance</th>
+                                <th>Progress</th>
+                                <th>Tasks</th>
+                                <th>Final Score</th>
+                                <th>Ratings</th>
+                                <th>Recommendation</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="evaluationTableBody"></tbody>
+                        <?php
+                        $search = $_POST['search'] ?? '';
+                        $course = $_POST['course'] ?? '';
+                        ?>
+                    </table>
+
+                </div>
 
             </section>
 
 
             <!-- download evaluation  -->
-             <div id="evaluation-download-modal" class="evaluation-download-modal">
+            <div id="evaluation-download-modal" class="evaluation-download-modal">
 
                 <div class="download-box">
 
-                     <div class="download-header">
+                    <div class="download-header">
 
                         <div class="download-title">
 
@@ -1549,17 +1588,16 @@ if ($_SESSION['role'] !== "ADMIN") {
                                 <?php echo getProgramOptions($conn); ?>
                             </select>
 
-                         </div>
+                        </div>
 
 
-                         <div class="form-group">
+                        <div class="form-group">
 
                             <label>Supervisor</label>
                             <select id="downloadSupervisor">
                                 <?php echo getSupervisorOptions($conn); ?>
                             </select>
                         </div>
-
 
                         <div class="modal-actions">
                             <button class="confirm-btn" onclick="downloadEvaluationPDF()">Download PDF</button>
@@ -1571,20 +1609,20 @@ if ($_SESSION['role'] !== "ADMIN") {
 
 
             <!-- attendance logs -->
-             <section class="admin-attendance" id="admin-attendance">
-                 <div class="user-management">
+            <section class="admin-attendance" id="admin-attendance">
+                <div class="user-management">
                     <div class="title-block">
                         <h2>Student Attendance Management</h2>
                         <p>Monitor, review, and manage attendance records of all OJT students.</p>
                     </div>
 
-                        <div class="user-action-btn">
-                            <button class="download-btn" onclick="openDownloadModal()">
-                                <i class="bi bi-download"></i>
-                                Download Attendance Report
-                            </button>
-                        </div>
-                    
+                    <div class="user-action-btn">
+                        <button class="download-btn" onclick="openDownloadModal()">
+                            <i class="bi bi-download"></i>
+                            Download Attendance Report
+                        </button>
+                    </div>
+
                 </div>
 
                 <div class="top-bar">
@@ -1599,11 +1637,10 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <div class="search-container">
                             <i class="bi bi-search search-icon"></i>
 
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 id="studentAttendanceSearch"
-                                placeholder="Search by Student ID, Name, Course, or RFID"
-                            >
+                                placeholder="Search by Student ID, Name, Course, or RFID">
                         </div>
 
                         <div class="filter-group">
@@ -1654,48 +1691,79 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </thead>
 
                         <tbody id="studentAttendanceBody">
-                                <?php
-                                $search = $_POST['search'] ?? '';
-                                $status = $_POST['status'] ?? '';
-                                $course = $_POST['course'] ?? '';
-                                $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
-                                $dateToAttendance = $_POST['dateToAttendance'] ?? '';
-                                echo renderAdminStudentAttendance($conn, $search, $status, $dateFromAttendance, $dateToAttendance);
-                                ?>
-                            </tbody>
-                        </table>
-                    </div>
+                            <?php
+                            $search = $_POST['search'] ?? '';
+                            $status = $_POST['status'] ?? '';
+                            $course = $_POST['course'] ?? '';
+                            $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
+                            $dateToAttendance = $_POST['dateToAttendance'] ?? '';
+                            echo renderAdminStudentAttendance($conn, $search, $status, $dateFromAttendance, $dateToAttendance);
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
 
             </section>
 
-             <!-- download attendance modal -->
-              <div id="attendance-download-modal" class="attendance-download-modal">
+            <!-- download attendance modal -->
+            <div id="attendance-download-modal" class="attendance-download-modal">
 
-                    <div class="download-box">
+                <div class="download-box">
 
-                       <div class="download-header">
+                    <div class="download-header">
 
-                            <div class="download-title">
+                        <div class="download-title">
 
-                                <div class="icon-wrapper">
-                                    <i class="bi bi-download"></i>
-                                </div>
-
-                                <div class="title-text">
-                                    <h2>Download Attendance Report</h2>
-                                    <p>Generate and export attendance data in PDF format</p>
-                                </div>
-
+                            <div class="icon-wrapper">
+                                <i class="bi bi-download"></i>
                             </div>
 
-                            <button class="modal-close" onclick="closeDownloadModal()">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
+                            <div class="title-text">
+                                <h2>Download Attendance Report</h2>
+                                <p>Generate and export attendance data in PDF format</p>
+                            </div>
 
                         </div>
 
-                        <div class="download-body">
+                        <button class="modal-close" onclick="closeDownloadModal()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
 
+                    </div>
+
+                    <div class="download-body">
+                        <div class="form-group">
+
+                            <label>Supervisor</label>
+
+                            <select id="downloadSupervisor">
+
+                                <option value="">All Supervisors</option>
+
+                                <?php
+
+                                $supers = $conn->query("
+                                        SELECT userID, name
+                                        FROM users
+                                        WHERE role = 'supervisor'
+                                        ORDER BY name ASC
+                                    ");
+
+                                while ($super = $supers->fetch_assoc()) {
+
+                                    echo "
+                                        <option value='{$super['userID']}'>
+                                            {$super['name']}
+                                        </option>
+                                        ";
+                                }
+
+                                ?>
+                            </select>
+
+                        </div>
+
+                        <div class="form-grid">
                             <div class="form-group">
                                 <label>Course</label>
 
@@ -1726,36 +1794,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                             </div>
 
-                            <div class="form-group">
 
-                                <label>Supervisor</label>
-
-                                <select id="downloadSupervisor">
-
-                                    <option value="">All Supervisors</option>
-
-                                    <?php
-
-                                    $supers = $conn->query("
-                                        SELECT userID, name
-                                        FROM users
-                                        WHERE role = 'supervisor'
-                                        ORDER BY name ASC
-                                    ");
-
-                                    while ($super = $supers->fetch_assoc()) {
-
-                                        echo "
-                                        <option value='{$super['userID']}'>
-                                            {$super['name']}
-                                        </option>
-                                        ";
-                                    }
-
-                                    ?>
-                                </select>
-
-                            </div>
 
                             <div class="form-group">
                                 <label>Date From</label>
@@ -1771,21 +1810,23 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                         </div>
 
-                        <div class="download-footer">
+                    </div>
 
-                            <button class="confirm-btn"
-                                onclick="downloadAttendanceReport()">
+                    <div class="download-footer">
 
-                                Download PDF
-                            </button>
+                        <button class="confirm-btn"
+                            onclick="downloadAttendanceReport()">
 
-                        </div>
+                            Download PDF
+                        </button>
 
                     </div>
 
                 </div>
 
-              <div id="inactivityModal" class="inactivity-modal">
+            </div>
+
+            <div id="inactivityModal" class="inactivity-modal">
                 <div class="inactivity-box">
 
                     <div class="inactivity-header">
@@ -1822,68 +1863,67 @@ if ($_SESSION['role'] !== "ADMIN") {
     </footer>
 
 </body>
-    <script>
+<script>
+    let inactivityTimer;
+    let countdownTimer;
+    let countdownValue = 60;
 
-            let inactivityTimer;
-        let countdownTimer;
-        let countdownValue = 60;
+    const modal = document.getElementById("inactivityModal");
+    const countdownEl = document.getElementById("countdown");
 
-        const modal = document.getElementById("inactivityModal");
-        const countdownEl = document.getElementById("countdown");
+    function startCountdown() {
 
-        function startCountdown() {
+        countdownValue = 60;
+        countdownEl.innerText = countdownValue;
 
-            countdownValue = 60;
+        modal.style.display = "flex";
+
+        countdownTimer = setInterval(() => {
+
+            countdownValue--;
             countdownEl.innerText = countdownValue;
 
-            modal.style.display = "flex";
+            if (countdownValue <= 10) {
+                countdownEl.style.color = "#dc2626";
+                countdownEl.style.transform = "scale(1.2)";
+            }
 
-            countdownTimer = setInterval(() => {
+            if (countdownValue <= 0) {
+                clearInterval(countdownTimer);
+                window.location.href = "../logoutPhase.php";
+            }
 
-                countdownValue--;
-                countdownEl.innerText = countdownValue;
+        }, 1000);
+    }
 
-                if (countdownValue <= 10) {
-                    countdownEl.style.color = "#dc2626";
-                    countdownEl.style.transform = "scale(1.2)";
-                }
+    function resetTimer() {
 
-                if (countdownValue <= 0) {
-                    clearInterval(countdownTimer);
-                    window.location.href = "../logoutPhase.php";
-                }
+        clearTimeout(inactivityTimer);
+        clearInterval(countdownTimer);
 
-            }, 1000);
-        }
+        modal.style.display = "none";
 
-        function resetTimer() {
+        inactivityTimer = setTimeout(() => {
+            startCountdown();
+        }, 600000);
+    }
 
-            clearTimeout(inactivityTimer);
-            clearInterval(countdownTimer);
+    function stayLoggedIn() {
 
-            modal.style.display = "none";
+        clearTimeout(inactivityTimer);
+        clearInterval(countdownTimer);
 
-            inactivityTimer = setTimeout(() => {
-                startCountdown();
-            }, 600000); 
-        }
+        modal.style.display = "none";
 
-        function stayLoggedIn() {
+        resetTimer();
+    }
 
-            clearTimeout(inactivityTimer);
-            clearInterval(countdownTimer);
-
-            modal.style.display = "none";
-
-            resetTimer();
-        }
-
-        window.onload = resetTimer;
-        document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-        document.onclick = resetTimer;
-        document.onscroll = resetTimer;
-    </script>
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onclick = resetTimer;
+    document.onscroll = resetTimer;
+</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

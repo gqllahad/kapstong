@@ -83,7 +83,7 @@ if (isset($_POST['login-submit'])) {
                 $_SESSION['superID'] = $row["superID"];
             }
 
-            
+
 
             $stmt = $conn->prepare("
         INSERT INTO activity_log 
@@ -122,7 +122,7 @@ if (isset($_POST['login-submit'])) {
             header("Location: trackerMain.php?login=Logging In..");
             exit();
         } else {
-            
+
             // $check = $conn->prepare("
             //     SELECT id 
             //     FROM login_attempts 
@@ -169,7 +169,7 @@ if (isset($_POST['signupForm'])) {
     //Student Information 
     $fName = $_POST['firstName'];
     $lName = $_POST['lastName'];
-    $mName = $_POST['middleName'];
+    $mName = $_POST['middleName'] ?? 'N\A';
     $fullName = $lName . " " .  $fName . " " . $mName;
 
     $email = filter_var($_POST['signEmail'], FILTER_VALIDATE_EMAIL);
@@ -184,11 +184,9 @@ if (isset($_POST['signupForm'])) {
     $birth = $_POST['signBirth'];
 
     $province = $_POST['province'];
-    $city = $_POST['city'];
-    $barangay = $_POST['barangay'];
-    $street = $_POST['street'];
+    $city = $_POST['signAddress'];
 
-    $fullAddress = $street . " " . $barangay . " " . $city . ", " . $province;
+    $fullAddress = $city . ", " . $province;
 
     // Academic Information
     $course = $_POST['signCourse'];
@@ -217,29 +215,27 @@ if (isset($_POST['signupForm'])) {
 
     $_SESSION['signup_data'] = [
 
-    "firstName" => $fName,
-    "lastName" => $lName,
-    "middleName" => $mName,
-    "fullName" => $fullName,
+        "firstName" => $fName,
+        "lastName" => $lName,
+        "middleName" => $mName,
+        "fullName" => $fullName,
 
-    "email" => $email,
-    "mobile" => $mobile,
-    "gender" => $gender,
-    "birth" => $birth,
+        "email" => $email,
+        "mobile" => $mobile,
+        "gender" => $gender,
+        "birth" => $birth,
 
-    "province" => $province,
-    "city" => $city,
-    "barangay" => $barangay,
-    "street" => $street,
-    "fullAddress" => $fullAddress,
+        "province" => $province,
+        "city" => $city,
+        "fullAddress" => $fullAddress,
 
-    "course" => $course,
-    "level" => $level,
-    "semester" => $semester,
-    "schoolYear" => $schoolYear,
+        "course" => $course,
+        "level" => $level,
+        "semester" => $semester,
+        "schoolYear" => $schoolYear,
 
-    "studentID" => $studentID,
-    "password" => $password
+        "studentID" => $studentID,
+        "password" => $password
     ];
 
     $otp = rand(100000, 999999);
@@ -249,26 +245,26 @@ if (isset($_POST['signupForm'])) {
 
     $mail = new PHPMailer(true);
 
-try {
+    try {
 
-    $mail->isSMTP();
-    $mail->Host = 'smtp.gmail.com';
-    $mail->SMTPAuth = true;
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
 
-    $mail->Username = 'madrigalinigojones@gmail.com';
-    $mail->Password = 'auvgdrtezpbblwqi';
-    $mail->SMTPSecure = 'tls';
-    $mail->Port = 587;
+        $mail->Username = 'madrigalinigojones@gmail.com';
+        $mail->Password = 'auvgdrtezpbblwqi';
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = 587;
 
-    $mail->setFrom('madrigalinigojones@gmail.com', 'OJT System');
+        $mail->setFrom('madrigalinigojones@gmail.com', 'OJT System');
 
-    $mail->addAddress($email);
+        $mail->addAddress($email);
 
-    $mail->isHTML(true);
+        $mail->isHTML(true);
 
-    $mail->Subject = 'OTP Verification';
+        $mail->Subject = 'OTP Verification';
 
-    $mail->Body = "
+        $mail->Body = "
         <h2>Email Verification</h2>
 
         <p>Your OTP Code is:</p>
@@ -278,15 +274,13 @@ try {
         <p>This expires in 5 minutes.</p>
     ";
 
-    $mail->send();
+        $mail->send();
 
-    header('Location: verifyOTP.php');
-    exit();
-
+        header('Location: verifyOTP.php');
+        exit();
     } catch (Exception $e) {
 
         header("Location: signupStudent.php?error=OTP+Email+Failed");
         exit();
     }
-
 };

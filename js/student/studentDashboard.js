@@ -7,6 +7,9 @@ const studentID = document.body.dataset.studentId;
 const menuToggle = document.getElementById("menuToggle");
 const profileMenu = document.getElementById("profileMenu");
 
+// darkmode
+const toggleBtn = document.getElementById("darkModeToggle");
+
 const navBar = document.querySelector('.navbar');
 
 const menuItems = document.querySelectorAll('.menu li');
@@ -172,6 +175,38 @@ window.previewImage = function(src) {
     // img.src = src;
     // modal.style.display = "flex";
     previewFile(src);
+}
+
+
+// reload charts
+function reloadAllCharts() {
+
+    if (window.lineChartInstance) {
+        window.lineChartInstance.destroy();
+    }
+
+    if (window.pieChartInstance) {
+        window.pieChartInstance.destroy();
+    }
+
+    if (window.progressChartInstance) {
+        window.progressChartInstance.destroy();
+    }
+
+    loadLineChart();
+    loadPieChart();
+    loadStudentProgressChart(studentID);
+}
+
+// darkmode 
+function isDarkMode() {
+    return document.body.classList.contains("dark-mode");
+}
+
+function getChartTextColor() {
+    return document.body.classList.contains("dark-mode")
+        ? '#e2e8f0'
+        : '#000';
 }
 
 function previewFile(src) {
@@ -876,8 +911,6 @@ function submitReport() {
 
     .catch(error => {
 
-        console.error(error);
-
         submitReport.disabled = false;
 
         submitReport.innerText = "Submit Report";
@@ -1180,7 +1213,8 @@ function loadStudentProgressChart(studentID) {
                 cutout: '75%',
                 plugins: {
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        color: getChartTextColor()
                     },
                     tooltip: {
                         callbacks: {
@@ -1452,13 +1486,24 @@ function loadLineChart() {
                     },
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            color: getChartTextColor()
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 1
+                            max: 1,
+                            ticks: {
+                            color: isDarkMode() ? '#cbd5e1' : '#9ca3af',
+                            stepSize: 1
+                        },
+
+                        grid: {
+                            color: isDarkMode()
+                                ? 'rgba(255,255,255,0.08)'
+                                : 'rgba(0,0,0,0.20)'
+                        }
                         }
                     }
                 }
@@ -1548,15 +1593,15 @@ document.getElementById('closeAccountModal').addEventListener('click', () => {
 }
 
 // sideMenu galaw
-sideBar.addEventListener('mouseenter', () => {
-    mainContent.classList.add('shifted');
-    navBar.classList.add('shifted');
-});
+// sideBar.addEventListener('mouseenter', () => {
+//     mainContent.classList.add('shifted');
+//     navBar.classList.add('shifted');
+// });
 
-sideBar.addEventListener('mouseleave', () => {
-    mainContent.classList.remove('shifted');
-    navBar.classList.remove('shifted');
-});
+// sideBar.addEventListener('mouseleave', () => {
+//     mainContent.classList.remove('shifted');
+//     navBar.classList.remove('shifted');
+// });
 
 // unverified features
 
@@ -1878,7 +1923,6 @@ if(studentTasksBtn){
     })
     .then(res => res.json())
     .then(data => {
-        console.log(data);
 
         if (data.status === "success") {
             showToast(data.message, "success");
@@ -2262,6 +2306,43 @@ if(reportCardBtn){
         overlay.classList.remove("show");
         reportCard.classList.remove("show");
     })
+}
+
+
+// dark mode
+
+if(toggleBtn){
+
+    toggleBtn.addEventListener("click", () => {
+
+        profileMenu.hidden = true;
+     setTimeout(reloadAllCharts, 100);
+});
+
+toggleBtn.addEventListener("click", () => {
+
+    document.body.classList.toggle("dark-mode");
+
+    if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("theme", "dark");
+    } else {
+        localStorage.setItem("theme", "light");
+    }
+
+    
+
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+    }
+});
+
+
 }
 
 

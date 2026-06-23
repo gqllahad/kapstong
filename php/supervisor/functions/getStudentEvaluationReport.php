@@ -73,7 +73,7 @@ while ($row = $taskResult->fetch_assoc()) {
         case 'SUBMITTED':
             $submitted++;
             break;
-        case 'IN PROGRESS':
+        case 'NOT STARTED':
             $inProgress++;
             break;
     }

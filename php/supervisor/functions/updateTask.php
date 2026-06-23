@@ -1,6 +1,7 @@
 <?php
 require_once("../../auth/supervisor_auth.php");
 require_once("../../kapstongConnection.php");
+require_once("../../functions.php");
 
 $taskID = $_POST['taskID'] ?? '';
 $title = $_POST['title'] ?? '';
@@ -76,7 +77,7 @@ if ($stmt->execute()) {
     ");
 
     $log->bind_param(
-        "isssssss",
+        "isssssis",
         $userID,
         $role,
         $action,
@@ -93,7 +94,6 @@ if ($stmt->execute()) {
         "status" => "success",
         "message" => "Task updated successfully"
     ]);
-
 } else {
     echo json_encode([
         "status" => "error",

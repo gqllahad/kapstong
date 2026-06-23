@@ -20,8 +20,6 @@ $stmt->bind_param("i", $taskID);
 $stmt->execute();
 $result = $stmt->get_result();
 
-
-
 if ($row = $result->fetch_assoc()) {
 
     $files = explode(",", $row['submission_file']);
@@ -104,31 +102,6 @@ if ($row = $result->fetch_assoc()) {
         <div class="section-title">
             <h3>Supervisor Notes</h3>
         </div>
-        <div class="info-card">
-            <div class="card-header" onclick="toggleSection(this)">
-                <h4>Supervisor Evaluation</h4>
-                <span class="arrow">▼</span>
-            </div>
-
-            <div class="card-body">
-
-                <div class="rating-wrapper">
-                    <div class="rating-select-container">
-                        <select id="supervisorRating" class="rating-select">
-                            <option value="">Select Rating</option>
-                            <option value="A+">A+ — Excellent</option>
-                            <option value="A">A — Very Good</option>
-                            <option value="B+">B+ — Good</option>
-                            <option value="B">B — Satisfactory</option>
-                            <option value="C">C — Needs Improvement</option>
-                        </select>
-
-                        <i class="bi bi-chevron-down select-icon"></i>
-                    </div>
-                </div>
-
-            </div>
-        </div>
 
         <div class="info-card">
             <div class="card-header" onclick="toggleSection(this)">
@@ -170,4 +143,4 @@ if ($row = $result->fetch_assoc()) {
 
     </div>
 
-<?php } ?>
+<?php }

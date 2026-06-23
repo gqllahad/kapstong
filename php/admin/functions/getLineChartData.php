@@ -48,24 +48,20 @@ header('Content-Type: application/json');
 $month = $_GET['month'] ?? date('Y-m');
 
 $startDate = date('Y-m-01', strtotime($month));
-$endDate = date('Y-m-t', strtotime($month));
+$endDate   = date('Y-m-t', strtotime($month));
 
-$labels = [];
-$values = [];
+// --- Zero-fill every day in the month ---
 $days = [];
-
 $current = strtotime($startDate);
-$last = strtotime($endDate);
+$last    = strtotime($endDate);
 
 while ($current <= $last) {
-
     $date = date('Y-m-d', $current);
-
     $days[$date] = 0;
-
     $current = strtotime("+1 day", $current);
 }
 
+// --- Query ---
 $query = "
     SELECT 
         log_date,
@@ -78,20 +74,37 @@ $query = "
 
 $result = $conn->query($query);
 
-while ($row = $result->fetch_assoc()) {
-
-    $days[$row['log_date']] = $row['total'];
+if (!$result) {
+    echo json_encode(["error" => $conn->error]);
+    exit;
 }
 
-foreach ($days as $date => $total) {
+while ($row = $result->fetch_assoc()) {
+    $days[$row['log_date']] = (int) $row['total'];
+}
 
-    $labels[] = date('M d', strtotime($date));
+// --- Group into 5-day chunks ---
+$labels = [];
+$values = [];
 
-    $values[] = $total;
+$dateKeys = array_keys($days);
+$chunks   = array_chunk($dateKeys, 5);
+
+foreach ($chunks as $chunk) {
+    $chunkStart = reset($chunk);
+    $chunkEnd   = end($chunk);
+
+    $chunkTotal = 0;
+    foreach ($chunk as $date) {
+        $chunkTotal += $days[$date];
+    }
+
+    // Short label: "Jun 01–05"
+    $labels[] = date('M d', strtotime($chunkStart)) . '–' . date('d', strtotime($chunkEnd));
+    $values[] = $chunkTotal;
 }
 
 echo json_encode([
     "labels" => $labels,
     "values" => $values
 ]);
-?>

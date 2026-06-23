@@ -1,25 +1,21 @@
 <?php
+
 require_once("../../auth/supervisor_auth.php");
 require_once("../../kapstongConnection.php");
+require_once("../../functions.php");
+
+header('Content-Type: application/json');
+
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $taskID = $_POST['taskID'] ?? '';
 $status = $_POST['status'] ?? '';
 $feedback = $_POST['supervisor_feedback'] ?? '';
-$rating = $_POST['rating'] ?? '';
-
 
 if (empty($taskID) || empty($status)) {
     echo json_encode([
         "status" => "error",
         "message" => "Missing required data"
-    ]);
-    exit;
-}
-
-if ($status === "APPROVED" && empty($rating)) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Rating is required when approving a task"
     ]);
     exit;
 }
@@ -39,14 +35,12 @@ if ($status === 'APPROVED') {
         SET 
             status = ?,
             supervisor_feedback = ?,
-            rating = ?,
             completed_at = NOW(),
             date_updated = NOW()
         WHERE taskID = ?
     ");
 
-    $stmt->bind_param("sssi", $status, $feedback, $rating, $taskID);
-
+    $stmt->bind_param("ssi", $status, $feedback, $taskID);
 } else {
 
     $stmt = $conn->prepare("
@@ -54,13 +48,12 @@ if ($status === 'APPROVED') {
         SET 
             status = ?,
             supervisor_feedback = ?,
-            rating = ?,
             completed_at = NULL,
             date_updated = NOW()
         WHERE taskID = ?
     ");
 
-    $stmt->bind_param("sssi", $status, $feedback, $rating, $taskID);
+    $stmt->bind_param("ssi", $status, $feedback, $taskID);
 }
 
 $get = $conn->prepare("
@@ -85,13 +78,12 @@ if ($stmt->execute()) {
 
         $action = "Approve Task";
 
-        $description = "Approved task '{$task['title']}' for student ID {$task['studentID']} with rating $rating";
-
+        $description = "Approved task '{$task['title']}' for student ID {$task['studentID']}.";
     } else {
 
         $action = "Reject Task";
 
-        $description = "Rejected task '{$task['title']}' for student ID {$task['studentID']} with feedback: $feedback";
+        $description = "Rejected task '{$task['title']}' for student ID {$task['studentID']} with feedback: {$feedback}";
     }
 
     $target_type = "task";
@@ -113,7 +105,7 @@ if ($stmt->execute()) {
     ");
 
     $log->bind_param(
-        "isssssss",
+        "isssssis",
         $userID,
         $role,
         $action,
@@ -130,7 +122,6 @@ if ($stmt->execute()) {
         "status" => "success",
         "message" => "Task updated successfully"
     ]);
-
 } else {
     echo json_encode([
         "status" => "error",

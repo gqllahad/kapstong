@@ -39,18 +39,18 @@ $documents = getStudentDocuments($conn, $studentID);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
     <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
-    <link rel="stylesheet" href="../../css/student/studentDashboard.css">
+    <link rel="stylesheet" href="../../css/student/studentDashboard2.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 
 <body data-student-id="<?= $studentID ?>">
 
-    <header class="navbar">
+    <!-- <header class="navbar">
         <div class="header-title">
             <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
             <h1>Student Dashboard</h1>
         </div>
-        
+
         <button id="menuToggle">☰</button>
         <nav class="profile-menu" id="profileMenu" hidden>
             <a id="openProfileBtn">Profile</a>
@@ -58,7 +58,7 @@ $documents = getStudentDocuments($conn, $studentID);
             <hr style="width: 75%; text-align: left;">
             <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
-    </header>
+    </header> -->
 
     <div class="layout">
         <aside class="sidebar">
@@ -70,9 +70,45 @@ $documents = getStudentDocuments($conn, $studentID);
                     <button id="student-tasks-btn"> <i class="bi bi-list-check"></i> My Tasks</button>
                 </li>
                 <li><button id="student-documents-btn"> <i class="bi bi-folder2-open"></i>My Documents</button></li>
-                 <li><button id="student-attendance-btn"><i class="bi bi-calendar-check"></i> Attendance logs</button></li>
+                <li><button id="student-attendance-btn"><i class="bi bi-calendar-check"></i> Attendance logs</button></li>
                 <li><button id="student-activity-btn"><i class="bi bi-activity"></i> Activity logs</button></li>
             </ul>
+
+            <div class="sidebar-profile">
+
+                <div class="profile-left">
+                    <div class="profile-avatar">
+                        M
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">MADRIGAL</span>
+                        <small>Supervisor</small>
+                    </div>
+                </div>
+                <button id="menuToggle" class="profile-trigger">
+                    ☰
+                </button>
+
+                <nav class="profile-menu" id="profileMenu" hidden>
+                    <a id="openProfileBtn">
+                        <i class="bi bi-person"></i>
+                        Profile
+                    </a>
+                    <a id="openAccountSettingsBtn">
+                        <i class="bi bi-gear"></i>
+                        Account Settings
+                    </a>
+                    <a id="darkModeToggle" class="dark-toggle">
+                        <i class="bi bi-moon-fill"></i>
+                        Dark Mode
+                    </a>
+                    <hr>
+                    <a href="../logoutPhase.php">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </a>
+                </nav>
+            </div>
         </aside>
 
         <main class="content">
@@ -273,9 +309,9 @@ $documents = getStudentDocuments($conn, $studentID);
                     <h3>Task Details</h3>
                     <button id="closeTaskViewModal" class="modal-close-profile">&times;</button>
                 </div>
-                 <div class="task-status-message" id="taskStatusMessage"></div>
+                <div class="task-status-message" id="taskStatusMessage"></div>
                 <div class="task-modal-content">
-               
+
 
                     <div class="task-modal-body">
 
@@ -407,7 +443,7 @@ $documents = getStudentDocuments($conn, $studentID);
                         </div>
 
                         <div class="progress-summary">
-                           <p class="progress-percent" id="progressPercent">
+                            <p class="progress-percent" id="progressPercent">
                                 0% Completed
                             </p>
 
@@ -421,21 +457,21 @@ $documents = getStudentDocuments($conn, $studentID);
                 </div>
             </div>
 
-             <!-- notification modal -->
+            <!-- notification modal -->
             <div class="notification-container" id="notification-container">
-                    <div class="modal-header">
-                        <h3>Notifications</h3>
+                <div class="modal-header">
+                    <h3>Notifications</h3>
 
-                        <button id="closeNotificationViewModal"
-                            class="modal-close-profile">
-                            &times;
-                        </button>
-                    </div>
+                    <button id="closeNotificationViewModal"
+                        class="modal-close-profile">
+                        &times;
+                    </button>
+                </div>
 
-                    <div class="notification-modal-content">
+                <div class="notification-modal-content">
 
                     <?php
-                        $alerts = getStudentAlerts($conn, $studentID);
+                    $alerts = getStudentAlerts($conn, $studentID);
                     ?>
 
                     <ul class="alerts-list scrollable">
@@ -450,15 +486,15 @@ $documents = getStudentDocuments($conn, $studentID);
 
                                         <span class="alert-icon">
                                             <?php
-                                                if ($alert['type'] === 'warning') {
-                                                    echo "⚠️";
-                                                } elseif ($alert['type'] === 'danger') {
-                                                    echo "⏰";
-                                                } elseif ($alert['type'] === 'critical') {
-                                                    echo "🚨";
-                                                } else {
-                                                    echo "ℹ️";
-                                                }
+                                            if ($alert['type'] === 'warning') {
+                                                echo "⚠️";
+                                            } elseif ($alert['type'] === 'danger') {
+                                                echo "⏰";
+                                            } elseif ($alert['type'] === 'critical') {
+                                                echo "🚨";
+                                            } else {
+                                                echo "ℹ️";
+                                            }
                                             ?>
                                         </span>
 
@@ -495,7 +531,7 @@ $documents = getStudentDocuments($conn, $studentID);
             </div>
 
             <!-- attendance modal -->
-             <!-- <div class="attendance-container" id="attendance-container">
+            <!-- <div class="attendance-container" id="attendance-container">
                 <div class="modal-header">
                     <h3>Attendance logs</h3>
                     <button id="closeAttendanceViewModal"
@@ -542,11 +578,11 @@ $documents = getStudentDocuments($conn, $studentID);
                         </thead>
 
                         <tbody id="attendanceReportBody"> -->
-                             <?php
-                                // $category = $_POST['category'] ?? '';
-                                // echo renderStudentAttendanceTable($conn, $studentID, $category);
-                                ?>
-                        <!-- </tbody>
+            <?php
+            // $category = $_POST['category'] ?? '';
+            // echo renderStudentAttendanceTable($conn, $studentID, $category);
+            ?>
+            <!-- </tbody>
 
                     </table>
 
@@ -557,24 +593,24 @@ $documents = getStudentDocuments($conn, $studentID);
             <!-- reports -->
             <div class="reports-container" id="reports-container">
                 <div class="modal-header">
-                <h3>Internship Reports</h3>
+                    <h3>Internship Reports</h3>
 
-                <button id="closeReportsModal"
-                    class="modal-close-profile">
-                    &times;
-                </button>
+                    <button id="closeReportsModal"
+                        class="modal-close-profile">
+                        &times;
+                    </button>
                 </div>
 
-               
 
-                    <?php
-                     echo renderProgressHeader($conn, $studentID);
-                     echo renderReports($conn, $studentID);
-                    ?>
-                
+
+                <?php
+                echo renderProgressHeader($conn, $studentID);
+                echo renderReports($conn, $studentID);
+                ?>
+
             </div>
 
-                <!-- REPORT FORM PANEL -->
+            <!-- REPORT FORM PANEL -->
             <div class="report-form-panel" id="reportFormPanel">
 
                 <div class="form-header">
@@ -586,7 +622,7 @@ $documents = getStudentDocuments($conn, $studentID);
                     <button onclick="closeReportForm()" class="close-btn">&times;</button>
                 </div>
 
-                <div class="form-body"  id="reportForm">
+                <div class="form-body" id="reportForm">
                     <input type="hidden" id="report_type" name="report_type">
                     <input type="hidden" id="stageID" name="stageID">
 
@@ -610,7 +646,7 @@ $documents = getStudentDocuments($conn, $studentID);
                             id="reportTitle"
                             placeholder="e.g. Weekly Training Report - Week 1">
                     </div>
-                    
+
                     <div class="hint-box" id="reportHints">
                         <strong>What should you include?</strong>
                         <ul>
@@ -651,7 +687,7 @@ $documents = getStudentDocuments($conn, $studentID);
                 </div>
 
             </div>
-            
+
 
 
 
@@ -686,28 +722,28 @@ $documents = getStudentDocuments($conn, $studentID);
 
                 <section class="dashboard-charts">
                     <section class="wrapper line-chart">
-                         <h2>Your Attendance Progress (Last 30 Days)</h2>
-                         <p class="chart-subtitle">Track your daily attendance consistency</p>
+                        <h2>Your Attendance Progress (Last 30 Days)</h2>
+                        <p class="chart-subtitle">Track your daily attendance consistency</p>
                         <div class="attendance-legend">
-                        <span class="present">
-                            <i></i>
-                            1.0 = Present
-                        </span>
-                        <span class="late">
-                            <i></i>
-                            0.5 = Late
-                        </span>
-                        <span class="absent">
-                            <i></i>
-                            0 = Absent
-                        </span>
-                    </div>
+                            <span class="present">
+                                <i></i>
+                                1.0 = Present
+                            </span>
+                            <span class="late">
+                                <i></i>
+                                0.5 = Late
+                            </span>
+                            <span class="absent">
+                                <i></i>
+                                0 = Absent
+                            </span>
+                        </div>
                         <canvas id="lineChart"></canvas>
                     </section>
 
                     <section class="wrapper pie-chart">
                         <h2>Task Completion Overview</h2>
-                         <p class="chart-subtitle">
+                        <p class="chart-subtitle">
                             Summary of your task progress and status.
                         </p>
                         <canvas id="pieChart"></canvas>
@@ -832,43 +868,43 @@ $documents = getStudentDocuments($conn, $studentID);
 
                     <div class="info-section">
                         <h3>OJT Information</h3>
-                        
+
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>Company Name</label>
-                                <input type="text" 
-                                    value="<?php echo htmlspecialchars($studentInfo['company_name'] ?? 'Not Assigned'); ?>" 
+                                <input type="text"
+                                    value="<?php echo htmlspecialchars($studentInfo['company_name'] ?? 'Not Assigned'); ?>"
                                     readonly>
                             </div>
 
                             <div class="form-group">
                                 <label>Assigned Supervisor</label>
-                                <input type="text" 
-                                    value="<?php echo htmlspecialchars($studentInfo['supervisor_name'] ?? 'Not Assigned'); ?>" 
+                                <input type="text"
+                                    value="<?php echo htmlspecialchars($studentInfo['supervisor_name'] ?? 'Not Assigned'); ?>"
                                     readonly>
                             </div>
 
                             <div class="form-group">
                                 <label>Assigned Supervisor Position</label>
-                                <input type="text" 
-                                    value="<?php echo htmlspecialchars($studentInfo['supervisor_position'] ?? 'Not Assigned'); ?>" 
+                                <input type="text"
+                                    value="<?php echo htmlspecialchars($studentInfo['supervisor_position'] ?? 'Not Assigned'); ?>"
                                     readonly>
                             </div>
 
                             <div class="form-group">
                                 <label>Supervisor Contact</label>
-                                <input type="text" 
-                                    value="<?php echo htmlspecialchars($studentInfo['supervisor_number'] ?? 'Not Available'); ?>" 
+                                <input type="text"
+                                    value="<?php echo htmlspecialchars($studentInfo['supervisor_number'] ?? 'Not Available'); ?>"
                                     readonly>
                             </div>
 
                             <div class="form-group">
                                 <label>Internship Status</label>
-                                <input type="text" 
-                                    value="<?php echo htmlspecialchars($studentInfo['assignment_status'] ?? 'Ongoing'); ?>" 
+                                <input type="text"
+                                    value="<?php echo htmlspecialchars($studentInfo['assignment_status'] ?? 'Ongoing'); ?>"
                                     readonly>
                             </div>
-                        </div>        
+                        </div>
                     </div>
 
                     <div class="info-section">
@@ -909,8 +945,8 @@ $documents = getStudentDocuments($conn, $studentID);
             </section>
 
             <section class="student-activity" id="student-activity">
-              
-                
+
+
                 <div class="top-bar">
 
                     <div class="top-header">
@@ -945,9 +981,9 @@ $documents = getStudentDocuments($conn, $studentID);
                         </div>
                     </div>
 
-                </div>    
-                
-                
+                </div>
+
+
                 <div class="activity-log-container">
 
                     <div class="table-container">
@@ -969,7 +1005,7 @@ $documents = getStudentDocuments($conn, $studentID);
                                 $module = $_POST['module'] ?? '';
                                 $dateFrom = $_POST['dateFrom'] ?? '';
                                 $dateTo = $_POST['dateTo'] ?? '';
-                                echo renderStudentActivityLogTable($conn,$studentID, $search, $module, $dateFrom, $dateTo);
+                                echo renderStudentActivityLogTable($conn, $studentID, $search, $module, $dateFrom, $dateTo);
                                 ?>
                             </tbody>
                         </table>
@@ -1016,7 +1052,7 @@ $documents = getStudentDocuments($conn, $studentID);
 
                 </div>
 
-              <div class="table-container-attendance">
+                <div class="table-container-attendance">
                     <table>
                         <thead>
                             <tr>
@@ -1031,20 +1067,20 @@ $documents = getStudentDocuments($conn, $studentID);
                         </thead>
 
                         <tbody id="attendanceReportBody">
-                             <?php
-                                $category = $_POST['category'] ?? '';
-                                 $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
-                                $dateToAttendance = $_POST['dateToAttendance'] ?? '';
-                                echo renderStudentAttendanceTable($conn, $studentID, $category, $dateFromAttendance, $dateToAttendance);
-                                ?>
+                            <?php
+                            $category = $_POST['category'] ?? '';
+                            $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
+                            $dateToAttendance = $_POST['dateToAttendance'] ?? '';
+                            echo renderStudentAttendanceTable($conn, $studentID, $category, $dateFromAttendance, $dateToAttendance);
+                            ?>
                         </tbody>
                     </table>
-                 </div>
+                </div>
 
             </section>
 
             <!-- download attendance -->
-             <div class="download-attendance-modal" id="download-attendance-modal">
+            <div class="download-attendance-modal" id="download-attendance-modal">
                 <div class="download-box">
 
                     <div class="download-header">
@@ -1103,7 +1139,7 @@ $documents = getStudentDocuments($conn, $studentID);
                     </div>
 
                 </div>
-             </div>
+            </div>
 
 
 
@@ -1112,13 +1148,13 @@ $documents = getStudentDocuments($conn, $studentID);
                     <img id="previewImg">
                 </div> -->
 
-                <div id="imagePreviewModal" class="image-modal">
-                    <span id="closeImagePreview">&times;</span>
+            <div id="imagePreviewModal" class="image-modal">
+                <span id="closeImagePreview">&times;</span>
 
-                    <div id="previewContainer"></div>
-                </div>
+                <div id="previewContainer"></div>
+            </div>
 
-                 <div id="inactivityModal" class="inactivity-modal">
+            <div id="inactivityModal" class="inactivity-modal">
                 <div class="inactivity-box">
 
                     <div class="inactivity-header">
@@ -1152,72 +1188,71 @@ $documents = getStudentDocuments($conn, $studentID);
 
 </body>
 <script>
+    let inactivityTimer;
+    let countdownTimer;
+    let countdownValue = 60;
 
-        let inactivityTimer;
-        let countdownTimer;
-        let countdownValue = 60;
+    const modal = document.getElementById("inactivityModal");
+    const countdownEl = document.getElementById("countdown");
 
-        const modal = document.getElementById("inactivityModal");
-        const countdownEl = document.getElementById("countdown");
+    function startCountdown() {
 
-        function startCountdown() {
+        countdownValue = 60;
+        countdownEl.innerText = countdownValue;
 
-            countdownValue = 60;
+        modal.style.display = "flex";
+
+        countdownTimer = setInterval(() => {
+
+            countdownValue--;
             countdownEl.innerText = countdownValue;
 
-            modal.style.display = "flex";
+            if (countdownValue <= 10) {
+                countdownEl.style.color = "#dc2626";
+                countdownEl.style.transform = "scale(1.2)";
+            }
 
-            countdownTimer = setInterval(() => {
+            if (countdownValue <= 0) {
+                clearInterval(countdownTimer);
+                window.location.href = "../logoutPhase.php";
+            }
 
-                countdownValue--;
-                countdownEl.innerText = countdownValue;
+        }, 1000);
+    }
 
-                if (countdownValue <= 10) {
-                    countdownEl.style.color = "#dc2626";
-                    countdownEl.style.transform = "scale(1.2)";
-                }
+    function resetTimer() {
 
-                if (countdownValue <= 0) {
-                    clearInterval(countdownTimer);
-                    window.location.href = "../logoutPhase.php";
-                }
+        clearTimeout(inactivityTimer);
+        clearInterval(countdownTimer);
 
-            }, 1000);
-        }
+        modal.style.display = "none";
 
-        function resetTimer() {
+        inactivityTimer = setTimeout(() => {
+            startCountdown();
+        }, 600000);
+    }
 
-            clearTimeout(inactivityTimer);
-            clearInterval(countdownTimer);
+    function stayLoggedIn() {
 
-            modal.style.display = "none";
+        clearTimeout(inactivityTimer);
+        clearInterval(countdownTimer);
 
-            inactivityTimer = setTimeout(() => {
-                startCountdown();
-            }, 600000); 
-        }
+        modal.style.display = "none";
 
-        function stayLoggedIn() {
+        resetTimer();
+    }
 
-            clearTimeout(inactivityTimer);
-            clearInterval(countdownTimer);
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onclick = resetTimer;
+    document.onscroll = resetTimer;
 
-            modal.style.display = "none";
-
-            resetTimer();
-        }
-
-        window.onload = resetTimer;
-        document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-        document.onclick = resetTimer;
-        document.onscroll = resetTimer;
-
-window.onload = resetTimer;
-document.onmousemove = resetTimer;
-document.onkeypress = resetTimer;
-document.onclick = resetTimer;
-document.onscroll = resetTimer;
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onclick = resetTimer;
+    document.onscroll = resetTimer;
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
