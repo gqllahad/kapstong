@@ -164,7 +164,7 @@ if (isset($_POST['rfid'])) {
     // time in
     if ($state === 'NONE') {
 
-    if ($current_time < $timeInStart ) { //|| $current_time > $invalidScanTime
+    if ($current_time < $timeInStart || $current_time > $invalidScanTime ) { 
 
         $_SESSION['status'] =   
             "Time-in allowed only between $timeInStart - $lateTime";

@@ -389,8 +389,6 @@ function approveStudent(studentID) {
         return;
     }
 
-    if (!confirm("Approve student and register RFID?")) return;
-
     approveBtn.disabled = true;
 
     fetch("functions/approveStudent.php", {
@@ -425,7 +423,6 @@ function resetRFID() {
 }
 
 function approveWithoutRFID(studentID) {
-    if (!confirm("Approve student WITHOUT RFID? You can register it later.")) return;
 
     fetch("functions/approveStudent.php", {
         method: "POST",
