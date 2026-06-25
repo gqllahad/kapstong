@@ -1,6 +1,7 @@
 <?php
-require_once("../../kapstongConnection.php");
+require_once("../../Shared/kapstongConnection.php");
 require_once("../../auth/admin_auth.php");
+
 
 $rfid = trim($_POST['rfid'] ?? '');
 $studentID = trim($_POST['studentID'] ?? '');

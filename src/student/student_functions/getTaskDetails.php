@@ -1,8 +1,8 @@
 <?php
 
 header('Content-Type: application/json');
-require_once("../../kapstongConnection.php");
 require_once("../../auth/student_auth.php");
+require_once("../../Shared/kapstongConnection.php");
 
 $taskID = $_GET['taskID'] ?? '';
 

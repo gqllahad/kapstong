@@ -1,8 +1,9 @@
 <?php
 session_start();
 // require_once("../../auth/supervisor_auth.php");
-require_once("../../kapstongConnection.php");
-require_once("../../functions.php");
+require_once("../../auth/student_auth.php");
+require_once("../../Shared/kapstongConnection.php");
+require_once("../../Shared/functions.php");
 
 $studentID = $_SESSION['studentID'] ?? '';
 

@@ -3,8 +3,8 @@
 session_start();
 header('Content-Type: application/json');
 
-require_once("../../kapstongConnection.php");
 require_once("../../auth/student_auth.php");
+require_once("../../Shared/kapstongConnection.php");
 
 if (!isset($_SESSION['studentID'])) {
     echo json_encode([

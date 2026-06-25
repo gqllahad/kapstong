@@ -1,21 +1,22 @@
 <?php
 
 session_start();
-require_once("../kapstongConnection.php");
-require_once("../functions.php");
-require_once("../sessionTimeout.php");
+require_once("../../auth/student_auth.php");
+require_once("../Shared/kapstongConnection.php");
+require_once("../Shared/functions.php");
+require_once("../Session/sessionTimeout.php");
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 
 
 if ($_SESSION['role'] !== "student") {
-    header("Location: ../trackerMain.php");
+    header("Location: ../Session/trackerMain.php");
     exit();
 }
 
 if ($_SESSION['isVerified'] !== "VERIFIED") {
-    header("Location: ../trackerMain.php");
+    header("Location: ../Session/trackerMain.php");
     exit();
 }
 
@@ -38,8 +39,8 @@ $documents = getStudentDocuments($conn, $studentID);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
-    <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
-    <link rel="stylesheet" href="../../css/student/studentDashboard2.css">
+    <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
+    <link rel="stylesheet" href="../../public/css/student/studentDashboard2.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 
@@ -103,7 +104,7 @@ $documents = getStudentDocuments($conn, $studentID);
                         Dark Mode
                     </a>
                     <hr>
-                    <a href="../logoutPhase.php">
+                    <a href="../Session/logoutPhase.php">
                         <i class="bi bi-box-arrow-right"></i>
                         Logout
                     </a>
@@ -1214,7 +1215,7 @@ $documents = getStudentDocuments($conn, $studentID);
 
             if (countdownValue <= 0) {
                 clearInterval(countdownTimer);
-                window.location.href = "../logoutPhase.php";
+                window.location.href = "../Session/logoutPhase.php";
             }
 
         }, 1000);

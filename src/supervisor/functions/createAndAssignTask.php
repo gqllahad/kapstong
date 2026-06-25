@@ -2,8 +2,8 @@
 session_start();
 header('Content-Type: application/json');
 require_once("../../auth/supervisor_auth.php");
-require_once("../../kapstongConnection.php");
-require_once("../../functions.php");
+require_once("../../Shared/kapstongConnection.php");
+require_once("../../Shared/functions.php");
 
 $superID = $_POST['superID'];
 $title = $_POST['title'];

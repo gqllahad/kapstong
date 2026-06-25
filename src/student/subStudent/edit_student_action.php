@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once("../../kapstongConnection.php");
 require_once("../../auth/student_auth.php");
+require_once("../../Shared/kapstongConnection.php");
 
 if (!isset($_POST['editInfoStudent'])) {
     header("Location: pendingStudentDashboard.php");

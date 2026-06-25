@@ -1,6 +1,6 @@
 <?php
-require_once("../../kapstongConnection.php");
 require_once("../../auth/student_auth.php");
+require_once("../../Shared/kapstongConnection.php");
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);

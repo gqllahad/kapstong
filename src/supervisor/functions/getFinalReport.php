@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once("../../kapstongConnection.php");
+require_once("../../Shared/kapstongConnection.php");
 
 header('Content-Type: application/json');
 

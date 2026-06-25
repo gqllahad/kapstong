@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-require_once("../../kapstongConnection.php");
-require_once("../../mailer.php");
+require_once("../../Shared/kapstongConnection.php");
+require_once("../../Mail/mailer.php");
 
 header('Content-Type: application/json');
 

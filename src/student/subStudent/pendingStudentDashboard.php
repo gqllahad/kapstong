@@ -1,10 +1,10 @@
 <?php
 
 session_start();
-require_once("../../kapstongConnection.php");
 require_once("../../auth/student_auth.php");
-require_once("../../functions.php");
-require_once("../../sessionTimeout.php");
+require_once("../../Shared/kapstongConnection.php");
+require_once("../../Shared/functions.php");
+require_once("../../Session/sessionTimeout.php");
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");

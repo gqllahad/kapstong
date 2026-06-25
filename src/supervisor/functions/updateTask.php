@@ -1,7 +1,7 @@
 <?php
 require_once("../../auth/supervisor_auth.php");
-require_once("../../kapstongConnection.php");
-require_once("../../functions.php");
+require_once("../../Shared/kapstongConnection.php");
+require_once("../../Shared/functions.php");
 
 $taskID = $_POST['taskID'] ?? '';
 $title = $_POST['title'] ?? '';

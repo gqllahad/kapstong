@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once("../../kapstongConnection.php");
+require_once("../../Shared/kapstongConnection.php");
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'supervisor') {
     header("Location: ../../loginPhase.php");

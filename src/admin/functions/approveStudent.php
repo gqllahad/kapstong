@@ -1,6 +1,6 @@
 <?php
+require_once("../../Shared/kapstongConnection.php");
 require_once("../../auth/admin_auth.php");
-require_once("../../kapstongConnection.php");
 
 
 $studentID = $_POST['studentID'] ?? null;

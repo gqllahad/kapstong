@@ -126,7 +126,7 @@
 
 
 
-require_once("../../kapstongConnection.php");
+require_once("../../Shared/kapstongConnection.php");
 require_once("../../auth/admin_auth.php");
 
 header('Content-Type: application/json');
@@ -138,25 +138,25 @@ SELECT
     o.course,
     o.yearLevel,
  
-    /* ── Attendance (all-time) ───────────────────── */
+    /* ── Attendance  */
     COALESCE(SUM(a.status = 'absent'),  0) AS absents,
     COALESCE(SUM(a.status = 'late'),    0) AS lates,
     COALESCE(SUM(a.status = 'present'), 0) AS presents,
     COALESCE(SUM(a.status = 'excused'), 0) AS excused,
  
-    /* ── Recent absences (last 7 days) ──────────── */
+    /* ── Recent absences */
     COALESCE(SUM(
         a.status = 'absent'
         AND a.log_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
     ), 0) AS recent_absents,
  
-    /* ── Consecutive absences (last 3 days) ─────── */
+    /* ── Consecutive absences */
     COALESCE(SUM(
         a.status = 'absent'
         AND a.log_date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
     ), 0) AS consecutive_absents,
  
-    /* ── Task stats ──────────────────────────────── */
+    /* ── Task stats */
     COALESCE(SUM(
         t.due_date < CURDATE()
         AND t.status NOT IN ('APPROVED', 'SUBMITTED')
@@ -166,12 +166,12 @@ SELECT
     COALESCE(SUM(t.status = 'IN PROGRESS'), 0)  AS inprogress_tasks,
     COALESCE(COUNT(DISTINCT t.taskID), 0)        AS total_tasks,
  
-    /* ── Progress ────────────────────────────────── */
+    /* ── Progress  */
     COALESCE(p.completed_hours, 0)  AS completed_hours,
     COALESCE(p.required_hours,  500) AS required_hours,
     p.completion_status,
  
-    /* ── Last attendance date ────────────────────── */
+    /* ── Last attendance date  */
     MAX(a.log_date) AS last_seen
  
 FROM users u

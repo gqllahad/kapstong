@@ -1,7 +1,7 @@
 <?php
-require_once("../../kapstongConnection.php");
+require_once("../../Shared/kapstongConnection.php");
 require_once("../../auth/admin_auth.php");
-require_once("../../functions.php");
+require_once("../../Shared/functions.php");
 
 $search = $_POST['search'] ?? '';
 $course = $_POST['course'] ?? '';

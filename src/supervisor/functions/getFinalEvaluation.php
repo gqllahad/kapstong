@@ -2,8 +2,8 @@
 
 session_start();
 require_once("../../auth/supervisor_auth.php");
-require_once("../../kapstongConnection.php");
-require_once("../../functions.php");
+require_once("../../Shared/kapstongConnection.php");
+require_once("../../Shared/functions.php");
 
 header('Content-Type: application/json');
 
@@ -86,7 +86,7 @@ while ($t = $taskResult->fetch_assoc()) {
     $ratingScore = 0;
 
     if (!empty($t['rating'])) {
-        $ratingScore = convertRatingToScore($t['rating']);
+        $ratingScore = $t['rating'];
     }
 
     $taskFinal = ($statusScore * 0.6) + ($ratingScore * 0.4);

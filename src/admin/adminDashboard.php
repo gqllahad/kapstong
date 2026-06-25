@@ -1,16 +1,17 @@
 <?php
 
 session_start();
-require_once("../kapstongConnection.php");
-require_once("../functions.php");
-require_once("../sessionTimeout.php");
+require_once("../../Shared/kapstongConnection.php");
+require_once("../../auth/admin_auth.php");
+require_once("../../Shared/functions.php");
+require_once("../Session/sessionTimeout.php");
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 
 
 if ($_SESSION['role'] !== "ADMIN") {
-    header("Location: ../trackerMain.php");
+    header("Location: ../Session/trackerMain.php");
     exit();
 }
 
@@ -27,31 +28,15 @@ if ($_SESSION['role'] !== "ADMIN") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Admin Dashboard</title>
-    <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
+    <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
 
-    <link rel="stylesheet" href="../../css/admin/adminDashboard3.css">
+    <link rel="stylesheet" href="../../public/css/admin/adminDashboard3.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 </head>
 
 
 <body>
-    <!-- <header class="navbar">
-
-        <div class="header-title">
-            <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
-            <h1>Administrator Dashboard</h1>
-        </div>
-
-        <button id="menuToggle">☰</button>
-        <nav class="profile-menu" id="profileMenu" hidden>
-            <a href="#">Profile</a>
-            <hr style="width: 75%; text-align: left;">
-            <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
-        </nav>
-
-    </header> -->
-
     <!--  MAIN LAYOUT -->
     <div class="layout">
 
@@ -91,7 +76,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         Dark Mode
                     </a>
                     <hr>
-                    <a href="../logoutPhase.php">
+                    <a href="../Session/logoutPhase.php">
                         <i class="bi bi-box-arrow-right"></i>
                         Logout
                     </a>
@@ -1929,7 +1914,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="../../js/admin/adminDashboard.js"></script>
+<script src="../../public/js/admin/adminDashboard.js"></script>
 
 
 </html>

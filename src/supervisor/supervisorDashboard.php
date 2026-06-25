@@ -1,15 +1,15 @@
 <?php
 
 session_start();
-require_once("../kapstongConnection.php");
-require_once("../functions.php");
-require_once("../sessionTimeout.php");
+require_once("../Shared/kapstongConnection.php");
+require_once("../Shared/functions.php");
+require_once("../Session/sessionTimeout.php");
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 
 if ($_SESSION['role'] !== "supervisor") {
-    header("Location: ../trackerMain.php");
+    header("Location: ../Session/trackerMain.php");
     exit();
 }
 
@@ -55,8 +55,8 @@ foreach ($nameParts as $part) {
 
     <title>Supervisor Dashboard</title>
 
-    <link rel="icon" type="image/png" href="../../kapstongImage/logo.jpg">
-    <link rel="stylesheet" href="../../css/supervisor/supervisorDashboard2.css">
+    <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
+    <link rel="stylesheet" href="../../public.css/supervisor/supervisorDashboard2.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 
@@ -105,7 +105,7 @@ foreach ($nameParts as $part) {
             <div class="force-modal-header">
                 <h2><i class="bi bi-exclamation-triangle"></i> Change Password Required</h2>
                 <p>You must change your password before continuing.</p>
-                <a href="../logoutPhase.php" class="force-modal-close-profile">&times;</a>
+                <a href="../Session/logoutPhase.php" class="force-modal-close-profile">&times;</a>
             </div>
 
             <form action="functions/settings.php" method="POST">
@@ -164,7 +164,7 @@ foreach ($nameParts as $part) {
                         Dark Mode
                     </a>
                     <hr>
-                    <a href="../logoutPhase.php">
+                    <a href="../Session/logoutPhase.php">
                         <i class="bi bi-box-arrow-right"></i>
                         Logout
                     </a>
@@ -1747,6 +1747,6 @@ foreach ($nameParts as $part) {
     document.onscroll = resetTimer;
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="../../js/supervisor/supervisorDashboard.js"></script>
+<script src="../../public/js/supervisor/supervisorDashboard.js"></script>
 
 </html>

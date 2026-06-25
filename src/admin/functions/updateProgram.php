@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once("../../kapstongConnection.php");
+require_once("../../Shared/kapstongConnection.php");
 require_once("../../auth/admin_auth.php");
 
 $program_id = $_POST['program_id'] ?? '';
