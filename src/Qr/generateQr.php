@@ -1,6 +1,6 @@
 <?php
 include "../phpqrcode/qrlib.php";
-require_once("kapstongConnection.php");
+require_once("../Shared/kapstongConnection.php");
 
 
 $result = mysqli_query($conn, "SELECT rfid FROM user");

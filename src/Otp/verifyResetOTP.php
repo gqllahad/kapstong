@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['reset_email'])) {
-    header("Location: forgotPassword.php");
+    header("Location: ../Password/forgotPassword.php");
     exit();
 }
 
@@ -17,7 +17,7 @@ unset($_SESSION['reset_otp_error']);
 <head>
     <meta charset="UTF-8">
     <title>Verify OTP</title>
-    <link rel="stylesheet" href="../../css/otpPhase.css">
+    <link rel="stylesheet" href="../public/css/otpPhase.css">
 </head>
 
 <body class="reset-body">
@@ -63,7 +63,7 @@ unset($_SESSION['reset_otp_error']);
 
     <div id="verifyLoadingScreen" class="loading-screen">
         <div class="logo-loader">
-            <img src="../../kapstongImage/logo.jpg" class="logo-img-loading">
+            <img src="../Shared/kapstongImage/logo.jpg" class="logo-img-loading">
         </div>
         <p>Loading..</p>
     </div>

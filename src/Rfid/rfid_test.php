@@ -1,5 +1,5 @@
 <?php
-require_once("auth/auth_guard.php");
+require_once("../auth/auth_guard.php");
 
 requireRole(['ADMIN', 'supervisor']);
 ?>

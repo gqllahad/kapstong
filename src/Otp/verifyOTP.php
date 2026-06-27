@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-require_once("kapstongConnection.php");
-require_once("functions.php");
+require_once("../Shared/kapstongConnection.php");
+require_once("../Shared/functions.php");
 
 if (isset($_POST['otp'])) {
 

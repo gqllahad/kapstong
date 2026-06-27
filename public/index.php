@@ -1,3 +1,3 @@
 <?php
-header("Location: php/loginPhase.php");
+header("Location: ../src/Session/loginPhase.php");
 exit;

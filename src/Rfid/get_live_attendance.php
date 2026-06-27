@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once("../kapstongConnection.php");
+require_once("../Shared/kapstongConnection.php");
 
 $role = $_SESSION['role'] ?? null;
 $superID = $_SESSION['superID'] ?? null;

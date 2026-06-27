@@ -2,9 +2,9 @@
 
 session_start();
 
-require_once("../kapstongConnection.php");
+require_once("../Shared/kapstongConnection.php");
 require_once("../auth/auth_guard.php");
-require '../../vendor/autoload.php';
+require '../vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
