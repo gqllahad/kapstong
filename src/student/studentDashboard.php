@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once("../../auth/student_auth.php");
+require_once("../auth/student_auth.php");
 require_once("../Shared/kapstongConnection.php");
 require_once("../Shared/functions.php");
 require_once("../Session/sessionTimeout.php");
@@ -125,7 +125,7 @@ $documents = getStudentDocuments($conn, $studentID);
                 </div>
 
 
-                <form id="profileUpload" action="./student_functions/profile_upload.php" method="POST" enctype="multipart/form-data">
+                <form id="profileUpload" action="student_functions/profile_upload.php" method="POST" enctype="multipart/form-data">
                     <input type="file" id="profileInput" name="profilePicture" accept=".jpg, .jpeg, .png" style="display:none;">
                 </form>
 
@@ -1257,6 +1257,6 @@ $documents = getStudentDocuments($conn, $studentID);
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="../../js/student/studentDashboard.js"></script>
+<script src="../../public/js/student/studentDashboard.js"></script>
 
 </html>

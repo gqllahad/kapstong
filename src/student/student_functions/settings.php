@@ -14,7 +14,7 @@ if (isset($_POST['changePasswordStudent'])) {
     $newPassword = $_POST['newPassword'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
 
-    $redirect = $_SERVER['HTTP_REFERER'] ?? '../../../index.php';
+    $redirect = $_SERVER['HTTP_REFERER'] ?? '../../public/index.php';
 
     if (empty($email) || empty($oldPassword) || empty($newPassword) || empty($confirmPassword)) {
         $_SESSION['error'] = "All fields are required.";

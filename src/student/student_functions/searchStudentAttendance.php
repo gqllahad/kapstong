@@ -4,7 +4,6 @@ require_once("../../auth/student_auth.php");
 require_once("../../Shared/kapstongConnection.php");
 require_once("../../Shared/functions.php");
 
-session_start();
 $studentID = $_SESSION['studentID'];
 
 echo renderStudentAttendanceTable(

@@ -27,5 +27,3 @@ $conn = new mysqli(
 if ($conn->connect_error) {
     die("Connection Failed: " . $conn->connect_error);
 }
-
-var_dump($_ENV['DB_HOST']);

@@ -51,20 +51,10 @@ if (isset($_GET['success_forget'])) {
     </div>
   <?php endif; ?>
 
-  <!-- <?php if ($wrongPassword): ?>
-    <div class="modal-backdrop" id="errorLogin">
-      <div class="modal-box">
-        <h2>Error</h2>
-        <p>Incorrect email or password.</p>
-      </div>
-    </div>
-  <?php endif; ?> -->
-
-
   <header class="header">
     <div class="container">
       <h1 class="logo-text">
-        <img src="../kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
+        <img src="../../public/kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
         <div class="header-title">
           <div>Granby</div>
           <small>OJT Monitoring System </small>

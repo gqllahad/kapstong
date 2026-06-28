@@ -159,7 +159,7 @@ const toggleBtn = document.getElementById("darkModeToggle");
 
 // open rfid
 function openRfid(){
-     window.open("../../php/rfid_test.php", "_blank");
+     window.open("../Rfid/rfid_test.php", "_blank");
 }
 
 // toast
@@ -733,7 +733,7 @@ function refreshAssignStudentList() {
 
 
 function loadBarChart() {
-    fetch("../../php/admin/functions/getBarChartData.php")
+    fetch("functions/getBarChartData.php")
         .then(res => res.json())
         .then(data => {
 
@@ -798,7 +798,7 @@ function loadLineChart() {
 
     const selectedMonth = document.getElementById("monthSelector").value;
 
-    fetch(`../../php/admin/functions/getLineChartData.php?month=${selectedMonth}`)
+    fetch(`functions/getLineChartData.php?month=${selectedMonth}`)
         .then(res => {
             if (!res.ok) throw new Error("Server error: " + res.status);
             return res.json();
@@ -898,7 +898,7 @@ function downloadChartCSV() {
     }
 
     const url =
-        `../../php/admin/functions/download_line_attendance.php?month=${selectedMonth}`;
+        `functions/download_line_attendance.php?month=${selectedMonth}`;
 
     window.open(url, "_blank");
 
@@ -941,7 +941,7 @@ function populateMonthDropdown() {
 
 }
 // function loadLineChart() {
-//     fetch("../../php/admin/functions/getLineChartData.php")
+//     fetch("functions/getLineChartData.php")
 //         .then(res => res.json())
 //         .then(data => {
 
@@ -1017,7 +1017,7 @@ function populateMonthDropdown() {
 
 // pie chart
 // function loadPieChart() {
-//     fetch("../../php/admin/functions/getDonutChartData.php")
+//     fetch("functions/getDonutChartData.php")
 //         .then(res => res.json())
 //         .then(data => {
 
@@ -1109,7 +1109,7 @@ function populateMonthDropdown() {
 // doughnut chart health score
 // function loadHealthScore() {
 
-//     fetch("../../php/admin/functions/getAttendanceHealthScore.php")
+//     fetch("functions/getAttendanceHealthScore.php")
 //         .then(res => res.json())
 //         .then(data => {
 
@@ -1140,7 +1140,7 @@ function loadPieChart() {
  
     _removePieEmpty(wrapper);
  
-    fetch("../../php/admin/functions/getDonutChartData.php")
+    fetch("functions/getDonutChartData.php")
         .then(res => res.json())
         .then(data => {
  
@@ -1224,7 +1224,7 @@ function loadHealthScore() {
     if (healthEl) healthEl.innerText = "—%";
     if (totalEl)  totalEl.innerText  = "—";
  
-    fetch("../../php/admin/functions/getAttendanceHealthScore.php")
+    fetch("functions/getAttendanceHealthScore.php")
         .then(res => res.json())
         .then(data => {
  
@@ -1345,7 +1345,7 @@ function loadPieChart() {
     const healthEl = document.getElementById('health-score');
     const totalEl  = document.getElementById('total-attendance');
  
-    fetch("../../php/admin/functions/getDonutChartData.php")
+    fetch("functions/getDonutChartData.php")
         .then(res => res.json())
         .then(data => {
  
@@ -1441,7 +1441,7 @@ function openStudentAssign(){
 // at risk students
 function loadRiskStudents() {
 
-    fetch("../../php/admin/functions/getAtRiskStudents.php")
+    fetch("functions/getAtRiskStudents.php")
         .then(res => res.json())
         .then(data => {
 
@@ -1528,7 +1528,7 @@ function loadRiskStudents() {
 
 // function loadAllRiskStudents() {
 
-//     fetch("../../php/admin/functions/getAllAtRiskStudent.php")
+//     fetch("functions/getAllAtRiskStudent.php")
 //         .then(res => res.json())
 //         .then(data => {
 
@@ -1661,7 +1661,7 @@ function loadAllRiskStudents() {
             <span>Loading intern data…</span>
         </div>`;
  
-    fetch("../../php/admin/functions/getAllAtRiskStudent.php")
+    fetch("functions/getAllAtRiskStudent.php")
         .then(res => res.json())
         .then(data => {
  
@@ -1834,7 +1834,7 @@ function loadAllRiskStudents() {
 /* ── also update the mini dashboard widget ───────────────────── */
 function loadRiskStudents() {
  
-    fetch("../../php/admin/functions/getAtRiskStudents.php")
+    fetch("functions/getAtRiskStudents.php")
         .then(res => res.json())
         .then(data => {
  

@@ -1,9 +1,9 @@
 <?php
 
 session_start();
-require_once("../../Shared/kapstongConnection.php");
-require_once("../../auth/admin_auth.php");
-require_once("../../Shared/functions.php");
+require_once("../Shared/kapstongConnection.php");
+require_once("../auth/admin_auth.php");
+require_once("../Shared/functions.php");
 require_once("../Session/sessionTimeout.php");
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -1875,7 +1875,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             if (countdownValue <= 0) {
                 clearInterval(countdownTimer);
-                window.location.href = "../logoutPhase.php";
+                window.location.href = "../Session/logoutPhase.php";
             }
 
         }, 1000);

@@ -1302,7 +1302,7 @@ function removeFile(index) {
 // Chartss
 function loadPieChart() {
 
-    fetch(`../../php/student/student_functions/getStudentTaskChart.php?studentID=${studentID}`)
+    fetch(`student_functions/getStudentTaskChart.php?studentID=${studentID}`)
 
     .then(res => res.json())
 
@@ -1413,7 +1413,7 @@ function loadPieChart() {
 }
 
 function loadLineChart() {
-    fetch(`../../php/student/student_functions/getStudentAttendanceTrend.php?studentID=${studentID}`)
+    fetch(`student_functions/getStudentAttendanceTrend.php?studentID=${studentID}`)
         .then(res => res.json())
         .then(data => {
 

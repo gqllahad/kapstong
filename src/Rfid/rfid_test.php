@@ -17,7 +17,7 @@ requireRole(['ADMIN', 'supervisor']);
     <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OJT Attendance</title>
-     <link rel="stylesheet" href="../css/rfidPhase.css" />
+     <link rel="stylesheet" href="../../public/css/rfidPhase.css" />
      <link
   href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
   rel='stylesheet'
@@ -29,8 +29,8 @@ requireRole(['ADMIN', 'supervisor']);
 
 <div class="container"> 
     <div class="header">
-        <a href="loginPhase.php">
-            <img class="scanner-logo" src="../kapstongImage/logo.jpg" alt="Logo">
+        <a href="../Session/loginPhase.php">
+            <img class="scanner-logo" src="../../public/kapstongImage/logo.jpg" alt="Logo">
         </a>
 
         <h1>Granby On-the-Job Training Attendance System</h1>
@@ -188,7 +188,7 @@ requireRole(['ADMIN', 'supervisor']);
 
 
 <!-- scroipts -->
-<script src="../js/rfidPhase.js"></script>
+<script src="../../public/js/rfidPhase.js"></script>
 </body>
 
 </html>
