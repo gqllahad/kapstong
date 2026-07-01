@@ -4,7 +4,7 @@ session_start();
 
 require_once("../Shared/kapstongConnection.php");
 require_once("../auth/auth_guard.php");
-require '../vendor/autoload.php';
+require '../../vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -52,7 +52,7 @@ if ($role === "supervisor") {
     $result = $conn->query($sql);
 }
 
-$imagePath = $_SERVER['DOCUMENT_ROOT'] . '/kapstong/kapstongImage/logo.jpg';
+$imagePath = $_SERVER['DOCUMENT_ROOT'] . '/kapstong/public/kapstongImage/logo.jpg';
 
 if (!file_exists($imagePath)) {
     die("Logo not found: " . $imagePath);

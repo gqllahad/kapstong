@@ -70,7 +70,7 @@ function closeModal() {
 }
 
 function loadAttendance() {
-    fetch("../php/rfid_functions/get_live_attendance.php")
+    fetch("get_live_attendance.php")
         .then(res => res.json())
         .then(data => {
            const now = new Date();
@@ -310,7 +310,7 @@ function toggleDashboard() {
 function downloadTodayAttendance() {
 
     window.open(
-        "../php/rfid_functions/download_today_attendance.php",
+        "download_today_attendance.php",
         "_blank"
     );
 }
@@ -325,7 +325,7 @@ function submitEmergencyTimeout() {
         reason = "Emergency time out (no reason selected)";
     }
 
-    fetch("../php/rfid_functions/emergency_timeout.php", {
+    fetch("emergency_timeout.php", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
