@@ -1669,7 +1669,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const currentCourse = courseSelect.dataset.current;
 
-    fetch('../../getCourses.php')
+    fetch('../../Shared/getCourses.php')
         .then(res => res.json())
         .then(data => {
 

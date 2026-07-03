@@ -6,6 +6,8 @@ require '../PHPMailer/src/PHPMailer.php';
 require '../PHPMailer/src/SMTP.php';
 require '../PHPMailer/src/Exception.php';
 
+require_once("../Shared/config.php");
+
 $mail = new PHPMailer(true);
 
 try {
@@ -13,13 +15,13 @@ try {
     $mail->Host = 'smtp.gmail.com'; 
     $mail->SMTPAuth = true;
     
-    $mail->Username = 'madrigalinigojones@gmail.com';
-    $mail->Password = 'auvgdrtezpbblwqi';
+    $mail->Username = MAIL_USERNAME;
+    $mail->Password = MAIL_PASSWORD;
     $mail->SMTPSecure = 'tls';
     $mail->Port = 587;
 
-    $mail->setFrom('madrigalinigojones@gmail.com', 'OJT System');
-    $mail->addAddress('nyenye.arimado@gmail.com');
+    $mail->setFrom(MAIL_USERNAME, 'OJT System');
+    $mail->addAddress(MAIL_USERNAME);
 
     $mail->isHTML(true);
     $mail->Subject = 'Test Email';

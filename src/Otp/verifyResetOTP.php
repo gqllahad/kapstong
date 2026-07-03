@@ -17,7 +17,7 @@ unset($_SESSION['reset_otp_error']);
 <head>
     <meta charset="UTF-8">
     <title>Verify OTP</title>
-    <link rel="stylesheet" href="../public/css/otpPhase.css">
+    <link rel="stylesheet" href="../../public/css/otpPhase.css">
 </head>
 
 <body class="reset-body">
@@ -55,7 +55,7 @@ unset($_SESSION['reset_otp_error']);
             Didn't receive the email? Check spam/junk folder.
         </div>
 
-        <a href="../loginPhase.php" class="back-login">
+        <a href="../Session/loginPhase.php" class="back-login">
             ← Back to Login
         </a>
 
@@ -63,7 +63,7 @@ unset($_SESSION['reset_otp_error']);
 
     <div id="verifyLoadingScreen" class="loading-screen">
         <div class="logo-loader">
-            <img src="../Shared/kapstongImage/logo.jpg" class="logo-img-loading">
+            <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
         </div>
         <p>Loading..</p>
     </div>

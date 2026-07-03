@@ -114,11 +114,11 @@ if (isset($_POST['otp'])) {
             unset($_SESSION['signup_data']);
             unset($_SESSION['otp_expiry']);
 
-            header("Location: loginPhase.php?success=Account+created+successfully!#log-container");
+            header("Location: ../Session/loginPhase.php?success=Account+created+successfully!#log-container");
             exit();
         } catch (Exception $e) {
             $conn->rollback();
-            header("Location: signupStudent.php?error=Database+error");
+            header("Location: ../Signup/signupStudent.php?error=Database+error");
             exit();
         }
     } else {
@@ -138,7 +138,7 @@ if (isset($_POST['otp'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Verify OTP</title>
-    <link rel="stylesheet" href="../css/otpPhase.css?v=123">
+    <link rel="stylesheet" href="../../public/css/otpPhase.css?v=123">
 </head>
 
 <body class="reset-body">
@@ -178,7 +178,7 @@ if (isset($_POST['otp'])) {
             If still not received, contact support or try using a different email.
         </div>
 
-        <a href="loginPhase.php" class="back-login">
+        <a href="../Session/loginPhase.php" class="back-login">
             ← Back to Login
         </a>
     </div>

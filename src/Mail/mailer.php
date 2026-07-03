@@ -6,6 +6,8 @@ require_once __DIR__ . '/../PHPMailer/src/PHPMailer.php';
 require_once __DIR__ . '/../PHPMailer/src/SMTP.php';
 require_once __DIR__ . '/../PHPMailer/src/Exception.php';
 
+require_once("../Shared/config.php");
+
 function sendEvaluationEmail($toEmail, $studentName, $finalScore, $recommendationText)
 {
     $mail = new PHPMailer(true);
@@ -15,13 +17,13 @@ function sendEvaluationEmail($toEmail, $studentName, $finalScore, $recommendatio
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
 
-        $mail->Username = 'madrigalinigojones@gmail.com';
-        $mail->Password = 'auvgdrtezpbblwqi';
+        $mail->Username = MAIL_USERNAME;
+        $mail->Password = MAIL_PASSWORD;
 
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
-        $mail->setFrom('madrigalinigojones@gmail.com', 'Granby OJT System Tracking System');
+        $mail->setFrom(MAIL_USERNAME, 'Granby OJT System Tracking System');
         $mail->addAddress($toEmail);
 
         $mail->isHTML(true);

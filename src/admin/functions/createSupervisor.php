@@ -11,6 +11,7 @@ session_start();
 require_once("../../Shared/kapstongConnection.php");
 require_once("../../auth/admin_auth.php");
 require_once("../../Shared/functions.php");
+require_once("../../Shared/config.php");
 
 header('Content-Type: application/json');
 error_reporting(0);
@@ -132,12 +133,12 @@ $stmtUser->execute();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
 
-             $mail->Username = 'madrigalinigojones@gmail.com';
-            $mail->Password = 'auvgdrtezpbblwqi';
+             $mail->Username = MAIL_USERNAME;
+            $mail->Password = MAIL_PASSWORD;
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
 
-            $mail->setFrom('madrigalinigojones@gmail.com', 'OJT System');
+            $mail->setFrom(MAIL_USERNAME, 'OJT System');
             $mail->addAddress($email);
 
             $mail->isHTML(true);

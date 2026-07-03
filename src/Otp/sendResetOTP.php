@@ -9,7 +9,8 @@ require '../../PHPMailer/src/PHPMailer.php';
 require '../../PHPMailer/src/SMTP.php';
 require '../../PHPMailer/src/Exception.php';
 
-require_once("../kapstongConnection.php");
+require_once("../Shared/kapstongConnection.php");
+require_once("../Shared/config.php");
 
 if(isset($_POST['send-reset'])) {
 
@@ -21,7 +22,7 @@ if(isset($_POST['send-reset'])) {
     if(!$email) {
 
         header(
-            "Location: forgotPassword.php?error=Invalid+Email"
+            "Location: ../Password/forgotPassword.php?error=Invalid+Email"
         );
 
         exit();
@@ -60,17 +61,17 @@ if(isset($_POST['send-reset'])) {
             $mail->SMTPAuth = true;
 
             $mail->Username =
-            'madrigalinigojones@gmail.com';
+            MAIL_USERNAME;
 
             $mail->Password =
-            'auvgdrtezpbblwqi';
+            MAIL_PASSWORD;
 
             $mail->SMTPSecure = 'tls';
 
             $mail->Port = 587;
 
             $mail->setFrom(
-                'madrigalinigojones@gmail.com',
+                MAIL_USERNAME,
                 'Granby OJT System'
             );
 
@@ -109,7 +110,7 @@ if(isset($_POST['send-reset'])) {
     } else {
 
         header(
-            "Location: forgotPassword.php?error=Email+Not+Found"
+            "Location: ../Password/forgotPassword.php?error=Email+Not+Found"
         );
 
         exit();

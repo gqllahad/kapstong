@@ -25,7 +25,7 @@ switch ($role) {
 
     case "student":
         if ($isVerified === 'NOT VERIFIED' || $isVerified === 'PENDING') {
-            header("Location: student/subStudent/pendingStudentDashboard.php");
+            header("Location: ../student/subStudent/pendingStudentDashboard.php");
             exit();
         }
         header("Location: ../student/studentDashboard.php");

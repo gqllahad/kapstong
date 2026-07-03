@@ -3,7 +3,7 @@ session_start();
 require_once("../../Shared/kapstongConnection.php");
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'supervisor') {
-    header("Location: ../../loginPhase.php");
+    header("Location: ../../Session/loginPhase.php");
     exit();
 }
 
@@ -15,7 +15,7 @@ if (isset($_POST['changePasswordSupervisor'])) {
     $newPassword = $_POST['newPassword'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
 
-    $redirect = $_SERVER['HTTP_REFERER'] ?? '../../index.php';
+    $redirect = $_SERVER['HTTP_REFERER'] ?? '../../../public/index.php';
 
     if (empty($oldPassword) || empty($newPassword) || empty($confirmPassword)) {
         $_SESSION['error'] = "All fields are required.";

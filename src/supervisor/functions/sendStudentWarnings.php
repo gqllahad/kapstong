@@ -8,6 +8,7 @@ require '../../../PHPMailer/src/SMTP.php';
 require '../../../PHPMailer/src/Exception.php';
 
 require_once("../../Shared/kapstongConnection.php");
+require_once("../../Shared/config.php");
 
 function sendWarningEmail($studentEmail, $studentName, $subject, $message)
 {
@@ -19,14 +20,14 @@ function sendWarningEmail($studentEmail, $studentName, $subject, $message)
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
 
-        $mail->Username = 'madrigalinigojones@gmail.com';
-        $mail->Password = 'auvgdrtezpbblwqi';
+        $mail->Username = MAIL_USERNAME;
+        $mail->Password = MAIL_PASSWORD;
 
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
         $mail->setFrom(
-            'madrigalinigojones@gmail.com',
+            MAIL_USERNAME,
             'OJT Monitoring System'
         );
 

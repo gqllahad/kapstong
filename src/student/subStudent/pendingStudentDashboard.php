@@ -11,12 +11,12 @@ header("Pragma: no-cache");
 
 
 if ($_SESSION['role'] !== "student") {
-    header("Location: ../../trackerMain.php");
+    header("Location: ../../Session/trackerMain.php");
     exit();
 }
 
 if ($_SESSION['isVerified'] !== "NOT VERIFIED" && $_SESSION['isVerified'] !== "PENDING") {
-    header("Location: ../../trackerMain.php");
+    header("Location: ../../Session/trackerMain.php");
     exit();
 }
 
@@ -30,6 +30,19 @@ $documents = getStudentDocuments($conn, $studentID);
 $studentName = $_SESSION['name'];
 $studentStatus = $_SESSION['isVerified'];
 
+$nameParts = explode(' ', trim($studentName));
+
+$initial = '';
+
+foreach ($nameParts as $part) {
+
+    $initial .= strtoupper(substr($part, 0, 1));
+
+    if (strlen($initial) >= 2) {
+        break;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -39,26 +52,25 @@ $studentStatus = $_SESSION['isVerified'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
-    <link rel="icon" type="image/png" href="../../../kapstongImage/logo.jpg">
-    <link rel="stylesheet" href="../../../css/student/studentDashboard.css">
+    <link rel="icon" type="image/png" href="../../../public/kapstongImage/logo.jpg">
+    <link rel="stylesheet" href="../../../public/css/student/pendingStudentDashboard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 
 <body>
 
-    <header class="navbar">
+    <!-- <header class="navbar">
         <div class="header-title">
-            <img src="../../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
+            <img src="../../../public/kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
             <h1>Student Dashboard</h1>
         </div>
         <button id="menuToggle">☰</button>
         <nav class="profile-menu" id="profileMenu" hidden>
             <a id="openProfilePendingBtn">Profile</a>
-            <!-- <a id="openAccountSettingsBtn">Account Setting</a> -->
             <hr style="width: 75%; text-align: left;">
-            <a href="../../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            <a href="../../Session/logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
-    </header>
+    </header> -->
 
     <div class="layout">
         <aside class="sidebar">
@@ -71,6 +83,42 @@ $studentStatus = $_SESSION['isVerified'];
                 </li>
                 <li><button id="unverified-student-messages-button"><i class="bi bi-chat-left-text"></i> Messages</button></li>
             </ul>
+
+            <div class="sidebar-profile">
+
+                <div class="profile-left">
+                    <div class="profile-avatar">
+                        <?= $initial ?>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name"><?= htmlspecialchars($studentName) ?></span>
+                        <small>Unverified Student</small>
+                    </div>
+                </div>
+                <button id="menuToggle" class="profile-trigger">
+                    ☰
+                </button>
+
+                <nav class="profile-menu" id="profileMenu" hidden>
+                    <a id="openProfilePendingBtn">
+                        <i class="bi bi-person"></i>
+                        Profile
+                    </a>
+                    <!-- <a id="openAccountSettingsBtn">
+                        <i class="bi bi-gear"></i>
+                        Account Settings
+                    </a> -->
+                    <a id="darkModeToggle" class="dark-toggle">
+                        <i class="bi bi-moon-fill"></i>
+                        Dark Mode
+                    </a>
+                    <hr>
+                    <a href="../../Session/logoutPhase.php">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </a>
+                </nav>
+            </div>
         </aside>
 
         <main class="content">
@@ -246,12 +294,7 @@ $studentStatus = $_SESSION['isVerified'];
                         <div class="form-section">
                             <h4>Academic Information</h4>
 
-                            <div class="form-group-edit">
-                                <label for="course">Course</label>
-                                <select name="course" id="edit_course" data-current="<?php echo htmlspecialchars($studentInfo['course'] ?? ''); ?>">
-
-                                </select>
-                            </div>
+                            
 
                             <div class="form-group-edit">
                                 <label for="yearLevel">Year Level</label>
@@ -270,13 +313,22 @@ $studentStatus = $_SESSION['isVerified'];
                                     <option value="2nd Semester" <?php if (($studentInfo['semester'] ?? '') == '2nd Semester') echo 'selected'; ?>>2nd Semester</option>
                                 </select>
                             </div>
+
+                            <div class="form-group-edit">
+                                <label for="course">Course</label>
+                                <select name="course" id="edit_course" data-current="<?php echo htmlspecialchars($studentInfo['course'] ?? ''); ?>">
+
+                                </select>
+                            </div>
+
+                            
                         </div>
 
                         <!-- Address -->
                         <div class="form-section">
                             <h4>Address</h4>
 
-                            <div class="form-group-edit">
+                            <div class="form-group-edit full-width">
                                 <label for="address">Full Address</label>
                                 <input type="text" name="address" id="address"
                                     value="<?php echo htmlspecialchars($studentInfo['address'] ?? ''); ?>">
@@ -284,9 +336,9 @@ $studentStatus = $_SESSION['isVerified'];
                         </div>
 
                         <!-- Actions -->
-                        <div class="modal-actions">
-                            <button type="submit" class="btn-upload" name="editInfoStudent">Save Changes</button>
+                        <div class="modal-actions">                 
                             <button type="button" id="cancelEditModal" class="btn-edit">Cancel</button>
+                             <button type="submit" class="btn-upload" name="editInfoStudent">Save Changes</button>
                         </div>
                     </form>
                 </div>
@@ -611,7 +663,7 @@ $studentStatus = $_SESSION['isVerified'];
 
                 if (countdownValue <= 0) {
                     clearInterval(countdownTimer);
-                    window.location.href = "../logoutPhase.php";
+                    window.location.href = "../../Session/logoutPhase.php";
                 }
 
             }, 1000);
@@ -646,7 +698,7 @@ $studentStatus = $_SESSION['isVerified'];
         document.onscroll = resetTimer;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../../../js/student/studentDashboard.js"></script>
+    <script src="../../../public/js/student/studentDashboard.js"></script>
 
     <?php
     $messages = [

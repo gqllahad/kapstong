@@ -3,3 +3,4 @@ vendor/
 uploads/
 *.sql
 *.dump
+src/Shared/config.php
