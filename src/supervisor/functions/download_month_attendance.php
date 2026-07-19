@@ -17,7 +17,7 @@ if (!$superID || !$month) {
 $startDate = $month . "-01";
 $endDate = date("Y-m-t", strtotime($startDate));
 
-$imagePath = $_SERVER['DOCUMENT_ROOT'] . '/kapstong/kapstongImage/logo.jpg';
+$imagePath = $_SERVER['DOCUMENT_ROOT'] . '/kapstong/public/kapstongImage/logo.jpg';
 
 if (!file_exists($imagePath)) {
     die("Logo not found: " . $imagePath);

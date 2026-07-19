@@ -1569,7 +1569,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <div class="form-group">
 
                             <label>Course</label>
-                            <select id="downloadCourse">
+                            <select id="downloadCourseEvaluation">
                                 <?php echo getProgramOptions($conn); ?>
                             </select>
 
@@ -1579,7 +1579,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <div class="form-group">
 
                             <label>Supervisor</label>
-                            <select id="downloadSupervisor">
+                            <select id="downloadSupervisorEvaluation">
                                 <?php echo getSupervisorOptions($conn); ?>
                             </select>
                         </div>
@@ -1723,27 +1723,9 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                             <select id="downloadSupervisor">
 
-                                <option value="">All Supervisors</option>
+                                <!-- <option value="">All Supervisors</option> -->
 
-                                <?php
-
-                                $supers = $conn->query("
-                                        SELECT userID, name
-                                        FROM users
-                                        WHERE role = 'supervisor'
-                                        ORDER BY name ASC
-                                    ");
-
-                                while ($super = $supers->fetch_assoc()) {
-
-                                    echo "
-                                        <option value='{$super['userID']}'>
-                                            {$super['name']}
-                                        </option>
-                                        ";
-                                }
-
-                                ?>
+                               <?php echo getSupervisorOptions($conn); ?>
                             </select>
 
                         </div>
@@ -1902,6 +1884,8 @@ if ($_SESSION['role'] !== "ADMIN") {
 
         resetTimer();
     }
+
+    console.log("Current location:", window.location.href);
 
     window.onload = resetTimer;
     document.onmousemove = resetTimer;

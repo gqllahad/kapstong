@@ -3153,6 +3153,24 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchEvaluations();
 });
 
+function downloadEvaluationPDF(){
+    
+    const course = document.getElementById("downloadCourseEvaluation").value;
+    const supervisor = document.getElementById("downloadSupervisorEvaluation").value;
+
+
+    const url = 
+        `functions/download_all_evaluation_report.php?` +
+        `course=${encodeURIComponent(course)}` +
+        `&superID=${encodeURIComponent(supervisor)}`;
+
+
+     window.open(url, "_blank");
+
+     closeEvaluationDownloadModal();
+
+}
+
 
 // system config buttons
 

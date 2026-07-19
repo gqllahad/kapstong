@@ -77,7 +77,7 @@ $filterDisplay = !empty($filterText)
     : 'All Students';
 
 
-$imagePath = $_SERVER['DOCUMENT_ROOT'] . '/kapstong/kapstongImage/logo.jpg';
+$imagePath = $_SERVER['DOCUMENT_ROOT'] . '/kapstong/public/kapstongImage/logo.jpg';
 
 if (!file_exists($imagePath)) {
     die("Logo not found: " . $imagePath);
