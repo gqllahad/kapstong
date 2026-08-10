@@ -29,6 +29,19 @@ if ($studentID) {
 
 $documents = getStudentDocuments($conn, $studentID);
 
+$nameParts = explode(' ', trim($studentName));
+
+$initial = '';
+
+foreach ($nameParts as $part) {
+
+    $initial .= strtoupper(substr($part, 0, 1));
+
+    if (strlen($initial) >= 2) {
+        break;
+    }
+}
+
 ?>
 
 
@@ -79,11 +92,11 @@ $documents = getStudentDocuments($conn, $studentID);
 
                 <div class="profile-left">
                     <div class="profile-avatar">
-                        M
+                        <?= $initial ?>
                     </div>
                     <div class="profile-info">
-                        <span class="profile-name">MADRIGAL</span>
-                        <small>Supervisor</small>
+                        <span class="profile-name"><?= htmlspecialchars($studentName) ?></span>
+                        <small>Student</small>
                     </div>
                 </div>
                 <button id="menuToggle" class="profile-trigger">

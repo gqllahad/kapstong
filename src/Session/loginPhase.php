@@ -110,9 +110,7 @@ if (isset($_GET['success_forget'])) {
         </h1>
 
         <p class="hero-desc">
-          A modern web-based platform designed to simplify attendance monitoring,
-          RFID tracking, and OJT management for students, coordinators, and administrators
-          with real-time and secure record handling.
+          Fast, reliable RFID-based attendance and OJT monitoring for administrators, coordinators, and students.
         </p>
 
         <div class="hero-buttons">
@@ -156,7 +154,7 @@ if (isset($_GET['success_forget'])) {
               <div class="brand">
 
                 <div class="logo">
-                  <img src="../kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
+                  <img src="../../public/kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
                 </div>
 
 

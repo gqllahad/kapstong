@@ -15,7 +15,6 @@ if ($_SESSION['role'] !== "supervisor") {
 
 $userID = $_SESSION['user_id'];
 
-
 $stmtForce = $conn->prepare("SELECT mustChangePassword FROM users WHERE userID = ?");
 $stmtForce->bind_param("i", $userID);
 $stmtForce->execute();
@@ -56,7 +55,7 @@ foreach ($nameParts as $part) {
     <title>Supervisor Dashboard</title>
 
     <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
-    <link rel="stylesheet" href="../../public.css/supervisor/supervisorDashboard2.css">
+    <link rel="stylesheet" href="../../public/css/supervisor/supervisorDashboard2.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 
@@ -1280,8 +1279,8 @@ foreach ($nameParts as $part) {
                     </div>
                 </div>
 
-                <!-- Self Tasks -->
-                <div class="table-view" id="task-self-table">
+                <!-- Self Tasks inigo -->
+                <!-- <div class="table-view" id="task-self-table">
                     <div class="table-switcher">
                         <button class="tab-btn active" data-tab="manage" onclick="showManageTable()">
                             Task Management
@@ -1343,15 +1342,15 @@ foreach ($nameParts as $part) {
 
                             <tbody id="selfTaskBody">
                                 <?php
-                                $selfSearch = $_POST['search'] ?? '';
-                                $selfStatus = $_POST['status'] ?? '';
-                                $selfDate = $_POST['date'] ?? '';
-                                echo renderSelfTaskList($conn, $superID, $selfSearch, $selfStatus, $selfDate);
+                                // $selfSearch = $_POST['search'] ?? '';
+                                // $selfStatus = $_POST['status'] ?? '';
+                                // $selfDate = $_POST['date'] ?? '';
+                                // echo renderSelfTaskList($conn, $superID, $selfSearch, $selfStatus, $selfDate);
                                 ?>
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> -->
 
             </section>
 

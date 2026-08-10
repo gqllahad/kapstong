@@ -96,7 +96,7 @@ const taskSelf = document.getElementById("task-self-table");
 
 // open rfid
 function openRfid() {
-     window.open("../../php/rfid_test.php", "_blank");
+     window.open("../Rfid/rfid_test.php", "_blank");
 }
 
 // force
