@@ -65,6 +65,9 @@ if (isset($_GET['success_forget'])) {
         <a href="#log-hows">Help</a>
         <a href="#log-about">About</a>
         <a href="#log-container" id="login">Login</a>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light and dark mode">
+  <i class='bx bx-sun'></i>
+</button> 
       </nav>
     </div>
 
@@ -209,69 +212,54 @@ if (isset($_GET['success_forget'])) {
 
       <span class="section-tag">System Workflow</span>
 
-      <h1>How the OJT Monitoring System <br> Works</h1>
+      <h1>How the OJT Monitoring System <br> <span>Works</span></h1>
 
       <p class="how-subtitle">
-        The system streamlines student attendance and OJT monitoring through
-        RFID technology, providing a faster and more reliable workflow for
-        administrators, coordinators, and students.
-      </p>
+      The system streamlines student attendance and OJT monitoring through
+      RFID technology, providing a faster and more reliable workflow for
+      administrators, coordinators, and students.
+    </p>
 
-      <div class="how-container">
+    <div class="how-container">
 
-        <div class="how-individual">
-
-          <div class="step-number">01</div>
-
-          <div class="how-image register"></div>
-
-          <h3>RFID Student Registration</h3>
-
-          <p class="how-text">
-            Students are registered into the system with their assigned RFID cards
-            and verified OJT information for secure attendance monitoring.
-          </p>
-
-        </div>
-
-        <div class="how-individual">
-
-          <div class="step-number">02</div>
-
-          <div class="how-image progress"></div>
-
-          <h3>Real-Time Attendance Tracking</h3>
-
-          <p class="how-text">
-            Students scan their RFID cards to automatically record attendance,
-            time-in, and time-out activities in real time.
-          </p>
-
-        </div>
-
-        <div class="how-individual">
-
-          <div class="step-number">03</div>
-
-          <div class="how-image reports"></div>
-
-          <h3>Monitoring & Reports</h3>
-
-          <p class="how-text">
-            Coordinators and administrators can monitor student records,
-            evaluate attendance, and generate performance reports efficiently.
-          </p>
-
-        </div>
-
+      <div class="how-individual">
+        <span class="step-number">01</span>
+        <div class="how-icon"><i class='bx bx-id-card'></i></div>
+        <h3>RFID Student Registration</h3>
+        <p class="how-text">
+          Students are registered into the system with their assigned RFID cards
+          and verified OJT information for secure attendance monitoring.
+        </p>
       </div>
+
+      <div class="how-individual">
+        <span class="step-number">02</span>
+        <div class="how-icon"><i class='bx bx-wifi'></i></div>
+        <h3>Real-Time Attendance Tracking</h3>
+        <p class="how-text">
+          Students scan their RFID cards to automatically record attendance,
+          time-in, and time-out activities in real time.
+        </p>
+      </div>
+
+      <div class="how-individual">
+        <span class="step-number">03</span>
+        <div class="how-icon"><i class='bx bx-bar-chart-alt-2'></i></div>
+        <h3>Monitoring &amp; Reports</h3>
+        <p class="how-text">
+          Coordinators and administrators can monitor student records,
+          evaluate attendance, and generate performance reports efficiently.
+        </p>
+      </div>
+
+    </div>
     </div>
   </section>
 
   <hr />
 
   <section class="log-container" id="log-container">
-
+    <div class="login-overlay"></div>
     <div
       class="container scroll-reveal"
       id="sign-container"
@@ -349,58 +337,52 @@ if (isset($_GET['success_forget'])) {
   <hr />
 
   <section class="log-about" id="log-about">
-    <div class="about-overlay"></div>
-    <div class="about-container container">
+  <div class="about-overlay"></div>
+  <div class="about-container container">
 
+    <div class="about-grid">
+      <div class="about-copy scroll-reveal">
+        <span class="about-tag">RFID-Powered Monitoring System</span>
+        <h1>OJT Monitoring <br><span>&amp; Attendance System</span></h1>
 
-      <span class="about-tag">RFID-Powered Monitoring System</span>
+        <p class="about-description">
+          The OJT Tracking System is a modern attendance and monitoring platform
+          designed to simplify the management of On-the-Job Training students through
+          RFID technology. The system enables fast, accurate, and contactless attendance
+          recording by allowing students to scan their RFID cards upon arrival and departure.
+        </p>
 
-      <h1>OJT Monitoring <br>& Attendance System</h1>
+        <p class="about-description">
+          This system helps coordinators and administrators efficiently monitor student
+          attendance, track training records, and reduce manual errors commonly found in
+          traditional attendance methods.
+        </p>
 
-      <p class="about-description">
-        The OJT Tracking System is a modern attendance and monitoring platform
-        designed to simplify the management of On-the-Job Training students through
-        RFID technology. The system enables fast, accurate, and contactless attendance
-        recording by allowing students to scan their RFID cards upon arrival and departure.
-      </p>
-
-      <p class="about-description">
-        This system helps coordinators and administrators efficiently monitor student
-        attendance, track training records, and reduce manual errors commonly found in
-        traditional attendance methods. With a centralized database and real-time tracking,
-        the platform improves reliability, security, and overall management of OJT activities.
-      </p>
-
-      <div class="about-features">
-
-        <div class="feature-card">
-          <i class="bx bx-scan"></i>
-          <h3>RFID Attendance</h3>
-          <p>
-            Fast and automated attendance logging using RFID technology.
-          </p>
+        <div class="about-stats">
+          <div class="about-stat"><strong>3</strong><span>User roles</span></div>
+          <div class="about-stat"><strong>RFID</strong><span>Attendance method</span></div>
+          <div class="about-stat"><strong>Live</strong><span>Record updates</span></div>
         </div>
-
-        <div class="feature-card">
-          <i class="bx bx-time-five"></i>
-          <h3>Real-Time Monitoring</h3>
-          <p>
-            Track student attendance records and time logs instantly.
-          </p>
-        </div>
-
-        <div class="feature-card">
-          <i class="bx bx-data"></i>
-          <h3>Centralized Records</h3>
-          <p>
-            Securely manage attendance data and OJT information in one system.
-          </p>
-        </div>
-
       </div>
 
+      <div class="about-features">
+        <div class="feature-card">
+          <i class="bx bx-scan"></i>
+          <div><h3>RFID Attendance</h3><p>Fast and automated attendance logging using RFID technology.</p></div>
+        </div>
+        <div class="feature-card">
+          <i class="bx bx-time-five"></i>
+          <div><h3>Real-Time Monitoring</h3><p>Track student attendance records and time logs instantly.</p></div>
+        </div>
+        <div class="feature-card">
+          <i class="bx bx-data"></i>
+          <div><h3>Centralized Records</h3><p>Securely manage attendance data and OJT information in one system.</p></div>
+        </div>
+      </div>
     </div>
-  </section>
+
+  </div>
+</section>
 
 
   <div id="loadingScreen" class="loading-screen">

@@ -1,0 +1,3 @@
+<?php
+define('MAIL_USERNAME', 'email');
+define('MAIL_PASSWORD', 'email_password_app');
