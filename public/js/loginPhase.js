@@ -53,6 +53,7 @@ function revealOnScroll() {
   });
 }
 
+if(signUp){
 signUp.addEventListener("click", () => {
   loadingScreen.classList.add("show");
 
@@ -61,6 +62,7 @@ signUp.addEventListener("click", () => {
   }, 1000);
   
 });
+}
 
 // theme toggle
 function applyTheme(mode) {
@@ -111,10 +113,13 @@ if(modalSignSuccess){
 }
 
 // login
+if(form){
 form.addEventListener("submit" ,function () {
     loginLoadingScreen.classList.add("show");
 });
+}
 
+if(forgotPasswordLink){
 forgotPasswordLink.addEventListener("click", (e) => {
 
     e.preventDefault();
@@ -128,6 +133,7 @@ forgotPasswordLink.addEventListener("click", (e) => {
     }, 1000);
 
 });
+}
 
 // incorrect login
 

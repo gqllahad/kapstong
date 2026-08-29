@@ -34,7 +34,7 @@ if(isset($_POST['newPassword'], $_POST['confirmPassword'])) {
 
     session_destroy();
 
-    header("Location: ../Session/loginPhase.php?success_forget=Password+Updated!");
+    header("Location: ../Session/loginPage.php?success_forget=Password+Updated!");
     exit();
 }
 ?>

@@ -179,7 +179,7 @@ require_once("../Shared/functions.php");
                                 <span class="btn-inner">Next Step <i class="ti ti-arrow-right" style="font-size:16px;" aria-hidden="true"></i></span>
                             </button>
                         </div>
-                        <div class="signin-row">Already have an account? <a href="../Session/loginPhase.php#log-container">Sign In</a></div>
+                        <div class="signin-row">Already have an account? <a href="../Session/loginPage.php">Sign In</a></div>
                     </div>
 
                     <!-- STEP 2: ACADEMIC INFO -->

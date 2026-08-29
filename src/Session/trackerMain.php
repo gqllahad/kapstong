@@ -36,6 +36,6 @@ switch ($role) {
         exit();
 
     default:
-        header("Location: loginPhase.php");
+        header("Location: loginPage.php");
         exit();
 }

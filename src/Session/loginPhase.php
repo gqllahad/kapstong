@@ -1,26 +1,26 @@
 <?php
 include("../Shared/kapstongConnection.php");
 
-$invaderLogin = false;
-$wrongPassword = false;
-$successSignUp = false;
-$successForget = false;
+// $invaderLogin = false;
+// $wrongPassword = false;
+// $successSignUp = false;
+// $successForget = false;
 
-if (isset($_GET['error'])) {
-  $invaderLogin = true;
-}
+// if (isset($_GET['error'])) {
+//   $invaderLogin = true;
+// }
 
-if (isset($_GET['warning'])) {
-  $wrongPassword = true;
-}
+// if (isset($_GET['warning'])) {
+//   $wrongPassword = true;
+// }
 
-if (isset($_GET['success'])) {
-  $successSignUp = true;
-}
+// if (isset($_GET['success'])) {
+//   $successSignUp = true;
+// }
 
-if (isset($_GET['success_forget'])) {
-  $successForget = true;
-}
+// if (isset($_GET['success_forget'])) {
+//   $successForget = true;
+// }
 
 ?>
 
@@ -41,16 +41,6 @@ if (isset($_GET['success_forget'])) {
 
 <body>
 
-  <?php if ($invaderLogin): ?>
-    <div class="modal-backdrop" id="accessDenied">
-      <div class="modal-box">
-        <h2>Access Denied</h2>
-        <p>Please make sure you login first.</p>
-        <button id="invaderLogin">Go to login</button>
-      </div>
-    </div>
-  <?php endif; ?>
-
   <header class="header">
     <div class="container">
       <h1 class="logo-text">
@@ -61,37 +51,16 @@ if (isset($_GET['success_forget'])) {
         </div>
       </h1>
       <nav class="nav">
-        <a href="#log-start">Home</a>
-        <a href="#log-hows">Help</a>
-        <a href="#log-about">About</a>
-        <a href="#log-container" id="login">Login</a>
-        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light and dark mode">
+        <a href="#log-start" class="tooltip" data-tooltip="Return to the home page">Home</a>
+        <a href="#log-hows" class="tooltip" data-tooltip="Get help and support">Help</a>
+        <a href="#log-about" class="tooltip" data-tooltip="Learn more about our system">About</a>
+        <!-- <a href="#log-container" class="tooltip" data-tooltip="Sign in to your account" id="login">Login</a> -->
+         <a href="loginPage.php" class="tooltip" data-tooltip="Sign in to your account" id="login">Login</a>
+        <button id="themeToggle" class="theme-toggle tooltip" data-tooltip="Toggle light and dark mode" type="button" aria-label="Toggle light and dark mode">
   <i class='bx bx-sun'></i>
 </button> 
       </nav>
     </div>
-
-    <?php if ($wrongPassword): ?>
-      <div class="incorrectLogin-box" id="incorrectLogin">
-        <p>⚠ Incorrect Email or Password!</p>
-      </div>
-
-    <?php endif; ?>
-
-    <?php if ($successSignUp): ?>
-      <div class="signSuccess-box" id="signSuccess">
-        <p>✅ Account Created Successfully!</p>
-      </div>
-
-    <?php endif; ?>
-
-    <?php if ($successForget): ?>
-      <div class="signSuccess-box" id="signSuccess">
-        <p>✅ Account Password Successfully Resetted!</p>
-      </div>
-
-    <?php endif; ?>
-
 
   </header>
 
@@ -258,7 +227,7 @@ if (isset($_GET['success_forget'])) {
 
   <hr />
 
-  <section class="log-container" id="log-container">
+  <!-- <section class="log-container" id="log-container">
     <div class="login-overlay"></div>
     <div
       class="container scroll-reveal"
@@ -287,7 +256,7 @@ if (isset($_GET['success_forget'])) {
       <div class="sign-divider"></div>
 
       <div class="sign-cta-row">
-        <button id="ls-switch" class="ls-switch">Create account</button>
+        <button id="ls-switch" class="ls-switch tooltip" data-tooltip="Create a new account">Create account</button>
         <p class="sign-cta-note">
           OJT students only.<br>
           <span>Free</span> &mdash; takes 2 minutes.
@@ -332,7 +301,7 @@ if (isset($_GET['success_forget'])) {
 
       </div>
     </form>
-  </section>
+  </section> -->
 
   <hr />
 

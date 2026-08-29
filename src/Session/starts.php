@@ -19,7 +19,7 @@ if (isset($_POST['login-submit'])) {
     $userEmail = filter_var($_POST["loginEmail"], FILTER_VALIDATE_EMAIL);
 
     if (!$userEmail) {
-        header("Location: loginPhase.php?warning=Invalid+email+or+password");
+        header("Location: loginPage.php?warning=Invalid+email+or+password");
         exit();
     }
 
@@ -154,12 +154,12 @@ if (isset($_POST['login-submit'])) {
             //     $insert->execute();
             // }
 
-            header("Location: loginPhase.php?warning=Incorrect+Password");
+            header("Location: loginPage.php?warning=Incorrect+Password");
             exit();
         }
     } else {
 
-        header("Location: loginPhase.php?warning=Invalid+email+or+password");
+        header("Location: loginPage.php?warning=Invalid+email+or+password");
         exit();
     }
 }
