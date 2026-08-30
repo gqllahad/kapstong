@@ -2,6 +2,10 @@
 require_once("../../Shared/kapstongConnection.php");
 require_once("../../auth/admin_auth.php");
 
+function e($val) {
+    return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
+}
+
 $studentID = $_POST['studentID'] ?? '';
 
 $sql = "SELECT 
@@ -47,27 +51,27 @@ if ($row = $result->fetch_assoc()) {
             <div class="card-body">
                 <div class="info-row">
                     <span class="info-label">Student ID</span>
-                    <span class="info-value"><?= $row['studentID'] ?></span>
+                    <span class="info-value"><?= e($row['studentID']) ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Name</span>
-                    <span class="info-value"><?= $row['name'] ?></span>
+                    <span class="info-value"><?= e($row['name']) ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Email</span>
-                    <span class="info-value"><?= $row['email'] ?></span>
+                    <span class="info-value"><?= e($row['email']) ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Mobile Number</span>
-                    <span class="info-value"><?= $row['mobileNumber'] ?></span>
+                    <span class="info-value"><?= e($row['mobileNumber']) ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Address</span>
-                    <span class="info-value"><?= $row['address'] ?></span>
+                    <span class="info-value"><?= e($row['address']) ?></span>
                 </div>
             </div>
         </div>
@@ -82,32 +86,32 @@ if ($row = $result->fetch_assoc()) {
             <div class="card-body">
                 <div class="info-row">
                     <span class="info-label">Course</span>
-                    <span class="info-value"><?= $row['course'] ?? '-' ?></span>
+                    <span class="info-value"><?= e($row['course']) ?? '-' ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Year Level</span>
-                    <span class="info-value"><?= $row['yearLevel'] ?? '-' ?></span>
+                    <span class="info-value"><?= e($row['yearLevel']) ?? '-' ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Semester</span>
-                    <span class="info-value"><?= $row['semester'] ?? '-' ?></span>
+                    <span class="info-value"><?= e($row['semester']) ?? '-' ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">School Year</span>
-                    <span class="info-value"><?= $row['schoolYear'] ?? '-' ?></span>
+                    <span class="info-value"><?= e($row['schoolYear']) ?? '-' ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Status</span>
-                    <span class="info-value"><?= $row['isVerified'] ?></span>
+                    <span class="info-value"><?= e($row['isVerified']) ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Date Admitted</span>
-                    <span class="info-value"><?= $row['dateCreated'] ?></span>
+                    <span class="info-value"><?= e($row['dateCreated']) ?></span>
                 </div>
             </div>
 
@@ -125,12 +129,12 @@ if ($row = $result->fetch_assoc()) {
                         <span class="doc-title">Student ID</span>
                     </div>
 
-                    <?php if (!empty($row['idUpload'])): ?>
+                    <?php if (!empty(e($row['idUpload']))): ?>
                         <button class="btn-preview"
-                            onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $row['idUpload']; ?>')">
+                            onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . e($row['idUpload']); ?>')">
                             👁 View Document
                         </button>
-                        <span class="status-badge success">Uploaded</span>
+                        <!-- <span class="status-badge success">Uploaded</span> -->
                     <?php else: ?>
                         <span class="status-badge missing">Not Uploaded</span>
                     <?php endif; ?>
@@ -142,12 +146,12 @@ if ($row = $result->fetch_assoc()) {
                         <span class="doc-title">Registration Form</span>
                     </div>
 
-                    <?php if (!empty($row['regFormUpload'])): ?>
+                    <?php if (!empty(e($row['regFormUpload']))): ?>
                         <button class="btn-preview"
-                            onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $row['regFormUpload']; ?>')">
+                            onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . e($row['regFormUpload']); ?>')">
                             👁 View Document
                         </button>
-                        <span class="status-badge success">Uploaded</span>
+                        <!-- <span class="status-badge success">Uploaded</span> -->
                     <?php else: ?>
                         <span class="status-badge missing">Not Uploaded</span>
                     <?php endif; ?>
@@ -159,12 +163,12 @@ if ($row = $result->fetch_assoc()) {
                         <span class="doc-title">Student Picture</span>
                     </div>
 
-                    <?php if (!empty($row['profilePicture'])): ?>
+                    <?php if (!empty(e($row['profilePicture']))): ?>
                         <button class="btn-preview"
-                            onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . $row['profilePicture']; ?>')">
+                            onclick="previewImage('<?php echo '../../uploads/student_uploads/' . $studentID . '/' . e($row['profilePicture']); ?>')">
                             👁 View Document
                         </button>
-                        <span class="status-badge success">Uploaded</span>
+                        <!-- <span class="status-badge success">Uploaded</span> -->
                     <?php else: ?>
                         <span class="status-badge missing">Not Uploaded</span>
                     <?php endif; ?>

@@ -155,7 +155,7 @@ h5 {
 /* ══════════════════════════════════════════════════════════════
    NAVBAR
 ══════════════════════════════════════════════════════════════ */
-.navbar {
+/* .navbar {
   position: fixed;
   top: 0;
   right: 0;
@@ -178,7 +178,7 @@ h5 {
 }
 .navbar.shifted {
   left: var(--sidebar-ex);
-}
+} */
 
 .header-title {
   display: flex;
@@ -1922,6 +1922,7 @@ td {
 .all-unverified-modal,
 .assign-student-container,
 .supervisor-view,
+.supervisor-assigned-view,
 .ojt-program-container,
 .department-management-container,
 .department-management-modal,
@@ -1964,6 +1965,7 @@ td {
 .all-unverified-modal.show,
 .assign-student-container.show,
 .supervisor-view.show,
+.supervisor-assigned-view.show,
 .ojt-program-container.show,
 .department-management-container.show,
 .department-management-modal.show,
@@ -2009,6 +2011,7 @@ td {
   margin-bottom: 18px;
   border-bottom: 1px solid var(--surface-divider);
 }
+
 .modal-header h3 {
   font-size: 17px;
   font-weight: 700;
@@ -2867,7 +2870,7 @@ body.dark-mode .att-bar-track {
 .assign-body {
   display: flex;
   gap: 20px;
-  padding: 20px;
+  padding: 10px;
 }
 .assign-column {
   flex: 1;
@@ -2941,12 +2944,13 @@ body.dark-mode .att-bar-track {
 .assign-footer {
   display: flex;
   justify-content: flex-end;
+  gap: 30px;
 }
 .assign-btn {
   background: linear-gradient(135deg, var(--navy-400), var(--accent));
   color: #fff;
   border: none;
-  padding: 10px 20px;
+  padding: 10px;
   border-radius: var(--r-md);
   font-family: "Outfit", sans-serif;
   font-weight: 600;
@@ -3403,8 +3407,12 @@ body.dark-mode .att-bar-track {
 /* Documents */
 .documents-grid {
   display: grid;
-  align-items: center;
-  gap: 10px;
+  /* align-items: center;
+  gap: 10px; */
+  grid-template-columns: repeat(auto-fit, minmax(160px, max-content));
+  align-items: start;
+  gap: 12px;
+  justify-content: start;
 }
 .doc-card {
   background: var(--surface-card);
@@ -3412,9 +3420,8 @@ body.dark-mode .att-bar-track {
   border-radius: var(--r-lg);
   padding: 14px;
   box-shadow: var(--shadow-xs);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  width: fit-content;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .doc-card:hover {
   transform: translateY(-2px);
@@ -3455,6 +3462,7 @@ body.dark-mode .att-bar-track {
   color: var(--danger);
 }
 
+
 /* Assigned student rows in supervisor view */
 .assigned-student-row {
   display: flex;
@@ -3478,6 +3486,286 @@ body.dark-mode .att-bar-track {
   overflow-y: auto;
   padding-right: 4px;
 }
+
+.supervisor-roster {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px;
+}
+
+.roster-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--r-lg);
+  padding: 10px 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.roster-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--navy-500);
+}
+
+.roster-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--navy-700);
+  color: var(--navy-25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.roster-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.roster-name {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--gray-800, #1f2937);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roster-meta {
+  font-size: 0.72rem;
+  color: var(--gray-500, #6b7280);
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roster-dot {
+  color: var(--gray-300, #d1d5db);
+}
+
+.roster-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.roster-btn {
+  border: none;
+  padding: 6px 10px;
+  border-radius: var(--r-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.roster-btn:hover {
+  transform: scale(1.04);
+}
+
+.roster-btn-view {
+  background: linear-gradient(135deg, var(--navy-500), var(--accent));
+  color: #fff;
+}
+
+.roster-btn-reassign {
+  background: transparent;
+  border: 1px solid var(--surface-border);
+  color: var(--gray-600, #4b5563);
+}
+
+.roster-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--gray-500, #6b7280);
+  font-size: 0.8rem;
+}
+/* tabs supervisor */
+.supervisor-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--surface-divider);
+  margin-bottom: 16px;
+  padding: 0 2px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gray-500, #6b7280);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.tab-btn:hover {
+  color: var(--navy-700);
+}
+
+.tab-btn.active {
+  color: var(--navy-700);
+  border-bottom-color: var(--navy-500);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* assigned student prototype */
+
+
+
+.assignment-summary {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 30px;
+  padding: 6px 4px;
+}
+
+.assignment-count {
+  display: flex;
+  flex-direction: column;
+}
+
+.assignment-number {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--navy-700);
+  line-height: 1;
+}
+
+.assignment-label {
+  font-size: 0.72rem;
+  color: var(--gray-500, #6b7280);
+  margin-top: 4px;
+}
+
+.view-all-assign-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, var(--navy-500), var(--accent));
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: var(--r-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.view-all-assign-btn:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+.view-all-assign-btn:disabled {
+  background: var(--gray-300, #d1d5db);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.view-all-assign-btn i {
+  font-size: 0.9rem;
+}
+
+.student-grid-modal {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  padding: 6px;
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.student-box-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--r-lg);
+  padding: 16px 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.student-box-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--navy-500);
+}
+
+.student-box-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--navy-700);
+  color: var(--navy-25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.student-box-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gray-800, #1f2937);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.student-box-meta {
+  font-size: 0.68rem;
+  color: var(--gray-500, #6b7280);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.student-box-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.student-box-actions .roster-btn {
+  flex: 1;
+}
+
+
 
 /* ══════════════════════════════════════════════════════════════
    IMAGE PREVIEW
@@ -4200,6 +4488,7 @@ body.dark-mode .all-supervisor-modal,
 body.dark-mode .all-unverified-modal,
 body.dark-mode .assign-student-container,
 body.dark-mode .supervisor-view,
+body.dark-mode .supervisor-assigned-view,
 body.dark-mode .ojt-program-container,
 body.dark-mode .department-management-container,
 body.dark-mode .department-management-modal,

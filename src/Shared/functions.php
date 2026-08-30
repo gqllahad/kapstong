@@ -372,42 +372,113 @@ function renderSupervisorAssignedStudents($conn, $superID)
 
     if ($result->num_rows > 0) {
 
-        $output .= "<div style='padding:10px;'>";
+        // $output .= "<div class='supervisor-roster'>";
+        $output .= "
+                    <div class='modal-header'>
+                    <h3>Assigned Students</h3>
+
+                    <div class='header-actions'>
+                        <button  onclick='closeSuperAssignedViewModal()' class='modal-close'>&times;</button>
+                    </div>
+                </div>
+        
+        <div class='student-grid-modal'>";
 
         while ($row = $result->fetch_assoc()) {
-            $output .= '
-                    <div class="assigned-student-row">
+            $safeName      = htmlspecialchars($row['name'] ?? '', ENT_QUOTES, 'UTF-8');
+            $safeID        = htmlspecialchars($row['studentID'] ?? '', ENT_QUOTES, 'UTF-8');
+            $safeCourse    = htmlspecialchars($row['course'] ?? '', ENT_QUOTES, 'UTF-8');
+            $safeYearLevel = htmlspecialchars($row['yearLevel'] ?? '', ENT_QUOTES, 'UTF-8');
+
+            $jsID = json_encode($row['studentID'] ?? '');
+
+             $output .= '
+        <div class="student-box-card">
+            <div class="student-box-avatar">' . strtoupper(substr($safeName, 0, 1)) . '</div>
+            <div class="student-box-name">' . $safeName . '</div>
+            <div class="student-box-meta">' . $safeID . '<br>' . $safeCourse . ' • ' . $safeYearLevel . '</div>
+            <div class="student-box-actions">
                         
-                        <div class="student-info">
-                            <strong>' . $row['name'] . '</strong><br>
-                            <small>
-                                ' . $row['studentID'] . ' • 
-                                ' . $row['course'] . ' • 
-                                ' . $row['yearLevel'] . '
-                            </small>
-                        </div>
-
-                        <div class="student-action">
-                            <button class="view-btn" onclick="viewUser(\'' . $row['studentID'] . '\', \'supervisorView\')">
-                                View
+                        <button class="roster-btn roster-btn-view" onclick="viewUser(\'' . $row['studentID'] . '\', \'supervisorView\')">
+                               View
                             </button>
-                            <button class="view-btn" onclick="reAssignUser(\'' . $row['studentID'] . '\', \'supervisorView\')">
-                                Reassign
+                            <button class="roster-btn roster-btn-reassign" onclick="reAssignUser(\'' . $row['studentID'] . '\', \'supervisorView\')">
+                             Reassign
                             </button>
-                        </div>
 
-                    </div>';
+
+                    </div>
+                </div>';
         }
-
-
 
         $output .= "</div>";
     } else {
-        $output = "<p style='padding:10px;color:#6b7280;'>No assigned students yet.</p>";
+        $output = "<p class='roster-empty'>No assigned students yet.</p>";
     }
 
     return $output;
 }
+
+// function renderSupervisorAssignedStudents($conn, $superID)
+// {
+//     $stmt = $conn->prepare("
+//         SELECT 
+//             ojtstudent.studentID,
+//             ojtstudent.name,
+//             ojtstudent.course,
+//             ojtstudent.yearLevel
+//         FROM student_supervisor
+//         INNER JOIN ojtstudent 
+//             ON student_supervisor.studentID = ojtstudent.studentID
+//         WHERE student_supervisor.superID = ?
+//         AND student_supervisor.status = 'ACTIVE'
+//         ORDER BY ojtstudent.name ASC
+//     ");
+
+//     $stmt->bind_param("i", $superID);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+
+//     $output = '';
+
+//     if ($result->num_rows > 0) {
+
+//         $output .= "<div style='padding:10px;'>";
+
+//         while ($row = $result->fetch_assoc()) {
+//             $output .= '
+//                     <div class="assigned-student-row">
+                        
+//                         <div class="student-info">
+//                             <strong>' . $row['name'] . '</strong><br>
+//                             <small>
+//                                 ' . $row['studentID'] . ' • 
+//                                 ' . $row['course'] . ' • 
+//                                 ' . $row['yearLevel'] . '
+//                             </small>
+//                         </div>
+
+//                         <div class="student-action">
+//                             <button class="view-btn" onclick="viewUser(\'' . $row['studentID'] . '\', \'supervisorView\')">
+//                                 View
+//                             </button>
+//                             <button class="view-btn" onclick="reAssignUser(\'' . $row['studentID'] . '\', \'supervisorView\')">
+//                                 Reassign
+//                             </button>
+//                         </div>
+
+//                     </div>';
+//         }
+
+
+
+//         $output .= "</div>";
+//     } else {
+//         $output = "<p style='padding:10px;color:#6b7280;'>No assigned students yet.</p>";
+//     }
+
+//     return $output;
+// }
 
 // pending approval reports(student)
 function renderApprovalReportList($conn, $superID, $search = '')

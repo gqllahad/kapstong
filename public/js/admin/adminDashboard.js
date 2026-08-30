@@ -1,6 +1,6 @@
 const sideBar = document.querySelector('.sidebar');
 const mainContent = document.querySelector('.content');
-const navBar = document.querySelector('.navbar');
+// const navBar = document.querySelector('.navbar');
 
 // menu profile
 const menuToggle = document.getElementById("menuToggle");
@@ -84,6 +84,9 @@ const superCreateBtn = document.getElementById("supervisor-btn");
 const superCloseBtn = document.getElementById("closeCreateSupervisorModal");
 
 const superView = document.getElementById("supervisor-view");
+const superAssignedView = document.getElementById("supervisor-assigned-view");
+const superAssignedViewClose = document.getElementById("closeAllAssignedStudentModal");
+
 // const superAssignView = document.getElementById("supervisor-assigned-view");
 
 const AssignStudent = document.getElementById("assign-student-container");
@@ -320,6 +323,27 @@ function viewSupervisor(superID) {
     });
 }
 
+function viewAssignedStudents(superID) {
+    superView.classList.remove("show");
+    superAssignedView.classList.add("show");
+
+    superAssignedView.innerHTML = '';
+
+    fetch("functions/getAssignedStudents.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "superID=" + encodeURIComponent(superID)
+    })
+    .then(res => res.text())
+    .then(data => {
+        superAssignedView.innerHTML = data;
+    }).catch(() => {
+            showToast("Server error occurred, cannot load students.", "error");
+        });
+}
+
 function approveUser(studentID) {
     
     overlay.classList.add("show");
@@ -531,6 +555,13 @@ function closeSuperViewModal() {
 
     overlay.classList.add("show");
     
+}
+
+function closeSuperAssignedViewModal() {
+
+    superAssignedView.classList.remove("show");
+    superView.classList.add("show");
+
 }
 
 function closeApproveModal() {
@@ -2427,12 +2458,12 @@ menuItems.forEach(item => {
 // sideMenu galaw
 sideBar.addEventListener('mouseenter', () => {
       mainContent.classList.add('shifted');
-      navBar.classList.add('shifted');
+    //   navBar.classList.add('shifted');
     });
 
 sideBar.addEventListener('mouseleave', () => {
     mainContent.classList.remove('shifted');
-    navBar.classList.remove('shifted');
+    // navBar.classList.remove('shifted');
 });
 
 adminDashboardBtn.addEventListener("click", () => {
@@ -3098,9 +3129,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-
-
-
 // evaluation
 function openEvaluationDownloadModal() {
     document.getElementById("evaluation-download-modal").classList.add("show");
@@ -3268,8 +3296,6 @@ closeRfidRegister.addEventListener("click", () => {
     rfidRegister.classList.remove("show");
     allStudent.classList.add("show");
 });
-
-
 
 
 

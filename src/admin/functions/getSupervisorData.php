@@ -3,6 +3,11 @@ require_once("../../Shared/kapstongConnection.php");
 require_once("../../auth/admin_auth.php");
 require_once("../../Shared/functions.php");
 
+function e($val) {
+    return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+
 $superID = $_POST['superID'] ?? '';
 
 $sql = "SELECT 
@@ -30,7 +35,7 @@ if ($row = $result->fetch_assoc()) {
 
     <div class="student-modal-content">
 
-        <!-- BASIC INFO -->
+        
         <div class="info-card">
 
             <div class="card-header" onclick="toggleSection(this)">
@@ -42,28 +47,28 @@ if ($row = $result->fetch_assoc()) {
 
                 <div class="info-row">
                     <span class="info-label">Supervisor ID</span>
-                    <span class="info-value"><?= $row['superID'] ?></span>
+                    <span class="info-value"><?= e($row['superID']) ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Name</span>
-                    <span class="info-value"><?= $row['name'] ?></span>
+                    <span class="info-value"><?= e($row['name']) ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Email</span>
-                    <span class="info-value"><?= $row['email'] ?></span>
+                    <span class="info-value"><?= e($row['email']) ?></span>
                 </div>
 
                 <div class="info-row">
                     <span class="info-label">Contact Number</span>
-                    <span class="info-value"><?= $row['number'] ?></span>
+                    <span class="info-value"><?= e($row['number']) ?></span>
                 </div>
 
             </div>
         </div>
 
-        <!-- WORK INFO -->
+        
         <div class="info-card">
 
             <div class="card-header" onclick="toggleSection(this)">
@@ -75,7 +80,7 @@ if ($row = $result->fetch_assoc()) {
 
                 <div class="info-row">
                     <span class="info-label">Department</span>
-                    <span class="info-value"><?= $row['department'] ?></span>
+                    <span class="info-value"><?= e($row['department']) ?></span>
                 </div>
 
                 <div class="info-row">
@@ -87,14 +92,14 @@ if ($row = $result->fetch_assoc()) {
 
                 <div class="info-row">
                     <span class="info-label">Date Created</span>
-                    <span class="info-value"><?= date("M d, Y h:i A", strtotime($row['date_created'])) ?></span>
+                    <span class="info-value"><?= date("M d, Y h:i A", strtotime(e($row['date_created']))) ?></span>
                 </div>
 
             </div>
 
         </div>
 
-        <div class="info-card">
+        <!-- <div class="info-card">
 
             <div class="card-header" onclick="toggleSection(this)">
                 <h4>Student Assignments</h4>
@@ -103,11 +108,45 @@ if ($row = $result->fetch_assoc()) {
 
             <div class="card-body">
                 <div class="student-scroll-box">
-                    <?php echo renderSupervisorAssignedStudents($conn, $superID); ?>
+                    
                 </div>
 
             </div>
 
+        </div> -->
+
+        <!-- <div class="info-card">
+
+    <div class="card-header" onclick="toggleSection(this)">
+        <h4>Student Assignments</h4>
+        <span class="arrow">▼</span>
+    </div>
+
+    <div class="card-body"> -->
+        <?php
+            $countStmt = $conn->prepare("
+                SELECT COUNT(*) AS total 
+                FROM student_supervisor 
+                WHERE superID = ? AND status = 'ACTIVE'
+            ");
+            $countStmt->bind_param("i", $superID);
+            $countStmt->execute();
+            $totalAssigned = $countStmt->get_result()->fetch_assoc()['total'] ?? 0;
+        ?>
+
+        <div class="assignment-summary">
+            <div class="assignment-count">
+                <span class="assignment-number"><?= (int) $totalAssigned ?></span>
+                <span class="assignment-label"><?= $totalAssigned == 1 ? 'Student Assigned' : 'Students Assigned' ?></span>
+            </div>
+
+            <button 
+                class="view-all-assign-btn" 
+                onclick="viewAssignedStudents(<?= $superID ?>)"
+                <?= $totalAssigned == 0 ? 'disabled' : '' ?>>
+                View All Students
+                <i class='bx bx-right-arrow-alt'></i>
+            </button>
         </div>
 
     </div>

@@ -21,7 +21,6 @@ if ($_SESSION['role'] !== "ADMIN") {
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
 
     <meta charset="UTF-8">
@@ -470,12 +469,21 @@ if ($_SESSION['role'] !== "ADMIN") {
             <div class="supervisor-view" id="supervisor-view">
             </div>
 
+            <!-- supervisor assigned students -->
+            <div class="supervisor-assigned-view" id="supervisor-assigned-view">
+            </div>
+
             <!-- assign student-supervisor -->
             <div class="assign-student-container" id="assign-student-container">
                 <div class="modal-header">
                     <h3>👥 Student–Supervisor Assignment</h3>
+                    <div class="assign-footer">
+                    <button class="assign-btn" id="assign-btn"> <i class="bi bi-person-plus"></i> Assign Student</button>
                     <button id="closeAssignModal" class="modal-close">&times;</button>
                 </div>
+                    
+                </div>
+                
 
                 <div class="assign-body">
 
@@ -497,9 +505,9 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 </div>
 
-                <div class="assign-footer">
-                    <button class="assign-btn" id="assign-btn">Assign Student</button>
-                </div>
+                
+
+                
 
             </div>
 
