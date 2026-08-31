@@ -218,7 +218,7 @@ function viewUser(studentID, source) {
         studentApplicationView.classList.add("show");
     }
     if(source === "supervisorView"){
-        superView.classList.remove("show");
+        superAssignedView.classList.remove("show");
         studentApplicationView.classList.add("show");
     }
     if(source === "main"){
@@ -3126,6 +3126,21 @@ document.addEventListener("DOMContentLoaded", function () {
     courseFilter.addEventListener("change", fetchAdminAttendance);
 
     fetchAdminAttendance();
+});
+
+// supervisor profile view
+document.addEventListener('click', function (e) {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+
+  const tabsBar = btn.closest('.supervisor-tabs');
+  const content = tabsBar.nextElementSibling;
+
+  tabsBar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  content.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+  btn.classList.add('active');
+  content.querySelector('#tab-' + btn.dataset.tab).classList.add('active');
 });
 
 

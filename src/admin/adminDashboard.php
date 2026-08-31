@@ -1651,10 +1651,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <div class="filter-group">
 
                             <select id="attendanceCourseFilter">
-                                <option value="">All Courses</option>
-                                <option value="BSCS">BSCS</option>
-                                <option value="BSIT">BSIT</option>
-                                <option value="BSA">BSA</option>
+                                <?php echo getProgramOptions($conn); ?>
                             </select>
 
                         </div>
@@ -1744,11 +1741,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                                 <select id="downloadCourse">
 
-                                    <option value="">All Courses</option>
-
-                                    <option value="BSIT">BSIT</option>
-                                    <option value="BSBA">BSBA</option>
-                                    <option value="BSED">BSED</option>
+                                    <?php echo getProgramOptions($conn); ?>
 
                                 </select>
                             </div>

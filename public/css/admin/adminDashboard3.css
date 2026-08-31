@@ -3600,6 +3600,11 @@ body.dark-mode .att-bar-track {
   padding: 0 2px;
 }
 
+.tab-panel .info-card .card-body {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
 .tab-btn {
   background: none;
   border: none;
@@ -3635,6 +3640,11 @@ body.dark-mode .att-bar-track {
   to { opacity: 1; transform: translateY(0); }
 }
 
+.tab-panel .info-card .card-body {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
 /* assigned student prototype */
 
 
@@ -3642,7 +3652,7 @@ body.dark-mode .att-bar-track {
 .assignment-summary {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 30px;
   padding: 6px 4px;
 }
@@ -4193,7 +4203,7 @@ body.dark-mode .card.unverified-supervisors {
   background: var(--surface-card);
   border-color: var(--surface-border);
 }
-/* dark variants for inverted cards keep their dark bg naturally */
+
 body.dark-mode .card-content h3 {
   color: var(--navy-300);
 }
@@ -4423,7 +4433,6 @@ body.dark-mode .approval-card.unverified-student {
   background: rgba(239, 68, 68, 0.1);
   border-color: rgba(239, 68, 68, 0.25);
 }
-/* student & supervisor cards are already dark by design */
 
 /* ── Preparation grid ────────────────────────────────────────── */
 body.dark-mode .preparation-grid {
@@ -4443,6 +4452,26 @@ body.dark-mode .create-btn:hover {
   background: rgba(46, 110, 196, 0.18);
   border-color: var(--accent);
   color: var(--navy-100);
+}
+
+body.dark-mode .assignment-number {
+  color: var(--navy-100);
+}
+
+body.dark-mode .assignment-label {
+  color: var(--gray-500);
+}
+body.dark-mode .tab-btn {
+  color: var(--gray-500);
+}
+
+body.dark-mode .tab-btn:hover {
+  color: var(--navy-200);
+}
+
+body.dark-mode .tab-btn.active {
+  color: var(--navy-200);
+  border-bottom-color: var(--navy-400);
 }
 
 /* ── Action buttons ──────────────────────────────────────────── */
