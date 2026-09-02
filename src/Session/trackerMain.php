@@ -9,7 +9,7 @@ header("Pragma: no-cache");
 
 
 if (!isset($_SESSION['role'])) {
-    header("Location: loginPhase.php?error=login+required!");
+    header("Location: loginPage.php?error=login+required!");
     exit();
 }
 

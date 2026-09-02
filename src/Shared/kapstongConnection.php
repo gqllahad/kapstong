@@ -25,5 +25,6 @@ $conn = new mysqli(
 );
 
 if ($conn->connect_error) {
-    die("Connection Failed: " . $conn->connect_error);
+    error_log("DB Connection Failed: " . $conn->connect_error);
+    die("Something went wrong. Please try again later."); 
 }

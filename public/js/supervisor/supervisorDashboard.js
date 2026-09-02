@@ -29,6 +29,9 @@ const createTask = document.getElementById("create-task-container");
 const createTaskBtn = document.getElementById("create-task-btn"); 
 const closeCreateTask = document.getElementById("closeCreateTaskModal");
 
+const createTaskNextBtn = document.getElementById("ctNextBtn");
+const createTaskSubmitBtn = document.getElementById("ctSubmitBtn");
+
 const editTaskContainer = document.getElementById("task-edit-container");
 const closeEditTask = document.getElementById("closeEditTaskModal");
 
@@ -64,6 +67,10 @@ let searchTimer;
 let activitySearchTimer;
 let assignSearchTimer;
 
+// steps
+let currentStep = 0;
+let steps = ['panel-1', 'panel-2'];
+
 // arrays
 let selectedTaskStudentIDs = [];
 
@@ -90,7 +97,7 @@ window.currentMonth = null;
 // task swtich
 const taskManage = document.getElementById("task-manage-table");
 const taskSubmit = document.getElementById("task-submit-table");
-const taskSelf = document.getElementById("task-self-table");
+// const taskSelf = document.getElementById("task-self-table");
 
 // functions
 
@@ -141,7 +148,362 @@ function toggleSection(header) {
     card.classList.toggle("active");
 }
 
+// steps create tasks
 
+  ['ct-title', 'due_date'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      document.getElementById('field-' + (id === 'due_date' ? 'due' : 'title')).classList.remove('invalid');
+    });
+  });
+ 
+//   character count
+  function bindCounter(inputId, countId, max) {
+    const el = document.getElementById(inputId), out = document.getElementById(countId);
+    el.addEventListener('input', () => {
+      const n = el.value.length;
+      out.textContent = `${n} / ${max}`;
+      out.classList.toggle('warn', n > max * .85);
+    });
+  }
+  bindCounter('ct-title', 'titleCount', 120);
+  bindCounter('ct-desc', 'descCount', 600);
+ 
+//   priority buttons
+  ['low', 'medium', 'high'].forEach(p => {
+    document.getElementById('p-' + p).addEventListener('click', () => {
+      ['low', 'medium', 'high'].forEach(pp => {
+        const btn = document.getElementById('p-' + pp);
+        btn.className = 'ct-priority-btn';
+        if (pp === p) btn.classList.add('sel-' + pp);
+      });
+      document.getElementById('ct-priority').value = p;
+    });
+  });
+
+//   document.getElementById('taskStudentSearch').addEventListener('input', function () {
+//     const q = this.value.toLowerCase();
+//     document.querySelectorAll('#taskStudentList [data-name]').forEach(row => {
+//       row.style.display = row.dataset.name.includes(q) ? '' : 'none';
+//     });
+//   });
+ 
+//   const list = document.getElementById('taskStudentList');
+//   list.addEventListener('change', e => {
+//     if (e.target.name === 'student_ids[]') updateSelectionState();
+//   });
+ 
+//   document.getElementById('clearSel').addEventListener('click', () => {
+//     list.querySelectorAll('input[name="student_ids[]"]').forEach(cb => cb.checked = false);
+//     updateSelectionState();
+//   });
+
+//   function getSelectedCount() {
+//     return list.querySelectorAll('input[name="student_ids[]"]:checked').length;
+//   }
+
+  studentList.addEventListener('click', e => {
+
+        const student = e.target.closest('.task-student-item');
+
+        if (!student) return;
+
+        student.classList.toggle('selected');
+
+        updateSelectionState();
+    });
+
+
+    document.getElementById('clearSel').addEventListener('click', () => {
+
+    studentList.querySelectorAll('.task-student-item.selected-student' && '.task-student-item.selected').forEach(student => {
+        student.classList.remove('selected-student');
+        student.classList.remove('selected');
+        
+    });
+    selectedTaskStudentIDs = [];
+    updateSelectionState();
+});
+
+function getSelectedCount() {
+
+    return selectedTaskStudentIDs.length;
+}
+
+function updateSelectionState() {
+
+    const count = getSelectedCount();
+
+    const badge = document.getElementById('selBadge');
+
+    badge.textContent = count;
+
+    badge.classList.add('pop');
+
+    setTimeout(() => {
+        badge.classList.remove('pop');
+    }, 260);
+
+    document
+        .getElementById('clearSel')
+        .classList.toggle('visible', count > 0);
+
+
+    document.getElementById('assignEmptyHint').style.display = 'none';
+
+    const submitBtn = document.getElementById('ctSubmitBtn');
+
+    if (submitBtn) {
+        submitBtn.disabled = count === 0;
+    }
+}
+
+function goTo(n) {
+        document.getElementById(steps[currentStep]).classList.remove('active');
+        currentStep = n;
+        document.getElementById(steps[currentStep]).classList.add('active');
+        updateStepper();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+        document.getElementById('ctSubtitle').textContent =
+      currentStep === 0 ? 'Step 1 of 2 — fill in the task details'
+                 : 'Step 2 of 2 — choose who this task goes to';
+ 
+    
+ 
+    document.getElementById('create-task-container').scrollTop = 0;
+    }
+
+function updateStepper() {
+
+    document.querySelectorAll('.ct-step').forEach(s => {
+
+        const n = Number(s.dataset.step);
+        const stepIndex = n - 1;
+
+        s.classList.toggle('active', stepIndex === currentStep);
+        s.classList.toggle('done', stepIndex < currentStep);
+
+        s.querySelector('.step-num').textContent =
+            stepIndex < currentStep ? '✓' : n;
+    });
+}
+
+function validateStep1() {
+    const title = document.getElementById('ct-title');
+    const due   = document.getElementById('due_date');
+    let ok = true;
+ 
+    [{ el: title, fid: 'field-title' }, { el: due, fid: 'field-due' }].forEach(({ el, fid }) => {
+      const wrap = document.getElementById(fid);
+      const valid = el.value.trim().length > 0;
+      wrap.classList.toggle('invalid', !valid);
+      if (!valid) ok = false;
+    });
+    return ok;
+}
+
+
+
+function backToStep1() {
+    goTo(0);
+}
+
+
+function closeTaskCreateModal() {
+    createTask.classList.remove("show");
+    overlay.classList.remove("show");
+}
+
+document.querySelectorAll('.ct-step').forEach(s => {
+
+    const n = Number(s.dataset.step);
+    const stepIndex = n - 1;
+
+    s.classList.toggle('active', stepIndex === currentStep);
+    s.classList.toggle('done', stepIndex < currentStep);
+
+    s.querySelector('.step-num').textContent =
+        stepIndex < currentStep ? '✓' : n;
+});
+
+
+    createTaskNextBtn.addEventListener("click", () => {
+    if(validateStep1()) goTo(1);
+
+});
+
+
+
+
+
+
+
+// function goToStep(step) {
+//     currentStep = step;
+ 
+//     document.querySelectorAll('.ct-panel').forEach(p => {
+//       p.classList.toggle('active', Number(p.dataset.panel) === step);
+//     });
+//     document.querySelectorAll('.ct-step').forEach(s => {
+//       const n = Number(s.dataset.step);
+//       s.classList.toggle('active', n === step);
+//       s.classList.toggle('done', n < step);
+//       s.querySelector('.step-num').textContent = n < step ? '✓' : n;
+//     });
+ 
+//     document.getElementById('ctSubtitle').textContent =
+//       step === 1 ? 'Step 1 of 2 — fill in the task details'
+//                  : 'Step 2 of 2 — choose who this task goes to';
+ 
+//     renderFooter();
+ 
+//     document.getElementById('create-task-container').scrollTop = 0;
+//   }
+
+//   function renderFooter() {
+//     const actions = document.getElementById('ctFooterActions');
+//     if (currentStep === 1) {
+//       actions.innerHTML = `
+//         <button type="button" class="ct-cancel-btn" onclick="closeTaskModal()">Cancel</button>
+//         <button type="button" class="submit-btn" onclick="tryAdvance();">Next: Assign Students <i class="bi bi-arrow-right"></i></button>
+//       `;
+//       document.getElementById('ctNextBtn').addEventListener('click', tryAdvance);
+//     } else {
+//       actions.innerHTML = `
+//         <button type="button" class="ct-back-btn" id="ctBackBtn"><i class="bi bi-arrow-left"></i> Back</button>
+//         <button type="button" class="submit-btn" id="ctSubmitBtn" disabled><i class="bi bi-send"></i> Create &amp; Assign</button>
+//       `;
+//       document.getElementById('ctBackBtn').addEventListener('click', () => goToStep(1));
+//       document.getElementById('ctSubmitBtn').addEventListener('click', trySubmit);
+//       updateSelectionState();
+//     }
+//   }
+
+//   function validateStep1() {
+//     const title = document.getElementById('ct-title');
+//     const due   = document.getElementById('due_date');
+//     let ok = true;
+ 
+//     [{ el: title, fid: 'field-title' }, { el: due, fid: 'field-due' }].forEach(({ el, fid }) => {
+//       const wrap = document.getElementById(fid);
+//       const valid = el.value.trim().length > 0;
+//       wrap.classList.toggle('invalid', !valid);
+//       if (!valid) ok = false;
+//     });
+//     return ok;
+//   }
+//   function tryAdvance() {
+//     if (validateStep1()) goToStep(2);
+//   }
+
+//     function goTo(n) {
+//         document.getElementById(steps[current]).classList.remove('active');
+//         current = n;
+//         document.getElementById(steps[current]).classList.add('active');
+//         updateStepper();
+//         window.scrollTo({
+//             top: 0,
+//             behavior: 'smooth'
+//         });
+//     }
+
+
+
+
+ 
+//   ['ct-title', 'due_date'].forEach(id => {
+//     document.getElementById(id).addEventListener('input', () => {
+//       document.getElementById('field-' + (id === 'due_date' ? 'due' : 'title')).classList.remove('invalid');
+//     });
+//   });
+
+//   function bindCounter(inputId, countId, max) {
+//     const el = document.getElementById(inputId), out = document.getElementById(countId);
+//     el.addEventListener('input', () => {
+//       const n = el.value.length;
+//       out.textContent = `${n} / ${max}`;
+//       out.classList.toggle('warn', n > max * .85);
+//     });
+//   }
+//   bindCounter('ct-title', 'titleCount', 120);
+//   bindCounter('ct-desc', 'descCount', 600);
+ 
+//   /* ── Priority buttons ── */
+//   ['low', 'medium', 'high'].forEach(p => {
+//     document.getElementById('p-' + p).addEventListener('click', () => {
+//       ['low', 'medium', 'high'].forEach(pp => {
+//         const btn = document.getElementById('p-' + pp);
+//         btn.className = 'ct-priority-btn';
+//         if (pp === p) btn.classList.add('sel-' + pp);
+//       });
+//       document.getElementById('ct-priority').value = p;
+//     });
+//   });
+
+
+//   /* ── Student search (client-side filter over whatever the list contains) ── */
+//   document.getElementById('taskStudentSearch').addEventListener('input', function () {
+//     const q = this.value.toLowerCase();
+//     document.querySelectorAll('#taskStudentList [data-name]').forEach(row => {
+//       row.style.display = row.dataset.name.includes(q) ? '' : 'none';
+//     });
+//   });
+ 
+//   /* ── Selection counter — delegated to whatever checkboxes render inside
+//         #taskStudentList, so it works regardless of PHP markup shape ── */
+//   const list = document.getElementById('taskStudentList');
+//   list.addEventListener('change', e => {
+//     if (e.target.name === 'student_ids[]') updateSelectionState();
+//   });
+ 
+//   document.getElementById('clearSel').addEventListener('click', () => {
+//     list.querySelectorAll('input[name="student_ids[]"]').forEach(cb => cb.checked = false);
+//     updateSelectionState();
+//   });
+ 
+//   function getSelectedCount() {
+//     return list.querySelectorAll('input[name="student_ids[]"]:checked').length;
+//   }
+ 
+//   function updateSelectionState() {
+//     const count = getSelectedCount();
+//     const badge = document.getElementById('selBadge');
+//     badge.textContent = count;
+//     badge.classList.add('pop');
+//     setTimeout(() => badge.classList.remove('pop'), 260);
+ 
+//     document.getElementById('clearSel').classList.toggle('visible', count > 0);
+//     document.getElementById('assignEmptyHint').style.display = 'none';
+ 
+//     const submitBtn = document.getElementById('ctSubmitBtn');
+//     if (submitBtn) submitBtn.disabled = count === 0;
+//   }
+ 
+//   /* ── Final submit ── */
+//   function trySubmit() {
+//     if (getSelectedCount() === 0) {
+//       document.getElementById('assignEmptyHint').style.display = 'flex';
+//       return;
+//     }
+//     /* No preventDefault — let this fall through to whatever handler your
+//        app already binds to #createTaskForm (native submit or AJAX). */
+//     document.getElementById('createTaskForm').requestSubmit
+//       ? document.getElementById('createTaskForm').requestSubmit()
+//       : document.getElementById('createTaskForm').submit();
+//   }
+ 
+//   /* Demo-only: prevent the stub form from actually navigating away */
+//   document.getElementById('createTaskForm').addEventListener('submit', e => {
+//     e.preventDefault();
+//     closeTaskModal();
+//     alert(`Task created and assigned to ${getSelectedCount()} student(s).`);
+//   });
+ 
+//   /* Min date = today */
+//   document.getElementById('due_date').min = new Date().toISOString().split('T')[0];
 
 // charts
 
@@ -1438,6 +1800,8 @@ function viewEvaluationReport(studentID) {
         .then(res => res.json())
         .then(data => {
 
+            console.log(data.attendance.score);
+
             document.getElementById("reportSummary").innerHTML = `
                 <div class="report-card">
 
@@ -1892,7 +2256,7 @@ function setActiveTab(tabName) {
 function showManageTable() {
 
     taskSubmit.classList.remove("show");
-    taskSelf.classList.remove("show");
+    // taskSelf.classList.remove("show");
     taskManage.classList.add("show");
 
     setActiveTab("manage");
@@ -1901,7 +2265,7 @@ function showManageTable() {
 function showSubmittedTable() {
 
     taskManage.classList.remove("show");
-    taskSelf.classList.remove("show");
+    // taskSelf.classList.remove("show");
     taskSubmit.classList.add("show");
 
     setActiveTab("submitted");
@@ -1911,7 +2275,7 @@ function showSelfTable() {
 
     taskManage.classList.remove("show");
     taskSubmit.classList.remove("show");
-    taskSelf.classList.add("show");
+    // taskSelf.classList.add("show");
 
     setActiveTab("self");
 }
@@ -2179,8 +2543,6 @@ closeStudentChart.addEventListener("click", () => {
 });
 
 
-
-
 // assigning task to students
 studentList.addEventListener("click", function (e) {
 
@@ -2221,12 +2583,24 @@ document.getElementById("taskStudentSearch").addEventListener("keyup", function 
             setTimeout(() => {
                 studentList.innerHTML = data;
 
+                studentList
+                    .querySelectorAll(".task-student-item")
+                    .forEach(student => {
+
+                        if (selectedTaskStudentIDs.includes(student.dataset.id)) {
+                            student.classList.add("selected-student");
+                        }
+
+                    });
+
                 studentList.classList.remove("fade-out");
                 studentList.classList.add("fade-in");
 
                 setTimeout(() => {
                     studentList.classList.remove("fade-in");
                 }, 200);
+
+                updateSelectionState();
 
             }, 200);
 

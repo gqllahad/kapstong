@@ -28,6 +28,28 @@ function logout()
     exit;
 }
 
+// time out session serverside (admin/supervisor)
+function enforceSessionTimeout($requiredRole, $timeoutSeconds = 600) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== $requiredRole) {
+        http_response_code(403);
+        echo json_encode(["status" => "error", "message" => "Unauthorized"]);
+        exit;
+    }
+
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeoutSeconds)) {
+        session_unset();
+        session_destroy();
+        http_response_code(401);
+        echo json_encode(["status" => "error", "message" => "Session expired"]);
+        exit;
+    }
+    $_SESSION['last_activity'] = time();
+}
+
 // ipaddress
 function getUserIP()
 {
@@ -1331,7 +1353,7 @@ function renderTaskAssignStudentList($conn, $superID, $search = '')
             $yearLevel = $row['yearLevel'] ?? '-';
 
             $output .= '
-            <div class="task-student-item"
+            <div class="task-student-item" 
                 data-id="' . $row['studentID'] . '">
 
                 <div class="student-name">

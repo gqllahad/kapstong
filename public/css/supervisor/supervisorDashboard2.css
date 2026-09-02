@@ -1621,6 +1621,113 @@ body.dark-mode .filter-group input[type="date"] {
   font-size: 16px;
 }
 
+/* new create */
+.ct-subtitle { font-size:12px; color:var(--gray-500); margin-top:2px; }
+ 
+.ct-steps {
+  display:flex; align-items:center; gap:0;
+  margin:0 -26px 20px; padding:14px 26px;
+  background:var(--surface-subtle);
+  border-top:1px solid var(--surface-divider);
+  border-bottom:1px solid var(--surface-divider);
+}
+.ct-step {
+  display:flex; align-items:center; gap:9px; font-size:12.5px; font-weight:600;
+  color:var(--gray-400); flex:1; position:relative; transition:color .25s;
+}
+.ct-step::after { content:''; flex:1; height:1.5px; background:var(--surface-border); margin:0 12px; transition:background .25s; }
+.ct-step:last-child::after { display:none; }
+.ct-step.active { color:var(--accent); }
+.ct-step.done { color:var(--success); }
+.ct-step.active::after, .ct-step.done::after { background:var(--accent); }
+.step-num {
+  width:24px; height:24px; border-radius:50%; background:var(--surface-border);
+  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;
+  color:var(--gray-400); flex-shrink:0; transition:.25s;
+}
+.ct-step.active .step-num { background:var(--accent); color:#fff; box-shadow:0 0 0 4px var(--accent-glow); }
+.ct-step.done .step-num { background:var(--success); color:#fff; }
+ 
+.ct-panel { display:none; }
+.ct-panel.active { display:block; animation:ct-fade-in .28s var(--ease); }
+@keyframes ct-fade-in {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+ 
+.ct-char-count { font-size:11px; color:var(--gray-400); text-align:right; }
+.ct-char-count.warn { color:var(--warning); }
+ 
+.ct-required { font-size:10px; color:var(--danger); background:var(--danger-dim); padding:1px 5px; border-radius:4px; font-weight:700; margin-left:6px; }
+.ct-val-hint { font-size:11px; color:var(--danger); display:none; align-items:center; gap:4px; }
+.form-group.invalid .ct-val-hint { display:flex; }
+.form-group.invalid input, .form-group.invalid textarea { border-color:var(--danger); box-shadow:0 0 0 3px rgba(239,68,68,.12); }
+ 
+.ct-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+ 
+.ct-priority-row { display:flex; gap:8px; }
+.ct-priority-btn {
+  flex:1; padding:10px 8px; border:1.5px solid var(--surface-border); border-radius:var(--r-md);
+  background:var(--surface-subtle); font-family:'Outfit',sans-serif; font-size:12.5px; font-weight:600;
+  color:var(--gray-600); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all .18s;
+}
+.ct-priority-btn:hover { border-color:var(--gray-400); background:var(--surface-card); }
+.ct-priority-btn.sel-low { border-color:var(--success); background:var(--success-dim); color:var(--success); }
+.ct-priority-btn.sel-medium { border-color:var(--warning); background:var(--warning-dim); color:var(--warning); }
+.ct-priority-btn.sel-high { border-color:var(--danger); background:var(--danger-dim); color:var(--danger); }
+
+.ct-tip { display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:var(--r-md); background:rgba(59,130,246,.07); border:1px solid rgba(59,130,246,.2); }
+.ct-tip i { color:var(--accent); font-size:15px; flex-shrink:0; margin-top:1px; }
+.ct-tip p { font-size:12px; color:var(--gray-600); line-height:1.5; }
+body.dark-mode .ct-tip p { color:var(--gray-500); }
+ 
+.ct-search-wrap { margin-bottom:10px; }
+.ct-search {
+  display:flex; align-items:center; gap:8px; background:var(--surface-subtle);
+  border:1.5px solid var(--surface-border); border-radius:var(--r-md); padding:0 12px;
+  transition:border-color .2s, box-shadow .2s;
+}
+.ct-search:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+.ct-search i { color:var(--gray-400); font-size:13px; flex-shrink:0; }
+.ct-search input { padding:10px 0; width:100%; font-family:'Outfit',sans-serif; font-size:13px; border:none; background:transparent; outline:none; color:var(--gray-800); }
+body.dark-mode .ct-search input { color:var(--navy-100); }
+ 
+.ct-sel-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 12px; margin-bottom:10px; background:var(--surface-subtle);
+  border:1px solid var(--surface-divider); border-radius:var(--r-md);
+}
+.ct-sel-count { font-size:12px; font-weight:600; color:var(--gray-500); display:flex; align-items:center; gap:6px; }
+.ct-sel-badge {
+  background:var(--accent); color:#fff; font-size:11px; font-weight:700; padding:2px 8px;
+  border-radius:99px; min-width:20px; text-align:center; transition:transform .2s var(--ease);
+}
+.ct-sel-badge.pop { animation:ct-badge-pop .25s var(--ease); }
+@keyframes ct-badge-pop { 0%{transform:scale(1);} 50%{transform:scale(1.35);} 100%{transform:scale(1);} }
+.ct-clear-sel { font-size:12px; font-weight:600; color:var(--danger); background:none; border:none; cursor:pointer; opacity:0; visibility:hidden; transition:.15s; }
+.ct-clear-sel.visible { opacity:1; visibility:visible; }
+.ct-clear-sel:hover { text-decoration:underline; }
+ 
+.ct-assign-empty-hint { font-size:11px; color:var(--danger); display:flex; align-items:center; gap:5px; margin-top:8px; }
+ 
+.ct-footer {
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  margin:20px -26px -22px; padding:16px 26px;
+  border-top:1px solid var(--surface-divider);
+}
+.ct-footer-meta { font-size:12px; color:var(--gray-500); display:flex; align-items:center; gap:6px; }
+.ct-footer-meta i { color:var(--success); }
+.ct-footer-actions { display:flex; align-items:center; gap:10px; margin-left:auto; }
+.ct-cancel-btn, .ct-back-btn {
+  padding:10px 18px; background:var(--surface-subtle); border:1.5px solid var(--surface-border);
+  border-radius:var(--r-md); font-family:'Outfit',sans-serif; font-size:13.5px; font-weight:600;
+  color:var(--gray-600); cursor:pointer; transition:.18s;
+}
+.ct-cancel-btn:hover, .ct-back-btn:hover { background:var(--gray-100); border-color:var(--gray-300); color:var(--gray-800); }
+body.dark-mode .ct-cancel-btn, body.dark-mode .ct-back-btn { background:var(--surface-subtle); border-color:var(--surface-border); color:var(--gray-500); }
+
+.ct-footer .submit-btn { width:auto; padding:11px 22px; display:flex; align-items:center; gap:8px; }
+
 /* Action buttons in table */
 .view-btn,
 .evaluate-btn,

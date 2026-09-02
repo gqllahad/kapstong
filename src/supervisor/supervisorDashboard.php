@@ -693,11 +693,25 @@ foreach ($nameParts as $part) {
             <!-- create task -->
             <div class="create-task-container" id="create-task-container">
                 <div class="modal-header">
-                    <h3><i class="bi bi-plus-circle"></i> Create Task</h3>
-                    <button id="closeCreateTaskModal" class="modal-close">&times;</button>
+                        <div>
+                        <h3><i class="bi bi-plus-circle"></i> Create Task</h3>
+                        <div class="ct-subtitle" id="ctSubtitle">Step 1 of 2 — fill in the task details</div>
+                        </div>
+                        <button id="closeCreateTaskModal" class="modal-close" onclick="closeTaskModal()">&times;</button> 
                 </div>
 
-                <div class="info-card active">
+                <div class="ct-steps" id="ctSteps">
+                    <div class="ct-step active" data-step="1">
+                    <div class="step-num">1</div>
+                    <span>Task Details</span>
+                    </div>
+                    <div class="ct-step" data-step="2">
+                    <div class="step-num">2</div>
+                    <span>Assign Students</span>
+                    </div>
+                </div>
+
+                <!-- <div class="info-card active">
 
                     <div class="card-header" onclick="toggleSection(this)">
                         <h4>Task Guidelines</h4>
@@ -718,48 +732,142 @@ foreach ($nameParts as $part) {
                     </div>
                 </div>
 
-                <div class="divider"></div>
+                <div class="divider"></div> -->
 
                 <form id="createTaskForm">
 
+                <div class="ct-panel active" data-panel="1" id="panel-1">
+ 
                     <div class="info-card">
-
                         <div class="card-header" onclick="toggleSection(this)">
-                            <h4>Task Information</h4>
-                            <span class="arrow">▼</span>
+                        <h4>Task Guidelines</h4>
+                        <span class="arrow">▼</span>
                         </div>
-
                         <div class="card-body">
-                            <div class="form-group">
-                                <label>Task Title</label>
-                                <input
-                                    type="text"
-                                    name="title"
-                                    placeholder="Example: Submit Weekly Progress Report"
-                                    required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Task Description</label>
-                                <textarea
-                                    name="description"
-                                    placeholder="Describe clearly what the student needs to complete and submit..."></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Due Date</label>
-                                <input
-                                    type="date"
-                                    name="due_date"
-                                    id="due_date"
-                                    required>
-                            </div>
+                        <div class="task-guidelines">
+                            <ul>
+                            <li>✔ Be specific — clearly state what the student must submit</li>
+                            <li>✔ Include expected output (PDF, report, screenshot, etc.)</li>
+                            <li>✔ Set realistic deadlines based on workload</li>
+                            <li>✔ Use action words like "Create", "Submit", "Prepare", "Develop"</li>
+                            <li>✔ Avoid vague titles like "Documentation Task"</li>
+                            </ul>
+                        </div>
                         </div>
                     </div>
 
-                    <div class="divider"></div>
+                    <div class="form-group" id="field-title">
+                        <label>Task Title <span class="ct-required">Required</span></label>
+                        <input type="text" name="title" id="ct-title" maxlength="120"
+                            placeholder="Example: Submit Weekly Progress Report" autocomplete="off">
+                        <div class="ct-char-count" id="titleCount">0 / 120</div>
+                        <div class="ct-val-hint"><i class="bi bi-exclamation-circle"></i> Please enter a task title.</div>
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Task Description</label>
+                        <textarea name="description" id="ct-desc" maxlength="600"
+                                placeholder="Describe clearly what the student needs to complete and submit..."></textarea>
+                        <div class="ct-char-count" id="descCount">0 / 600</div>
+                    </div>
+                
+                    <div class="ct-row-2">
+                        <div class="form-group" id="field-due">
+                        <label>Due Date <span class="ct-required">Required</span></label>
+                        <input type="date" name="due_date" id="due_date" autocomplete="off">
+                        <div class="ct-val-hint"><i class="bi bi-exclamation-circle"></i> A due date is required.</div>
+                        </div>
+                
+                        <div class="form-group">
+                        <label>Priority</label>
+                        <div class="ct-priority-row">
+                            <button type="button" class="ct-priority-btn sel-low" data-p="low" id="p-low">
+                            <i class="bi bi-arrow-down-circle"></i><span> Low</span>
+                            </button>
+                            <button type="button" class="ct-priority-btn" data-p="medium" id="p-medium">
+                            <i class="bi bi-dash-circle"></i><span> Medium</span>
+                            </button>
+                            <button type="button" class="ct-priority-btn" data-p="high" id="p-high">
+                            <i class="bi bi-arrow-up-circle"></i><span> High</span>
+                            </button>
+                        </div>
+                        <input type="hidden" name="priority" id="ct-priority" value="low">
+                        </div>
+                    </div>
+                
+                    <div class="ct-tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <p>Use action words — <strong>Create, Submit, Prepare, Develop</strong>. Include the expected output format so students know exactly what to deliver.</p>
+                    </div>
 
-                    <div class="info-card">
+                    <div class="ct-footer">
+                        <div class="ct-footer-meta">
+                            <i class="bi bi-shield-check"></i> Task will be saved and students notified
+                        </div>
+                        <div class="ct-footer-actions" id="ctFooterActions">
+                            <button type="button" class="ct-cancel-btn" onclick="closeTaskCreateModal()">Cancel</button>
+                            <button type="button" class="submit-btn" id="ctNextBtn">
+                            Next: Assign Students <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                
+                </div><!-- /panel 1 -->
+
+                <!-- <div class="divider"></div> -->
+
+    <div class="ct-panel" data-panel="2" id="panel-2">
+ 
+      <div class="form-group" style="margin-bottom:12px;" >
+        <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;">
+          <i class="bi bi-people" style="color:var(--accent);"></i> Assign Students
+        </label>
+        <div class="ct-subtitle" style="margin-top:-2px;">Select one or more students for this task</div>
+      </div>
+ 
+      <div class="ct-search-wrap">
+        <div class="ct-search">
+          <i class="bi bi-search"></i>
+          <input type="text" id="taskStudentSearch" placeholder="Search by name, ID, course, or year level…" autocomplete="off">
+        </div>
+      </div>
+ 
+      <div class="ct-sel-bar">
+        <div class="ct-sel-count">
+          <span>Selected:</span>
+          <span class="ct-sel-badge" id="selBadge">0</span>
+        </div>
+        <button type="button" class="ct-clear-sel" id="clearSel">Clear all</button>
+      </div>
+ 
+      <div class="list-box" id="taskStudentList">
+        <?php
+          $search = $_POST['search'] ?? '';
+          echo renderTaskAssignStudentList($conn, $superID, $search);
+        ?>
+      </div>
+ 
+      <div class="ct-assign-empty-hint" id="assignEmptyHint" style="display:none;">
+        <i class="bi bi-exclamation-circle"></i> Select at least one student before creating the task.
+      </div>
+ 
+      <input type="hidden" id="superID" value="<?= $superID ?>">
+
+      <div class="ct-footer">
+                        <div class="ct-footer-meta">
+                            <i class="bi bi-shield-check"></i> Task will be saved and students notified
+                        </div>
+                        <div class="ct-footer-actions" id="ctFooterActions">
+                            <button type="button" class="ct-cancel-btn" onclick="backToStep1()">Back</button>
+                            <button type="button" class="submit-btn" id="ctSubmitBtn"> <i class="bi bi-send"></i>
+                            Create Task & Assign 
+                            </button>
+                        </div>
+                    </div>
+ 
+    </div><!-- /panel 2 -->
+
+                    <!-- <div class="info-card">
 
                         <div class="card-header" onclick="toggleSection(this)">
                             <h4>Assignment</h4>
@@ -779,7 +887,7 @@ foreach ($nameParts as $part) {
                                 <div class="list-box" id="taskStudentList">
                                     <?php
                                     $search =  $_POST['search'] ?? '';
-                                    echo renderTaskAssignStudentList($conn, $superID, $search);
+                                     renderTaskAssignStudentList($conn, $superID, $search);
                                     ?>
                                 </div>
                             </div>
@@ -790,7 +898,10 @@ foreach ($nameParts as $part) {
 
                     <button type="submit" class="submit-btn">
                         Create Task & Assign
-                    </button>
+                    </button> -->
+
+
+                    
 
                 </form>
             </div>
@@ -1281,6 +1392,7 @@ foreach ($nameParts as $part) {
 
                 <!-- Self Tasks inigo -->
                 <!-- <div class="table-view" id="task-self-table">
+                    
                     <div class="table-switcher">
                         <button class="tab-btn active" data-tab="manage" onclick="showManageTable()">
                             Task Management
@@ -1294,6 +1406,7 @@ foreach ($nameParts as $part) {
                             Self-Initiated Tasks
                         </button>
                     </div>
+                    
                     <div class="top-bar">
 
                         <div class="top-header">
@@ -1540,7 +1653,7 @@ foreach ($nameParts as $part) {
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Attendance</th>
+                                    <th>Completion Status</th>
                                     <th>Reports</th>
                                     <th>Tasks</th>
                                     <th>Final Grade</th>
@@ -1711,7 +1824,7 @@ foreach ($nameParts as $part) {
 
             if (countdownValue <= 0) {
                 clearInterval(countdownTimer);
-                window.location.href = "../logoutPhase.php";
+                window.location.href = "../Session/logoutPhase.php";
             }
 
         }, 1000);
