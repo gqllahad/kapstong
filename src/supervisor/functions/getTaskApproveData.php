@@ -31,116 +31,126 @@ if ($row = $result->fetch_assoc()) {
         <button onclick="closeTaskModal()" class="modal-close">&times;</button>
     </div>
 
+    <div class="task-profile-strip">
+        <div class="task-strip-icon">
+            <i class='bx bx-task'></i>
+        </div>
+        <div class="task-strip-info">
+            <span class="task-strip-title"><?= $row['title'] ?></span>
+            <span class="task-strip-meta"><?= $row['name'] ?> • <?= $row['studentID'] ?></span>
+        </div>
+        <span class="status-badge"><?= $row['status'] ?></span>
+    </div>
+
+    <div class="supervisor-tabs">
+        <button type="button" class="tab-btn active" data-tab="info">
+            <i class='bx bx-info-circle'></i> Task Info
+        </button>
+        <button type="button" class="tab-btn" data-tab="file">
+            <i class='bx bx-file'></i> Submitted File
+        </button>
+        <button type="button" class="tab-btn" data-tab="feedback">
+            <i class='bx bx-message-square-edit'></i> Feedback
+        </button>
+    </div>
+
     <div class="student-modal-content">
 
-        <div class="info-card">
-            <div class="card-header" onclick="toggleSection(this)">
-                <h4>Task Information</h4>
-                <span class="arrow">▼</span>
-            </div>
+        <!-- TASK INFO TAB -->
+        <div class="tab-panel active" id="tab-info">
+            <div class="info-card">
+                <div class="card-body">
 
-            <div class="card-body">
-
-                <div class="info-row">
-                    <span class="info-label">Student ID</span>
-                    <span class="info-value"><?= $row['studentID'] ?></span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">Student Name</span>
-                    <span class="info-value"><?= $row['name'] ?></span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">Task Title</span>
-                    <span class="info-value"><?= $row['title'] ?></span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">Student Note</span>
-                    <span class="info-value"><?= $row['student_note'] ?: '-' ?></span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">Status</span>
-                    <span class="info-value"><?= $row['status'] ?></span>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="info-card">
-            <div class="card-header" onclick="toggleSection(this)">
-                <h4>Uploaded Files</h4>
-                <span class="arrow">▼</span>
-            </div>
-
-            <div class="card-body">
-                <div class="documents-grid">
-
-                    <div class="doc-card">
-
-                        <?php if (!empty($row['submission_file'])): ?>
-                            <button class="btn-preview"
-                                onclick="previewImage('../../uploads/student_tasks/<?= $row['studentID'] ?>/<?= $firstFile ?>')">
-                                👁 View File
-                            </button>
-
-                            <span class="status-badge success">Uploaded</span>
-                        <?php else: ?>
-                            <span class="status-badge missing">No File Uploaded</span>
-                        <?php endif; ?>
+                    <div class="info-row">
+                        <span class="info-label">Student ID</span>
+                        <span class="info-value"><?= $row['studentID'] ?></span>
                     </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Student Name</span>
+                        <span class="info-value"><?= $row['name'] ?></span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Task Title</span>
+                        <span class="info-value"><?= $row['title'] ?></span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Student Note</span>
+                        <span class="info-value"><?= $row['student_note'] ?: '-' ?></span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value"><?= $row['status'] ?></span>
+                    </div>
+
                 </div>
             </div>
         </div>
 
-        <div class="divider"></div>
+        <!-- FILE TAB -->
+        <div class="tab-panel" id="tab-file">
+            <div class="documents-grid">
+                <div class="doc-card">
 
-        <div class="section-title">
-            <h3>Supervisor Notes</h3>
+                    <?php if (!empty($row['submission_file'])): ?>
+                        <div class="doc-header">
+                            <span class="doc-title">Submitted File</span>
+                        </div>
+                        <button class="btn-preview"
+                            onclick="previewImage('../../uploads/student_tasks/<?= $row['studentID'] ?>/<?= $firstFile ?>')">
+                            👁 View File
+                        </button>
+
+                        <span class="status-badge success">Uploaded</span>
+                    <?php else: ?>
+                        <span class="status-badge missing">No File Uploaded</span>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
 
-        <div class="info-card">
-            <div class="card-header" onclick="toggleSection(this)">
-                <h4>Supervisor Feedback</h4>
-                <span class="arrow">▼</span>
-            </div>
+        <!-- FEEDBACK TAB -->
+        <div class="tab-panel" id="tab-feedback">
+            <div class="info-card">
+                <div class="card-body">
 
-            <div class="card-body">
+                    <div class="form-group">
+                        <label>Supervisor Feedback</label>
 
-                <textarea
-                    id="supervisorFeedback"
-                    placeholder="Write recommendations, corrections, or comments for the student..."
-                    style="width:100%; min-height:120px; padding:10px; border-radius:8px; border:1px solid #ccc;">
+                        <textarea
+                            id="supervisorFeedback"
+                            class="feedback-textarea"
+                            placeholder="Write recommendations, corrections, or comments for the student...">
         </textarea>
 
-                <small style="color:#666;">
-                    Provide suggestions before approving or rejecting the task.
-                </small>
+                        <small class="feedback-hint">
+                            Provide suggestions before approving or rejecting the task.
+                        </small>
+                    </div>
 
+                </div>
             </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="task-action-buttons">
-
-            <button
-                class="reject-btn"
-                onclick="updateTaskStatus(<?= $row['taskID'] ?>, 'REJECTED')">
-                Reject
-            </button>
-
-            <button
-                class="approve-btn"
-                onclick="updateTaskStatus(<?= $row['taskID'] ?>, 'APPROVED')">
-                Approve
-            </button>
         </div>
 
     </div>
+
+    <div class="task-action-buttons">
+
+        <button
+            class="reject-btn"
+            onclick="updateTaskStatus(<?= $row['taskID'] ?>, 'REJECTED')">
+            <i class='bx bx-x-circle'></i> Reject
+        </button>
+
+        <button
+            class="approve-btn"
+            onclick="updateTaskStatus(<?= $row['taskID'] ?>, 'APPROVED')">
+            <i class='bx bx-check-circle'></i> Approve
+        </button>
+    </div>
+
 
 <?php }

@@ -18,7 +18,7 @@ $sql = "
         title,
         description,
         due_date,
-        status
+        priority
     FROM student_tasks
     WHERE taskID = '$taskID'
     LIMIT 1

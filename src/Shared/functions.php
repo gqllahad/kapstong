@@ -525,8 +525,8 @@ function renderApprovalReportList($conn, $superID, $search = '')
             student_tasks.studentID,
             ojtstudent.name,
             student_tasks.title,
-            student_tasks.status,
-            student_tasks.date_created
+            student_tasks.date_created,
+            student_tasks.priority
         FROM student_tasks
         INNER JOIN ojtstudent 
             ON student_tasks.studentID = ojtstudent.studentID
@@ -540,6 +540,25 @@ function renderApprovalReportList($conn, $superID, $search = '')
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+
+        $priority = strtolower($row['priority']);
+
+    switch ($priority) {
+        case 'low':
+            $priorityColor = '#10B981';
+            break;
+
+        case 'medium':
+            $priorityColor = '#F59E0B';
+            break;
+
+        case 'high':
+            $priorityColor = '#EF4444';
+            break;
+
+        default:
+            $priorityColor = '#9CA3AF';
+    }
 
             $output .= '
             <tr>
@@ -571,9 +590,12 @@ function renderApprovalReportList($conn, $superID, $search = '')
             </div>
         </td>
                 <td>
-                    <span class="status-pill submitted">
-                        ' . $row['status'] . '
-                    </span>
+                    <span class="status-pill" style="
+                background: ' . $priorityColor . ';
+                border: 1px solid ' . $priorityColor . ';
+            ">
+                ' . ucfirst($priority) . '
+            </span>
                 </td>
                 <td>
             <div class="date-cell">
@@ -607,10 +629,11 @@ function renderApprovalReportList($conn, $superID, $search = '')
 }
 
 // task management (supervisor)
-function renderTaskManagementList($conn, $superID, $search = '', $status = '', $deadline = '')
+function renderTaskManagementList($conn, $superID, $search = '', $status = '', $deadline = '', $priority = '')
 {
     $where = "
-        WHERE student_tasks.superID = '$superID'
+        WHERE student_tasks.superID = '$superID' 
+        AND student_tasks.status != 'SUBMITTED'
     ";
 
     if (!empty($search)) {
@@ -629,6 +652,10 @@ function renderTaskManagementList($conn, $superID, $search = '', $status = '', $
         $where .= " AND student_tasks.status = '$status'";
     }
 
+     if (!empty($priority)) {
+        $where .= " AND student_tasks.priority = '$priority'";
+    }
+
     $sql = "
         SELECT 
             student_tasks.taskID,
@@ -638,6 +665,7 @@ function renderTaskManagementList($conn, $superID, $search = '', $status = '', $
             student_tasks.description,
             student_tasks.due_date,
             student_tasks.status,
+            student_tasks.priority,
             student_tasks.date_created
         FROM student_tasks
         INNER JOIN ojtstudent 
@@ -673,6 +701,23 @@ function renderTaskManagementList($conn, $superID, $search = '', $status = '', $
                     break;
                 default:
                     $color = '#9CA3AF';
+            }
+
+
+            $priority = $row['priority'];
+
+            switch($priority) {
+                case 'low':
+                    $priorityColor = '#10B981';
+                    break;
+                case 'medium':
+                    $priorityColor = '#F59E0B';
+                    break;
+                case 'high':
+                    $priorityColor = '#EF4444';
+                    break;
+                default:
+                    $priorityColor = '#9CA3AF';
             }
 
             $actionButtons = '';
@@ -720,6 +765,13 @@ function renderTaskManagementList($conn, $superID, $search = '', $status = '', $
                     </div>
                 </td>
                 <td>' . date("M d, Y", strtotime($row['due_date'])) . '</td>
+                <td>
+                    <span class="status-pill" style="
+                        background: ' . $priorityColor . ';
+                        border: 1px solid ' . $priorityColor . ';
+                    ">
+                        ' . ucfirst($priority) . '
+                    </span>
                 <td>
                     <span class="status-pill" style="
                         background: ' . $color . ';

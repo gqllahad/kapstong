@@ -13,6 +13,7 @@ $userID = $_SESSION['user_id'];
 $superID = getSupervisorIDByUserID($conn, $userID);
 $search = $_POST['search'] ?? '';
 $status = $_POST['status'] ?? '';
+$priority = $_POST['priority'] ?? '';
 $deadline = $_POST['deadline'] ?? '';
 
-echo renderTaskManagementList($conn, $superID, $search, $status, $deadline);
+echo renderTaskManagementList($conn, $superID, $search, $status, $deadline, $priority);

@@ -500,119 +500,111 @@ foreach ($nameParts as $part) {
                 <div id="taskDeadlineWarning" class="task-deadline-warning" style="display:none;">
                     <span id="taskDeadlineWarningText"></span>
                 </div>
+
+                <div class="task-profile-strip">
+                    <div class="task-strip-icon">
+                        <i class='bx bx-task'></i>
+                    </div>
+                    <div class="task-strip-info">
+                        <span class="task-strip-title" id="modalTaskTitle"></span>
+                        <span class="task-strip-meta">Due <span id="modalTaskDueStrip"></span></span>
+                    </div>
+                    <span id="modalTaskStatusStrip" class="status-badge"></span>
+                </div>
+
+                <div class="supervisor-tabs">
+                    <button type="button" class="tab-btn active" data-tab="description">
+                        <i class='bx bx-align-left'></i> Description
+                    </button>
+                    <button type="button" class="tab-btn" data-tab="progress">
+                        <i class='bx bx-line-chart'></i> Progress
+                    </button>
+                    <button type="button" class="tab-btn" data-tab="files">
+                        <i class='bx bx-file'></i> Files
+                    </button>
+                    <button type="button" class="tab-btn" data-tab="notes">
+                        <i class='bx bx-note'></i> Notes
+                    </button>
+                </div>
+
                 <div class="task-modal-content">
 
-
-                    <div class="task-modal-body">
-
-                        <div class="task-info-grid">
-
-                            <div class="info-item">
-                                <label>Title</label>
-                                <p id="modalTaskTitle"></p>
-                            </div>
-
-                            <div class="info-card">
-
-                                <div class="card-header" onclick="toggleSection(this)">
-                                    <h4>Descriptions </h4>
-                                    <span class="arrow">▼</span>
-                                </div>
-
-                                <div class="card-body">
-                                    <div class="info-item">
-                                        <label>Description</label>
-                                        <p id="modalTaskDesc"></p>
-                                    </div>
+                    <!-- DESCRIPTION TAB -->
+                    <div class="tab-panel active" id="tab-description">
+                        <div class="info-card">
+                            <div class="card-body">
+                                <div class="info-item">
+                                    <label>Description</label>
+                                    <p id="modalTaskDesc"></p>
                                 </div>
                             </div>
-
-                            <div class="info-card">
-
-                                <div class="card-header" onclick="toggleSection(this)">
-                                    <h4>Progress </h4>
-                                    <span class="arrow">▼</span>
-                                </div>
-
-                                <div class="card-body">
-                                    <div class="info-item">
-                                        <label>Status</label>
-                                        <span id="modalTaskStatus" class="status-badge"></span>
-                                    </div>
-
-                                    <div class="info-item">
-                                        <label>Due Date</label>
-                                        <p id="modalTaskDue"></p>
-                                    </div>
-
-                                    <div class="info-item">
-                                        <label>Completed Date</label>
-                                        <p id="modalTaskCompleted"></p>
-                                    </div>
-
-                                    <div class="info-item">
-                                        <label>Progress</label>
-                                        <p id="modalTaskProgress"></p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="divider"></div>
-
-                            <div class="info-card" id="uploadedFileSection">
-
-                                <div class="card-header" onclick="toggleSection(this)">
-                                    <h4>Uploaded Files</h4>
-                                    <span class="arrow">▼</span>
-                                </div>
-
-                                <div class="card-body">
-                                    <div class="documents-grid">
-
-                                        <div class="doc-card">
-
-                                            <button
-                                                id="viewUploadedFileBtn"
-                                                class="btn-preview"
-                                                style="display:none;"
-                                                onclick="previewFile(document.getElementById('viewUploadedFileBtn').dataset.file)">
-                                                👁 View File
-                                            </button>
-
-                                            <span
-                                                id="uploadedFileStatus"
-                                                class="status-badge missing">
-                                                No File Uploaded
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="info-card">
-
-                                <div class="card-header" onclick="toggleSection(this)">
-                                    <h4>Notes </h4>
-                                    <span class="arrow">▼</span>
-                                </div>
-
-                                <div class="card-body">
-                                    <div class="info-item" id="studentNoteSection" style="display:none;">
-                                        <label>Student Note</label>
-                                        <p id="modalStudentNote"></p>
-                                    </div>
-
-                                    <div class="info-item" id="supervisorFeedbackSection" style="display:none;">
-                                        <label>Supervisor Feedback</label>
-                                        <p id="modalSupervisorFeedback"></p>
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
+
+                    <!-- PROGRESS TAB -->
+                    <div class="tab-panel" id="tab-progress">
+                        <div class="info-card">
+                            <div class="card-body">
+                                <div class="info-item">
+                                    <label>Status</label>
+                                    <span id="modalTaskStatus" class="status-badge"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Due Date</label>
+                                    <p id="modalTaskDue"></p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Completed Date</label>
+                                    <p id="modalTaskCompleted"></p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Progress</label>
+                                    <p id="modalTaskProgress"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FILES TAB -->
+                    <div class="tab-panel" id="tab-files">
+                        <div class="info-card" id="uploadedFileSection">
+                            <div class="card-body">
+                                <div class="documents-grid">
+                                    <div class="doc-card">
+                                        <button
+                                            id="viewUploadedFileBtn"
+                                            class="btn-preview"
+                                            style="display:none;"
+                                            onclick="previewFile(document.getElementById('viewUploadedFileBtn').dataset.file)">
+                                            👁 View File
+                                        </button>
+
+                                        <span id="uploadedFileStatus" class="status-badge missing">
+                                            No File Uploaded
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NOTES TAB -->
+                    <div class="tab-panel" id="tab-notes">
+                        <div class="info-card">
+                            <div class="card-body">
+                                <div class="info-item" id="studentNoteSection" style="display:none;">
+                                    <label>Student Note</label>
+                                    <p id="modalStudentNote"></p>
+                                </div>
+
+                                <div class="info-item" id="supervisorFeedbackSection" style="display:none;">
+                                    <label>Supervisor Feedback</label>
+                                    <p id="modalSupervisorFeedback"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -859,7 +851,7 @@ foreach ($nameParts as $part) {
                         </div>
                         <div class="ct-footer-actions" id="ctFooterActions">
                             <button type="button" class="ct-cancel-btn" onclick="backToStep1()">Back</button>
-                            <button type="button" class="submit-btn" id="ctSubmitBtn"> <i class="bi bi-send"></i>
+                            <button type="submit" class="submit-btn"> <i class="bi bi-send"></i>
                             Create Task & Assign 
                             </button>
                         </div>
@@ -919,33 +911,50 @@ foreach ($nameParts as $part) {
 
                     <div class="form-group">
                         <label>Task Title</label>
-                        <input type="text" id="editTitle" name="title" required>
+                        <input type="text" id="editTitle" name="title" placeholder="e.g. Submit weekly progress report" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Description</label>
-                        <textarea id="editDescription" name="description"></textarea>
+                        <label>
+                            Description
+                            <span class="char-counter" id="descCharCounter">0 / 300</span>
+                        </label>
+                        <textarea id="editDescription" name="description" maxlength="300" placeholder="Describe what the student needs to accomplish..."></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label>Due Date</label>
-                        <input type="date" id="editDueDate" name="due_date" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Due Date</label>
+                            <input type="date" id="editDueDate" name="due_date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <div class="priority-selector" id="prioritySelector">
+                                <input type="radio" name="priority" id="priorityLow" value="low" hidden>
+                                <label for="priorityLow" class="priority-pill priority-low">
+                                    <i class="bi bi-arrow-down-circle"></i> Low
+                                </label>
+
+                                <input type="radio" name="priority" id="priorityMedium" value="medium" hidden checked>
+                                <label for="priorityMedium" class="priority-pill priority-medium">
+                                    <i class="bi bi-dash-circle"></i> Medium
+                                </label>
+
+                                <input type="radio" name="priority" id="priorityHigh" value="high" hidden>
+                                <label for="priorityHigh" class="priority-pill priority-high">
+                                    <i class="bi bi-arrow-up-circle"></i> High
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="editStatus" name="status" required>
-                            <option value="NOT STARTED">NOT STARTED</option>
-                            <option value="IN PROGRESS">IN PROGRESS</option>
-                            <option value="SUBMITTED">SUBMITTED</option>
-                            <option value="APPROVED">APPROVED</option>
-                            <option value="REJECTED">REJECTED</option>
-                        </select>
+                    <div class="edit-task-actions">
+                        <button type="submit" class="submit-btn" id="editTaskSubmitBtn">
+                            <i class="bi bi-check-circle"></i>
+                            Update Task
+                        </button>
                     </div>
-
-                    <button type="submit" class="submit-btn">
-                        Update Task
-                    </button>
 
                 </form>
             </div>
@@ -1300,7 +1309,7 @@ foreach ($nameParts as $part) {
                                     <th>Student ID</th>
                                     <th>Name</th>
                                     <th>Title</th>
-                                    <th>Status</th>
+                                    <th>Priority</th>
                                     <th>Date Created</th>
                                     <th>Action</th>
                                 </tr>
@@ -1347,11 +1356,20 @@ foreach ($nameParts as $part) {
 
                             <div class="filter-group">
 
+                                <select id="taskPriorityFilter">
+                                    <option value="">All Priorities</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+
+                            </div>
+
+                            <div class="filter-group">
+
                                 <select id="taskStatusFilter">
                                     <option value="">All Status</option>
-                                    <option value="NOT STARTED">Not started</option>
-                                    <option value="IN PROGRESS">In progress</option>
-                                    <option value="SUBMITTED">Submitted</option>
+                                    <option value="NOT STARTED">In Progress</option>         
                                     <option value="REJECTED">Rejected</option>
                                     <option value="APPROVED">Approved</option>
                                 </select>
@@ -1373,6 +1391,7 @@ foreach ($nameParts as $part) {
                                     <th>Task Title</th>
                                     <th>Student Assigned</th>
                                     <th>Deadline</th>
+                                    <th>Priority</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -1382,8 +1401,9 @@ foreach ($nameParts as $part) {
                                 <?php
                                 $search = $_POST['search'] ?? '';
                                 $status = $_POST['status'] ?? '';
+                                $priority = $_POST['priority'] ?? '';
                                 $deadline = $_POST['deadline'] ?? '';
-                                echo renderTaskManagementList($conn, $superID, $search, $status, $deadline);
+                                echo renderTaskManagementList($conn, $superID, $search, $status, $deadline, $priority);
                                 ?>
                             </tbody>
                         </table>
@@ -1527,12 +1547,12 @@ foreach ($nameParts as $part) {
                 <!-- inigo -->
                 <div class="table-view show" id="attendance-table">
                     <div class="table-switcher">
-                        <button class="tab-btn active" data-tab="attendance">
+                        <button class="tab-btn active" data-tab="attendance" onclick="showAttendanceTable()">
                             Attendance logs
                         </button>
 
-                        <button class="tab-btn" data-tab="calendar">
-                            Attendance Calendar
+                        <button class="tab-btn" data-tab="calendar" onclick="showAttendanceCalendar()">
+                            Attendance calendar
                         </button>
                     </div>
 
@@ -1599,6 +1619,27 @@ foreach ($nameParts as $part) {
                         </table>
                     </div>
                 </div>
+
+
+                <div class="table-view" id="attendance-calendar">
+                    <div class="table-switcher">
+                        <button class="tab-btn" data-tab="attendance" onclick="showAttendanceTable()">
+                            Attendance logs
+                        </button>
+                        <button class="tab-btn active" data-tab="calendar" onclick="showAttendanceCalendar()">
+                            Attendance calendar
+                        </button>
+                    </div>
+
+                        <div class="top-bar">
+                                <div class="top-header">
+                                    <h3 class="table-title">Calendar</h3>
+                                    <p>Search and review student attendance records.</p>
+                                </div>
+                                
+                        </div>
+                </div>
+
             </section>
 
             <!-- reports evaluation -->
@@ -1611,7 +1652,7 @@ foreach ($nameParts as $part) {
 
                 <div class="table-view show" id="evaluation-table">
                     <div class="table-switcher">
-                        <button class="tab-btn active" data-tab="evaluation">
+                        <button class="tab-btn active" data-tab="evaluation" >
                             Evaluations
                         </button>
 
@@ -1824,6 +1865,7 @@ foreach ($nameParts as $part) {
 
             if (countdownValue <= 0) {
                 clearInterval(countdownTimer);
+
                 window.location.href = "../Session/logoutPhase.php";
             }
 

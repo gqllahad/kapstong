@@ -1448,6 +1448,145 @@ body.dark-mode .task-title {
   background: var(--pill-notstarted);
 }
 
+
+
+/* Tasks Section */
+/* .task-title-header {
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--surface-divider);
+}
+.task-title-header label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-500);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+.task-title-header p {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--navy-900);
+  margin: 0;
+}
+
+body.dark-mode .task-title-header {
+  border-bottom-color: var(--surface-divider);
+}
+body.dark-mode .task-title-header label {
+  color: var(--gray-500);
+}
+body.dark-mode .task-title-header p {
+  color: var(--navy-100);
+} */
+
+.supervisor-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--surface-divider);
+  margin-bottom: 16px;
+  padding: 0 2px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gray-500, #6b7280);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.tab-btn:hover {
+  color: var(--navy-700);
+}
+
+.tab-btn.active {
+  color: var(--navy-700);
+  border-bottom-color: var(--navy-500);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-panel .info-card .card-body {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.task-profile-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--r-lg);
+}
+
+.task-strip-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--navy-500), var(--accent));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.task-strip-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.task-strip-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--navy-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-strip-meta {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-top: 2px;
+}
+
+body.dark-mode .task-profile-strip {
+  background: var(--surface-subtle);
+  border-color: var(--surface-border);
+}
+body.dark-mode .task-strip-title {
+  color: var(--navy-100);
+}
+body.dark-mode .task-strip-meta {
+  color: var(--gray-500);
+}
+
 /* ══════════════════════════════════════════════════════════════
    TOP BAR (search + header)
 ══════════════════════════════════════════════════════════════ */
@@ -2230,6 +2369,148 @@ body.dark-mode .form-group select:focus {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 18px;
+}
+
+/* edit tasks */
+.char-counter {
+  float: right;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gray-400);
+  text-transform: none;
+  letter-spacing: normal;
+}
+.char-counter.near-limit {
+  color: var(--warning);
+}
+
+.priority-selector {
+  display: flex;
+  gap: 8px;
+}
+
+.priority-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--surface-border);
+  background: var(--surface-card);
+  color: var(--gray-500);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.priority-pill:hover {
+  border-color: var(--gray-300);
+}
+
+.priority-pill i {
+  font-size: 14px;
+}
+
+input#priorityLow:checked ~ label.priority-low,
+label.priority-low:has(input:checked) {
+  background: var(--success-dim);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+#priorityLow:checked + .priority-low {
+  background: var(--success-dim);
+  border-color: var(--success);
+  color: var(--success);
+}
+#priorityMedium:checked + .priority-medium {
+  background: var(--warning-dim);
+  border-color: var(--warning);
+  color: var(--warning);
+}
+#priorityHigh:checked + .priority-high {
+  background: var(--danger-dim);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.edit-task-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.edit-task-actions .submit-btn {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+body.dark-mode .priority-pill {
+  background: var(--surface-subtle);
+  border-color: var(--surface-border);
+  color: var(--gray-500);
+}
+
+/* aprproval tasks */
+.feedback-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--surface-border);
+  font-family: "Outfit", sans-serif;
+  font-size: 13.5px;
+  color: var(--gray-800);
+  background: var(--surface-card);
+  outline: none;
+  resize: vertical;
+  line-height: 1.55;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.feedback-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.feedback-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--gray-500);
+}
+
+.task-action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--surface-divider);
+}
+.task-action-buttons button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px;
+}
+
+body.dark-mode .feedback-textarea {
+  background: var(--surface-subtle);
+  color: var(--navy-100);
+  border-color: var(--surface-border);
+}
+body.dark-mode .feedback-hint {
+  color: var(--gray-500);
+}
+body.dark-mode .task-action-buttons {
+  border-top-color: var(--surface-divider);
 }
 
 /* Form section */

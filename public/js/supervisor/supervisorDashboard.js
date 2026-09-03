@@ -30,7 +30,7 @@ const createTaskBtn = document.getElementById("create-task-btn");
 const closeCreateTask = document.getElementById("closeCreateTaskModal");
 
 const createTaskNextBtn = document.getElementById("ctNextBtn");
-const createTaskSubmitBtn = document.getElementById("ctSubmitBtn");
+// const createTaskSubmitBtn = document.getElementById("ctSubmitBtn");
 
 const editTaskContainer = document.getElementById("task-edit-container");
 const closeEditTask = document.getElementById("closeEditTaskModal");
@@ -46,6 +46,11 @@ const views = {
     attendance: document.getElementById("attendanceView"),
     tasks: document.getElementById("tasksView")
 };
+
+// edit tasks
+const descField = document.getElementById('editDescription');
+const charCounter = document.getElementById('descCharCounter');
+
 
 // layouts
 const superDashboardBtn = document.getElementById("supervisor-dashboard-btn");
@@ -98,6 +103,11 @@ window.currentMonth = null;
 const taskManage = document.getElementById("task-manage-table");
 const taskSubmit = document.getElementById("task-submit-table");
 // const taskSelf = document.getElementById("task-self-table");
+
+
+//attendance switch
+const attendanceTable = document.getElementById("attendance-table");
+const attendanceCalendar = document.getElementById("attendance-calendar");
 
 // functions
 
@@ -250,11 +260,11 @@ function updateSelectionState() {
 
     document.getElementById('assignEmptyHint').style.display = 'none';
 
-    const submitBtn = document.getElementById('ctSubmitBtn');
+    // const submitBtn = document.getElementById('ctSubmitBtn');
 
-    if (submitBtn) {
-        submitBtn.disabled = count === 0;
-    }
+    // if (submitBtn) {
+    //     submitBtn.disabled = count === 0;
+    // }
 }
 
 function goTo(n) {
@@ -2040,6 +2050,11 @@ function viewTask(taskID) {
             document.getElementById("modalTaskDesc").innerText = data.description;
             document.getElementById("modalTaskStatus").innerText = data.status;
             document.getElementById("modalTaskDue").innerText = data.due_date;
+
+            document.getElementById("modalTaskDueStrip").innerText = data.due_date;
+            document.getElementById("modalTaskStatusStrip").innerText = data.status;
+            document.getElementById("modalTaskStatusStrip").className = "status-badge " + (data.status || '').toLowerCase();
+
             document.getElementById("modalTaskCompleted").innerText =
                 data.completed_at ? data.completed_at : "Not completed yet";
 
@@ -2136,11 +2151,23 @@ function editTask(taskID) {
             document.getElementById("editTitle").value = data.title;
             document.getElementById("editDescription").value = data.description;
             document.getElementById("editDueDate").value = data.due_date;
-            document.getElementById("editStatus").value = data.status;
+            // document.getElementById("editPriority").value = data.priority;
+
+            const priorityRadio = document.getElementById("priority" + capitalize(data.priority));
+            if (priorityRadio) {
+                priorityRadio.checked = true;
+            }
+
+            document.getElementById("editDescription").dispatchEvent(new Event('input'));
 
             overlay.classList.add("show");
             editTaskContainer.classList.add("show");
         });
+}
+
+function capitalize(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
 // delete task
@@ -2218,6 +2245,12 @@ function reloadTaskTable() {
     );
 
     formData.append(
+        "priority",
+        document.getElementById("taskPriorityFilter").value
+    );
+
+
+    formData.append(
         "deadline",
         document.getElementById("dateDeadline").value
     );
@@ -2278,6 +2311,22 @@ function showSelfTable() {
     // taskSelf.classList.add("show");
 
     setActiveTab("self");
+}
+
+
+function showAttendanceTable() {
+    attendanceCalendar.classList.remove("show");
+    attendanceTable.classList.add("show");
+
+    setActiveTab("attendance");
+    
+}
+
+function showAttendanceCalendar() {
+    attendanceTable.classList.remove("show");
+    attendanceCalendar.classList.add("show");
+
+    setActiveTab("calendar");
 }
 
 
@@ -2446,6 +2495,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("assignedTaskSearch");
     const statusFilter = document.getElementById("taskStatusFilter");
     const deadlineDate = document.getElementById("dateDeadline");
+    const priorityFilter = document.getElementById("taskPriorityFilter");  
     const tableBody = document.getElementById("assignedTaskBody");
 
     if (!searchInput || !statusFilter || !tableBody || !deadlineDate) return;
@@ -2457,6 +2507,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const search = searchInput.value;
         const status = statusFilter.value.toUpperCase();
         const deadline = deadlineDate.value;
+        const priority = priorityFilter.value;
 
         fetch("functions/searchTask.php", {
             method: "POST",
@@ -2466,7 +2517,8 @@ document.addEventListener("DOMContentLoaded", function () {
             body:
                 "search=" + encodeURIComponent(search) +
                 "&status=" + encodeURIComponent(status) +
-                "&deadline=" + encodeURIComponent(deadline)
+                "&deadline=" + encodeURIComponent(deadline) + 
+                "&priority=" + encodeURIComponent(priority)
               
         })
         .then(res => res.text())
@@ -2482,8 +2534,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     statusFilter.addEventListener("change", fetchLogs);
     deadlineDate.addEventListener("change", fetchLogs);
+    priorityFilter.addEventListener("change", fetchLogs);
 
     fetchLogs();
+});
+
+
+document.addEventListener('click', function (e) {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+
+  const tabsBar = btn.closest('.supervisor-tabs');
+  const content = tabsBar.nextElementSibling;
+
+  tabsBar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  content.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+  btn.classList.add('active');
+  content.querySelector('#tab-' + btn.dataset.tab).classList.add('active');
 });
 
 // modals
@@ -2636,7 +2704,6 @@ document.getElementById("createTaskForm").addEventListener("submit", function (e
 })
 .then(async res => {
     const text = await res.text();
-    console.log("Raw response:", text);
     return JSON.parse(text);
 })
 .then(data => {
@@ -2655,7 +2722,6 @@ document.getElementById("createTaskForm").addEventListener("submit", function (e
     }
 })
 .catch(err => {
-    console.error(err);
     showToast("Something went wrong.", "error");
 });
     
@@ -2680,6 +2746,19 @@ function reloadApprovalReportTable() {
 }
 
 // edit tasks
+
+descField.addEventListener('input', () => {
+  const len = descField.value.length;
+  charCounter.textContent = `${len} / 300`;
+  charCounter.classList.toggle('near-limit', len >= 270);
+});
+
+document.getElementById('editTaskForm').addEventListener('submit', function () {
+  const btn = document.getElementById('editTaskSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Updating...';
+});
+
 document.getElementById("editTaskForm").addEventListener("submit", function (e) {
     e.preventDefault();
 

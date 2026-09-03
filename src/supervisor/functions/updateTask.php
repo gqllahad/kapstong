@@ -7,13 +7,13 @@ $taskID = $_POST['taskID'] ?? '';
 $title = $_POST['title'] ?? '';
 $description = $_POST['description'] ?? '';
 $due_date = $_POST['due_date'] ?? '';
-$status = $_POST['status'] ?? '';
+$priority = $_POST['priority'] ?? '';
 
 if (
     empty($taskID) ||
     empty($title) ||
     empty($due_date) ||
-    empty($status)
+    empty($priority)
 ) {
     echo json_encode([
         "status" => "error",
@@ -24,7 +24,7 @@ if (
 
 $stmt = $conn->prepare("
     UPDATE student_tasks
-    SET title = ?, description = ?, due_date = ?, status = ?
+    SET title = ?, description = ?, due_date = ?, priority = ?
     WHERE taskID = ?
 ");
 
@@ -33,7 +33,7 @@ $stmt->bind_param(
     $title,
     $description,
     $due_date,
-    $status,
+    $priority,
     $taskID
 );
 
