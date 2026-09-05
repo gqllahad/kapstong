@@ -1430,6 +1430,10 @@ function renderTaskAssignStudentList($conn, $superID, $search = '')
 
 function renderStudentMainAttendance($conn, $superID, $search = '', $status = '', $dateFromAttendance = '', $dateToAttendance = '')
 {
+    function e($val) {
+        return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
+    }
+
     $sql = "
         SELECT 
             attendance_logs.attendanceID,
@@ -1446,13 +1450,10 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
             attendance_logs.emergency_reason,
             ojtstudent.name
         FROM attendance_logs
-
         LEFT JOIN student_supervisor 
             ON student_supervisor.studentID = attendance_logs.studentID
-
         LEFT JOIN ojtstudent 
             ON ojtstudent.studentID = attendance_logs.studentID
-
         WHERE student_supervisor.superID = ?
         AND student_supervisor.status = 'ACTIVE'
     ";
@@ -1467,7 +1468,6 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
             ojtstudent.name LIKE ? OR
             attendance_logs.rfid_uid LIKE ?
         )";
-
         $like = "%$search%";
         $types .= "sss";
         $params[] = $like;
@@ -1488,7 +1488,7 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
     }
 
     if (!empty($dateToAttendance)) {
-        $sql .= " AND attendance_logs.log_date >= ?";
+        $sql .= " AND attendance_logs.log_date <= ?"; 
         $types .= "s";
         $params[] = $dateToAttendance;
     }
@@ -1496,10 +1496,8 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
     $sql .= " ORDER BY attendance_logs.log_date DESC, attendance_logs.first_time_in DESC";
 
     $stmt = $conn->prepare($sql);
-
     $stmt->bind_param($types, ...$params);
     $stmt->execute();
-
     $result = $stmt->get_result();
 
     $output = '';
@@ -1510,52 +1508,40 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
             $status = strtolower($row['status']);
 
             switch ($status) {
-                case 'present':
-                    $color = '#059669';
-                    break;
-                case 'late':
-                    $color = '#F59E0B';
-                    break;
-                case 'absent':
-                    $color =  '#EF4444';
-                    break;
-                case 'excused':
-                    $color = '#3B82F6';
-                    break;
-                default:
-                    $color = '#9CA3AF';
-                    break;
-            };
+                case 'present': $color = '#059669'; break;
+                case 'late': $color = '#F59E0B'; break;
+                case 'absent': $color = '#EF4444'; break;
+                case 'excused': $color = '#3B82F6'; break;
+                default: $color = '#9CA3AF'; break;
+            }
 
-            $hasEmergency =
-                $row['emergency_timeout'] == 1 ||
-                !empty($row['emergency_reason']);
+            $hasEmergency = $row['emergency_timeout'] == 1 || !empty($row['emergency_reason']);
+
+            $timeIn = $row['first_time_in'] ? date('h:i A', strtotime($row['first_time_in'])) : '—';
+            $timeOut = $row['final_time_out'] ? date('h:i A', strtotime($row['final_time_out'])) : '—';
+
+            $jsAttendanceID = json_encode((int) $row['attendanceID']);
 
             $output .= "
             <tr>
-                <td><div class='student-id-cell'>
-                    #" . $row['rfid_uid'] . "
-                    </div>
-                </td>
-                <td>" . date('F d, Y', strtotime($row['log_date'])) . "</td>
-                <td>" . date('h:i A', strtotime($row['first_time_in'])) . "</td>
-                <td>" . date('h:i A', strtotime($row['final_time_out'])) . "</td>
+                <td><div class='student-id-cell'>#" . e($row['rfid_uid']) . "</div></td>
+                <td>" . e(date('F d, Y', strtotime($row['log_date']))) . "</td>
+                <td>" . e($timeIn) . "</td>
+                <td>" . e($timeOut) . "</td>
                 <td>
-                    <span class='status-pill' style='background: " . $color . ";border: 1px solid " . $color . ";'>
-                        " . $row['status'] . "
+                    <span class='status-pill' style='background: " . e($color) . ";border: 1px solid " . e($color) . ";'>
+                        " . e($row['status']) . "
                     </span>
                 </td>
-                <td>{$row['total_hours']}</td>
-                <td>{$row['remarks']}</td>
-               <td>
-                    " . (
-                $hasEmergency
-                ? "<button class='view-btn'
-                                onclick=\"viewAttendance('{$row['attendanceID']}\">
-                                View
-                        </button>"
-                : "<span style='color:#9CA3AF;'>—</span>"
-            ) . "
+                <td>" . e($row['total_hours']) . "</td>
+                <td>" . e($row['remarks']) . "</td>
+                <td>" . (
+                    $hasEmergency
+                    ? "<button class='view-btn' onclick='viewAttendanceExcuse(" . $jsAttendanceID . ")'>
+                            <i class='bx bx-error-alt'></i> View
+                       </button>"
+                    : "<span style='color:#9CA3AF;'>—</span>"
+                ) . "
                 </td>
             </tr>";
         }

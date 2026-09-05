@@ -640,11 +640,13 @@ foreach ($nameParts as $part) {
         let inactivityTimer;
         let countdownTimer;
         let countdownValue = 60;
+        let warningActive = false;
 
         const modal = document.getElementById("inactivityModal");
         const countdownEl = document.getElementById("countdown");
 
         function startCountdown() {
+            warningActive = true;
 
             countdownValue = 60;
             countdownEl.innerText = countdownValue;
@@ -670,6 +672,7 @@ foreach ($nameParts as $part) {
         }
 
         function resetTimer() {
+            if (warningActive) return;
 
             clearTimeout(inactivityTimer);
             clearInterval(countdownTimer);
@@ -682,6 +685,7 @@ foreach ($nameParts as $part) {
         }
 
         function stayLoggedIn() {
+            warningActive = false;
 
             clearTimeout(inactivityTimer);
             clearInterval(countdownTimer);

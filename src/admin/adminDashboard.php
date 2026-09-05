@@ -1843,10 +1843,12 @@ if ($_SESSION['role'] !== "ADMIN") {
 
         countdownValue = 60;
         countdownEl.innerText = countdownValue;
+        warningActive = false;
 
         modal.style.display = "flex";
 
         countdownTimer = setInterval(() => {
+            warningActive = true;
 
             countdownValue--;
             countdownEl.innerText = countdownValue;
@@ -1865,6 +1867,7 @@ if ($_SESSION['role'] !== "ADMIN") {
     }
 
     function resetTimer() {
+        if (warningActive) return;
 
         clearTimeout(inactivityTimer);
         clearInterval(countdownTimer);
@@ -1877,6 +1880,7 @@ if ($_SESSION['role'] !== "ADMIN") {
     }
 
     function stayLoggedIn() {
+        warningActive = false;
 
         clearTimeout(inactivityTimer);
         clearInterval(countdownTimer);

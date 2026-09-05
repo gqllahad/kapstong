@@ -237,6 +237,19 @@ foreach ($nameParts as $part) {
                 </form>
             </div>
 
+
+            <!-- view attendance excuse -->
+            <div class="attendance-excuse-container" id="attendance-excuse-container">
+                <div class="modal-header">
+                    <h3><i class='bx bx-error-alt'></i> Attendance Excuse</h3>
+                    <button onclick="closeAttendanceExcuseModal()" class="modal-close">&times;</button>
+                </div>
+
+                <div id="attendanceExcuseBody">
+                    
+                </div>
+            </div>
+
             <!-- view Evaluation breakdown -->
             <div class="student-breakdown-container" id="student-breakdown-container">
                 <div class="modal-header">
@@ -512,7 +525,7 @@ foreach ($nameParts as $part) {
                     <span id="modalTaskStatusStrip" class="status-badge"></span>
                 </div>
 
-                <div class="supervisor-tabs">
+                <div class="table-switcher">
                     <button type="button" class="tab-btn active" data-tab="description">
                         <i class='bx bx-align-left'></i> Description
                     </button>
@@ -1842,11 +1855,13 @@ foreach ($nameParts as $part) {
     let inactivityTimer;
     let countdownTimer;
     let countdownValue = 60;
+    let warningActive = false;
 
     const modal = document.getElementById("inactivityModal");
     const countdownEl = document.getElementById("countdown");
 
     function startCountdown() {
+         warningActive = true;
 
         countdownValue = 60;
         countdownEl.innerText = countdownValue;
@@ -1873,6 +1888,7 @@ foreach ($nameParts as $part) {
     }
 
     function resetTimer() {
+         if (warningActive) return;
 
         clearTimeout(inactivityTimer);
         clearInterval(countdownTimer);
@@ -1885,6 +1901,7 @@ foreach ($nameParts as $part) {
     }
 
     function stayLoggedIn() {
+        warningActive = false;
 
         clearTimeout(inactivityTimer);
         clearInterval(countdownTimer);

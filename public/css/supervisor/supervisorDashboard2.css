@@ -2081,6 +2081,7 @@ body.dark-mode .delete-btn {
 .create-task-container,
 .student-progress-container,
 .student-breakdown-container,
+.attendance-excuse-container,
 .task-edit-container,
 .student-application-approve,
 .student-final-evaluation,
@@ -2108,6 +2109,7 @@ body.dark-mode .delete-btn {
 .create-task-container.show,
 .student-progress-container.show,
 .student-breakdown-container.show,
+.attendance-excuse-container.show,
 .task-edit-container.show,
 .student-application-approve.show,
 .student-final-evaluation.show,
@@ -2241,6 +2243,135 @@ body.dark-mode .modal-close {
 body.dark-mode .modal-overlay {
   background: var(--surface-subtle);
   color: var(--gray-400);
+}
+
+/* excuse view */
+.excuse-profile-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--r-lg);
+}
+
+.excuse-strip-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: var(--danger-dim);
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.excuse-strip-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.excuse-strip-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--navy-900);
+}
+
+.excuse-strip-meta {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-top: 2px;
+}
+
+.status-badge.emergency {
+  background: var(--danger-dim);
+  color: var(--danger);
+  flex-shrink: 0;
+  font-size: 10px;
+}
+
+.excuse-time-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.excuse-time-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--r-lg);
+}
+
+.excuse-time-card-out {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: var(--danger-dim);
+}
+
+.excuse-time-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.excuse-time-value {
+  font-family: "Syne", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--navy-900);
+}
+
+.excuse-reason-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.excuse-reason-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.excuse-reason-text {
+  font-size: 13.5px;
+  color: var(--gray-800);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+body.dark-mode .excuse-profile-strip {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+body.dark-mode .excuse-strip-name {
+  color: var(--navy-100);
+}
+body.dark-mode .excuse-time-card {
+  background: var(--surface-subtle);
+  border-color: var(--surface-border);
+}
+body.dark-mode .excuse-time-value {
+  color: var(--navy-100);
+}
+body.dark-mode .excuse-reason-text {
+  color: var(--gray-300);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2648,6 +2779,12 @@ body.dark-mode .student-name {
 /* ══════════════════════════════════════════════════════════════
    TASK VIEW MODAL
 ══════════════════════════════════════════════════════════════ */
+
+.attendance-excuse-container .info-card .card-body {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
 .info-card {
   background: var(--surface-card);
   border: 1px solid var(--surface-border);
@@ -2721,7 +2858,7 @@ body.dark-mode .student-name {
   color: var(--gray-800);
 }
 body.dark-mode .info-item p {
-  color: var(--navy-100);
+  color: white;
 }
 
 .info-row {

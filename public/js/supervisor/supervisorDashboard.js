@@ -51,6 +51,9 @@ const views = {
 const descField = document.getElementById('editDescription');
 const charCounter = document.getElementById('descCharCounter');
 
+// excuse view
+const attendanceExcuse = document.getElementById("attendance-excuse-container");
+
 
 // layouts
 const superDashboardBtn = document.getElementById("supervisor-dashboard-btn");
@@ -345,6 +348,26 @@ document.querySelectorAll('.ct-step').forEach(s => {
 
 });
 
+// excuse view
+function viewAttendanceExcuse(attendanceID) {
+    overlay.classList.add('show');
+    attendanceExcuse.classList.add('show');
+
+    fetch('functions/getAttendanceExcuse.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'attendanceID=' + encodeURIComponent(attendanceID)
+    })
+    .then(res => res.text())
+    .then(html => {
+        document.getElementById('attendanceExcuseBody').innerHTML = html;
+    });
+}
+
+function closeAttendanceExcuseModal() {
+    overlay.classList.remove('show');
+    attendanceExcuse.classList.remove('show');
+}
 
 
 
@@ -1881,6 +1904,7 @@ function previewTask(taskID) {
     .then(res => res.text())
     .then(data => {
         studentApplicationApprove.innerHTML = data;
+        reloadApprovalReportTable();
     });
 }
 
@@ -1907,9 +1931,6 @@ function updateTaskStatus(taskID, status) {
 
     const text = await res.text();
 
-    console.log("RAW RESPONSE:");
-    console.log(text);
-
     return JSON.parse(text);
 })
     .then(data => {
@@ -1919,7 +1940,8 @@ function updateTaskStatus(taskID, status) {
         if (data.status === "success") {
             overlay.classList.remove("show");
             studentApplicationApprove.classList.remove("show");
-            location.reload();
+            reloadAllCharts();
+            showToast("Task approved successfully.", "success");
         }
     }).catch(err => {
         console.error(err);
@@ -2230,6 +2252,7 @@ document.getElementById("confirmDeleteBtn").onclick = () => {
     // });
 }
 
+// task table reload
 function reloadTaskTable() {
 
     const formData = new FormData();
@@ -2262,6 +2285,33 @@ function reloadTaskTable() {
     .then(res => res.text())
     .then(html => {
         document.getElementById("assignedTaskBody").innerHTML = html;
+    });
+}
+
+// approval table task reload
+
+function reloadApprovalReportTable() {
+
+    // const search = document.getElementById("reportApprovalSearch")?.value || "";
+
+     const formData = new FormData();
+
+     formData.append(
+        "search",
+        document.getElementById("reportApprovalSearch").value
+    );
+
+    fetch("functions/searchApprovalReport.php", {
+        method: "POST",
+        headers: {
+            "Content-Type":
+                "application/x-www-form-urlencoded"
+        },
+        body: formData
+    })
+    .then(res => res.text())
+    .then(html => {
+        document.getElementById("approvalReportBody").innerHTML = html;
     });
 }
 
@@ -2542,9 +2592,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener('click', function (e) {
   const btn = e.target.closest('.tab-btn');
-  if (!btn) return;
+    if (!btn) return;
 
-  const tabsBar = btn.closest('.supervisor-tabs');
+    const taskView = btn.closest('.task-view');
+    if (!taskView) return;
+
+  const tabsBar = btn.closest('.table-switcher');
   const content = tabsBar.nextElementSibling;
 
   tabsBar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -2568,6 +2621,7 @@ overlay.addEventListener("click", () => {
       changePasswordModal.classList.remove('show');
       studentFinalEvaluation.classList.remove("show");
       studentFinalEvaluationView.classList.remove("show");
+      attendanceExcuse.classList.remove("show");
 });
 
 
@@ -2696,8 +2750,6 @@ document.getElementById("createTaskForm").addEventListener("submit", function (e
         formData.append("studentIDs[]", id);
     });
 
-    console.log(selectedTaskStudentIDs, selectedSupervisorID);
-
     fetch("functions/createAndAssignTask.php", {
     method: "POST",
     body: formData
@@ -2727,23 +2779,6 @@ document.getElementById("createTaskForm").addEventListener("submit", function (e
     
 });
 
-function reloadApprovalReportTable() {
-
-    const search = document.getElementById("reportApprovalSearch")?.value || "";
-
-    fetch("functions/searchApprovalReport.php", {
-        method: "POST",
-        headers: {
-            "Content-Type":
-                "application/x-www-form-urlencoded"
-        },
-        body: "search=" + encodeURIComponent(search)
-    })
-    .then(res => res.text())
-    .then(html => {
-        document.getElementById("approvalReportBody").innerHTML = html;
-    });
-}
 
 // edit tasks
 
@@ -2773,7 +2808,11 @@ document.getElementById("editTaskForm").addEventListener("submit", function (e) 
         showToast(data.message,"success");
 
         if (data.status === "success") {
-            location.reload();
+            // location.reload();
+            showToast("Task updated successfully.", "success");
+            reloadTaskTable();
+            editTaskContainer.classList.remove("show");
+            overlay.classList.remove("show");
         }
     });
 });
@@ -2824,6 +2863,7 @@ closeEditTask.addEventListener("click", () => {
 
 //     }, 300);
 // });
+
 
 // buttons student dashboard view
 buttons.forEach(btn => {
