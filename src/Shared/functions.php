@@ -3621,3 +3621,12 @@ function getSupervisorOptions($conn)
 
     return $html;
 }
+
+// academic year options
+function academicYearOptions($conn)
+{
+     $sql = "SELECT academic_year FROM ojt_settings WHERE status = 'ACTIVE' LIMIT 1";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+    return $row ? htmlspecialchars($row['academic_year']) : '';
+}

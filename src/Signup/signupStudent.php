@@ -1,6 +1,9 @@
 <?php
-
+require_once("../Shared/kapstongConnection.php");
 require_once("../Shared/functions.php");
+
+
+$currentAcademicYear = academicYearOptions($conn);
 
 ?>
 
@@ -49,7 +52,7 @@ require_once("../Shared/functions.php");
                 <div class="left-hero">
                     <div class="left-tag">
                         <div class="left-tag-dot"></div>
-                        Academic Year 2025–2026
+                        Academic Year <?php echo $currentAcademicYear; ?>
                     </div>
                     <h1 class="left-heading">
                         Begin your<br>
@@ -186,7 +189,7 @@ require_once("../Shared/functions.php");
                     <div class="form-step" id="step2">
                         <div class="glass-card">
                             <h3 class="step-heading">Academic Information</h3>
-                            <p class="step-subheading">Your enrollment details for Academic Year 2025–2026</p>
+                            <p class="step-subheading">Your enrollment details for Academic Year <?php echo $currentAcademicYear; ?></p>
                             <div class="divider"></div>
 
                             <div class="field-grid col-2" style="margin-bottom:14px;">

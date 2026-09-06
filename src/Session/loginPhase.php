@@ -87,7 +87,7 @@ include("../Shared/kapstongConnection.php");
 
         <div class="hero-buttons">
 
-          <button class="primary-btn">
+          <button class="primary-btn" onclick="window.location.href='loginPage.php'">
             Get Started
           </button>
 
