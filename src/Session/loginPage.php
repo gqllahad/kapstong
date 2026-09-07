@@ -1,10 +1,14 @@
 <?php
 include("../Shared/kapstongConnection.php");
+include("../Shared/functions.php");
 
 $invaderLogin = false;
 $wrongPassword = false;
 $successSignUp = false;
 $successForget = false;
+
+$isLocked = false;
+$remainingSeconds = 0;
 
 if (isset($_GET['error'])) {
   $invaderLogin = true;
@@ -20,6 +24,30 @@ if (isset($_GET['success'])) {
 
 if (isset($_GET['success_forget'])) {
   $successForget = true;
+}
+
+if (isset($_GET['locked']) && isset($_GET['email'])) {
+    $checkEmail = $_GET['email'];
+
+    $stmt = $conn->prepare("
+        SELECT attempts, 
+               TIMESTAMPDIFF(SECOND, last_attempt, NOW()) AS elapsed_seconds
+        FROM login_attempts 
+        WHERE email = ?
+    ");
+    $stmt->bind_param("s", $checkEmail);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+
+    if ($row && $row['attempts'] >= 5) {
+        $lockTime = 10 * 60;
+        $elapsed = max(0, (int) $row['elapsed_seconds']);
+
+        if ($elapsed < $lockTime) {
+            $isLocked = true;
+            $remainingSeconds = $lockTime - $elapsed;
+        }
+    }
 }
 
 ?>
@@ -83,6 +111,12 @@ if (isset($_GET['success_forget'])) {
       </div>
 
     <?php endif; ?>
+
+    <?php if ($isLocked): ?>
+    <div class="incorrectLogin-box" id="lockoutBox" data-remaining="<?= $remainingSeconds ?>">
+        <p>⚠ Too many failed attempts. Try again in <span id="lockoutCountdown"><?= ceil($remainingSeconds / 60) ?> min<?= ceil($remainingSeconds / 60) != 1 ? 's' : '' ?></span>.</p>
+    </div>
+<?php endif; ?>
 
 
     <section class="log-container" id="log-container">

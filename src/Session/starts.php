@@ -11,8 +11,8 @@ require_once("../Shared/kapstongConnection.php");
 require_once("../Shared/functions.php");
 require_once("../Shared/config.php");
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 
 
 if (isset($_POST['login-submit'])) {
@@ -48,6 +48,37 @@ if (isset($_POST['login-submit'])) {
     //         }
     //     }
 
+    $stmt_brute = $conn->prepare("
+        SELECT id, attempts, last_attempt 
+        FROM login_attempts 
+        WHERE email = ?
+    ");
+    $stmt_brute->bind_param("s", $userEmail);
+    $stmt_brute->execute();
+    $attemptData = $stmt_brute->get_result()->fetch_assoc();
+
+    $lockTime = 10 * 60; 
+    $maxAttempts = 5;
+
+    if ($attemptData && $attemptData['attempts'] >= $maxAttempts) {
+
+    $elapsed = max(0, (int) $attemptData['elapsed_seconds']);
+//         $lastAttempt = strtotime($attemptData['last_attempt']);
+// $elapsed = time() - $lastAttempt;
+
+    if ($elapsed < $lockTime) {
+    header("Location: loginPage.php?locked=1&email=" . urlencode($userEmail));
+    exit();
+}
+    
+    //  $reset = $conn->prepare("UPDATE login_attempts SET attempts = 0 WHERE id = ?");
+    //     $reset->bind_param("i", $attemptData['id']);
+    //     $reset->execute();
+    $reset = $conn->prepare("DELETE FROM login_attempts WHERE id = ?");
+$reset->bind_param("i", $attemptData['id']);
+$reset->execute();
+    }
+
     $userPassword = $_POST["loginPassword"];
 
     $sql_prep = $conn->prepare("SELECT * FROM users WHERE email = ?");
@@ -64,7 +95,7 @@ if (isset($_POST['login-submit'])) {
 
             ini_set('session.cookie_httponly', 1);
             ini_set('session.use_strict_mode', 1);
-            ini_set('session.cookie_secure', 0);
+            ini_set('session.cookie_secure', 0); // zero to 1 pag prodcution na 
 
             session_start();
             session_regenerate_id(true);
@@ -120,6 +151,10 @@ if (isset($_POST['login-submit'])) {
             // $delete->bind_param("ss", $email, $ip);
             // $delete->execute();
 
+            $delete = $conn->prepare("DELETE FROM login_attempts WHERE email = ?");
+            $delete->bind_param("s", $userEmail);
+            $delete->execute();
+
             header("Location: trackerMain.php?login=Logging In..");
             exit();
         } else {
@@ -154,6 +189,33 @@ if (isset($_POST['login-submit'])) {
             //     $insert->execute();
             // }
 
+            $check = $conn->prepare("SELECT id FROM login_attempts WHERE email = ?");
+            $check->bind_param("s", $userEmail);
+            $check->execute();
+            $res = $check->get_result();
+
+            if ($existingRow = $res->fetch_assoc()) {
+
+                $update = $conn->prepare("
+                    UPDATE login_attempts 
+                    SET attempts = attempts + 1,
+                        ip_address = ?,
+                        last_attempt = NOW()
+                    WHERE id = ?
+                ");
+                $update->bind_param("si", $ip, $existingRow['id']);
+                $update->execute();
+
+                } else {
+
+                $insert = $conn->prepare("
+                    INSERT INTO login_attempts (email, ip_address, attempts, last_attempt)
+                    VALUES (?, ?, 1, NOW())
+                ");
+                $insert->bind_param("ss", $userEmail, $ip);
+                $insert->execute();
+            }
+
             header("Location: loginPage.php?warning=Incorrect+Password");
             exit();
         }
@@ -170,7 +232,7 @@ if (isset($_POST['signupForm'])) {
     //Student Information 
     $fName = $_POST['firstName'];
     $lName = $_POST['lastName'];
-    $mName = $_POST['middleName'] ?? 'N\A';
+    $mName = $_POST['middleName'] ?? 'N/A';
     $fullName = $lName . " " .  $fName . " " . $mName;
 
     $email = filter_var($_POST['signEmail'], FILTER_VALIDATE_EMAIL);

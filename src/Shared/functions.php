@@ -28,6 +28,59 @@ function logout()
     exit;
 }
 
+// rate limiting
+function isRateLimited($conn, $email, $ipAddress, $maxAttempts = 5, $windowMinutes = 15) {
+    $sql = "SELECT attempts, last_attempt 
+            FROM login_attempts 
+            WHERE (email = ? OR ip_address = ?)
+            AND last_attempt > (NOW() - INTERVAL ? MINUTE)
+            ORDER BY attempts DESC
+            LIMIT 1";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssi", $email, $ipAddress, $windowMinutes);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    
+    return $result && $result['attempts'] >= $maxAttempts;
+}
+
+function recordFailedAttempt($conn, $email, $ipAddress) {
+    // Try to find an existing recent row for this email
+    $sql = "SELECT id, attempts, last_attempt FROM login_attempts WHERE email = ? LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+
+    if ($row) {
+        // Row exists — increment or reset depending on whether the window has expired
+        $sql = "UPDATE login_attempts 
+                SET attempts = IF(last_attempt < (NOW() - INTERVAL 15 MINUTE), 1, attempts + 1),
+                    ip_address = ?,
+                    last_attempt = NOW()
+                WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("si", $ipAddress, $row['id']);
+        $stmt->execute();
+    } else {
+        // First failed attempt for this email
+        $sql = "INSERT INTO login_attempts (email, ip_address, attempts, last_attempt) 
+                VALUES (?, ?, 1, NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $email, $ipAddress);
+        $stmt->execute();
+    }
+}
+
+function clearAttempts($conn, $email) {
+    $sql = "DELETE FROM login_attempts WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+}
+
+
 // time out session serverside (admin/supervisor)
 function enforceSessionTimeout($requiredRole, $timeoutSeconds = 600) {
     if (session_status() === PHP_SESSION_NONE) {
