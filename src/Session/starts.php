@@ -48,8 +48,21 @@ if (isset($_POST['login-submit'])) {
     //         }
     //     }
 
+    // $stmt_brute = $conn->prepare("
+    //     SELECT id, attempts, last_attempt 
+    //     FROM login_attempts 
+    //     WHERE email = ?
+    // ");
+    // $stmt_brute->bind_param("s", $userEmail);
+    // $stmt_brute->execute();
+    // $attemptData = $stmt_brute->get_result()->fetch_assoc();
+
+    // $lockTime = 10 * 60; 
+    // $maxAttempts = 5;
+
     $stmt_brute = $conn->prepare("
-        SELECT id, attempts, last_attempt 
+        SELECT id, attempts, 
+            TIMESTAMPDIFF(SECOND, last_attempt, NOW()) AS elapsed_seconds
         FROM login_attempts 
         WHERE email = ?
     ");
@@ -57,26 +70,42 @@ if (isset($_POST['login-submit'])) {
     $stmt_brute->execute();
     $attemptData = $stmt_brute->get_result()->fetch_assoc();
 
-    $lockTime = 10 * 60; 
+    $lockTime = 10 * 60;
     $maxAttempts = 5;
 
-    if ($attemptData && $attemptData['attempts'] >= $maxAttempts) {
+    // if ($attemptData && $attemptData['attempts'] >= $maxAttempts) {
 
-    $elapsed = max(0, (int) $attemptData['elapsed_seconds']);
+    // $elapsed = max(0, (int) $attemptData['elapsed_seconds']);
 //         $lastAttempt = strtotime($attemptData['last_attempt']);
 // $elapsed = time() - $lastAttempt;
 
-    if ($elapsed < $lockTime) {
-    header("Location: loginPage.php?locked=1&email=" . urlencode($userEmail));
-    exit();
-}
+//     if ($elapsed < $lockTime) {
+//     header("Location: loginPage.php?locked=1&email=" . urlencode($userEmail));
+//     exit();
+// }
     
     //  $reset = $conn->prepare("UPDATE login_attempts SET attempts = 0 WHERE id = ?");
     //     $reset->bind_param("i", $attemptData['id']);
     //     $reset->execute();
-    $reset = $conn->prepare("DELETE FROM login_attempts WHERE id = ?");
-$reset->bind_param("i", $attemptData['id']);
-$reset->execute();
+
+
+//     $reset = $conn->prepare("DELETE FROM login_attempts WHERE id = ?");
+// $reset->bind_param("i", $attemptData['id']);
+// $reset->execute();
+    // }
+
+    // new updated
+    if ($attemptData && $attemptData['attempts'] >= $maxAttempts) {
+        $elapsed = max(0, (int) $attemptData['elapsed_seconds']);
+
+        if ($elapsed < $lockTime) {
+            header("Location: loginPage.php?locked=1&email=" . urlencode($userEmail));
+            exit();
+        }
+
+        $reset = $conn->prepare("UPDATE login_attempts SET attempts = 0 WHERE id = ?");
+        $reset->bind_param("i", $attemptData['id']);
+        $reset->execute();
     }
 
     $userPassword = $_POST["loginPassword"];
