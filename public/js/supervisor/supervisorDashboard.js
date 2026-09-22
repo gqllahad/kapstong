@@ -111,6 +111,10 @@ const taskSubmit = document.getElementById("task-submit-table");
 //attendance switch
 const attendanceTable = document.getElementById("attendance-table");
 const attendanceCalendar = document.getElementById("attendance-calendar");
+const attendanceCalendarModal = document.getElementById('day-edit-container');
+
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth() + 1;
 
 // functions
 
@@ -2376,10 +2380,122 @@ function showAttendanceCalendar() {
     attendanceTable.classList.remove("show");
     attendanceCalendar.classList.add("show");
 
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="calendar"]').classList.add('active');
+    loadCalendar();
+
     setActiveTab("calendar");
 }
 
 
+// calendar
+
+function loadCalendar() {
+    document.getElementById('calMonthLabel').textContent =
+        new Date(calYear, calMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    fetch('functions/getCalendarMonth.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `year=${calYear}&month=${calMonth}`
+    })
+    .then(res => res.text())
+    .then(html => {
+        document.getElementById('calendarBody').innerHTML = html;
+    });
+}
+
+function openDayModal(dateStr) {
+
+    const today = new Date().toISOString().split('T')[0]; 
+    if (dateStr < today) {
+        return; 
+    }
+
+    document.getElementById('dayEditDate').value = dateStr;
+    document.getElementById('dayEditDateLabel').textContent =
+        new Date(dateStr).toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+    fetch('functions/getDayEvent.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'date=' + encodeURIComponent(dateStr)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('dayEditLabel').value = data.label || '';
+        document.getElementById('dayEditMultiplier').value = data.hour_multiplier || '1.0';
+
+        const type = data.type || 'WORKDAY';
+        document.getElementById('type' + type.charAt(0) + type.slice(1).toLowerCase().replace('_w', 'W')).checked = true;
+
+        toggleMultiplierField(type);
+
+        overlay.classList.add('show');
+        attendanceCalendarModal.classList.add('show');
+    });
+}
+
+function closeDayModal() {
+    overlay.classList.remove('show');
+    attendanceCalendarModal.classList.remove('show');
+}
+
+function toggleMultiplierField(type) {
+    document.getElementById('multiplierGroup').style.display = type === 'HOLIDAY' ? 'block' : 'none';
+}
+
+document.getElementById('dayEditForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const date = document.getElementById('dayEditDate').value;
+    const type = document.querySelector('input[name="dayType"]:checked').value;
+    const label = document.getElementById('dayEditLabel').value;
+    const multiplier = document.getElementById('dayEditMultiplier').value;
+
+    fetch('functions/saveDayEvent.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `date=${encodeURIComponent(date)}&type=${type}&label=${encodeURIComponent(label)}&multiplier=${multiplier}`
+    })
+    .then(res => res.json())
+    .then(data => {
+        closeDayModal();
+        loadCalendar();
+    });
+});
+
+document.getElementById('clearDayBtn').addEventListener('click', () => {
+    const date = document.getElementById('dayEditDate').value;
+
+    fetch('functions/deleteDayEvent.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'date=' + encodeURIComponent(date)
+    })
+    .then(() => {
+        closeDayModal();
+        loadCalendar();
+    });
+});
+
+
+document.querySelectorAll('input[name="dayType"]').forEach(radio => {
+    radio.addEventListener('change', (e) => toggleMultiplierField(e.target.value));
+});
+
+document.getElementById('calPrevBtn').addEventListener('click', () => {
+    calMonth--;
+    if (calMonth < 1) { calMonth = 12; calYear--; }
+    loadCalendar();
+});
+
+
+document.getElementById('calNextBtn').addEventListener('click', () => {
+    calMonth++;
+    if (calMonth > 12) { calMonth = 1; calYear++; }
+    loadCalendar();
+});
 
 
 
@@ -2622,6 +2738,7 @@ overlay.addEventListener("click", () => {
       studentFinalEvaluation.classList.remove("show");
       studentFinalEvaluationView.classList.remove("show");
       attendanceExcuse.classList.remove("show");
+      attendanceCalendarModal.classList.remove("show");
 });
 
 

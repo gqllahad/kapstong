@@ -695,6 +695,57 @@ foreach ($nameParts as $part) {
 
             </div>
 
+            <!-- calendar modal -->
+             <div class="day-edit-container" id="day-edit-container">
+                <div class="modal-header">
+                    <h3 id="dayEditDateLabel">Edit Day</h3>
+                    <button onclick="closeDayModal()" class="modal-close">&times;</button>
+                </div>
+
+                <form id="dayEditForm">
+                    <input type="hidden" id="dayEditDate">
+
+                    <div class="form-group">
+                        <label>Day Type</label>
+                        <div class="day-type-selector">
+                            <input type="radio" name="dayType" id="typeWorkday" value="WORKDAY" hidden checked>
+                            <label for="typeWorkday" class="day-type-pill type-workday">
+                                <i class='bx bx-briefcase'></i> Regular Workday
+                            </label>
+
+                            <input type="radio" name="dayType" id="typeNoWork" value="NO_WORK" hidden>
+                            <label for="typeNoWork" class="day-type-pill type-nowork">
+                                <i class='bx bx-moon'></i> No Work
+                            </label>
+
+                            <input type="radio" name="dayType" id="typeHoliday" value="HOLIDAY" hidden>
+                            <label for="typeHoliday" class="day-type-pill type-holiday">
+                                <i class='bx bx-star'></i> Holiday
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Label</label>
+                        <input type="text" id="dayEditLabel" placeholder="e.g. Independence Day, Team Bonding">
+                    </div>
+
+                    <div class="form-group" id="multiplierGroup" style="display:none;">
+                        <label>Hour Multiplier</label>
+                        <select id="dayEditMultiplier">
+                            <option value="1.0">1x (Normal)</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2.0">2x (Double)</option>
+                        </select>
+                    </div>
+
+                    <div class="edit-task-actions">
+                        <button type="button" class="cancel-btn" id="clearDayBtn">Clear / Reset</button>
+                        <button type="submit" class="submit-btn">Save</button>
+                    </div>
+                </form>
+                    </div>
+
             <!-- create task -->
             <div class="create-task-container" id="create-task-container">
                 <div class="modal-header">
@@ -1557,7 +1608,6 @@ foreach ($nameParts as $part) {
                     <p>Monitor student attendance records and time logs.</p>
                 </div>
 
-                <!-- inigo -->
                 <div class="table-view show" id="attendance-table">
                     <div class="table-switcher">
                         <button class="tab-btn active" data-tab="attendance" onclick="showAttendanceTable()">
@@ -1633,7 +1683,7 @@ foreach ($nameParts as $part) {
                     </div>
                 </div>
 
-
+                <!-- calendar table -->
                 <div class="table-view" id="attendance-calendar">
                     <div class="table-switcher">
                         <button class="tab-btn" data-tab="attendance" onclick="showAttendanceTable()">
@@ -1647,12 +1697,35 @@ foreach ($nameParts as $part) {
                         <div class="top-bar">
                                 <div class="top-header">
                                     <h3 class="table-title">Calendar</h3>
-                                    <p>Search and review student attendance records.</p>
+                                    <p>View calendar and set events.</p>
                                 </div>
                                 
                         </div>
-                </div>
 
+
+                         <div class="calendar-container">
+                            <div class="calendar-nav">
+                                <button class="calendar-nav-btn" id="calPrevBtn">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                                <h2 class="calendar-month-label" id="calMonthLabel"></h2>
+                                <button class="calendar-nav-btn" id="calNextBtn">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                            </div>
+
+                            <div class="calendar-legend">
+                                <span class="legend-chip today-chip"><i class='bx bxs-circle'></i> Today</span>
+                                <span class="legend-chip past-chip"><i class='bx bxs-circle'></i> Past</span>
+                                <span class="legend-chip holiday-chip"><i class='bx bxs-circle'></i> Holiday</span>
+                                <span class="legend-chip nowork-chip"><i class='bx bxs-circle'></i> No Work</span>
+                            </div>
+
+                            <div id="calendarBody">
+                            </div>
+                        </div>
+                    </div>
+                </div>                      
             </section>
 
             <!-- reports evaluation -->

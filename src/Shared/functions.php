@@ -3683,3 +3683,166 @@ function academicYearOptions($conn)
     $row = $result->fetch_assoc();
     return $row ? htmlspecialchars($row['academic_year']) : '';
 }
+
+
+// calendar (supervisor)
+function renderAttendanceCalendar($conn, $year, $month) {
+    function e($val) {
+        return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
+    }
+
+    $month = (int)$month; 
+    $firstDay = sprintf("%04d-%02d-01", $year, $month);
+    $daysInMonth = date('t', strtotime($firstDay));
+    $startWeekday = date('w', strtotime($firstDay));
+
+    $stmt = $conn->prepare("
+        SELECT event_date, type, label, hour_multiplier 
+        FROM calendar_events 
+        WHERE event_date BETWEEN ? AND ?
+    ");
+    $lastDay = date('Y-m-t', strtotime($firstDay));
+    $stmt->bind_param("ss", $firstDay, $lastDay);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $events = [];
+    while ($row = $result->fetch_assoc()) {
+        $events[$row['event_date']] = $row;
+    }
+
+    $today = date('Y-m-d');
+    $output = '<div class="calendar-grid">';
+
+    $weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    foreach ($weekdays as $wd) {
+        $output .= "<div class='calendar-weekday'>" . e($wd) . "</div>";
+    }
+
+    for ($i = 0; $i < $startWeekday; $i++) {
+        $output .= "<div class='calendar-day empty'></div>";
+    }
+
+    for ($d = 1; $d <= $daysInMonth; $d++) {
+        $dateStr = sprintf("%04d-%02d-%02d", $year, $month, $d); 
+
+        $event = $events[$dateStr] ?? null;
+
+        $classes = ['calendar-day'];
+        $badge = '';
+
+        if ($dateStr < $today) {
+            $classes[] = 'past';
+        } elseif ($dateStr === $today) {
+            $classes[] = 'today';
+        } else {
+            $classes[] = 'future';
+        }
+
+        $isWeekend = in_array(date('w', strtotime($dateStr)), [0, 6]);
+        if ($isWeekend) $classes[] = 'weekend';
+
+        if ($event) {
+            $classes[] = 'has-event';
+            $classes[] = 'event-' . strtolower($event['type']);
+
+            $icon = $event['type'] === 'HOLIDAY' ? 'bx-star' : 'bx-moon';
+            $multiplierText = ($event['type'] === 'HOLIDAY' && $event['hour_multiplier'] > 1)
+                ? '<span class="calendar-multiplier">' . e($event['hour_multiplier']) . 'x</span>'
+                : '';
+
+            $badge = "<div class='calendar-event-badge'><i class='bx {$icon}'></i>" . e($event['label']) . "{$multiplierText}</div>";
+        }
+
+        $classAttr = implode(' ', $classes);
+        $jsDate = json_encode($dateStr);
+
+        $output .= "
+            <div class='{$classAttr}' onclick='openDayModal({$jsDate})'>
+                <span class='calendar-date-number'>{$d}</span>
+                {$badge}
+            </div>";
+    }
+
+    $output .= '</div>';
+    return $output;
+}
+// function renderAttendanceCalendar($conn, $year, $month) {
+//     function e($val) {
+//         return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
+//     }
+
+//     $firstDay = "$year-$month-01";
+//     $daysInMonth = date('t', strtotime($firstDay));
+//     $startWeekday = date('w', strtotime($firstDay));
+
+//     $stmt = $conn->prepare("
+//         SELECT event_date, type, label, hour_multiplier 
+//         FROM calendar_events 
+//         WHERE event_date BETWEEN ? AND ?
+//     ");
+//     $lastDay = date('Y-m-t', strtotime($firstDay));
+//     $stmt->bind_param("ss", $firstDay, $lastDay);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+
+//     $events = [];
+//     while ($row = $result->fetch_assoc()) {
+//         $events[$row['event_date']] = $row;
+//     }
+
+//     $today = date('Y-m-d');
+//     $output = '<div class="calendar-grid">';
+
+//     $weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+//     foreach ($weekdays as $wd) {
+//         $output .= "<div class='calendar-weekday'>" . e($wd) . "</div>";
+//     }
+
+//     for ($i = 0; $i < $startWeekday; $i++) {
+//         $output .= "<div class='calendar-day empty'></div>";
+//     }
+
+//     for ($d = 1; $d <= $daysInMonth; $d++) {
+//         $dateStr = sprintf("%s-%s-%02d", $year, $month, $d);
+//         $event = $events[$dateStr] ?? null;
+
+//         $classes = ['calendar-day'];
+//         $badge = '';
+
+//         if ($dateStr < $today) {
+//             $classes[] = 'past';
+//         } elseif ($dateStr === $today) {
+//             $classes[] = 'today';
+//         } else {
+//             $classes[] = 'future';
+//         }
+
+//         $isWeekend = in_array(date('w', strtotime($dateStr)), [0, 6]);
+//         if ($isWeekend) $classes[] = 'weekend';
+
+//         if ($event) {
+//             $classes[] = 'has-event';
+//             $classes[] = 'event-' . strtolower($event['type']);
+
+//             $icon = $event['type'] === 'HOLIDAY' ? 'bx-star' : 'bx-moon';
+//             $multiplierText = ($event['type'] === 'HOLIDAY' && $event['hour_multiplier'] > 1)
+//                 ? '<span class="calendar-multiplier">' . e($event['hour_multiplier']) . 'x</span>'
+//                 : '';
+
+//             $badge = "<div class='calendar-event-badge'><i class='bx {$icon}'></i>" . e($event['label']) . "{$multiplierText}</div>";
+//         }
+
+//         $classAttr = implode(' ', $classes);
+//         $jsDate = json_encode($dateStr);
+
+//         $output .= "
+//             <div class='{$classAttr}' onclick='openDayModal({$jsDate})'>
+//                 <span class='calendar-date-number'>{$d}</span>
+//                 {$badge}
+//             </div>";
+//     }
+
+//     $output .= '</div>';
+//     return $output;
+// }

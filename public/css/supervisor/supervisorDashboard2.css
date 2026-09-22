@@ -2087,7 +2087,8 @@ body.dark-mode .delete-btn {
 .student-final-evaluation,
 .task-view,
 .account-settings-modal,
-.final-evaluation-view {
+.final-evaluation-view,
+.day-edit-container {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -2115,7 +2116,8 @@ body.dark-mode .delete-btn {
 .student-final-evaluation.show,
 .task-view.show,
 .account-settings-modal.show,
-.final-evaluation-view.show {
+.final-evaluation-view.show,
+.day-edit-container.show {
   opacity: 1;
   visibility: visible;
   transform: translate(-50%, -50%) scale(1);
@@ -3783,6 +3785,7 @@ body.dark-mode .tab-btn.active {
   border-left: 4px solid var(--accent);
 }
 
+
 /* ══════════════════════════════════════════════════════════════
    IMAGE PREVIEW
 ══════════════════════════════════════════════════════════════ */
@@ -3985,6 +3988,306 @@ body.dark-mode .tab-btn.active {
   background: var(--danger-bg);
   color: var(--danger);
 }
+/* ══════════════════════════════════════════════════════════════
+   Attendance Calendar
+══════════════════════════════════════════════════════════════ */
+
+.calendar-container {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--r-xl);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.calendar-nav-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-subtle);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  color: var(--navy-700);
+  font-size: 18px;
+  transition: background 0.15s, transform 0.15s;
+}
+.calendar-nav-btn:hover {
+  background: var(--navy-100);
+  transform: scale(1.05);
+}
+
+.calendar-month-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy-900);
+}
+
+.calendar-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.legend-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-600);
+}
+.legend-chip i {
+  font-size: 8px;
+}
+.today-chip i { color: var(--success); }
+.past-chip i { color: var(--gray-300); }
+.holiday-chip i { color: #f59e0b; }
+.nowork-chip i { color: #64748b; }
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-bottom: 8px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--surface-border);
+  background: var(--surface-card);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-day:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--accent);
+}
+
+.calendar-day.empty {
+  border: none;
+  cursor: default;
+  background: transparent;
+}
+.calendar-day.empty:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.calendar-date-number {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.calendar-day.past {
+  background: var(--surface-subtle);
+  opacity: 0.55;
+}
+.calendar-day.past .calendar-date-number {
+  color: var(--gray-400);
+}
+
+.calendar-day.today {
+  background: var(--success-dim);
+  border-color: var(--success);
+  border-width: 2px;
+}
+.calendar-day.today .calendar-date-number {
+  color: var(--success);
+  font-weight: 800;
+}
+
+.calendar-day.future .calendar-date-number {
+  color: var(--navy-800);
+}
+
+.calendar-day.weekend:not(.event-holiday):not(.event-no_work) {
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.calendar-day.event-holiday {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.calendar-day.event-no_work {
+  background: rgba(100, 116, 139, 0.08);
+  border-color: rgba(100, 116, 139, 0.3);
+}
+
+.calendar-event-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--gray-700);
+  text-align: center;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.calendar-event-badge i {
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.calendar-multiplier {
+  background: #f59e0b;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 99px;
+  margin-left: 2px;
+}
+
+.day-type-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.day-type-pill {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 10px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--surface-border);
+  background: var(--surface-card);
+  color: var(--gray-500);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+#typeWorkday:checked + .type-workday {
+  background: var(--success-dim);
+  border-color: var(--success);
+  color: var(--success);
+}
+#typeNoWork:checked + .type-nowork {
+  background: rgba(100, 116, 139, 0.12);
+  border-color: #64748b;
+  color: #64748b;
+}
+#typeHoliday:checked + .type-holiday {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+/* body.dark-mode .calendar-day.past { background: var(--surface-subtle); }
+body.dark-mode .calendar-day.today { background: rgba(16, 185, 129, 0.15); }
+body.dark-mode .calendar-nav-btn { background: var(--surface-subtle); color: var(--navy-200); } */
+body.dark-mode .calendar-container {
+  background: var(--surface-card);
+  border-color: var(--surface-border);
+}
+
+body.dark-mode .calendar-month-label {
+  color: #f1f5f9;
+}
+body.dark-mode .calendar-nav-btn {
+  background: rgba(148, 163, 184, 0.08);
+  color: #e2e8f0;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+body.dark-mode .calendar-nav-btn:hover {
+  background: rgba(148, 163, 184, 0.15);
+}
+
+body.dark-mode .legend-chip {
+  color: #cbd5e1;
+}
+body.dark-mode .today-chip i { color: #34d399; }
+body.dark-mode .past-chip i { color: #64748b; }
+body.dark-mode .holiday-chip i { color: #fbbf24; }
+body.dark-mode .nowork-chip i { color: #94a3b8; }
+
+body.dark-mode .calendar-weekday {
+  color: #94a3b8;
+}
+
+body.dark-mode .calendar-day {
+  background: rgba(148, 163, 184, 0.04);
+  border-color: rgba(148, 163, 184, 0.15);
+}
+body.dark-mode .calendar-day .calendar-date-number {
+  color: #e2e8f0;
+}
+body.dark-mode .calendar-day:hover {
+  border-color: var(--accent);
+}
+
+body.dark-mode .calendar-day.past {
+  background: rgba(148, 163, 184, 0.02);
+  opacity: 0.5;
+}
+body.dark-mode .calendar-day.past .calendar-date-number {
+  color: #64748b;
+}
+
+body.dark-mode .calendar-day.today {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #34d399;
+}
+body.dark-mode .calendar-day.today .calendar-date-number {
+  color: #34d399;
+}
+
+body.dark-mode .calendar-day.weekend:not(.event-holiday):not(.event-no_work) {
+  background: rgba(59, 130, 246, 0.06);
+}
+
+
+body.dark-mode .calendar-day.event-holiday {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+body.dark-mode .calendar-day.event-no_work {
+  background: rgba(100, 116, 139, 0.15);
+  border-color: rgba(148, 163, 184, 0.3);
+}
+body.dark-mode .calendar-event-badge {
+  color: #cbd5e1;
+}
+
 
 /* ══════════════════════════════════════════════════════════════
    INACTIVITY MODAL
@@ -4083,7 +4386,7 @@ body.dark-mode .tab-btn.active {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   INFO CARD (dark glass — eval view)
+   INFO CARD 
 ══════════════════════════════════════════════════════════════ */
 .info-card-view {
   background: rgba(17, 24, 39, 0.85);
