@@ -1867,7 +1867,7 @@ body.dark-mode .ct-cancel-btn, body.dark-mode .ct-back-btn { background:var(--su
 
 .ct-footer .submit-btn { width:auto; padding:11px 22px; display:flex; align-items:center; gap:8px; }
 
-/* Action buttons in table */
+/* Action buttons (table) */
 .view-btn,
 .evaluate-btn,
 .report-btn,

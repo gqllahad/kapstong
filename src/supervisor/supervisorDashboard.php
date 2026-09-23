@@ -740,7 +740,7 @@ foreach ($nameParts as $part) {
                     </div>
 
                     <div class="edit-task-actions">
-                        <button type="button" class="cancel-btn" id="clearDayBtn">Clear / Reset</button>
+                        <button type="button" class="ct-cancel-btn" id="clearDayBtn">Clear / Reset</button>
                         <button type="submit" class="submit-btn">Save</button>
                     </div>
                 </form>
@@ -1725,7 +1725,6 @@ foreach ($nameParts as $part) {
                             </div>
                         </div>
                     </div>
-                </div>                      
             </section>
 
             <!-- reports evaluation -->

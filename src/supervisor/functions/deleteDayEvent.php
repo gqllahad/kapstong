@@ -4,17 +4,16 @@
     require_once("../../Shared/kapstongConnection.php");
 
     $date = $_POST['date'] ?? '';
-    $type = $_POST['type'] ?? 'WORKDAY';
-    $label = $_POST['label'] ?? '';
-    $multiplier = $_POST['multiplier'] ?? '1.0';
+
+    $superID = $_SESSION['user_id'] ?? null;
 
     $stmt = $conn->prepare("
-        INSERT INTO calendar_events (event_date, type, label, hour_multiplier, created_by)
-        VALUES (?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE type = VALUES(type), label = VALUES(label), hour_multiplier = VALUES(hour_multiplier)
+        DELETE FROM calendar_events
+        WHERE event_date = ?
     ");
-    $superID = $_SESSION['user_id'] ?? null;
-    $stmt->bind_param("sssdi", $date, $type, $label, $multiplier, $superID);
+
+    $stmt->bind_param("s", $date);
+
     $stmt->execute();
 
     $logStmt = $conn->prepare("
@@ -32,9 +31,9 @@
     ");
 
     $role = "supervisor";
-    $action = "SAVE";
+    $action = "DELETE";
     $module = "calendar";
-    $description = "Saved calendar event for {$date} ({$type})";
+    $description = "Cleared calendar event for {$date}";
     $targetType = "system";
     $targetID = $date;
     $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
@@ -54,6 +53,9 @@
     $logStmt->execute();
 
     header('Content-Type: application/json');
-    echo json_encode(['status' => 'success']);
+
+    echo json_encode([
+        'status' => 'success'
+    ]);
 
 ?>

@@ -123,6 +123,24 @@ requireRole(['ADMIN', 'supervisor']);
 
     </div>
 
+    <div class="manual-attendance-panel" id="manual-attendance-panel">
+
+        <div class="manual-attendance-info">
+            <i class='bx bx-edit-alt'></i>
+
+            <div>
+                <h3>Manual Attendance</h3>
+                <p>Record attendance for a student who lost or forgot their RFID card.</p>
+            </div>
+        </div>
+
+        <button class="manual-attendance-trigger-btn" onclick="openManualAttendanceModal()">
+            <i class='bx bx-user-check'></i>
+            Record
+        </button>
+
+    </div>
+
     <div class="table-wrapper">
         <div id="attendanceTable"></div>
     </div>
@@ -185,6 +203,65 @@ requireRole(['ADMIN', 'supervisor']);
 
     </div>
 
+</div>
+
+<!-- manual attendance -->
+<div class="manual-attendance-modal" id="manual-attendance-modal">
+    <div class="modal-header">
+        <h3><i class='bx bx-edit-alt'></i> Manual Attendance Entry</h3>
+        <button onclick="closeManualAttendanceModal()" class="modal-close">&times;</button>
+    </div>
+
+    <form id="manualAttendanceForm">
+        <div class="form-group">
+            <label>Student</label>
+            <select id="manualStudentSelect" required>
+                <option value="">Select a student...</option>
+                <!-- populated with supervisor's assigned students -->
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="manualDate" max="<?= date('Y-m-d') ?>" required>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="manualStatus" required>
+                    <option value="present">Present</option>
+                    <option value="late">Late</option>
+                    <option value="excused">Excused</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Time In</label>
+                <input type="time" id="manualTimeIn" required>
+            </div>
+            <div class="form-group">
+                <label>Time Out</label>
+                <input type="time" id="manualTimeOut" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Reason for Manual Entry <span class="required-mark">*</span></label>
+            <textarea id="manualReason" placeholder="e.g. Student forgot/lost RFID card, verified in person" required maxlength="300"></textarea>
+        </div>
+
+        <div class="manual-warning">
+            <i class='bx bx-info-circle'></i>
+            <span>This entry will be flagged as manually recorded and logged under your account for audit purposes.</span>
+        </div>
+
+        <div class="edit-task-actions">
+            <button type="button" class="cancel-btn" onclick="closeManualAttendanceModal()">Cancel</button>
+            <button type="submit" class="submit-btn">Record Attendance</button>
+        </div>
+    </form>
 </div>
 
 

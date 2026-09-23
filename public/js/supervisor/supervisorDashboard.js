@@ -2460,6 +2460,7 @@ document.getElementById('dayEditForm').addEventListener('submit', function (e) {
     })
     .then(res => res.json())
     .then(data => {
+        showToast("Updated Calendar.", "success");
         closeDayModal();
         loadCalendar();
     });
@@ -2474,6 +2475,7 @@ document.getElementById('clearDayBtn').addEventListener('click', () => {
         body: 'date=' + encodeURIComponent(date)
     })
     .then(() => {
+        showToast("Removed event.", "success");
         closeDayModal();
         loadCalendar();
     });

@@ -287,12 +287,14 @@ function toggleDashboard() {
      const panel = document.getElementById("dashboardPanel");
     const table = document.getElementById("attendanceTable");
     const emergency = document.getElementById("emergency-panel");
+    const manual = document.getElementById("manual-attendance-panel");
 
     panel.classList.toggle("active");
 
     if (panel.classList.contains("active")) {
         
         emergency.style.display = "flex";
+        manual.style.display = "flex";
 
         loadAttendance();
        attendanceInterval = setInterval(loadAttendance, 5000);
@@ -303,6 +305,7 @@ function toggleDashboard() {
         clearInterval(attendanceInterval);
         table.innerHTML = "";
         emergency.style.display = "none";
+        manual.style.display = "none";
 
     }
 }
@@ -351,6 +354,7 @@ function openEmergencyModal() {
     const panel = document.getElementById("dashboardPanel");
      const modal = document.getElementById("emergencyModal");
      const emergency = document.getElementById("emergency-panel");
+     const manual = document.getElementById("manual-attendance-panel");
     const input = document.getElementById("emergencyRfid");
     const table = document.getElementById("attendanceTable");
     const overlay = document.getElementById("dashboardOverlay");
@@ -359,6 +363,7 @@ function openEmergencyModal() {
     clearInterval(attendanceInterval);
     table.innerHTML = "";
     emergency.style.display = "none";
+    manual.style.display = "none";
 
      modal.classList.add("show");
      overlay.classList.add("show");
@@ -386,6 +391,43 @@ function setReason(text) {
 document.getElementById("emergencyModal").addEventListener("click", (e) => {
     e.stopPropagation();
 });
+
+
+// manual attendance
+function openManualAttendanceModal(){
+    allowRfidFocus = false;
+    const panel = document.getElementById("dashboardPanel");
+     const modal = document.getElementById("manual-attendance-modal");
+     const emergency = document.getElementById("emergency-panel");
+     const manual = document.getElementById("manual-attendance-panel");
+    const input = document.getElementById("emergencyRfid");
+    const table = document.getElementById("attendanceTable");
+    const overlay = document.getElementById("dashboardOverlay");
+
+     panel.classList.remove("active");
+    clearInterval(attendanceInterval);
+    table.innerHTML = "";
+    emergency.style.display = "none";
+    manual.style.display = "none";
+
+     modal.classList.add("show");
+     overlay.classList.add("show");
+
+    setTimeout(() => {
+        input.focus();
+    }, 50);
+}
+
+
+function closeManualAttendanceModal() {
+    const overlay = document.getElementById("dashboardOverlay");
+    document.getElementById("manual-attendance-modal").classList.remove("show");
+    // document.getElementById("emergencyRfid").value = "";
+    overlay.classList.remove("show");
+
+     allowRfidFocus = true;
+    input.focus();
+}
 
 
 window.onload = function () {

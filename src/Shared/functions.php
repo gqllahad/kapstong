@@ -1586,7 +1586,7 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
                         " . e($row['status']) . "
                     </span>
                 </td>
-                <td>" . e($row['total_hours']) . "</td>
+                <td>" . e(formatHoursMinutes($row['total_hours'])) . "</td>
                 <td>" . e($row['remarks']) . "</td>
                 <td>" . (
                     $hasEmergency
@@ -1608,6 +1608,26 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
     }
 
     return $output;
+}
+
+
+// manual attendance inigo
+function renderManualAttendanceStudentList(){
+    function e($val) {
+        return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
+    }
+
+    // sql = "
+    //         SELECT 
+    //             studentID
+
+    
+    
+    // ";
+
+
+
+
 }
 
 // render admin student attendance
@@ -3846,3 +3866,59 @@ function renderAttendanceCalendar($conn, $year, $month) {
 //     $output .= '</div>';
 //     return $output;
 // }
+
+
+// rfid setting up for calendar connections
+// function isNonWorkDay($conn, $dateStr) {
+//     $stmt = $conn->prepare("SELECT type FROM calendar_events WHERE event_date = ?");
+//     $stmt->bind_param("s", $dateStr);
+//     $stmt->execute();
+//     $row = $stmt->get_result()->fetch_assoc();
+
+//     if ($row) {
+//         return in_array($row['type'], ['NO_WORK', 'HOLIDAY']);
+//     }
+//     $weekday = date('w', strtotime($dateStr));
+//     return in_array($weekday, [0, 6]); 
+// }
+
+
+// rfid hours recalculation
+function roundHoursWithThreshold($totalHours, $thresholdMinutes = 30) {
+    $totalMinutes = $totalHours * 60;
+
+    $blocks = floor($totalMinutes / 30);
+    $remainder = $totalMinutes - ($blocks * 30);
+
+    if ($remainder >= $thresholdMinutes) {
+        $blocks++; 
+    }
+
+    $roundedHours = ($blocks * 30) / 60;
+
+    return $roundedHours;
+}
+
+function formatHoursMinutes($decimalHours) {
+    if ($decimalHours === null || $decimalHours === '') {
+        return '—';
+    }
+
+    $totalMinutes = round($decimalHours * 60);
+    $hours = floor($totalMinutes / 60);
+    $minutes = $totalMinutes % 60;
+
+    if ($hours == 0 && $minutes == 0) {
+        return '0m';
+    }
+
+    $parts = [];
+    if ($hours > 0) {
+        $parts[] = $hours . 'h';
+    }
+    if ($minutes > 0) {
+        $parts[] = $minutes . 'm';
+    }
+
+    return implode(' ', $parts);
+}

@@ -127,7 +127,7 @@ if (isset($_POST['rfid'])) {
         $res = $check->get_result();
 
         if ($res->num_rows == 0) {
-            die("Student not assigned to you!");
+            die("No record of this ID!");
         }
     }
 
@@ -365,6 +365,8 @@ if (isset($_POST['rfid'])) {
         if ($totalHours > $MAX_HOURS_PER_DAY) {
             $totalHours = $MAX_HOURS_PER_DAY;
         }
+
+        $totalHours = roundHoursWithThreshold($totalHours);
 
         $remarks = "Completed {$totalHours} hours for the day";
 
