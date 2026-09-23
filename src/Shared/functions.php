@@ -1612,23 +1612,171 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
 
 
 // manual attendance inigo
-function renderManualAttendanceStudentList(){
+function renderManualAttendanceStudentList($conn, $superID){
     function e($val) {
         return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
     }
 
-    // sql = "
-    //         SELECT 
-    //             studentID
+    $where = "
+        WHERE users.role = 'student'
+        AND users.isVerified = 'VERIFIED'
+        AND ss.superID = '$superID'
+        AND ss.status = 'ACTIVE'
+    ";
 
-    
-    
-    // ";
+    $sql = "
+            SELECT 
+            users.studentID,
+            users.name,
+            ojtstudent.course,
+            ojtstudent.yearLevel
+        FROM users
 
+        INNER JOIN student_supervisor ss
+            ON users.studentID = ss.studentID
 
+        LEFT JOIN ojtstudent
+            ON users.studentID = ojtstudent.studentID
 
+        $where
 
+        ORDER BY users.name ASC
+
+    ";
+
+     $result = $conn->query($sql);
+
+     $output = '<option value="">Select a student...</option>';
+
+     if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+
+            $course = $row['course'] ?? 'No Course';
+            $yearLevel = $row['yearLevel'] ?? '-';
+            $studentID = $row['studentID'] ?? '';
+            $name = $row['name'] ?? '';
+
+             $output .= '
+                <option value="' . htmlspecialchars($studentID) . '">
+                    ' . htmlspecialchars($name) . ' (' . htmlspecialchars($course) . ')
+                </option>
+            ';
+        }
+    } else {
+        $output .= '
+        <div class="empty-state">
+            No students found
+        </div>';
+    }
+
+    return $output;
 }
+
+// function renderDepartmentOptions($conn)
+// {
+//     $sql = "SELECT DISTINCT prg_department, prg_department_code FROM program";
+//     $result = $conn->query($sql);
+
+//     $output = '<option value="">All Departments</option>';
+
+//     if ($result->num_rows > 0) {
+//         while ($row = $result->fetch_assoc()) {
+//             $output .= '
+//                 <option value="' . htmlspecialchars($row['prg_department']) . '">
+//                     ' . htmlspecialchars($row['prg_department']) . ' (' . htmlspecialchars($row['prg_department_code']) . ')
+//                 </option>
+//             ';
+//         }
+//     }
+
+//     return $output;
+// }
+
+
+
+// function renderTaskAssignStudentList($conn, $superID, $search = '')
+// {
+//     $where = "
+//         WHERE users.role = 'student'
+//         AND users.isVerified = 'VERIFIED'
+//         AND ss.superID = '$superID'
+//         AND ss.status = 'ACTIVE'
+//     ";
+
+//     if (!empty($search)) {
+//         $where .= " AND (
+//             users.studentID LIKE '%$search%' OR
+//             users.name LIKE '%$search%' OR 
+//             ojtstudent.course LIKE '%$search%' OR
+//             ojtstudent.yearLevel LIKE '%$search%'
+//         )";
+//     }
+
+//     $sql = "
+//         SELECT 
+//             users.studentID,
+//             users.name,
+//             users.email,
+//             ojtstudent.course,
+//             ojtstudent.yearLevel
+//         FROM users
+
+//         INNER JOIN student_supervisor ss
+//             ON users.studentID = ss.studentID
+
+//         LEFT JOIN ojtstudent
+//             ON users.studentID = ojtstudent.studentID
+
+//         $where
+
+//         ORDER BY users.name ASC
+//     ";
+
+//     $result = $conn->query($sql);
+
+//     $output = '';
+
+//     if ($result->num_rows > 0) {
+//         while ($row = $result->fetch_assoc()) {
+
+//             $course = $row['course'] ?? 'No Course';
+//             $yearLevel = $row['yearLevel'] ?? '-';
+
+//             $output .= '
+//             <div class="task-student-item" 
+//                 data-id="' . $row['studentID'] . '">
+
+//                 <div class="student-name">
+//                     ' . $row['name'] . '
+//                 </div>
+
+//                 <div class="student-details">
+//                     ' . $row['studentID'] . ' • ' . $course . ' • ' . $yearLevel . '
+//                 </div>
+
+//             </div>';
+//         }
+//     } else {
+//         $output .= '
+//         <div class="empty-state">
+//             No students found
+//         </div>';
+//     }
+
+//     return $output;
+// }
+
+
+
+
+
+
+
+
+
+
+
+
 
 // render admin student attendance
 function renderAdminStudentAttendance($conn, $search = '', $status = '', $course = '', $dateFromAttendance = '', $dateToAttendance = '')

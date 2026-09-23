@@ -1,15 +1,20 @@
 <?php
 require_once("../auth/auth_guard.php");
+require_once("../Shared/kapstongConnection.php");
+require_once("../Shared/functions.php");
 
 requireRole(['ADMIN', 'supervisor']);
+
+
+$superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
+// $superID = getSupervisorIDByUserID($conn, $userID);
+
 ?>
 
 <?php if(isset($_SESSION['status'])): ?>
 
 <?php unset($_SESSION['status']); ?>
 <?php endif; ?>
-
-
 
 <!DOCTYPE html>
 <html>
@@ -216,8 +221,8 @@ requireRole(['ADMIN', 'supervisor']);
         <div class="form-group">
             <label>Student</label>
             <select id="manualStudentSelect" required>
-                <option value="">Select a student...</option>
-                <!-- populated with supervisor's assigned students -->
+                <!-- inigo -->
+                <?= renderManualAttendanceStudentList($conn, $superID) ?>
             </select>
         </div>
 
