@@ -1612,61 +1612,69 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
 
 
 // manual attendance inigo
-function renderManualAttendanceStudentList($conn, $superID){
+function renderManualAttendanceStudentList($conn, $superID, $role = 'supervisor'){
     function e($val) {
         return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
     }
 
-    $where = "
-        WHERE users.role = 'student'
-        AND users.isVerified = 'VERIFIED'
-        AND ss.superID = '$superID'
-        AND ss.status = 'ACTIVE'
-    ";
-
-    $sql = "
+    if ($role === 'ADMIN') {
+        $sql = "
             SELECT 
-            users.studentID,
-            users.name,
-            ojtstudent.course,
-            ojtstudent.yearLevel
-        FROM users
+                users.studentID,
+                users.name,
+                ojtstudent.course,
+                ojtstudent.yearLevel
+            FROM users
+            LEFT JOIN ojtstudent
+                ON users.studentID = ojtstudent.studentID
+            WHERE users.role = 'student'
+              AND users.isVerified = 'VERIFIED'
+            ORDER BY users.name ASC
+        ";
+        $result = $conn->query($sql);
+    } else {
+        $sql = "
+            SELECT 
+                users.studentID,
+                users.name,
+                ojtstudent.course,
+                ojtstudent.yearLevel
+            FROM users
+            INNER JOIN student_supervisor ss
+                ON users.studentID = ss.studentID
+            LEFT JOIN ojtstudent
+                ON users.studentID = ojtstudent.studentID
+            WHERE users.role = 'student'
+              AND users.isVerified = 'VERIFIED'
+              AND ss.superID = ?
+              AND ss.status = 'ACTIVE'
+            ORDER BY users.name ASC
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $superID);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    }
 
-        INNER JOIN student_supervisor ss
-            ON users.studentID = ss.studentID
+    $output = '<option value="">Select a student...</option>';
 
-        LEFT JOIN ojtstudent
-            ON users.studentID = ojtstudent.studentID
-
-        $where
-
-        ORDER BY users.name ASC
-
-    ";
-
-     $result = $conn->query($sql);
-
-     $output = '<option value="">Select a student...</option>';
-
-     if ($result->num_rows > 0) {
+    if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-
             $course = $row['course'] ?? 'No Course';
             $yearLevel = $row['yearLevel'] ?? '-';
             $studentID = $row['studentID'] ?? '';
             $name = $row['name'] ?? '';
 
-             $output .= '
-                <option value="' . htmlspecialchars($studentID) . '">
-                    ' . htmlspecialchars($name) . ' (' . htmlspecialchars($course) . ')
+            $sname = str_pad(e($name), 30, ' ');
+
+            $output .= '
+                  <option value="' . e($studentID) . '">
+                    ' . e($name) . ' (' . e($course) . ')
                 </option>
             ';
         }
     } else {
-        $output .= '
-        <div class="empty-state">
-            No students found
-        </div>';
+        $output .= '<div class="empty-state">No students found</div>';
     }
 
     return $output;

@@ -6,6 +6,8 @@ require_once("../Shared/functions.php");
 requireRole(['ADMIN', 'supervisor']);
 
 
+
+$role = $_SESSION['role'];
 $superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
 // $superID = getSupervisorIDByUserID($conn, $userID);
 
@@ -19,6 +21,16 @@ $superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
 <!DOCTYPE html>
 <html>
 <head>
+
+    <script>
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'logout-event') {
+                clearInterval(attendanceInterval);
+                window.close();
+            }
+        });
+    </script>
+
     <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OJT Attendance</title>
@@ -35,9 +47,9 @@ $superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
 
 <div class="container"> 
     <div class="header">
-        <a href="../Session/loginPhase.php">
+        
             <img class="scanner-logo" src="../../public/kapstongImage/logo.jpg" alt="Logo">
-        </a>
+        
 
         <h1>Granby On-the-Job Training Attendance System</h1>
 
@@ -222,7 +234,9 @@ $superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
             <label>Student</label>
             <select id="manualStudentSelect" required>
                 <!-- inigo -->
-                <?= renderManualAttendanceStudentList($conn, $superID) ?>
+                <?= 
+                renderManualAttendanceStudentList($conn, $superID, $role)
+                 ?>
             </select>
         </div>
 
@@ -269,9 +283,9 @@ $superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
     </form>
 </div>
 
-
 <!-- scroipts -->
 <script src="../../public/js/rfidPhase.js"></script>
+
 </body>
 
 </html>

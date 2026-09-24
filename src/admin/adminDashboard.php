@@ -75,7 +75,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                         Dark Mode
                     </a>
                     <hr>
-                    <a href="../Session/logoutPhase.php">
+                    <a href="../Session/logoutPhase.php" onclick="localStorage.setItem('logout-event', Date.now())">
                         <i class="bi bi-box-arrow-right"></i>
                         Logout
                     </a>
@@ -1860,6 +1860,8 @@ if ($_SESSION['role'] !== "ADMIN") {
 
             if (countdownValue <= 0) {
                 clearInterval(countdownTimer);
+
+                localStorage.setItem('logout-event', Date.now());
                 window.location.href = "../Session/logoutPhase.php";
             }
 

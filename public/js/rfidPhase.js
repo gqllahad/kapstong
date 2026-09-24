@@ -5,6 +5,8 @@ let lastScanTime = 0;
 
 let allowRfidFocus = true;
 
+let attendanceInterval;
+
 function updateClock() {
     const el = document.getElementById("clock");
     if (!el) return;
@@ -69,9 +71,17 @@ function closeModal() {
     input.focus();
 }
 
+
 function loadAttendance() {
     fetch("get_live_attendance.php")
-        .then(res => res.json())
+        .then(res => {
+            if (res.status === 401 || res.status === 403) {
+                clearInterval(attendanceInterval);
+                window.location.href = '../Session/loginPage.php';
+                return Promise.reject('unauthorized');
+            }
+            return res.json();
+        })
         .then(data => {
            const now = new Date();
 
@@ -214,8 +224,158 @@ function loadAttendance() {
             `;
 
             document.getElementById("attendanceTable").innerHTML = html;
+        })
+        .catch(err => {
+            if (err !== 'unauthorized') console.error(err);
         });
 }
+// function loadAttendance() {
+//     fetch("get_live_attendance.php")
+//         .then(res => res.json())
+//         .then(data => {
+//            const now = new Date();
+
+//             const formattedDate = now.toLocaleDateString('en-PH', {
+//                 weekday: 'long',
+//                 year: 'numeric',
+//                 month: 'long',
+//                 day: 'numeric'
+//             });
+
+//             let html = `
+
+//                 <div class="attendance-topbar">
+
+//                     <div class="attendance-day">
+//                         <i class='bx bx-calendar'></i>
+//                         <span>${formattedDate}</span>
+//                     </div>
+
+//                     <div class="attendance-count">
+//                         <i class='bx bx-user'></i>
+//                         <span>${data.length} Active Records</span>
+//                     </div>
+
+//                 </div>
+
+//                 <table class="attendance-table">
+
+//                     <thead>
+//                         <tr>
+//                             <th>Student</th>
+//                             <th>Time In</th>
+//                             <th>Time Out</th>
+//                             <th>Hours</th>
+//                             <th>Status</th>
+//                             <th>Current State</th>
+//                             <th>Remarks</th>
+//                         </tr>
+//                     </thead>
+
+//                     <tbody>
+//             `;
+
+//             data.forEach(row => {
+
+//                 let statusClass = "present";
+
+//                 if (row.status?.toLowerCase().includes("late")) {
+//                     statusClass = "late";
+//                 } else if (
+//                     row.remarks?.toLowerCase().includes("lunch")
+//                 ) {
+//                     statusClass = "lunch";
+//                 } else if (
+//                     row.remarks?.toLowerCase().includes("snack")
+//                 ) {
+//                     statusClass = "snack";
+//                 } else if (
+//                     row.remarks?.toLowerCase().includes("completed")
+//                 ) {
+//                     statusClass = "timeout";
+//                 }
+
+//                 const timeIn = row.first_time_in
+//                     ? new Date(row.first_time_in).toLocaleTimeString([], {
+//                         hour: '2-digit',
+//                         minute: '2-digit'
+//                     })
+//                     : '-';
+
+//                 const timeOut = row.final_time_out
+//                     ? new Date(row.final_time_out).toLocaleTimeString([], {
+//                         hour: '2-digit',
+//                         minute: '2-digit'
+//                     })
+//                     : '-';
+
+//                 html += `
+//                     <tr>
+
+//                         <td>
+//                             <div class="student-cell">
+
+//                                 <div class="student-avatar">
+//                                     ${row.name.charAt(0)}
+//                                 </div>
+
+//                                 <div class="student-info">
+//                                     <span class="student-name">
+//                                         ${row.name}
+//                                     </span>
+//                                 </div>
+
+//                             </div>
+//                         </td>
+
+//                         <td>
+//                             <span class="time-badge in">
+//                                 <i class='bx bx-log-in'></i>
+//                                 ${timeIn}
+//                             </span>
+//                         </td>
+
+//                         <td>
+//                             <span class="time-badge out">
+//                                 <i class='bx bx-log-out'></i>
+//                                 ${timeOut}
+//                             </span>
+//                         </td>
+
+//                         <td>
+//                             <span class="hours-pill">
+//                                 ${row.total_hours || 0} hrs
+//                             </span>
+//                         </td>
+
+//                         <td>
+//                             <span class="badge ${statusClass}">
+//                                 ${row.status}
+//                             </span>
+//                         </td>
+
+//                         <td>
+//                             <span class="badge ${statusClass}">
+//                                 ${row.current_state}
+//                             </span>
+//                         </td>
+
+//                         <td class="remarks">
+//                             ${row.remarks || '-'}
+//                         </td>
+
+//                     </tr>
+//                 `;
+//             });
+
+//             html += `
+//                     </tbody>
+//                 </table>
+//             `;
+
+//             document.getElementById("attendanceTable").innerHTML = html;
+//         });
+// }
 
 
 

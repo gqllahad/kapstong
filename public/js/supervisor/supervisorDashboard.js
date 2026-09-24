@@ -120,7 +120,7 @@ let calMonth = new Date().getMonth() + 1;
 
 // open rfid
 function openRfid() {
-     window.open("../Rfid/rfid_test.php", "_blank");
+    window.open("../Rfid/rfid_test.php", "_blank");
 }
 
 // force
@@ -153,6 +153,7 @@ document.addEventListener("keydown", e => {
         e.preventDefault();
     }
 });
+
 
 // toggles
 function toggleSection(header) {

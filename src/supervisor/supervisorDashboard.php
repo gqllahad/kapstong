@@ -104,7 +104,7 @@ foreach ($nameParts as $part) {
             <div class="force-modal-header">
                 <h2><i class="bi bi-exclamation-triangle"></i> Change Password Required</h2>
                 <p>You must change your password before continuing.</p>
-                <a href="../Session/logoutPhase.php" class="force-modal-close-profile">&times;</a>
+                <a href="../Session/logoutPhase.php"  class="force-modal-close-profile">&times;</a>
             </div>
 
             <form action="functions/settings.php" method="POST">
@@ -163,7 +163,7 @@ foreach ($nameParts as $part) {
                         Dark Mode
                     </a>
                     <hr>
-                    <a href="../Session/logoutPhase.php">
+                    <a href="../Session/logoutPhase.php" onclick="localStorage.setItem('logout-event', Date.now())">
                         <i class="bi bi-box-arrow-right"></i>
                         Logout
                     </a>
@@ -1952,7 +1952,8 @@ foreach ($nameParts as $part) {
 
             if (countdownValue <= 0) {
                 clearInterval(countdownTimer);
-
+                
+                localStorage.setItem('logout-event', Date.now());
                 window.location.href = "../Session/logoutPhase.php";
             }
 

@@ -250,12 +250,15 @@ input#rfidInput:focus {
   transition: right 0.4s var(--ease);
   z-index: 1000;
   padding: 24px;
+
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 #dashboardPanel.active {
   right: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  /* overflow-y: auto;
+  overflow-x: hidden; */
 }
 
 .dashboard-header {
@@ -265,6 +268,7 @@ input#rfidInput:focus {
   padding-bottom: 16px;
   margin-bottom: 20px;
   border-bottom: 1px solid var(--surface-divider);
+   flex-shrink: 0;
 }
 
 .dashboard-title {
@@ -360,6 +364,7 @@ input#rfidInput:focus {
   border-radius: var(--r-lg);
   background: var(--danger-dim);
   border: 1px solid rgba(239, 68, 68, 0.2);
+  flex-shrink: 0;
 }
 
 .emergency-info {
@@ -390,7 +395,11 @@ input#rfidInput:focus {
   box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
 }
 
-.table-wrapper { margin-top: 16px; }
+.table-wrapper { margin-top: 16px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; }
 
 
 /* ── Manual Attendance  ──────── */
@@ -413,6 +422,7 @@ input#rfidInput:focus {
   border: 1px solid rgba(255, 255, 255, 0.08);
 
   text-align: center;
+  flex-shrink: 0;
 }
 
 .manual-attendance-modal.show {
@@ -593,7 +603,6 @@ input#rfidInput:focus {
   line-height: 1.55;
 }
 
-/* Calendar/clock picker icon needs to stay visible on dark bg */
 .manual-attendance-modal input[type="date"],
 .manual-attendance-modal input[type="time"] {
   color-scheme: dark;
@@ -661,6 +670,10 @@ input#rfidInput:focus {
 .manual-attendance-modal .submit-btn:hover {
   transform: translateY(-1px);
   opacity: 0.92;
+}
+#manualStudentSelect{
+  font-family: monospace;
+  font-size: 14px;
 }
 
 
