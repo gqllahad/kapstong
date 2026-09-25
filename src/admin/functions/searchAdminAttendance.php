@@ -9,6 +9,7 @@ $status = $_POST['status'] ?? '';
 $course = $_POST['course'] ?? '';
 $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
 $dateToAttendance = $_POST['dateToAttendance'] ?? '';
+$entry = $_POST['entry'] ?? '';
 
 echo renderAdminStudentAttendance(
     $conn,
@@ -16,5 +17,6 @@ echo renderAdminStudentAttendance(
     $status,
     $course,
     $dateFromAttendance,
-    $dateToAttendance
+    $dateToAttendance,
+    $entry
 );

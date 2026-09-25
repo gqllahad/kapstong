@@ -1657,6 +1657,16 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </div>
 
                         <div class="filter-group">
+
+                            <select id="entryMethodFilter">
+                                <option value="">All Method</option>
+                                <option value="RFID">RFID</option>
+                                <option value="MANUAL">MANUAL</option>
+                            </select>
+
+                        </div>
+
+                        <div class="filter-group">
                             <input type="date" id="attendanceDateFrom" title="From date">
                             <input type="date" id="attendanceDateTo" title="To date">
                         </div>
@@ -1676,6 +1686,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                                 <th>Time Out</th>
                                 <th>Status</th>
                                 <th>Total Hours</th>
+                                <th>Attendance Method</th>
                                 <th>Remarks</th>
                             </tr>
                         </thead>
@@ -1687,7 +1698,8 @@ if ($_SESSION['role'] !== "ADMIN") {
                             $course = $_POST['course'] ?? '';
                             $dateFromAttendance = $_POST['dateFromAttendance'] ?? '';
                             $dateToAttendance = $_POST['dateToAttendance'] ?? '';
-                            echo renderAdminStudentAttendance($conn, $search, $status, $dateFromAttendance, $dateToAttendance);
+                            $entry = $_POST['entry'] ?? '';
+                            echo renderAdminStudentAttendance($conn, $search, $status, $dateFromAttendance, $dateToAttendance, $entry);
                             ?>
                         </tbody>
                     </table>

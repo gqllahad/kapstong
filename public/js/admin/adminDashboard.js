@@ -3071,6 +3071,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("studentAttendanceSearch");
     const statusFilter = document.getElementById("attendanceStatusFilter");
     const courseFilter = document.getElementById("attendanceCourseFilter");
+    const entryFilter = document.getElementById("entryMethodFilter");
     const attendanceDateFrom = document.getElementById("attendanceDateFrom");
     const attendanceDateTo = document.getElementById("attendanceDateTo");
     const tableBody = document.getElementById("studentAttendanceBody");
@@ -3081,6 +3082,7 @@ document.addEventListener("DOMContentLoaded", function () {
         !attendanceDateFrom ||
         !attendanceDateTo ||
         !courseFilter ||
+        !entryFilter ||
         !tableBody
     ) return;
 
@@ -3091,6 +3093,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const search = searchInput.value;
         const status = statusFilter.value;
         const dateFrom = attendanceDateFrom.value;
+        const entry = entryFilter.value;
         const dateTo = attendanceDateTo.value;
         const course = courseFilter.value;
 
@@ -3104,7 +3107,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 "&status=" + encodeURIComponent(status) +
                 "&course=" + encodeURIComponent(course) +
                 "&dateFromAttendance=" + encodeURIComponent(dateFrom) +
-                "&dateToAttendance=" + encodeURIComponent(dateTo)
+                "&dateToAttendance=" + encodeURIComponent(dateTo) +
+                "&entry=" + encodeURIComponent(entry)
         })
         .then(response => response.text())
         .then(data => {
@@ -3124,6 +3128,7 @@ document.addEventListener("DOMContentLoaded", function () {
     attendanceDateFrom.addEventListener("change", fetchAdminAttendance);
     attendanceDateTo.addEventListener("change", fetchAdminAttendance);
     courseFilter.addEventListener("change", fetchAdminAttendance);
+    entryFilter.addEventListener("change", fetchAdminAttendance);
 
     fetchAdminAttendance();
 });

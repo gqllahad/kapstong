@@ -483,7 +483,10 @@ function submitEmergencyTimeout() {
     const rfid = document.getElementById("emergencyRfid").value;
     let reason = document.getElementById("emergencyReason").value;
 
-    if (!rfid) return alert("Please enter RFID");
+    if (!rfid) {
+        showToast("Please enter RFID/studentID", false);
+        return
+    }
     if (!reason) {
         reason = "Emergency time out (no reason selected)";
     }
@@ -590,6 +593,73 @@ function closeManualAttendanceModal() {
 }
 
 
+function submitManualAttendance(){
+
+    const studentID = document.getElementById("manualStudentSelect").value;
+    const date = document.getElementById("manualDate").value;
+    const status = document.getElementById("manualStatus").value;
+    const timeIn = document.getElementById("manualTimeIn").value;
+    const timeOut = document.getElementById("manualTimeOut").value;
+    const breakTime = document.getElementById("manualBreak").value;
+    const reason = document.getElementById("manualReason").value;
+
+
+    if(!studentID){
+        showToast("Please select a student.", false);
+    }
+    if(!date){
+        showToast("Please select a date..", false);
+    }
+    if(!timeIn){
+        showToast("Please fill out time in..", false);
+    }
+    if(!timeOut){
+        showToast("Please fill out time out..", false);
+    }
+    if(!breakTime){
+        showToast("Please fill out break time..", false);
+    }
+    if(!reason){
+        showToast("Please fill out reason for manual attendance..", false);
+    }
+
+    fetch("saveManualAttendance.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "studentID=" + encodeURIComponent(studentID) +
+            "&date=" + encodeURIComponent(date) +
+            "&status=" + encodeURIComponent(status) +
+            "&timeIn=" + encodeURIComponent(timeIn) +
+            "&timeOut=" + encodeURIComponent(timeOut) +
+            "&breakTime=" + encodeURIComponent(breakTime) +
+            "&reason=" + encodeURIComponent(reason) 
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById("manualStudentSelect").value = "";
+            document.getElementById("manualDate").value = "";
+            document.getElementById("manualStatus").value = "present";
+            document.getElementById("manualTimeIn").value = "";
+            document.getElementById("manualTimeOut").value = "";
+            document.getElementById("manualBreak").value = "60";
+            document.getElementById("manualReason").value = "";
+
+            closeManualAttendanceModal();
+            loadAttendance();
+        }
+
+        showToast(data.message, data.success);
+    })
+    .catch(err => {
+        showToast("SERVER ERROR", false);
+    });
+}
+
+// clock
 window.onload = function () {
     updateClock();
     setInterval(updateClock, 1000);

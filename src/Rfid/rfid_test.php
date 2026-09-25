@@ -7,10 +7,21 @@ requireRole(['ADMIN', 'supervisor']);
 
 
 
-$role = $_SESSION['role'];
-$superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
+// $role = $_SESSION['role'];
+// $superID =  $_SESSION['superID'] ?? NULL;
+// $userID = $_SESSION['user_id'] ?? NULL; //both admin and supervisor selctiongs
 // $superID = getSupervisorIDByUserID($conn, $userID);
 
+$role = $_SESSION['role'];
+$superID = $_SESSION['superID'] ?? NULL;
+$userID = $_SESSION['user_id'] ?? NULL;
+$userName = $_SESSION['name'] ?? 'Unknown User';
+
+$isAdmin = ($role === 'ADMIN');
+$isSupervisor = ($role === 'supervisor');
+
+$roleLabel = $isAdmin ? 'Administrator' : 'Supervisor';
+$roleIcon = $isAdmin ? 'bx-shield-quarter' : 'bx-user-check';
 ?>
 
 <?php if(isset($_SESSION['status'])): ?>
@@ -44,10 +55,19 @@ $superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
 </head>
 
 <body>
+    
+<div class="rfid-operator-badge">
+        <i class='bx <?= $roleIcon ?>'></i>
+        <div class="rfid-operator-info">
+            <span class="rfid-operator-role"><?= htmlspecialchars($roleLabel) ?></span>
+            <span class="rfid-operator-name"><?= htmlspecialchars($userName) ?></span>
+        </div>
+    </div>
+
 
 <div class="container"> 
+    
     <div class="header">
-        
             <img class="scanner-logo" src="../../public/kapstongImage/logo.jpg" alt="Logo">
         
 
@@ -229,7 +249,8 @@ $superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
         <button onclick="closeManualAttendanceModal()" class="modal-close">&times;</button>
     </div>
 
-    <form id="manualAttendanceForm">
+        
+
         <div class="form-group">
             <label>Student</label>
             <select id="manualStudentSelect" required>
@@ -243,7 +264,7 @@ $superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
         <div class="form-row">
             <div class="form-group">
                 <label>Date</label>
-                <input type="date" id="manualDate" max="<?= date('Y-m-d') ?>" required>
+                <input type="date" id="manualDate" min="<?= date('Y-m-d', strtotime('-2 days')) ?>" max="<?= date('Y-m-d') ?>" required>
             </div>
             <div class="form-group">
                 <label>Status</label>
@@ -264,6 +285,17 @@ $superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
                 <label>Time Out</label>
                 <input type="time" id="manualTimeOut" required>
             </div>
+            <div class="form-group">
+                <label>Break Duration</label>
+                    <input 
+                        type="number" 
+                        id="manualBreak"
+                        min="0"
+                        max="480"
+                        value="60"
+                        required
+                    >
+</div>
         </div>
 
         <div class="form-group">
@@ -278,9 +310,8 @@ $superID =  $_SESSION['superID'] ?? NULL; //both admin and supervisor selctiongs
 
         <div class="edit-task-actions">
             <button type="button" class="cancel-btn" onclick="closeManualAttendanceModal()">Cancel</button>
-            <button type="submit" class="submit-btn">Record Attendance</button>
+            <button onclick="submitManualAttendance()" class="submit-btn">Record Attendance</button>
         </div>
-    </form>
 </div>
 
 <!-- scroipts -->

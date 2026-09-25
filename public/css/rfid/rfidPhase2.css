@@ -100,6 +100,47 @@ h1, h2, h3 {
 ::-webkit-scrollbar-thumb { background: var(--navy-600); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--navy-400); }
 
+
+/* ══════════════════════════════════════════════════════════════
+   WHOO
+══════════════════════════════════════════════════════════════ */
+
+
+.rfid-operator-badge {
+  position: absolute;
+  bottom: 20px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  z-index: 10;
+}
+.rfid-operator-badge i {
+  font-size: 18px;
+  color: #f59e0b;
+}
+.rfid-operator-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.rfid-operator-role {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.rfid-operator-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
 /* ══════════════════════════════════════════════════════════════
    SCANNER CARD
 ══════════════════════════════════════════════════════════════ */
@@ -555,8 +596,10 @@ input#rfidInput:focus {
 
 .manual-attendance-modal .form-row {
   display: flex;
+  /* grid-template-columns: repeat(3, 1fr); */
   gap: 14px;
 }
+
 .manual-attendance-modal .form-row .form-group {
   flex: 1;
 }

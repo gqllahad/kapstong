@@ -1787,8 +1787,12 @@ function renderManualAttendanceStudentList($conn, $superID, $role = 'supervisor'
 
 
 // render admin student attendance
-function renderAdminStudentAttendance($conn, $search = '', $status = '', $course = '', $dateFromAttendance = '', $dateToAttendance = '')
+function renderAdminStudentAttendance($conn, $search = '', $status = '', $course = '', $dateFromAttendance = '', $dateToAttendance = '', $entry = '')
 {
+    function e($val) {
+        return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
+    }
+
     $sql = "
         SELECT 
             attendance_logs.attendanceID,
@@ -1801,16 +1805,13 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
             attendance_logs.rfid_uid,
             attendance_logs.studentID,
             attendance_logs.created_at,
-
+            attendance_logs.entry_method,
             ojtstudent.name,
             ojtstudent.course,
             ojtstudent.yearLevel
-
         FROM attendance_logs
-
         LEFT JOIN ojtstudent 
             ON ojtstudent.studentID = attendance_logs.studentID
-
         WHERE 1=1
     ";
 
@@ -1818,18 +1819,18 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
     $types = "";
 
     if (!empty($search)) {
-
         $sql .= " AND (
             attendance_logs.studentID LIKE ? OR
             ojtstudent.name LIKE ? OR
             attendance_logs.rfid_uid LIKE ? OR
-            ojtstudent.course LIKE ?
+            ojtstudent.course LIKE ? OR
+            attendance_logs.entry_method LIKE ?
         )";
 
         $like = "%$search%";
+        $types .= "sssss";
 
-        $types .= "ssss";
-
+        $params[] = $like;
         $params[] = $like;
         $params[] = $like;
         $params[] = $like;
@@ -1837,35 +1838,33 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
     }
 
     if (!empty($status)) {
-
         $sql .= " AND attendance_logs.status = ?";
-
         $types .= "s";
         $params[] = $status;
     }
 
     if (!empty($course)) {
-
         $sql .= " AND ojtstudent.course = ?";
-
         $types .= "s";
         $params[] = $course;
     }
 
     if (!empty($dateFromAttendance)) {
-
         $sql .= " AND attendance_logs.log_date >= ?";
-
         $types .= "s";
         $params[] = $dateFromAttendance;
     }
 
     if (!empty($dateToAttendance)) {
-
         $sql .= " AND attendance_logs.log_date <= ?";
-
         $types .= "s";
         $params[] = $dateToAttendance;
+    }
+
+    if(!empty($entry)){
+        $sql .= " AND attendance_logs.entry_method <= ?";
+        $types .= "s";
+        $params[] = $entry;
     }
 
     $sql .= "
@@ -1881,7 +1880,6 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
     }
 
     $stmt->execute();
-
     $result = $stmt->get_result();
 
     $output = '';
@@ -1893,7 +1891,6 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
             $attendanceStatus = strtolower($row['status']);
 
             switch ($attendanceStatus) {
-
                 case 'present':
                     $color = '#059669';
                     break;
@@ -1930,39 +1927,44 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
                     <div class='student-name-cell'>
 
                         <div class='student-avatar'>
-                            " . strtoupper(substr($row['name'], 0, 1)) . "
+                            " . e(strtoupper(substr($row['name'], 0, 1))) . "
                         </div>
 
                         <div class='student-info'>
+
                             <span class='student-name'>
-                                {$row['name']}
+                                " . e($row['name']) . "
                             </span>
 
                             <small class='student-id'>
-                                {$row['studentID']}
+                                " . e($row['studentID']) . "
                             </small>
-                        </div>
 
+                        </div>
                     </div>
                 </td>
 
                 <td>
-                    {$row['course']} - {$row['yearLevel']}
+                    " . e($row['course']) . " - " . e($row['yearLevel']) . "
                 </td>
 
                 <td>
                     <div class='student-id-cell'>
-                        #{$row['rfid_uid']}
+                        #" . e($row['rfid_uid']) . "
                     </div>
                 </td>
 
                 <td>
-                    " . date('F d, Y', strtotime($row['log_date'])) . "
+                    " . e(date('F d, Y', strtotime($row['log_date']))) . "
                 </td>
 
-                <td>{$timeIn}</td>
+                <td>
+                    " . e($timeIn) . "
+                </td>
 
-                <td>{$timeOut}</td>
+                <td>
+                    " . e($timeOut) . "
+                </td>
 
                 <td>
                     <span class='status-pill'
@@ -1970,30 +1972,31 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
                                color: {$color};
                                border: 1px solid {$color}30;'>
 
-                        " . ucfirst($row['status']) . "
+                        " . e(ucfirst($row['status'])) . "
 
                     </span>
                 </td>
 
                 <td>
-                    {$row['total_hours']} hrs
+                    " . e(formatHoursMinutes($row['total_hours'])) . "
                 </td>
 
+                <td> ". e($row['entry_method']) . " </td>
+
                 <td>
-                    {$row['remarks']}
+                    " . e($row['remarks']) . "
                 </td>
 
             </tr>";
         }
+
     } else {
 
         $output .= "
         <tr>
             <td colspan='10'
                 style='text-align:center;padding:15px;'>
-
                 No attendance records found
-
             </td>
         </tr>";
     }
