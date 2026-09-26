@@ -482,7 +482,7 @@ h5 {
 ══════════════════════════════════════════════════════════════ */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+ grid-template-columns: repeat(3, 1fr);
   gap: 18px;
   margin-bottom: 24px;
 }
@@ -501,18 +501,13 @@ h5 {
     border-color 0.2s;
   animation: cardIn 0.45s var(--ease) both;
 }
-.card:nth-child(1) {
-  animation-delay: 0.05s;
-}
-.card:nth-child(2) {
-  animation-delay: 0.1s;
-}
-.card:nth-child(3) {
-  animation-delay: 0.15s;
-}
-.card:nth-child(4) {
-  animation-delay: 0.2s;
-}
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.15s; }
+.card:nth-child(4) { animation-delay: 0.2s; }
+.card:nth-child(5) { animation-delay: 0.25s; }
+.card:nth-child(6) { animation-delay: 0.3s; }
+
 @keyframes cardIn {
   from {
     opacity: 0;
@@ -557,6 +552,21 @@ h5 {
 }
 .card.supervisors:hover {
   box-shadow: 0 10px 32px rgba(2, 11, 24, 0.5);
+}
+
+.card.rfid-entry:hover {
+  box-shadow: 0 10px 32px rgba(245, 158, 11, 0.18);
+  border-color: var(--warning, #f59e0b);
+}
+.card.unassigned-students:hover {
+  box-shadow: 0 10px 32px rgba(139, 92, 246, 0.18);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.card-badge.attention {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .card-badge {
@@ -678,6 +688,92 @@ h5 {
 .card.supervisors .trend {
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.75);
+}
+
+.card.for-review:hover {
+  box-shadow: 0 10px 32px rgba(59, 130, 246, 0.18);
+  border-color: var(--accent);
+}
+.card.for-review .card-icon {
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--accent);
+}
+
+.card.all-students {
+  background: var(--navy-800);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+.card.all-students:hover {
+  background: var(--navy-700);
+  box-shadow: 0 10px 32px rgba(18, 49, 96, 0.4);
+}
+.card.all-students .card-icon {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.card.all-students .card-content h3,
+.card.all-students .card-content p {
+  color: rgba(255, 255, 255, 0.55);
+}
+.card.all-students .card-content h3 {
+  color: rgba(255, 255, 255, 0.65);
+}
+.card.all-students .card-content h2 {
+  color: #fff;
+}
+.card.all-students .trend {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.card-badge.active {
+  background: var(--success-dim);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.card-badge.verified {
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--accent);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.card-badge.monitor {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning, #f59e0b);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+body.dark-mode .card-badge.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+body.dark-mode .card-badge.verified {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+body.dark-mode .card-badge.monitor {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+body.dark-mode .card.rfid-entry:hover {
+  box-shadow: 0 10px 32px rgba(251, 191, 36, 0.2);
+}
+body.dark-mode .card.unassigned-students:hover {
+  box-shadow: 0 10px 32px rgba(167, 139, 250, 0.2);
+  border-color: rgba(167, 139, 250, 0.5);
+}
+
+body.dark-mode .card-badge.attention {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.3);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1287,6 +1383,160 @@ h5 {
   width: 100%;
   border-top: 1px solid var(--surface-border);
 }
+
+
+/* table view */
+
+.table-view {
+  display: none;
+}
+
+.table-view.show {
+  display: block;
+}
+
+.table-switcher {
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.tab-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.6);
+  color: #444;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.tab-btn:hover {
+  border-color: rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.9);
+  color: #111;
+  transform: translateY(-1px);
+}
+
+.tab-btn.active {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  color: #1d4ed8;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.08);
+}
+
+body.dark-mode .table-switcher {
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  width: fit-content;
+}
+
+body.dark-mode .tab-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: #b5b5b5;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(6px);
+}
+
+body.dark-mode .tab-btn:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+body.dark-mode .tab-btn.active {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+
+/* manual */
+
+.watchlist-reasons {
+  margin: 12px 0;
+  padding: 10px 12px;
+  background: var(--surface-subtle);
+  border-radius: var(--r-md);
+  border: 1px solid var(--surface-border);
+}
+.watchlist-reasons-label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.watchlist-reasons ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12px;
+  color: var(--gray-700);
+  line-height: 1.6;
+}
+
+.watchlist-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+.watchlist-last-seen {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--gray-500);
+}
+
+.rfid-reregister-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, var(--navy-500), var(--accent));
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.rfid-reregister-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+body.dark-mode .watchlist-reasons {
+  background: var(--surface-subtle);
+  border-color: var(--surface-border);
+}
+body.dark-mode .watchlist-reasons ul {
+  color: var(--gray-300);
+}
+body.dark-mode .watchlist-last-seen {
+  color: var(--gray-500);
+}
+
 
 /* Search input */
 .search-container {

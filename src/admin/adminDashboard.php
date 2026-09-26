@@ -896,7 +896,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                     </div>
 
 
-                    <div class="card students">
+                    <div class="card for-review">
 
                         <?php
                         $pendingStudents = countPendingStudents($conn);
@@ -932,15 +932,48 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </div>
                     </div>
 
-                    <div class="card unverified-supervisors">
+                    <!-- unassigned students-->
+                    <div class="card unassigned-students">
+
+                         <?php
+                            $unassigned = countUnassignedStudents($conn);
+                            $trend = getUnassignedTrend($conn);
+                            ?>
+
+                            <span class="card-badge attention">ATTENTION</span>
+
+                            <div class="card-content">
+                                <div class="card-left">
+
+                                    <div class="card-top">
+                                        <div class="card-icon">
+                                            <i class="bi bi-person-fill-slash"></i>
+                                        </div>
+
+                                        <div>
+                                            <h3>UNASSIGNED STUDENTS</h3>
+                                            <p>Verified students with no supervisor assigned yet.</p>
+                                        </div>
+                                    </div>
+
+                                    <span class="trend">
+                                        <?= $trend ?> this week
+                                    </span>
+
+                                </div>
+
+                                <h2><?= $unassigned ?></h2>
+                            </div>
+
+                    </div>
+
+                    <div class="card all-students">
 
                         <?php
                         $students = countStudents($conn);
-                        $trend = getTrend($conn, 'student', 'VERIFIED');
-                        $badge = getBadge($students);
                         ?>
 
-                        <span class="card-badge"><?= $badge ?></span>
+                        <span class="card-badge active">ACTIVE</span>
 
                         <div class="card-content">
                             <div class="card-left">
@@ -956,10 +989,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                                     </div>
                                 </div>
 
-                                <span class="trend">
-                                    <?= $trend ?> this week
-                                </span>
-
                             </div>
 
                             <h2><?= $students ?></h2>
@@ -970,11 +999,9 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <div class="card supervisors">
                         <?php
                         $supervisor = countSupervisors($conn);
-                        $superTrend = getTrend($conn, 'supervisor', 'VERIFIED');
-                        $superBadge = getBadge($supervisor);
                         ?>
 
-                        <span class="card-badge"><?= $superBadge ?></span>
+                        <span class="card-badge verified">VERIFIED</span>
 
                         <div class="card-content">
                             <div class="card-left">
@@ -990,40 +1017,42 @@ if ($_SESSION['role'] !== "ADMIN") {
                                     </div>
                                 </div>
 
-                                <span class="trend">
-                                    <?= $superTrend ?> this week
-                                </span>
-
                             </div>
 
                             <h2><?= $supervisor ?></h2>
                         </div>
                     </div>
 
-                    <!-- <div class="card rfid-card" onclick="openRfid()">
+                    <!-- rfid manuals -->
+                    <div class="card rfid-entry">
+
+                        <?php
+                        $rfidFlags = countRfidManualFlags($conn);
+                        ?>
+
+                        <span class="card-badge monitor">MONITOR</span>
 
                         <div class="card-content">
-
                             <div class="card-left">
 
                                 <div class="card-top">
+                                    <div class="card-icon">
+                                        <i class="bi bi-credit-card-2-front-fill"></i>
+                                    </div>
 
-                                    
-
-                                    <div class="rfid-text">
-                                        <h3>RFID Attendance</h3>
-                                        <p>Start real-time scanning for student attendance tracking</p>
+                                    <div>
+                                        <h3>RFID MANUAL ENTRY</h3>
+                                        <p>Students frequently logging in without RFID tap.</p>
                                     </div>
                                 </div>
 
-                                <span class="trend">
-                                    Live scanning mode
-                                </span>
 
                             </div>
+
+                            <h2><?= $rfidFlags ?></h2>
                         </div>
 
-                    </div> -->
+                    </div>
 
                 </section>
 
@@ -1545,6 +1574,19 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 </div>
 
+            <div class="table-view show" id="attendance-records">
+
+                <div class="table-switcher">
+                        <button type="button" class="tab-btn active" data-tab="attendance" onclick="showAttendanceRecords()" >
+                            Attendance Records
+                        </button>
+
+                        <button type="button" class="tab-btn" data-tab="manual" onclick="showManualAttendance()">
+                            Lost Card Alerts
+                        </button>
+                    </div>
+
+
                 <div class="top-bar">
 
                     <div class="top-header">
@@ -1631,6 +1673,27 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+
+            <!-- manuals -->
+             <div class="table-view" id="manual-attention">
+                 <div class="table-switcher">
+                        <button type="button" class="tab-btn" data-tab="attendance" onclick="showAttendanceRecords()" >
+                            Attendance Records
+                        </button>
+
+                        <button type="button" class="tab-btn active" data-tab="manual" onclick="showManualAttendance()">
+                            Lost Card Alerts
+                        </button>
+                </div>
+
+                <div id="manualWatchlistBody">
+                    <?php
+                        echo renderManualAttendanceWatchlist($conn);
+                    ?>
+                </div>
+             </div>
 
             </section>
 

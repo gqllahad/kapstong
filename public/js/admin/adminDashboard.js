@@ -89,6 +89,11 @@ const superAssignedViewClose = document.getElementById("closeAllAssignedStudentM
 
 // const superAssignView = document.getElementById("supervisor-assigned-view");
 
+// attendance records
+
+const attendanceRecords = document.getElementById("attendance-records");
+const manualRecords = document.getElementById("manual-attention");
+
 const AssignStudent = document.getElementById("assign-student-container");
 const AssignStudentBtn = document.getElementById("assign-student-btn");
 const AssignCloseBtn = document.getElementById("closeAssignModal");
@@ -2972,6 +2977,41 @@ document.getElementById("supervisorAssignSearch").addEventListener("keyup", func
 
     }, 300);
 });
+
+//swithcer
+function setActiveTab(tabName) {
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+
+        btn.classList.toggle(
+            "active",
+            btn.dataset.tab === tabName
+        );
+    });
+}
+
+
+function showAttendanceRecords(){
+    attendanceRecords.classList.add("show");
+    manualRecords.classList.remove("show");
+
+    setActiveTab("attendance");
+}
+
+function showManualAttendance(){
+    attendanceRecords.classList.remove("show");
+    manualRecords.classList.add("show");
+
+    setActiveTab("manual");
+}
+
+
+// function openRfidRegisterModal(studentID) {
+//     document.getElementById('rfidStudentID').value = studentID;
+//     overlay.classList.add('show');
+//     document.getElementById('rfid-register-modal').classList.add('show');
+// }
+
 
 // assign submit
 

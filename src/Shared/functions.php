@@ -1680,6 +1680,105 @@ function renderManualAttendanceStudentList($conn, $superID, $role = 'supervisor'
     return $output;
 }
 
+function renderManualAttendanceWatchlist($conn, $threshold = 3, $daysWindow = 90) {
+
+    $sql = "
+        SELECT 
+            al.studentID,
+            os.name,
+            os.course,
+            COUNT(*) AS manual_count,
+            MAX(al.log_date) AS last_manual_date,
+            GROUP_CONCAT(al.manual_reason ORDER BY al.log_date DESC SEPARATOR '||') AS reasons,
+            GROUP_CONCAT(al.log_date ORDER BY al.log_date DESC SEPARATOR '||') AS dates
+        FROM attendance_logs al
+        INNER JOIN ojtstudent os ON os.studentID = al.studentID
+        WHERE al.entry_method = 'MANUAL'
+        AND al.log_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+        GROUP BY al.studentID
+        HAVING manual_count >= ?
+        ORDER BY manual_count DESC, last_manual_date DESC
+    ";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $daysWindow, $threshold);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $totalFlagged = $result->num_rows;
+    $totalManualEntries = 0;
+    $cardsHtml = '';
+
+    if ($totalFlagged > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $totalManualEntries += (int) $row['manual_count'];
+
+            $initial = strtoupper(substr($row['name'], 0, 1));
+            $reasons = explode('||', $row['reasons']);
+            $dates = explode('||', $row['dates']);
+
+            $recentList = '';
+            for ($i = 0; $i < min(3, count($reasons)); $i++) {
+                $formattedDate = date('M d', strtotime($dates[$i]));
+                $recentList .= "<li><strong>{$formattedDate}:</strong> " . e($reasons[$i] ?: 'No reason given') . "</li>";
+            }
+
+            $riskLevel = $row['manual_count'] >= 6 ? 'critical' : ($row['manual_count'] >= 4 ? 'high' : 'medium');
+            $jsStudentID = json_encode($row['studentID']);
+
+            $cardsHtml .= "
+            <div class='ris-card risk-{$riskLevel}'>
+                <div class='ris-top'>
+                    <div class='ris-avatar'>{$initial}</div>
+                    <div class='ris-identity'>
+                        <span class='ris-name'>" . e($row['name']) . "</span>
+                        <span class='ris-meta'>" . e($row['studentID']) . " • " . e($row['course']) . "</span>
+                    </div>
+                    <div class='ris-badges'>
+                        <span class='ris-risk-badge risk-{$riskLevel}'>{$row['manual_count']}x Manual</span>
+                    </div>
+                </div>
+
+                <div class='watchlist-reasons'>
+                    <span class='watchlist-reasons-label'>Recent entries</span>
+                    <ul>{$recentList}</ul>
+                </div>
+
+                <div class='watchlist-actions'>
+                    <span class='watchlist-last-seen'>
+                        <i class='bx bx-time-five'></i> Last: " . e(date('M d, Y', strtotime($row['last_manual_date']))) . "
+                    </span>
+                    <button class='rfid-reregister-btn' onclick='openRfidRegisterModal({$jsStudentID})'>
+                        <i class='bx bx-id-card'></i> Re-register RFID
+                    </button>
+                </div>
+            </div>";
+        }
+    }
+
+    $summaryBar = "
+    <div class='risk-summary-bar'>
+        <div class='rsb-item rsb-critical'>
+            <span class='rsb-count'>{$totalFlagged}</span>
+            <span class='rsb-label'>Flagged Students</span>
+        </div>
+        <div class='rsb-item rsb-total'>
+            <span class='rsb-count'>{$totalManualEntries}</span>
+            <span class='rsb-label'>Manual Entries ({$daysWindow}d)</span>
+        </div>
+    </div>";
+
+    if ($totalFlagged === 0) {
+        return $summaryBar . "
+        <div class='risk-empty'>
+            <i class='bx bx-check-shield'></i>
+            <p>No students have hit the manual-entry threshold. RFID usage looks healthy.</p>
+        </div>";
+    }
+
+    return $summaryBar . "<div class='risk-list'>{$cardsHtml}</div>";
+}
+
 // function renderDepartmentOptions($conn)
 // {
 //     $sql = "SELECT DISTINCT prg_department, prg_department_code FROM program";
@@ -2996,6 +3095,48 @@ function countSupervisors($conn)
     return $stmt->get_result()->fetch_assoc()['total'];
 }
 
+function countRfidManualFlags($conn) {
+    $sql = "
+        SELECT COUNT(*) AS total FROM (
+            SELECT studentID
+            FROM (
+                SELECT
+                    studentID,
+                    entry_method,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY studentID
+                        ORDER BY log_date DESC, attendanceID DESC
+                    ) AS rn
+                FROM attendance_logs
+            ) ranked
+            WHERE rn <= 3
+            GROUP BY studentID
+            HAVING SUM(entry_method = 'MANUAL') = 3
+        ) flagged
+    ";
+
+    $result = $conn->query($sql);
+    return (int)$result->fetch_assoc()['total'];
+}
+
+function countUnassignedStudents($conn) {
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM users u
+        WHERE u.role = 'student'
+        AND u.status = 'VERIFIED'
+        AND NOT EXISTS (
+            SELECT 1
+            FROM student_supervisor ss
+            WHERE ss.studentID = u.studentID
+            AND ss.status = 'ACTIVE'
+        )
+    ";
+
+    $result = $conn->query($sql);
+    return (int)$result->fetch_assoc()['total'];
+}
+
 // trend takings
 function getTrend($conn, $role, $status)
 {
@@ -3031,10 +3172,48 @@ function getTrend($conn, $role, $status)
     return round($percent, 1) . "%";
 }
 
+
+function getUnassignedTrend($conn)
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total
+        FROM users u
+        WHERE u.role = 'student'
+        AND u.isVerified = 'VERIFIED'
+        AND u.dateCreated >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        AND NOT EXISTS (
+            SELECT 1 FROM student_supervisor ss
+            WHERE ss.studentID = u.studentID
+            AND ss.status = 'ACTIVE'
+        )
+    ");
+    $stmt->execute();
+    $recent = $stmt->get_result()->fetch_assoc()['total'];
+
+    $stmt2 = $conn->prepare("
+        SELECT COUNT(*) AS total
+        FROM users u
+        WHERE u.role = 'student'
+        AND u.isVerified = 'VERIFIED'
+        AND NOT EXISTS (
+            SELECT 1 FROM student_supervisor ss
+            WHERE ss.studentID = u.studentID
+            AND ss.status = 'ACTIVE'
+        )
+    ");
+    $stmt2->execute();
+    $total = $stmt2->get_result()->fetch_assoc()['total'];
+
+    if ($total == 0) return "0%";
+
+    $percent = ($recent / $total) * 100;
+    return round($percent, 1) . "%";
+}
+
 // badges
 function getBadge($count)
 {
-    if ($count >= 10) return "Hot";
+    if ($count >= 10) return "Attention";
     if ($count >= 3) return "New";
     return "Stable";
 }
