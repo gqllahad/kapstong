@@ -127,7 +127,12 @@ foreach ($nameParts as $part) {
 
             <ul class="menu">
                 <li><button id="supervisor-dashboard-btn"><i class="bi bi-house"></i> Home </button></li>
-                <li><button id="supervisor-oversight-btn"><i class="bi bi-check2-square"></i> Task Reviews</button></li>
+                <li>
+                    <button id="supervisor-oversight-btn">
+                        <i class="bi bi-check2-square"></i> Task Reviews
+                        <span class="sidebar-badge" id="taskReviewBadge" style="display:none;"></span>
+                    </button>
+                </li>
                 <li><button id="supervisor-students-btn"><i class="bi bi-people"></i>Students</button></li>
                 <li><button id="supervisor-attendance-btn"><i class="bi bi-calendar-check"></i> Attendance Log</button></li>
                 <li><button id="supervisor-evaluation-btn"><i class="bi bi-clipboard-data"></i> Reports / Evaluation</button></li>
@@ -402,6 +407,21 @@ foreach ($nameParts as $part) {
 
                 </div>
 
+            </div>
+
+            <!-- delete template -->
+             <div class="delete-cert-modal" id="certConfirmModal" style="display:none;">
+                <div class="delete-cert-box">
+                    <div class="delete-cert-icon">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="delete-cert-title">Remove certificate template?</h3>
+                    <p class="delete-cert-message">This will permanently delete the saved template. This can't be undone.</p>
+                    <div class="modal-actions">
+                        <button type="button" class="delete-cert-cancel" id="certModalCancel">Cancel</button>
+                        <button type="button" class="delete-cert-confirm" id="certModalConfirm">Remove</button>
+                    </div>
+                </div>
             </div>
 
             <!-- view final evaluation -->
@@ -1183,6 +1203,11 @@ foreach ($nameParts as $part) {
                                     <p>Distribution across all assigned students</p>
                                 </div>
                             </div>
+                            <select id="entrySourceSelector" onchange="loadPieChart()">
+                                <option value="all">All Entries</option>
+                                <option value="RFID">RFID Only</option>
+                                <option value="MANUAL">Manual Only</option>
+                            </select>
                         </div>
 
                         <div class="pie-container">
@@ -1737,12 +1762,16 @@ foreach ($nameParts as $part) {
 
                 <div class="table-view show" id="evaluation-table">
                     <div class="table-switcher">
-                        <button class="tab-btn active" data-tab="evaluation" >
+                        <button type="button" class="tab-btn active" data-tab="evaluation" onclick="showEvaluation()" >
                             Evaluations
                         </button>
 
-                        <button class="tab-btn" data-tab="reports">
+                        <button type="button" class="tab-btn" data-tab="reports" onclick="showReports()">
                             Reports
+                        </button>
+
+                        <button type="button" class="tab-btn" data-tab="completion" onclick="showCompletion()">
+                            Certificate of Completion
                         </button>
                     </div>
 
@@ -1798,6 +1827,84 @@ foreach ($nameParts as $part) {
                         </table>
                     </div>
                 </div>
+
+
+                <!-- reports -->
+                 <div class="table-view" id="reports-table">
+                    <div class="table-switcher">
+                        <button type="button" class="tab-btn" data-tab="evaluation" onclick="showEvaluation()" >
+                            Evaluations
+                        </button>
+
+                        <button type="button" class="tab-btn active" data-tab="reports" onclick="showReports()">
+                            Reports
+                        </button>
+
+                        <button type="button" class="tab-btn" data-tab="completion" onclick="showCompletion()">
+                            Certificate of Completion
+                        </button>
+                    </div>
+                 </div>
+
+
+                 <!-- completion certificate -->
+                  <div class="table-view" id="certificate-complete">
+                    <div class="table-switcher">
+                        <button type="button" class="tab-btn" data-tab="evaluation" onclick="showEvaluation()" >
+                            Evaluations
+                        </button>
+
+                        <button type="button" class="tab-btn" data-tab="reports" onclick="showReports()">
+                            Reports
+                        </button>
+
+                        <button type="button" class="tab-btn active" data-tab="completion" onclick="showCompletion()">
+                            Certificate of Completion
+                        </button>
+                    </div>
+
+                    <div class="top-bar">
+                        <div class="top-header">
+                            <h3 class="table-title">Certificate of Completion</h3>
+                            <p>Upload the certificate template issued when a student completes their OJT hours.</p>
+                        </div>
+                    </div>
+
+                    <div class="cert-upload-wrap">
+
+                        <div class="cert-dropzone" id="certDropzone">
+                            <input type="file" id="certFileInput" accept=".pdf,.png,.jpg,.jpeg" hidden>
+
+                            <div class="cert-dropzone-empty" id="certEmptyState">
+                                <i class="bi bi-file-earmark-arrow-up cert-upload-icon"></i>
+                                <p class="cert-upload-title">Drop your certificate template here</p>
+                                <p class="cert-upload-sub">PDF, PNG or JPG, up to 10MB</p>
+                                <button type="button" class="cert-browse-btn" id="certBrowseBtn">Browse file</button>
+                            </div>
+
+                            <div class="cert-dropzone-preview" id="certPreviewState" style="display:none;">
+                                <i class="bi bi-file-earmark-check cert-preview-icon"></i>
+                                <div class="cert-preview-info">
+                                    <p class="cert-preview-name" id="certFileName"></p>
+                                    <p class="cert-preview-size" id="certFileSize"></p>
+                                </div>
+                                <div class="cert-preview-actions">
+                                    <button type="button" class="cert-replace-btn" id="certReplaceBtn">Replace</button>
+                                    <button type="button" class="cert-remove-btn" id="certRemoveBtn">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cert-upload-footer">
+                            <span class="cert-status" id="certStatus"></span>
+                            <button type="button" class="cert-save-btn" id="certSaveBtn" disabled>Save Template</button>
+                        </div>
+
+                    </div>
+                  </div>
+                  
 
             </section>
 

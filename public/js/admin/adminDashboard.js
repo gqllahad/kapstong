@@ -110,10 +110,6 @@ const closeRfidAttendanceBtn = document.getElementById("closeRfidAttendanceModal
 const evaluationSettingsBtn = document.getElementById("evaluation-settings-btn");
 const closeEvaluationSettingsBtn = document.getElementById("closeEvaluationSettingsModal");
 
-
-const requirementsSetupBtn = document.getElementById("requirements-setup-btn");
-const closeRequirementsSetupBtn = document.getElementById("closeRequirementsSetupModal");
-
 const ojtSetup = document.getElementById("ojt-program-container");
 const departmentManagement = document.getElementById("department-management-container");
 const rfidAttendance = document.getElementById("rfid-attendance-container");

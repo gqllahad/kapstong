@@ -839,72 +839,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
             </div>
 
-            <!-- requirements setup -->
-            <div class="requirements-setup-container" id="requirements-setup-container">
-                <div class="modal-header">
-                    <h3>Requirements Setup</h3>
-                    <button id="closeRequirementsSetupModal" class="modal-close">&times;</button>
-                </div>
-
-                <div class="requirements-body">
-
-
-
-                    <div class="form-group">
-                        <label>Requirement Name</label>
-                        <input type="text" placeholder="e.g. Resume / CV">
-                    </div>
-                    <div class="form-grid">
-
-
-                        <div class="form-group">
-                            <label>Requirement Type</label>
-                            <select>
-                                <option value="DOCUMENT">Document</option>
-                                <option value="FORM">Form</option>
-                                <option value="REPORT">Report</option>
-                                <option value="OTHER">Other</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Submission Stage</label>
-                            <select>
-                                <option value="PRE-OJT">Pre-OJT</option>
-                                <option value="DURING-OJT">During OJT</option>
-                                <option value="POST-OJT">Post-OJT</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Required?</label>
-                            <select>
-                                <option value="YES">Yes (Required)</option>
-                                <option value="NO">No (Optional)</option>
-                            </select>
-                        </div>
-
-
-
-                        <div class="form-group">
-                            <label>Deadline (if applicable)</label>
-                            <input type="date">
-                        </div>
-
-                    </div>
-
-                    <div class="form-group">
-                        <label>Description / Instructions</label>
-                        <textarea placeholder="Provide instructions for students..."></textarea>
-                    </div>
-
-                    <div class="requirements-actions">
-                        <button class="save-btn">Add Requirement</button>
-                    </div>
-
-                </div>
-            </div>
-
             <!-- viewall -->
             <div class="view-all-modal" id="view-all-modal">
                 <div class="modal-header">
@@ -1390,13 +1324,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <button class="create-btn" id="evaluation-settings-btn">
                             <i class="bi bi-star-fill icon"></i>
                             <span class="text">Evaluation Settings</span>
-                        </button>
-                    </div>
-
-                    <div class="create-section-container">
-                        <button class="create-btn" id="requirements-setup-btn">
-                            <i class="bi bi-file-earmark-text icon"></i>
-                            <span class="text">Requirements Setup</span>
                         </button>
                     </div>
 

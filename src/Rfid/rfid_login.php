@@ -67,6 +67,26 @@ if (isset($_POST['rfid'])) {
         die("RFID CANNOT BE EMPTY");
     }
 
+    // Event handler
+    $calStmt = $conn->prepare("
+        SELECT type, label, hour_multiplier 
+        FROM calendar_events 
+        WHERE event_date = ?
+    ");
+    $calStmt->bind_param("s", $today);
+    $calStmt->execute();
+    $calEvent = $calStmt->get_result()->fetch_assoc();
+
+    $dayType = $calEvent['type'] ?? 'WORKDAY';
+    $hourMultiplier = $calEvent ? (float) $calEvent['hour_multiplier'] : 1.0;
+    $dayLabel = $calEvent['label'] ?? null;
+
+    if ($dayType === 'NO_WORK') {
+        $_SESSION['status'] = "Today is marked as a no-work day" . ($dayLabel ? " ({$dayLabel})" : "") . ". Attendance scanning is disabled.";
+        echo $_SESSION['status'];
+        exit();
+    }
+
     $stmt = $conn->prepare("
         SELECT userID, studentID, name, role 
         FROM users 
@@ -186,6 +206,10 @@ if (isset($_POST['rfid'])) {
         } else {
             $status = "present";
             $remarks = "Arrived on time";
+        }
+
+        if ($dayType === 'HOLIDAY') {
+            $remarks .= " (Holiday: " . ($dayLabel ?: 'Unnamed') . ", {$hourMultiplier}x hours)";
         }
 
        $stmtIn = $conn->prepare("
@@ -368,7 +392,12 @@ if (isset($_POST['rfid'])) {
 
         $totalHours = roundHoursWithThreshold($totalHours);
 
+        $creditedHours = round($totalHours * $hourMultiplier, 2);
+
         $remarks = "Completed {$totalHours} hours for the day";
+        if ($hourMultiplier != 1.0) {
+            $remarks .= " — credited as {$creditedHours}h ({$hourMultiplier}x" . ($dayLabel ? ", {$dayLabel}" : "") . ")";
+        }
 
         $stmt = $conn->prepare("
             UPDATE attendance_logs
@@ -380,27 +409,19 @@ if (isset($_POST['rfid'])) {
             WHERE attendanceID = ?
         ");
 
-        $stmt->bind_param("dsi",$totalHours,$remarks,$row['attendanceID']);
+        $stmt->bind_param("dsi", $creditedHours, $remarks, $row['attendanceID']);
         $stmt->execute();
 
         $updateProgress = $conn->prepare("
             UPDATE student_progress
-            SET 
-                completed_hours = completed_hours + ?,
+            SET completed_hours = completed_hours + ?,
                 remaining_hours = LEAST(required_hours, completed_hours + ?)
             WHERE studentID = ?
         ");
-
-        $updateProgress->bind_param(
-            "dds",
-            $totalHours,
-            $totalHours,
-            $studentID
-        );
-
+        $updateProgress->bind_param("dds", $creditedHours, $creditedHours, $studentID);
         $updateProgress->execute();
 
-        $_SESSION['status'] = "TIME OUT SUCCESS ($totalHours hrs).";
+        $_SESSION['status'] = "TIME OUT SUCCESS ({$creditedHours} hrs)" . ($hourMultiplier != 1.0 ? " [{$hourMultiplier}x applied]" : "") . ".";
         echo $_SESSION['status'];
         exit();
     }

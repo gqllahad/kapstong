@@ -15,6 +15,8 @@ if (!$superID) {
     exit;
 }
 
+$source = $_GET['source'] ?? 'all';
+
 $sql = "
 SELECT 
     status,
@@ -26,11 +28,22 @@ WHERE studentID IN (
     WHERE superID = ?
     AND status = 'ACTIVE'
 )
-GROUP BY status
 ";
 
+if ($source === 'RFID' || $source === 'MANUAL') {
+    $sql .= " AND entry_method = ? ";
+}
+
+$sql .= " GROUP BY status ";
+
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $superID);
+
+if ($source === 'RFID' || $source === 'MANUAL') {
+    $stmt->bind_param("is", $superID, $source);
+} else {
+    $stmt->bind_param("i", $superID);
+}
+
 $stmt->execute();
 $result = $stmt->get_result();
 

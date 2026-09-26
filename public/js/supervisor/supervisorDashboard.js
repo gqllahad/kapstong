@@ -113,6 +113,12 @@ const attendanceTable = document.getElementById("attendance-table");
 const attendanceCalendar = document.getElementById("attendance-calendar");
 const attendanceCalendarModal = document.getElementById('day-edit-container');
 
+
+// reports switch
+const evaluationTable = document.getElementById("evaluation-table");
+const reportsTable = document.getElementById("reports-table");
+const certificateComplete = document.getElementById("certificate-complete");
+
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth() + 1;
 
@@ -164,6 +170,28 @@ function toggleSection(header) {
     });
 
     card.classList.toggle("active");
+}
+
+// sidebar notif
+function loadSidebarNotifications() {
+    fetch("functions/getPendingCounts.php", { credentials: "include" })
+        .then(res => res.json())
+        .then(data => {
+            updateBadge("taskReviewBadge", data.pending_tasks);
+        })
+        .catch(err => console.error("Notification fetch failed:", err));
+}
+
+function updateBadge(elementId, count) {
+    const badge = document.getElementById(elementId);
+    if (!badge) return;
+
+    if (count > 0) {
+        badge.textContent = count > 99 ? "99+" : count;
+        badge.style.display = "inline-flex";
+    } else {
+        badge.style.display = "none";
+    }
 }
 
 // steps create tasks
@@ -1126,7 +1154,9 @@ function reloadAllCharts() {
 
 function loadPieChart() {
 
-    fetch("functions/getOverallAttendanceChart.php", {
+    const source = document.getElementById("entrySourceSelector").value;
+
+    fetch(`functions/getOverallAttendanceChart.php?source=${source}`, {
         credentials: "include"
     })
 
@@ -1136,7 +1166,6 @@ function loadPieChart() {
 
         const ctx = document.getElementById('pieChart');
 
-        // Colors
         const pieColors = data.labels.map(label => {
 
             if (label === "Present") return "#22c55e";
@@ -1326,6 +1355,18 @@ function loadLineChart() {
 
         window.currentChartData = data;
 
+        function pointColors(baseColor) {
+            return data.labels.map((_, i) =>
+                data.no_work && data.no_work[i] ? '#9CA3AF' : baseColor
+            );
+        }
+
+        function pointRadii() {
+            return data.labels.map((_, i) =>
+                data.no_work && data.no_work[i] ? 4 : 2
+            );
+        }
+
         window.lineChartInstance = new Chart(ctx, {
 
             type: 'line',
@@ -1338,74 +1379,48 @@ function loadLineChart() {
 
                     {
                         label: 'Present',
-
                         data: data.present,
-
                         borderColor: '#22c55e',
-
                         backgroundColor: 'transparent',
-
                         borderWidth: 2,
-
                         tension: 0.2,
-
-                        pointRadius: 2,
-
-                        pointHoverRadius: 5
+                        pointRadius: pointRadii(),
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: pointColors('#22c55e'),
                     },
 
                     {
                         label: 'Late',
-
                         data: data.late,
-
                         borderColor: '#f59e0b',
-
                         backgroundColor: 'transparent',
-
                         borderWidth: 2,
-
                         tension: 0.2,
-
                         pointRadius: 2,
-
                         pointHoverRadius: 5
                     },
 
                     {
                         label: 'Excused',
-
                         data: data.excused,
-
                         borderColor: '#3b82f6',
-
                         backgroundColor: 'transparent',
-
                         borderWidth: 2,
-
                         tension: 0.2,
-
                         pointRadius: 2,
-
                         pointHoverRadius: 5
                     },
 
                     {
                         label: 'Absent',
-
                         data: data.absent,
-
                         borderColor: '#ef4444',
-
                         backgroundColor: 'transparent',
-
                         borderWidth: 2,
-
                         tension: 0.2,
-
                         pointRadius: 2,
-
-                        pointHoverRadius: 5
+                        pointHoverRadius: 5,
+                        hidden : true
                     }
 
                 ]
@@ -1426,41 +1441,33 @@ function loadLineChart() {
                 plugins: {
 
                     legend: {
-
                         position: 'top',
-
                         align: 'start',
 
                         labels: {
-
                             color: getChartTextColor(),
-
                             usePointStyle: true,
-
                             pointStyle: 'line',
-
                             padding: 16,
-
                             font: {
                                 size: 12
                             }
-
                         }
 
                     },
 
                     tooltip: {
-
-                        backgroundColor: '#111827',
-
+                         backgroundColor: '#111827',
                         titleColor: '#fff',
-
                         bodyColor: '#d1d5db',
-
                         borderColor: 'rgba(255,255,255,0.08)',
-
-                        borderWidth: 1
-
+                        borderWidth: 1,
+                        callbacks: {
+                            afterTitle: function(context) {
+                                const i = context[0].dataIndex;
+                                return data.no_work && data.no_work[i] ? '(No-work day)' : '';
+                            }
+                        }
                     }
 
                 },
@@ -1946,6 +1953,7 @@ function updateTaskStatus(taskID, status) {
             overlay.classList.remove("show");
             studentApplicationApprove.classList.remove("show");
             reloadAllCharts();
+            loadSidebarNotifications();
             showToast("Task approved successfully.", "success");
         }
     }).catch(err => {
@@ -2499,6 +2507,42 @@ document.getElementById('calNextBtn').addEventListener('click', () => {
     if (calMonth > 12) { calMonth = 1; calYear++; }
     loadCalendar();
 });
+
+
+// reports switcher
+
+function showEvaluation(){
+    evaluationTable.classList.remove("show");
+    certificateComplete.classList.remove("show");
+    evaluationTable.classList.add("show");
+
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="evaluation"]').classList.add('active');
+
+    setActiveTab("evaluation");
+}
+
+function showReports(){
+    evaluationTable.classList.remove("show");
+    certificateComplete.classList.remove("show");
+    reportsTable.classList.add("show");
+
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="reports"]').classList.add('active');
+
+    setActiveTab("reports");
+}
+
+function showCompletion(){
+    reportsTable.classList.remove("show");
+    evaluationTable.classList.remove("show");
+    certificateComplete.classList.add("show");
+
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="completion"]').classList.add('active');
+
+    setActiveTab("completion");
+}
 
 
 
@@ -3230,6 +3274,324 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// completion certificate
+(function () {
+
+    const dropzone = document.getElementById("certDropzone");
+    const fileInput = document.getElementById("certFileInput");
+    const browseBtn = document.getElementById("certBrowseBtn");
+    const emptyState = document.getElementById("certEmptyState");
+    const previewState = document.getElementById("certPreviewState");
+    const fileNameEl = document.getElementById("certFileName");
+    const fileSizeEl = document.getElementById("certFileSize");
+    const replaceBtn = document.getElementById("certReplaceBtn");
+    const removeBtn = document.getElementById("certRemoveBtn");
+    const saveBtn = document.getElementById("certSaveBtn");
+    const statusEl = document.getElementById("certStatus");
+
+    function showConfirmModal() {
+        const modal = document.getElementById("certConfirmModal");
+        const cancelBtn = document.getElementById("certModalCancel");
+        const confirmBtn = document.getElementById("certModalConfirm");
+
+        return new Promise((resolve) => {
+            modal.style.display = "flex";
+
+            function cleanup(result) {
+                modal.style.display = "none";
+                cancelBtn.removeEventListener("click", onCancel);
+                confirmBtn.removeEventListener("click", onConfirm);
+                modal.removeEventListener("click", onOverlayClick);
+                resolve(result);
+            }
+
+            function onCancel() { cleanup(false); }
+            function onConfirm() { cleanup(true); }
+            function onOverlayClick(e) {
+                if (e.target === modal) cleanup(false);
+            }
+
+            cancelBtn.addEventListener("click", onCancel);
+            confirmBtn.addEventListener("click", onConfirm);
+            modal.addEventListener("click", onOverlayClick);
+        });
+    }
+
+    let selectedFile = null;
+    let isSavedOnServer = false; 
+
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+        return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    }
+
+    function showPreview(name, size, saved) {
+        fileNameEl.textContent = name;
+        fileSizeEl.textContent = size;
+        emptyState.style.display = "none";
+        previewState.style.display = "flex";
+        isSavedOnServer = saved;
+        saveBtn.disabled = saved; 
+        statusEl.textContent = "";
+        statusEl.className = "cert-status";
+    }
+
+    function resetDropzone() {
+        selectedFile = null;
+        isSavedOnServer = false;
+        fileInput.value = "";
+        emptyState.style.display = "flex";
+        previewState.style.display = "none";
+        saveBtn.disabled = true;
+    }
+
+    function handleFile(file) {
+        const allowed = ["application/pdf", "image/png", "image/jpeg"];
+        if (!allowed.includes(file.type)) {
+            statusEl.textContent = "Unsupported file type.";
+            statusEl.className = "cert-status error";
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            statusEl.textContent = "File exceeds 10MB limit.";
+            statusEl.className = "cert-status error";
+            return;
+        }
+        selectedFile = file;
+        showPreview(file.name, formatSize(file.size), false);
+        saveBtn.disabled = false;
+    }
+
+    function loadExistingCertificate() {
+        fetch("functions/getCertificate.php", { credentials: "include" })
+            .then(res => res.json())
+            .then(data => {
+                if (data.exists) {
+                    showPreview(data.file_name, formatSize(data.file_size), true);
+                }
+            })
+            .catch(() => {});
+    }
+
+    browseBtn.addEventListener("click", () => fileInput.click());
+    replaceBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        fileInput.click();
+    });
+
+    removeBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+
+        if (!isSavedOnServer) {
+            resetDropzone();
+            return;
+        }
+
+        const confirmed = await showConfirmModal();
+        if (!confirmed) return;
+
+        statusEl.textContent = "Removing...";
+        statusEl.className = "cert-status";
+
+        fetch("functions/deleteCertificate.php", {
+            method: "POST",
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                resetDropzone();
+                statusEl.textContent = "Template removed.";
+                statusEl.className = "cert-status success";
+            } else {
+                statusEl.textContent = data.message || "Failed to remove.";
+                statusEl.className = "cert-status error";
+            }
+        })
+        .catch(() => {
+            statusEl.textContent = "Failed to remove. Try again.";
+            statusEl.className = "cert-status error";
+        });
+    });
+
+    fileInput.addEventListener("change", () => {
+        if (fileInput.files.length) handleFile(fileInput.files[0]);
+    });
+
+    dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.classList.add("drag-over");
+    });
+
+    dropzone.addEventListener("dragleave", () => {
+        dropzone.classList.remove("drag-over");
+    });
+
+    dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("drag-over");
+        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+
+    saveBtn.addEventListener("click", () => {
+        if (!selectedFile) return;
+
+        const formData = new FormData();
+        formData.append("certificate", selectedFile);
+
+        saveBtn.disabled = true;
+        statusEl.textContent = "Uploading...";
+        statusEl.className = "cert-status";
+
+        fetch("functions/uploadCertificateTemplate.php", {
+            method: "POST",
+            credentials: "include",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                isSavedOnServer = true;
+                statusEl.textContent = "Template saved.";
+                statusEl.className = "cert-status success";
+            } else {
+                statusEl.textContent = data.message || "Upload failed.";
+                statusEl.className = "cert-status error";
+                saveBtn.disabled = false;
+            }
+        })
+        .catch(() => {
+            statusEl.textContent = "Upload failed. Try again.";
+            statusEl.className = "cert-status error";
+            saveBtn.disabled = false;
+        });
+    });
+
+    loadExistingCertificate();
+
+})();
+// (function () {
+
+//     const dropzone = document.getElementById("certDropzone");
+//     const fileInput = document.getElementById("certFileInput");
+//     const browseBtn = document.getElementById("certBrowseBtn");
+//     const emptyState = document.getElementById("certEmptyState");
+//     const previewState = document.getElementById("certPreviewState");
+//     const fileNameEl = document.getElementById("certFileName");
+//     const fileSizeEl = document.getElementById("certFileSize");
+//     const replaceBtn = document.getElementById("certReplaceBtn");
+//     const removeBtn = document.getElementById("certRemoveBtn");
+//     const saveBtn = document.getElementById("certSaveBtn");
+//     const statusEl = document.getElementById("certStatus");
+
+//     let selectedFile = null;
+
+//     function formatSize(bytes) {
+//         if (bytes < 1024) return bytes + " B";
+//         if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+//         return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+//     }
+
+//     function showPreview(file) {
+//         selectedFile = file;
+//         fileNameEl.textContent = file.name;
+//         fileSizeEl.textContent = formatSize(file.size);
+//         emptyState.style.display = "none";
+//         previewState.style.display = "flex";
+//         saveBtn.disabled = false;
+//         statusEl.textContent = "";
+//         statusEl.className = "cert-status";
+//     }
+
+//     function resetDropzone() {
+//         selectedFile = null;
+//         fileInput.value = "";
+//         emptyState.style.display = "flex";
+//         previewState.style.display = "none";
+//         saveBtn.disabled = true;
+//     }
+
+//     function handleFile(file) {
+//         const allowed = ["application/pdf", "image/png", "image/jpeg"];
+//         if (!allowed.includes(file.type)) {
+//             statusEl.textContent = "Unsupported file type.";
+//             statusEl.className = "cert-status error";
+//             return;
+//         }
+//         if (file.size > 10 * 1024 * 1024) {
+//             statusEl.textContent = "File exceeds 10MB limit.";
+//             statusEl.className = "cert-status error";
+//             return;
+//         }
+//         showPreview(file);
+//     }
+
+//     browseBtn.addEventListener("click", () => fileInput.click());
+//     replaceBtn.addEventListener("click", (e) => {
+//         e.stopPropagation();
+//         fileInput.click();
+//     });
+//     removeBtn.addEventListener("click", (e) => {
+//         e.stopPropagation();
+//         resetDropzone();
+//     });
+
+//     fileInput.addEventListener("change", () => {
+//         if (fileInput.files.length) handleFile(fileInput.files[0]);
+//     });
+
+//     dropzone.addEventListener("dragover", (e) => {
+//         e.preventDefault();
+//         dropzone.classList.add("drag-over");
+//     });
+
+//     dropzone.addEventListener("dragleave", () => {
+//         dropzone.classList.remove("drag-over");
+//     });
+
+//     dropzone.addEventListener("drop", (e) => {
+//         e.preventDefault();
+//         dropzone.classList.remove("drag-over");
+//         if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+//     });
+
+//     saveBtn.addEventListener("click", () => {
+//         if (!selectedFile) return;
+
+//         const formData = new FormData();
+//         formData.append("certificate", selectedFile);
+
+//         saveBtn.disabled = true;
+//         statusEl.textContent = "Uploading...";
+//         statusEl.className = "cert-status";
+
+//         fetch("functions/uploadCertificateTemplate.php", {
+//             method: "POST",
+//             credentials: "include",
+//             body: formData
+//         })
+//         .then(res => res.json())
+//         .then(data => {
+//             if (data.success) {
+//                 statusEl.textContent = "Template saved.";
+//                 statusEl.className = "cert-status success";
+//             } else {
+//                 statusEl.textContent = data.message || "Upload failed.";
+//                 statusEl.className = "cert-status error";
+//                 saveBtn.disabled = false;
+//             }
+//         })
+//         .catch(() => {
+//             statusEl.textContent = "Upload failed. Try again.";
+//             statusEl.className = "cert-status error";
+//             saveBtn.disabled = false;
+//         });
+//     });
+
+// })();
+
+
 
 
 
@@ -3265,6 +3627,8 @@ toggleBtn.addEventListener("click", () => {
         localStorage.setItem("theme", "light");
     }
 });
+
+document.addEventListener("DOMContentLoaded", loadSidebarNotifications);
 
 window.addEventListener("DOMContentLoaded", () => {
 
