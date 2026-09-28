@@ -1762,10 +1762,6 @@ function renderManualAttendanceWatchlist($conn, $threshold = 3, $daysWindow = 90
             <span class='rsb-count'>{$totalFlagged}</span>
             <span class='rsb-label'>Flagged Students</span>
         </div>
-        <div class='rsb-item rsb-total'>
-            <span class='rsb-count'>{$totalManualEntries}</span>
-            <span class='rsb-label'>Manual Entries ({$daysWindow}d)</span>
-        </div>
     </div>";
 
     if ($totalFlagged === 0) {

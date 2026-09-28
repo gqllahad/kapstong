@@ -2184,6 +2184,7 @@ td {
 .download-all-student-modal,
 .download-all-supervisor-modal,
 .rfid-register-modal,
+.lost-rfid-register-modal,
 .attendance-download-modal,
 .evaluation-download-modal {
   position: fixed;
@@ -2227,6 +2228,7 @@ td {
 .download-all-student-modal.show,
 .download-all-supervisor-modal.show,
 .rfid-register-modal.show,
+.lost-rfid-register-modal.show,
 .attendance-download-modal.show,
 .evaluation-download-modal.show {
   opacity: 1;
@@ -4779,6 +4781,7 @@ body.dark-mode .view-all-modal,
 body.dark-mode .download-all-student-modal,
 body.dark-mode .download-all-supervisor-modal,
 body.dark-mode .rfid-register-modal,
+body.dark-mode .lost-rfid-register-modal,
 body.dark-mode .attendance-download-modal,
 body.dark-mode .evaluation-download-modal {
   background: var(--surface-card);

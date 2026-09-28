@@ -333,6 +333,55 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
             </div>
 
+            <!-- reregister student rfid -->
+            <div class="lost-rfid-register-modal" id="lost-rfid-register-modal">
+                <div class="rfid-register-content">
+
+                    <div class="modal-header">
+                        <h3>Register RFID</h3>
+
+                        <button id="closeLostRfidRegisterModal" onclick="closeRfidRegisterModal()"
+                            class="modal-close">
+                            &times;
+                        </button>
+                    </div>
+
+                    <div class="rfid-register-body">
+
+                        <input type="hidden" id="lostRfidStudentID">
+
+                        <div class="rfid-icon">
+                            <i class="bi bi-person-vcard"></i>
+                        </div>
+
+                        <h2 class="rfid-title">
+                            Scan RFID Card
+                        </h2>
+
+                        <p class="rfid-subtitle">
+                            Place the RFID card near the scanner
+                        </p>
+
+                        <div class="rfid-input-container">
+
+                            <input type="text"
+                                id="lost_rfid_uid"
+                                class="rfid-input"
+                                placeholder="Tap RFID Card..."
+                                autocomplete="off">
+
+                        </div>
+
+                        <button class="register-rfid-btn"
+                            onclick="reRegisterRfid()">
+                            Register RFID
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+
             <!-- download students data -->
             <div class="download-all-student-modal" id="download-all-student-modal">
 
@@ -1837,6 +1886,7 @@ if ($_SESSION['role'] !== "ADMIN") {
     let inactivityTimer;
     let countdownTimer;
     let countdownValue = 60;
+    let warningActive = false;
 
     const modal = document.getElementById("inactivityModal");
     const countdownEl = document.getElementById("countdown");

@@ -108,7 +108,6 @@ const filterProgramsBody = document.getElementById("filterProgramsBody");
 const closeDeparmentManagementBtn = document.getElementById("closeDepartmentManagement");
 const closeDeparmentManagementModalBtn = document.getElementById("closeDepartmentManagementModal");
 
-
 const rfidAttendanceBtn = document.getElementById("rfid-attendance-btn");
 const closeRfidAttendanceBtn = document.getElementById("closeRfidAttendanceModal");
 
@@ -119,7 +118,6 @@ const ojtSetup = document.getElementById("ojt-program-container");
 const departmentManagement = document.getElementById("department-management-container");
 const rfidAttendance = document.getElementById("rfid-attendance-container");
 const evaluationSettings = document.getElementById("evaluation-settings-container");
-const requirementsSetup = document.getElementById("requirements-setup-container");
 
 const viewAllBtn = document.getElementById("view-all-btn");
 const viewAll = document.getElementById("view-all-modal");
@@ -127,6 +125,9 @@ const closeViewAllBtn = document.getElementById("closeViewAllModal");
 
 const rfidRegister = document.getElementById("rfid-register-modal");
 const closeRfidRegister = document.getElementById("closeRfidRegisterModal");
+
+const lostRfidRegister = document.getElementById("lost-rfid-register-modal");
+const lostRfidRegisterClose = document.getElementById("closeLostRfidRegisterModal");
 
 // downloads
 const downloadAllStudentBtn = document.getElementById("downloadAllStudentBtn");
@@ -2573,11 +2574,11 @@ overlay.addEventListener('click', () => {
 
       rfidAttendance.classList.remove("show")
       evaluationSettings.classList.remove("show")
-      requirementsSetup.classList.remove("show")
       viewAll.classList.remove("show")
       downloadAllStudent.classList.remove("show")
       downloadAllSupervisor.classList.remove("show")
       rfidRegister.classList.remove("show");
+      lostRfidRegister.classList.remove("show");
       document.getElementById("attendance-download-modal").classList.remove("show");
       document.getElementById("evaluation-download-modal").classList.remove("show");
 });
@@ -3006,12 +3007,61 @@ function showManualAttendance(){
 }
 
 
-// function openRfidRegisterModal(studentID) {
-//     document.getElementById('rfidStudentID').value = studentID;
-//     overlay.classList.add('show');
-//     document.getElementById('rfid-register-modal').classList.add('show');
-// }
+// reregister rfid
+function openRfidRegisterModal(studentID) {
+    document.getElementById('lostRfidStudentID').value = studentID;
+    
+    const input = document.getElementById("lost_rfid_uid");
+    input.value = "";
+    
+    lostRfidRegister.classList.add('show');
+    overlay.classList.add('show');
 
+    setTimeout(() => input.focus(), 100);
+}
+
+function closeRfidRegisterModal(){
+    lostRfidRegister.classList.remove('show');
+    overlay.classList.remove("show");
+}
+
+
+function reRegisterRfid() {
+    const studentID = document.getElementById("lostRfidStudentID").value;
+    const rfid_uid = document.getElementById("lost_rfid_uid").value.trim();
+    const btn = document.querySelector(".register-rfid-btn");
+
+    if (rfid_uid === "") {
+        showToast("Please scan RFID first", "warning");
+        return;
+    }
+
+    btn.disabled = true;
+
+    fetch("functions/reregister_rfid.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "studentID=" + encodeURIComponent(studentID)
+            + "&rfid_uid=" + encodeURIComponent(rfid_uid)
+    })
+    .then(response => response.text())
+    .then(data => {
+        if (data === "success") {
+            showToast("RFID re-registered successfully", "success");
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast(data, "error");
+            btn.disabled = false;
+        }
+    })
+    .catch(error => {
+        showToast(error, "error");
+        btn.disabled = false;
+    });
+}
 
 // assign submit
 
@@ -3303,15 +3353,6 @@ closeEvaluationSettingsBtn.addEventListener("click", () => {
     evaluationSettings.classList.remove("show");
 });
 
-requirementsSetupBtn.addEventListener("click", () => {
-    overlay.classList.add("show");
-    requirementsSetup.classList.add("show");
-});
-closeRequirementsSetupBtn.addEventListener("click", () => {
-    overlay.classList.remove("show");
-    requirementsSetup.classList.remove("show");
-}); 
-
 viewAllBtn.addEventListener("click", () => {
     overlay.classList.add("show");
     viewAll.classList.add("show");
@@ -3346,8 +3387,6 @@ closeDownloadAllSupervisor.addEventListener("click", () => {
 });
 
 // reigister rfid
-
-
 closeRfidRegister.addEventListener("click", () => {
     rfidRegister.classList.remove("show");
     allStudent.classList.add("show");
