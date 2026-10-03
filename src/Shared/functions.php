@@ -2462,15 +2462,6 @@ function renderAdminFinalEvaluation($conn, $search = '', $course = '', $superID 
         fe.evaluationID,
         fe.studentID,
         fe.superID,
-        fe.attendance_score,
-        fe.progress_score,
-        fe.task_score,
-        fe.final_score,
-        fe.ethics_rating,
-        fe.communication_rating,
-        fe.initiative_rating,
-        fe.discipline_rating,
-        fe.final_recommendation,
         fe.final_remarks,
         fe.status,
         fe.created_at,
@@ -2565,21 +2556,6 @@ function renderAdminFinalEvaluation($conn, $search = '', $course = '', $superID 
 
                 <td>{$row['supervisor_name']}</td>
 
-                <td>{$row['attendance_score']}</td>
-                <td>{$row['progress_score']}</td>
-                <td>{$row['task_score']}</td>
-
-                <td><b>{$row['final_score']}</b></td>
-
-                <td>
-                    E: {$row['ethics_rating']} |
-                    C: {$row['communication_rating']} |
-                    I: {$row['initiative_rating']} |
-                    D: {$row['discipline_rating']}
-                </td>
-
-                <td>{$row['final_recommendation']}</td>
-
                 <td>
                     <span class='status-pill'
                         style='background: {$color}15;
@@ -2590,6 +2566,15 @@ function renderAdminFinalEvaluation($conn, $search = '', $course = '', $superID 
                 </td>
 
                 <td>" . date('F d, Y', strtotime($row['created_at'])) . "</td>
+
+                <td>
+                    <button class='btn-preview' onclick='previewEvaluation({$row['evaluationID']})'>
+                        <i class='bi bi-eye'></i> Preview
+                    </button>
+                    <button class='btn-export' onclick='exportEvaluation({$row['evaluationID']})'>
+                        <i class='bi bi-envelope-paper'></i> Export
+                    </button>
+                </td>
 
             </tr>";
         }
@@ -2606,6 +2591,129 @@ function renderAdminFinalEvaluation($conn, $search = '', $course = '', $superID 
     return $output;
 }
 
+
+function getEvaluationData($conn, $evaluationID) {
+    $stmt = $conn->prepare("
+        SELECT fe.*, o.name AS student_name, o.course, o.yearLevel,
+               o.semester, o.schoolYear, s.name AS supervisor_name
+        FROM final_evaluation fe
+        LEFT JOIN ojtstudent o ON o.studentID = fe.studentID
+        LEFT JOIN users s ON s.superID = fe.superID
+        WHERE fe.evaluationID = ? AND fe.status = 'FINALIZED'
+    ");
+    $stmt->bind_param("i", $evaluationID);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+function buildEvaluationHTML($r) {
+    $e = fn($v) => htmlspecialchars((string)$v);
+
+    $scoreColor = function ($s) {
+        $s = (float)$s;
+        if ($s >= 90) return '#059669';
+        if ($s >= 75) return '#2563EB';
+        if ($s >= 60) return '#D97706';
+        return '#DC2626';
+    };
+
+    $bar = function ($label, $val) use ($e, $scoreColor) {
+        $pct   = max(0, min(100, (float)$val));
+        $color = $scoreColor($pct);
+        $rest  = 100 - $pct;
+        $fill  = $pct > 0 ? "<td width='{$pct}%' style='background:{$color};height:8px;'></td>" : "";
+        $empty = $rest > 0 ? "<td width='{$rest}%' style='background:#E5E7EB;height:8px;'></td>" : "";
+        return "
+        <table width='100%' cellspacing='0' cellpadding='0' style='margin-bottom:10px;'>
+            <tr>
+                <td class='ev-bar-label'>{$e($label)}</td>
+                <td class='ev-bar-val' align='right'>{$e($val)}</td>
+            </tr>
+            <tr><td colspan='2'>
+                <table width='100%' cellspacing='0' cellpadding='0'><tr>{$fill}{$empty}</tr></table>
+            </td></tr>
+        </table>";
+    };
+
+    $rating = function ($label, $val) use ($e) {
+        $val = max(0, min(5, (int)$val));
+        $dots = str_repeat("<span class='ev-dot-on'>&#9679;</span>", $val)
+              . str_repeat("<span class='ev-dot-off'>&#9679;</span>", 5 - $val);
+        return "
+        <tr>
+            <td class='ev-rate-label'>{$e($label)}</td>
+            <td class='ev-rate-dots'>{$dots}</td>
+            <td class='ev-rate-num' align='right'>{$val}/5</td>
+        </tr>";
+    };
+
+    $finalColor = $scoreColor($r['final_score']);
+
+    return "
+    <div class='ev'>
+
+        <div class='ev-header'>
+            <h2>OJT Final Evaluation</h2>
+            <p>{$e($r['schoolYear'])} &bull; {$e($r['semester'])}</p>
+        </div>
+
+        <div class='ev-section'>Student Information</div>
+        <table class='ev-info' width='100%' cellspacing='0' cellpadding='0'>
+            <tr>
+                <td><small>Student</small><b>{$e($r['student_name'])}</b><br>{$e($r['studentID'])}</td>
+                <td><small>Supervisor</small><b>{$e($r['supervisor_name'])}</b></td>
+            </tr>
+            <tr>
+                <td><small>Course</small>{$e($r['course'])}</td>
+                <td><small>Year Level</small>{$e($r['yearLevel'])}</td>
+            </tr>
+        </table>
+
+        <div class='ev-section'>Performance Scores</div>
+        <table width='100%' cellspacing='0' cellpadding='0'>
+            <tr>
+                <td width='32%' valign='middle'>
+                    <div class='ev-final'>
+                        <div class='ev-final-num' style='color:{$finalColor};'>{$e($r['final_score'])}</div>
+                        <div class='ev-final-lbl'>Final Score</div>
+                    </div>
+                </td>
+                <td width='4%'></td>
+                <td width='64%' valign='middle'>
+                    {$bar('Attendance', $r['attendance_score'])}
+                    {$bar('Progress', $r['progress_score'])}
+                    {$bar('Tasks', $r['task_score'])}
+                </td>
+            </tr>
+        </table>
+
+        <div class='ev-section'>Supervisor Ratings</div>
+        <table width='100%' cellspacing='0' cellpadding='0'>
+            {$rating('Work Ethics', $r['ethics_rating'])}
+            {$rating('Communication', $r['communication_rating'])}
+            {$rating('Initiative', $r['initiative_rating'])}
+            {$rating('Discipline', $r['discipline_rating'])}
+        </table>
+
+        <div class='ev-section'>Recommendation</div>
+        <div class='ev-reco' style='border-left-color:{$finalColor};'>
+            <p class='ev-reco-title'>{$e($r['recommendation_title'])}</p>
+            <p>{$e($r['recommendation_text'])}</p>
+        </div>
+
+        <div class='ev-section'>Supervisor Remarks</div>
+        <div class='ev-remarks'>" . nl2br($e($r['final_remarks'])) . "</div>
+
+    </div>";
+}
+
+
+function buildEvaluationDocument($r) {
+    $css = file_get_contents(__DIR__ . '/../../public/css/admin/evaluation.css');
+    return "<html><head><meta charset='UTF-8'><style>{$css}</style></head><body>"
+         . buildEvaluationHTML($r)
+         . "</body></html>";
+}
 
 
 
@@ -3120,7 +3228,8 @@ function countUnassignedStudents($conn) {
         SELECT COUNT(*) AS total
         FROM users u
         WHERE u.role = 'student'
-        AND u.status = 'VERIFIED'
+        AND u.isVerified = 'VERIFIED'
+        AND u.status = 'ACTIVE'
         AND NOT EXISTS (
             SELECT 1
             FROM student_supervisor ss

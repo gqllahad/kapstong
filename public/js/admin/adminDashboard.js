@@ -57,6 +57,11 @@ const allStudent = document.getElementById("all-student-modal");
 const allStudentBtn = document.getElementById("viewAllStudentsBtn");
 const allStudentClose = document.getElementById("closeAllStudentModal");
 
+// eval
+let currentEvalID = null;
+
+const closeEvalPreview = document.getElementById("closeEvalPreview");
+
 
 const studentApplicationView = document.getElementById("student-application-view");
 // const studentApplicationViewBtn = document.getElementById("student-application-view-btn");
@@ -113,6 +118,11 @@ const closeRfidAttendanceBtn = document.getElementById("closeRfidAttendanceModal
 
 const evaluationSettingsBtn = document.getElementById("evaluation-settings-btn");
 const closeEvaluationSettingsBtn = document.getElementById("closeEvaluationSettingsModal");
+
+const certificateCompletionBtn = document.getElementById("certificate-settings-btn")
+const closeCertificateCompletionBtn = document.getElementById("closeCertificateOfCompletionModal");
+
+const certificateComplete = document.getElementById("certificate-complete");
 
 const ojtSetup = document.getElementById("ojt-program-container");
 const departmentManagement = document.getElementById("department-management-container");
@@ -184,6 +194,36 @@ function showToast(message, type = "success") {
     setTimeout(() => {
         toast.classList.remove("show");
     }, 3000);
+}
+
+// evaluation export
+function previewEvaluation(id) {
+    currentEvalID = id;
+    fetch("functions/previewEvaluation.php?id=" + encodeURIComponent(id))
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("evalPreviewBody").innerHTML = html;
+            document.getElementById("evalPreviewModal").classList.add("show");
+            overlay.classList.add("show");
+        });
+}
+
+function exportEvaluation(id) {
+    fetch("functions/exportEvaluation.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "evaluationID=" + encodeURIComponent(id)
+    })
+    .then(res => res.text())
+    .then(text => {
+        console.log(text);              
+        const data = JSON.parse(text);
+        showToast(data.message, data.status === "success" ? "success" : "error");
+    })
+    .catch(err => {
+        console.error(err);
+        showToast("Export failed", "error");
+    });
 }
 
 // reload charts
@@ -1480,82 +1520,105 @@ function loadRiskStudents() {
 
             const container = document.getElementById("risk-list");
 
-            container.innerHTML = "";
+            if (!data.length) {
+                container.innerHTML = `
+                    <div class="risk-empty">
+                        <i class='bx bx-check-shield'></i>
+                        <p>No students currently flagged. Everyone is on track.</p>
+                    </div>
+                `;
+                return;
+            }
 
-            data.forEach(student => {
+            const cardsHtml = data.map(student => {
 
-                const progress = parseFloat(student.progress_percent);
+                const progress = parseFloat(student.progress_percent) || 0;
+                const initial = (student.name || '?').charAt(0).toUpperCase();
 
-                let badgeClass = "track";
-                let badgeText = "ON TRACK";
-                let progressClass = "good";
+                let riskLevel = 'low';
+                let badgeText = 'ON TRACK';
+                let progFillClass = 'bar-track';
 
                 if (progress < 75) {
-                    badgeClass = "behind";
-                    badgeText = "BEHIND";
-                    progressClass = "low";
+                    riskLevel = (student.overdue_tasks > 2 || student.absents > 3) ? 'critical' : 'high';
+                    badgeText = 'BEHIND';
+                    progFillClass = 'bar-behind';
+                } else if (progress < 90) {
+                    riskLevel = 'medium';
+                    badgeText = 'DUE SOON';
+                    progFillClass = 'bar-soon';
                 }
-                else if (progress < 90) {
-                    badgeClass = "soon";
-                    badgeText = "DUE SOON";
-                    progressClass = "medium";
-                }
 
-                container.innerHTML += `
-                    <div class="task-item">
+                const hasFlags = student.absents > 0 || student.lates > 0 || student.overdue_tasks > 0;
 
-                        <div class="student-top">
+                return `
+                    <div class="ris-card risk-${riskLevel}">
 
-                            <div class="student-info">
-                                <strong>${student.name}</strong>
-                                <span class="student-role">
-                                    ${student.role}
-                                </span>
+                        <div class="ris-top">
+                            <div class="ris-avatar">${initial}</div>
+
+                            <div class="ris-identity">
+                                <span class="ris-name">${student.name}</span>
+                                <span class="ris-meta">${student.role}</span>
                             </div>
 
-                            <span class="status-badge ${badgeClass}">
-                                ${badgeText}
-                            </span>
-
+                            <div class="ris-badges">
+                                <span class="ris-risk-badge risk-${riskLevel}">${badgeText}</span>
+                            </div>
                         </div>
 
-                        <div class="progress-wrapper">
-
-                            <div class="progress-label">
-                                <span>
-                                    ${student.completed_hours} / 
-                                    ${student.required_hours} Hours
+                        <div class="ris-progress-row">
+                            <div class="ris-prog-header">
+                                <span class="ris-prog-label prog-${progFillClass === 'bar-track' ? 'track' : progFillClass === 'bar-soon' ? 'soon' : 'behind'}">
+                                    <i class='bx bx-time-five'></i> Progress
                                 </span>
-
-                                <span>
-                                    ${progress}%
-                                </span>
+                                <span class="ris-prog-hours">${student.completed_hours} / ${student.required_hours} hrs</span>
+                                <span class="ris-prog-pct">${progress}%</span>
                             </div>
+                            <div class="ris-bar-track">
+                                <div class="ris-bar-fill ${progFillClass}" style="width:${progress}%"></div>
+                            </div>
+                        </div>
 
-                            <div class="progress-bar">
-                               <div 
-                                    class="progress-fill ${progressClass}"
-                                    style="width:${student.progress_percent}%">
+                        ${hasFlags ? `
+                        <div class="ris-stats">
+                            <div class="ris-stat ${student.absents > 0 ? 'stat-warn' : ''} absent">
+                                <i class='bx bx-calendar-x'></i>
+                                <div>
+                                    <span class="stat-val">${student.absents}</span>
+                                    <span class="stat-key">Absents</span>
                                 </div>
                             </div>
-
-                        <div class="student-meta">
-                            <span class="meta-pill">
-                                Absents: ${student.absents}
-                            </span>
-
-                            <span class="meta-pill">
-                                Lates: ${student.lates}
-                            </span>
-
-                            <span class="meta-pill">
-                                ${student.overdue_tasks} Overdue Tasks
-                            </span>
+                            <div class="ris-stat ${student.lates > 0 ? 'stat-warn' : ''} late">
+                                <i class='bx bx-time'></i>
+                                <div>
+                                    <span class="stat-val">${student.lates}</span>
+                                    <span class="stat-key">Lates</span>
+                                </div>
+                            </div>
+                            <div class="ris-stat ${student.overdue_tasks > 0 ? 'stat-warn' : ''} task">
+                                <i class='bx bx-task-x'></i>
+                                <div>
+                                    <span class="stat-val">${student.overdue_tasks}</span>
+                                    <span class="stat-key">Overdue</span>
+                                </div>
+                            </div>
                         </div>
+                        ` : ''}
 
                     </div>
                 `;
-            });
+            }).join('');
+
+            container.innerHTML = cardsHtml;
+        })
+        .catch(() => {
+            document.getElementById("risk-list").innerHTML = `
+                <div class="risk-empty risk-error">
+                    <i class='bx bx-error-circle'></i>
+                    <p>Failed to load student data. Try refreshing.</p>
+                </div>
+            `;
         });
 }
 
@@ -1709,7 +1772,6 @@ function loadAllRiskStudents() {
                 return;
             }
  
-            /* ── summary header ─────────────────────────── */
             const critical = data.filter(s => s.risk === "CRITICAL").length;
             const high     = data.filter(s => s.risk === "HIGH").length;
             const medium   = data.filter(s => s.risk === "MEDIUM").length;
@@ -2579,7 +2641,9 @@ overlay.addEventListener('click', () => {
       downloadAllSupervisor.classList.remove("show")
       rfidRegister.classList.remove("show");
       lostRfidRegister.classList.remove("show");
+      certificateComplete.classList.remove("show");
       document.getElementById("attendance-download-modal").classList.remove("show");
+      document.getElementById("evalPreviewModal").classList.remove("show");
       document.getElementById("evaluation-download-modal").classList.remove("show");
 });
 
@@ -2616,6 +2680,206 @@ allSupervisorClose.addEventListener("click", () => {
     overlay.classList.remove("show");
     allSupervisor.classList.remove("show");
 });
+
+
+
+// completion certificate
+(function () {
+
+    const dropzone = document.getElementById("certDropzone");
+    const fileInput = document.getElementById("certFileInput");
+    const browseBtn = document.getElementById("certBrowseBtn");
+    const emptyState = document.getElementById("certEmptyState");
+    const previewState = document.getElementById("certPreviewState");
+    const fileNameEl = document.getElementById("certFileName");
+    const fileSizeEl = document.getElementById("certFileSize");
+    const replaceBtn = document.getElementById("certReplaceBtn");
+    const removeBtn = document.getElementById("certRemoveBtn");
+    const saveBtn = document.getElementById("certSaveBtn");
+    const statusEl = document.getElementById("certStatus");
+
+    function showConfirmModal() {
+        const modal = document.getElementById("certConfirmModal");
+        const cancelBtn = document.getElementById("certModalCancel");
+        const confirmBtn = document.getElementById("certModalConfirm");
+
+        return new Promise((resolve) => {
+            modal.style.display = "flex";
+
+            function cleanup(result) {
+                modal.style.display = "none";
+                cancelBtn.removeEventListener("click", onCancel);
+                confirmBtn.removeEventListener("click", onConfirm);
+                modal.removeEventListener("click", onOverlayClick);
+                resolve(result);
+            }
+
+            function onCancel() { cleanup(false); }
+            function onConfirm() { cleanup(true); }
+            function onOverlayClick(e) {
+                if (e.target === modal) cleanup(false);
+            }
+
+            cancelBtn.addEventListener("click", onCancel);
+            confirmBtn.addEventListener("click", onConfirm);
+            modal.addEventListener("click", onOverlayClick);
+        });
+    }
+
+    let selectedFile = null;
+    let isSavedOnServer = false; 
+
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+        return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    }
+
+    function showPreview(name, size, saved) {
+        fileNameEl.textContent = name;
+        fileSizeEl.textContent = size;
+        emptyState.style.display = "none";
+        previewState.style.display = "flex";
+        isSavedOnServer = saved;
+        saveBtn.disabled = saved; 
+        statusEl.textContent = "";
+        statusEl.className = "cert-status";
+    }
+
+    function resetDropzone() {
+        selectedFile = null;
+        isSavedOnServer = false;
+        fileInput.value = "";
+        emptyState.style.display = "flex";
+        previewState.style.display = "none";
+        saveBtn.disabled = true;
+    }
+
+    function handleFile(file) {
+        const allowed = ["application/pdf", "image/png", "image/jpeg"];
+        if (!allowed.includes(file.type)) {
+            statusEl.textContent = "Unsupported file type.";
+            statusEl.className = "cert-status error";
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            statusEl.textContent = "File exceeds 10MB limit.";
+            statusEl.className = "cert-status error";
+            return;
+        }
+        selectedFile = file;
+        showPreview(file.name, formatSize(file.size), false);
+        saveBtn.disabled = false;
+    }
+
+    function loadExistingCertificate() {
+        fetch("functions/getCertificate.php", { credentials: "include" })
+            .then(res => res.json())
+            .then(data => {
+                if (data.exists) {
+                    showPreview(data.file_name, formatSize(data.file_size), true);
+                }
+            })
+            .catch(() => {});
+    }
+
+    browseBtn.addEventListener("click", () => fileInput.click());
+    replaceBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        fileInput.click();
+    });
+
+    removeBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+
+        if (!isSavedOnServer) {
+            resetDropzone();
+            return;
+        }
+
+        const confirmed = await showConfirmModal();
+        if (!confirmed) return;
+
+        statusEl.textContent = "Removing...";
+        statusEl.className = "cert-status";
+
+        fetch("functions/deleteCertificate.php", {
+            method: "POST",
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                resetDropzone();
+                statusEl.textContent = "Template removed.";
+                statusEl.className = "cert-status success";
+            } else {
+                statusEl.textContent = data.message || "Failed to remove.";
+                statusEl.className = "cert-status error";
+            }
+        })
+        .catch(() => {
+            statusEl.textContent = "Failed to remove. Try again.";
+            statusEl.className = "cert-status error";
+        });
+    });
+
+    fileInput.addEventListener("change", () => {
+        if (fileInput.files.length) handleFile(fileInput.files[0]);
+    });
+
+    dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.classList.add("drag-over");
+    });
+
+    dropzone.addEventListener("dragleave", () => {
+        dropzone.classList.remove("drag-over");
+    });
+
+    dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("drag-over");
+        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+
+    saveBtn.addEventListener("click", () => {
+        if (!selectedFile) return;
+
+        const formData = new FormData();
+        formData.append("certificate", selectedFile);
+
+        saveBtn.disabled = true;
+        statusEl.textContent = "Uploading...";
+        statusEl.className = "cert-status";
+
+        fetch("functions/uploadCertificateTemplate.php", {
+            method: "POST",
+            credentials: "include",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                isSavedOnServer = true;
+                statusEl.textContent = "Template saved.";
+                statusEl.className = "cert-status success";
+            } else {
+                statusEl.textContent = data.message || "Upload failed.";
+                statusEl.className = "cert-status error";
+                saveBtn.disabled = false;
+            }
+        })
+        .catch(() => {
+            statusEl.textContent = "Upload failed. Try again.";
+            statusEl.className = "cert-status error";
+            saveBtn.disabled = false;
+        });
+    });
+
+    loadExistingCertificate();
+
+})();
 
 
 
@@ -3063,6 +3327,11 @@ function reRegisterRfid() {
     });
 }
 
+
+
+
+
+
 // assign submit
 
 document.getElementById("assign-btn").addEventListener("click", function () {
@@ -3348,6 +3617,18 @@ evaluationSettingsBtn.addEventListener("click", () => {
     overlay.classList.add("show");
     evaluationSettings.classList.add("show");
 });
+
+certificateCompletionBtn.addEventListener("click", () => {
+    overlay.classList.add("show");
+    certificateComplete.classList.add("show");
+});
+
+closeCertificateCompletionBtn.addEventListener("click", () => {
+    overlay.classList.remove("show");
+    certificateComplete.classList.remove("show");
+
+});
+
 closeEvaluationSettingsBtn.addEventListener("click", () => {
      overlay.classList.remove("show");
     evaluationSettings.classList.remove("show");
@@ -3363,6 +3644,11 @@ closeViewAllBtn.addEventListener("click", () => {
     overlay.classList.remove("show");
     viewAll.classList.remove("show");
 }); 
+
+closeEvalPreview.addEventListener("click", () => {
+     document.getElementById("evalPreviewModal").classList.remove("show");
+     overlay.classList.remove("show");
+});
 
 // downloads laayout
 

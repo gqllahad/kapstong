@@ -2513,7 +2513,7 @@ document.getElementById('calNextBtn').addEventListener('click', () => {
 
 function showEvaluation(){
     evaluationTable.classList.remove("show");
-    certificateComplete.classList.remove("show");
+    // certificateComplete.classList.remove("show");
     evaluationTable.classList.add("show");
 
     document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
@@ -2524,7 +2524,7 @@ function showEvaluation(){
 
 function showReports(){
     evaluationTable.classList.remove("show");
-    certificateComplete.classList.remove("show");
+    // certificateComplete.classList.remove("show");
     reportsTable.classList.add("show");
 
     document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
@@ -2533,16 +2533,16 @@ function showReports(){
     setActiveTab("reports");
 }
 
-function showCompletion(){
-    reportsTable.classList.remove("show");
-    evaluationTable.classList.remove("show");
-    certificateComplete.classList.add("show");
+// function showCompletion(){
+//     reportsTable.classList.remove("show");
+//     evaluationTable.classList.remove("show");
+//     // certificateComplete.classList.add("show");
 
-    document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
-    document.querySelector('[data-tab="completion"]').classList.add('active');
+//     document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+//     document.querySelector('[data-tab="completion"]').classList.add('active');
 
-    setActiveTab("completion");
-}
+//     setActiveTab("completion");
+// }
 
 
 
@@ -3274,203 +3274,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// completion certificate
-(function () {
 
-    const dropzone = document.getElementById("certDropzone");
-    const fileInput = document.getElementById("certFileInput");
-    const browseBtn = document.getElementById("certBrowseBtn");
-    const emptyState = document.getElementById("certEmptyState");
-    const previewState = document.getElementById("certPreviewState");
-    const fileNameEl = document.getElementById("certFileName");
-    const fileSizeEl = document.getElementById("certFileSize");
-    const replaceBtn = document.getElementById("certReplaceBtn");
-    const removeBtn = document.getElementById("certRemoveBtn");
-    const saveBtn = document.getElementById("certSaveBtn");
-    const statusEl = document.getElementById("certStatus");
-
-    function showConfirmModal() {
-        const modal = document.getElementById("certConfirmModal");
-        const cancelBtn = document.getElementById("certModalCancel");
-        const confirmBtn = document.getElementById("certModalConfirm");
-
-        return new Promise((resolve) => {
-            modal.style.display = "flex";
-
-            function cleanup(result) {
-                modal.style.display = "none";
-                cancelBtn.removeEventListener("click", onCancel);
-                confirmBtn.removeEventListener("click", onConfirm);
-                modal.removeEventListener("click", onOverlayClick);
-                resolve(result);
-            }
-
-            function onCancel() { cleanup(false); }
-            function onConfirm() { cleanup(true); }
-            function onOverlayClick(e) {
-                if (e.target === modal) cleanup(false);
-            }
-
-            cancelBtn.addEventListener("click", onCancel);
-            confirmBtn.addEventListener("click", onConfirm);
-            modal.addEventListener("click", onOverlayClick);
-        });
-    }
-
-    let selectedFile = null;
-    let isSavedOnServer = false; 
-
-    function formatSize(bytes) {
-        if (bytes < 1024) return bytes + " B";
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-        return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-    }
-
-    function showPreview(name, size, saved) {
-        fileNameEl.textContent = name;
-        fileSizeEl.textContent = size;
-        emptyState.style.display = "none";
-        previewState.style.display = "flex";
-        isSavedOnServer = saved;
-        saveBtn.disabled = saved; 
-        statusEl.textContent = "";
-        statusEl.className = "cert-status";
-    }
-
-    function resetDropzone() {
-        selectedFile = null;
-        isSavedOnServer = false;
-        fileInput.value = "";
-        emptyState.style.display = "flex";
-        previewState.style.display = "none";
-        saveBtn.disabled = true;
-    }
-
-    function handleFile(file) {
-        const allowed = ["application/pdf", "image/png", "image/jpeg"];
-        if (!allowed.includes(file.type)) {
-            statusEl.textContent = "Unsupported file type.";
-            statusEl.className = "cert-status error";
-            return;
-        }
-        if (file.size > 10 * 1024 * 1024) {
-            statusEl.textContent = "File exceeds 10MB limit.";
-            statusEl.className = "cert-status error";
-            return;
-        }
-        selectedFile = file;
-        showPreview(file.name, formatSize(file.size), false);
-        saveBtn.disabled = false;
-    }
-
-    function loadExistingCertificate() {
-        fetch("functions/getCertificate.php", { credentials: "include" })
-            .then(res => res.json())
-            .then(data => {
-                if (data.exists) {
-                    showPreview(data.file_name, formatSize(data.file_size), true);
-                }
-            })
-            .catch(() => {});
-    }
-
-    browseBtn.addEventListener("click", () => fileInput.click());
-    replaceBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        fileInput.click();
-    });
-
-    removeBtn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-
-        if (!isSavedOnServer) {
-            resetDropzone();
-            return;
-        }
-
-        const confirmed = await showConfirmModal();
-        if (!confirmed) return;
-
-        statusEl.textContent = "Removing...";
-        statusEl.className = "cert-status";
-
-        fetch("functions/deleteCertificate.php", {
-            method: "POST",
-            credentials: "include"
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                resetDropzone();
-                statusEl.textContent = "Template removed.";
-                statusEl.className = "cert-status success";
-            } else {
-                statusEl.textContent = data.message || "Failed to remove.";
-                statusEl.className = "cert-status error";
-            }
-        })
-        .catch(() => {
-            statusEl.textContent = "Failed to remove. Try again.";
-            statusEl.className = "cert-status error";
-        });
-    });
-
-    fileInput.addEventListener("change", () => {
-        if (fileInput.files.length) handleFile(fileInput.files[0]);
-    });
-
-    dropzone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropzone.classList.add("drag-over");
-    });
-
-    dropzone.addEventListener("dragleave", () => {
-        dropzone.classList.remove("drag-over");
-    });
-
-    dropzone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropzone.classList.remove("drag-over");
-        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-    });
-
-    saveBtn.addEventListener("click", () => {
-        if (!selectedFile) return;
-
-        const formData = new FormData();
-        formData.append("certificate", selectedFile);
-
-        saveBtn.disabled = true;
-        statusEl.textContent = "Uploading...";
-        statusEl.className = "cert-status";
-
-        fetch("functions/uploadCertificateTemplate.php", {
-            method: "POST",
-            credentials: "include",
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                isSavedOnServer = true;
-                statusEl.textContent = "Template saved.";
-                statusEl.className = "cert-status success";
-            } else {
-                statusEl.textContent = data.message || "Upload failed.";
-                statusEl.className = "cert-status error";
-                saveBtn.disabled = false;
-            }
-        })
-        .catch(() => {
-            statusEl.textContent = "Upload failed. Try again.";
-            statusEl.className = "cert-status error";
-            saveBtn.disabled = false;
-        });
-    });
-
-    loadExistingCertificate();
-
-})();
 // (function () {
 
 //     const dropzone = document.getElementById("certDropzone");

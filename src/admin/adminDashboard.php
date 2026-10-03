@@ -888,6 +888,76 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
             </div>
 
+
+            <!-- evaluation modal -->
+             <div id="evalPreviewModal" class="eval-preview-modal">
+                <div class="modal-header">
+                <h3>Certificate of Completion</h3>
+                <button id="closeEvalPreview" class="modal-close">&times;</button>
+            </div>
+                <div class="modal-box">
+                    <div id="evalPreviewBody" class="eval-preview-body"></div>
+                </div>
+            </div>
+
+            <!-- completion certificate -->
+            <div class="certificate-complete" id="certificate-complete">
+
+            <div class="modal-header">
+                <h3>Certificate of Completion</h3>
+                <button id="closeCertificateOfCompletionModal" class="modal-close">&times;</button>
+            </div>
+
+            <div class="cert-upload-wrap">
+
+                <div class="cert-dropzone" id="certDropzone">
+                    <input type="file" id="certFileInput" accept=".pdf,.png,.jpg,.jpeg" hidden>
+
+                    <div class="cert-dropzone-empty" id="certEmptyState">
+                        <i class="bi bi-file-earmark-arrow-up cert-upload-icon"></i>
+                        <p class="cert-upload-title">Drop your certificate template here</p>
+                        <p class="cert-upload-sub">PDF, PNG or JPG, up to 10MB</p>
+                        <button type="button" class="cert-browse-btn" id="certBrowseBtn">Browse file</button>
+                    </div>
+
+                    <div class="cert-dropzone-preview" id="certPreviewState" style="display:none;">
+                        <i class="bi bi-file-earmark-check cert-preview-icon"></i>
+                        <div class="cert-preview-info">
+                            <p class="cert-preview-name" id="certFileName"></p>
+                            <p class="cert-preview-size" id="certFileSize"></p>
+                        </div>
+                        <div class="cert-preview-actions">
+                            <button type="button" class="cert-replace-btn" id="certReplaceBtn">Replace</button>
+                            <button type="button" class="cert-remove-btn" id="certRemoveBtn">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cert-upload-footer">
+                    <span class="cert-status" id="certStatus"></span>
+                    <button type="button" class="cert-save-btn" id="certSaveBtn" disabled>Save Template</button>
+                </div>
+
+            </div>
+            </div>
+
+            <!-- delete template -->
+             <div class="delete-cert-modal" id="certConfirmModal" style="display:none;">
+                <div class="delete-cert-box">
+                    <div class="delete-cert-icon">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="delete-cert-title">Remove certificate template?</h3>
+                    <p class="delete-cert-message">This will permanently delete the saved template. This can't be undone.</p>
+                    <div class="modal-actions">
+                        <button type="button" class="delete-cert-cancel" id="certModalCancel">Cancel</button>
+                        <button type="button" class="delete-cert-confirm" id="certModalConfirm">Remove</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- viewall -->
             <div class="view-all-modal" id="view-all-modal">
                 <div class="modal-header">
@@ -901,8 +971,6 @@ if ($_SESSION['role'] !== "ADMIN") {
 
 
             </div>
-
-
 
 
             <!-- dashboard -->
@@ -1405,6 +1473,13 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </button>
                     </div>
 
+                    <div class="create-section-container">
+                        <button class="create-btn" id="certificate-settings-btn">
+                            <i class="bi bi-patch-check-fill icon"></i>
+                            <span class="text">Certificate of Completion</span>
+                        </button>
+                    </div>
+
                 </div>
 
                 <div class="top-bar">
@@ -1527,14 +1602,9 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <tr>
                                 <th>Student</th>
                                 <th>Supervisor</th>
-                                <th>Attendance</th>
-                                <th>Progress</th>
-                                <th>Tasks</th>
-                                <th>Final Score</th>
-                                <th>Ratings</th>
-                                <th>Recommendation</th>
                                 <th>Status</th>
                                 <th>Date</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
 

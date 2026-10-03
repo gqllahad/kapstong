@@ -1,21 +1,13 @@
 <?php
 session_start();
-require_once("../../auth/supervisor_auth.php");
+require_once("../../auth/admin_auth.php");
 require_once("../../Shared/kapstongConnection.php");
 
 header('Content-Type: application/json');
 
-$superID = $_SESSION['superID'] ?? null;
-
-if (!$superID) {
-    echo json_encode(["exists" => false]);
-    exit;
-}
-
 $stmt = $conn->prepare("
-    SELECT file_path FROM supervisor_certificate WHERE superID = ?
+    SELECT file_path FROM certificate_template ORDER BY uploaded_at DESC LIMIT 1
 ");
-$stmt->bind_param("i", $superID);
 $stmt->execute();
 $row = $stmt->get_result()->fetch_assoc();
 

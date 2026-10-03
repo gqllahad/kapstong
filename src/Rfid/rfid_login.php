@@ -7,8 +7,6 @@ require_once("../Shared/functions.php");
 date_default_timezone_set('Asia/Manila');
 
 $timeInStart = getAttendanceSetting($conn, 'morning_time_in', '07:50:00');
-$invalidScanTime = getAttendanceSetting($conn, 'late_time', '10:30:00');
-
 $lateGraceMinutes = (int)getAttendanceSetting($conn, 'late_threshold_minutes', 5);
 
 $lateTime = date(
@@ -16,45 +14,17 @@ $lateTime = date(
     strtotime($timeInStart . " +{$lateGraceMinutes} minutes")
 );
 
-$snackStartTime = "15:00:00";
-
 $timeOutMorningTime = getAttendanceSetting($conn, 'morning_time_out', '12:00:00');
-
 $timeInAfternoonTime = getAttendanceSetting($conn, 'afternoon_time_in', '13:00:00');
 $timeOutAfternoonTime = getAttendanceSetting($conn, 'afternoon_time_out', '17:00:00');
 
-$MIN_WORK_MINUTES = (int)getAttendanceSetting(
-    $conn,
-    'minimum_work_minutes',
-    5
-);
-
-$MIN_BREAK_MINUTES = (int)getAttendanceSetting(
-    $conn,
-    'minimum_break_minutes',
-    5
-);
-
-$MAX_HOURS_PER_DAY = (int)getAttendanceSetting(
-    $conn,
-    'max_hours_per_day',
-    8
-);
-
-$snackBreakTime = (int)getAttendanceSetting(
-    $conn,
-    'snack_break_minutes',
-    15
-);
-
-$lunchBreakTime = (int)getAttendanceSetting(
-    $conn,
-    'lunch_break_minutes',
-    60
-);
+$MIN_WORK_MINUTES = (int)getAttendanceSetting($conn, 'minimum_work_minutes', 5);
+$MAX_HOURS_PER_DAY = (int)getAttendanceSetting($conn, 'max_hours_per_day', 8);
+$lunchBreakTime = (int)getAttendanceSetting($conn, 'lunch_break_minutes', 60);
 
 $current_time = date("H:i:s");
 $now = time();
+$today = date('Y-m-d'); // FIXED — was missing, calendar query relied on it
 
 $role = $_SESSION['role'];
 $superID = $_SESSION['superID'] ?? null;
@@ -67,7 +37,7 @@ if (isset($_POST['rfid'])) {
         die("RFID CANNOT BE EMPTY");
     }
 
-    // Event handler
+    // Calendar check
     $calStmt = $conn->prepare("
         SELECT type, label, hour_multiplier 
         FROM calendar_events 
@@ -103,49 +73,34 @@ if (isset($_POST['rfid'])) {
     $user = $result->fetch_assoc();
     $studentID = $user['studentID'];
 
-
     $progressCheck = $conn->prepare("
         SELECT completion_status, completed_hours, required_hours
         FROM student_progress
         WHERE studentID = ?
         LIMIT 1
     ");
-
     $progressCheck->bind_param("s", $studentID);
     $progressCheck->execute();
-
     $progressData = $progressCheck->get_result()->fetch_assoc();
 
     if ($progressData) {
-
         $status = strtoupper($progressData['completion_status']);
-
         if ($status === 'COMPLETED') {
-
-            $_SESSION['status'] =
-                "OJT already completed. Attendance is no longer allowed.";
-
+            $_SESSION['status'] = "OJT already completed. Attendance is no longer allowed.";
             echo $_SESSION['status'];
             exit();
         }
     }
 
     if ($role === "supervisor") {
-
         $check = $conn->prepare("
-            SELECT 1 
-            FROM student_supervisor
-            WHERE studentID = ?
-            AND superID = ?
-            AND status = 'ACTIVE'
+            SELECT 1 FROM student_supervisor
+            WHERE studentID = ? AND superID = ? AND status = 'ACTIVE'
             LIMIT 1
         ");
-
         $check->bind_param("si", $studentID, $superID);
         $check->execute();
-
         $res = $check->get_result();
-
         if ($res->num_rows == 0) {
             die("No record of this ID!");
         }
@@ -153,55 +108,33 @@ if (isset($_POST['rfid'])) {
 
     $stmtAttendance = $conn->prepare("
         SELECT * FROM attendance_logs
-        WHERE studentID = ?
-        AND log_date = CURDATE()
+        WHERE studentID = ? AND log_date = CURDATE()
         LIMIT 1
     ");
-
     $stmtAttendance->bind_param("s", $studentID);
     $stmtAttendance->execute();
-
     $row = $stmtAttendance->get_result()->fetch_assoc();
 
-    // $stmtCount = $conn->prepare("
-    //     SELECT COUNT(*) as total
-    //     FROM attendance_logs
-    //     WHERE studentID = ? AND log_date = CURDATE()
-    // ");
-
-    // $stmtCount->bind_param("s", $studentID);
-    // $stmtCount->execute();
-    // $count = $stmtCount->get_result()->fetch_assoc();
-
-    // $isFirstTimeToday = ($count['total'] == 0);
-
     $state = $row['current_state'] ?? 'NONE';
-
     if (!$row) {
         $state = 'NONE';
     }
 
-    // time in
+    // ── 1. TIME IN (morning) ──
     if ($state === 'NONE') {
 
-    if ($current_time < $timeInStart  ) { //|| $current_time > $invalidScanTime
+        if ($current_time < $timeInStart) {
+            $_SESSION['status'] = "Time-in allowed only between $timeInStart - $lateTime";
+            echo $_SESSION['status'];
+            exit();
+        }
 
-        $_SESSION['status'] =   
-            "Time-in allowed only between $timeInStart - $lateTime";
-             echo $_SESSION['status'];
-             exit();
-    }
-    
         $lateMinutes = 0;
         $remarks = "Arrived on time";
 
         if ($current_time > $lateTime) {
             $status = "late";
-
-            $lateMinutes = round(
-                (strtotime($current_time) - strtotime($lateTime)) / 60
-            );
-
+            $lateMinutes = round((strtotime($current_time) - strtotime($lateTime)) / 60);
             $remarks = "Late by {$lateMinutes} minute(s)";
         } else {
             $status = "present";
@@ -212,45 +145,30 @@ if (isset($_POST['rfid'])) {
             $remarks .= " (Holiday: " . ($dayLabel ?: 'Unnamed') . ", {$hourMultiplier}x hours)";
         }
 
-       $stmtIn = $conn->prepare("
+        $stmtIn = $conn->prepare("
             INSERT INTO attendance_logs (
-                studentID,
-                rfid_uid,
-                log_date,
-                first_time_in,
-                status,
-                remarks,
-                current_state
+                studentID, rfid_uid, log_date, first_time_in,
+                status, remarks, current_state
             )
             VALUES (?, ?, CURDATE(), NOW(), ?, ?, 'WORKING')
         ");
-        $stmtIn->bind_param(
-            "ssss",
-            $studentID,
-            $rfid,
-            $status,
-            $remarks
-        );
-
+        $stmtIn->bind_param("ssss", $studentID, $rfid, $status, $remarks);
         $stmtIn->execute();
 
         $_SESSION['status'] = "TIME IN SUCCESS ($status)";
         echo $_SESSION['status'];
         exit();
     }
-    // lunch break
-     if ($state === 'WORKING' && !$row['lunch_break_out'] && $current_time >= $timeOutMorningTime && $current_time < $timeInAfternoonTime) {
+
+    // ── 2. TIME OUT FOR LUNCH ──
+    if ($state === 'WORKING' && !$row['lunch_break_out'] && $current_time >= $timeOutMorningTime && $current_time < $timeInAfternoonTime) {
         $remarks = "Started lunch break";
 
         $stmt = $conn->prepare("
             UPDATE attendance_logs
-            SET
-                lunch_break_out = NOW(),
-                remarks = ?,
-                current_state = 'LUNCH_BREAK'
+            SET lunch_break_out = NOW(), remarks = ?, current_state = 'LUNCH_BREAK'
             WHERE attendanceID = ?
         ");
-
         $stmt->bind_param("si", $remarks, $row['attendanceID']);
         $stmt->execute();
 
@@ -258,110 +176,43 @@ if (isset($_POST['rfid'])) {
         echo $_SESSION['status'];
         exit();
     }
-    // return lunch break
-      if ($state === 'LUNCH_BREAK') {
 
+    // ── 3. TIME IN AFTER LUNCH ──
+    if ($state === 'LUNCH_BREAK') {
         $remarks = "Returned from lunch break";
         $lastBreak = strtotime($row['lunch_break_out']);
         $breakMinutes = ($now - $lastBreak) / 60;
 
         if ($breakMinutes < $lunchBreakTime) {
-
             $remaining = ceil($lunchBreakTime - $breakMinutes);
-
-            $_SESSION['status'] =
-                "Lunch break ongoing. Wait {$remaining} minutes.";
+            $_SESSION['status'] = "Lunch break ongoing. Wait {$remaining} minutes.";
+            echo $_SESSION['status'];
             exit();
         }
 
         $stmt = $conn->prepare("
             UPDATE attendance_logs
-            SET
-                lunch_break_in = NOW(),
-                remarks = ?,
-                current_state = 'WORKING'
+            SET lunch_break_in = NOW(), remarks = ?, current_state = 'WORKING'
             WHERE attendanceID = ?
         ");
-
         $stmt->bind_param("si", $remarks, $row['attendanceID']);
         $stmt->execute();
 
         $_SESSION['status'] = "RETURNED FROM LUNCH";
-         echo $_SESSION['status'];
-         exit();
-    }
-    // snack break
-      if ( $state === 'WORKING' && $row['lunch_break_in'] && !$row['snack_break_out'] && $current_time >= $snackStartTime) {
-
-      $remarks = "Started snack break";
-        $stmt = $conn->prepare("
-            UPDATE attendance_logs
-            SET
-                snack_break_out = NOW(),
-                remarks = ?,
-                current_state = 'SNACK_BREAK'
-            WHERE attendanceID = ?
-        ");
-
-        $stmt->bind_param("si", $remarks,$row['attendanceID']);
-        $stmt->execute();
-
-        $_SESSION['status'] = "SNACK BREAK STARTED";
-        echo $_SESSION['status'];
-        exit();
-    }
-    // return snack break
-      if ($state === 'SNACK_BREAK') {
-
-         $remarks = "Returned from snack break";
-        $lastBreak = strtotime($row['snack_break_out']);
-        $breakMinutes = ($now - $lastBreak) / 60;
-
-        if ($breakMinutes < $snackBreakTime) {
-
-            $remaining = ceil($snackBreakTime - $breakMinutes);
-
-            $_SESSION['status'] =
-                "Snack break ongoing. Wait {$remaining} minutes.";
-
-            exit();
-        }
-
-        $stmt = $conn->prepare("
-            UPDATE attendance_logs
-            SET
-                snack_break_in = NOW(),
-                remarks = ?,
-                current_state = 'WORKING'
-            WHERE attendanceID = ?
-        ");
-
-        $stmt->bind_param("si", $remarks, $row['attendanceID']);
-        $stmt->execute();
-
-        $_SESSION['status'] = "RETURNED FROM SNACK BREAK";
         echo $_SESSION['status'];
         exit();
     }
 
-
-    //time out
-     if ($state === 'WORKING' && $current_time >= $timeOutAfternoonTime && !$row['final_time_out']) {
+    // ── 4. TIME OUT (final) ──
+    if ($state === 'WORKING' && $current_time >= $timeOutAfternoonTime && !$row['final_time_out']) {
 
         $firstIn = strtotime($row['first_time_in']);
         $finalOut = time();
-
         $workedMinutes = ($finalOut - $firstIn) / 60;
 
-        
-
-         if ($workedMinutes < $MIN_WORK_MINUTES) {
-
+        if ($workedMinutes < $MIN_WORK_MINUTES) {
             $remaining = ceil($MIN_WORK_MINUTES - $workedMinutes);
-
-            $_SESSION['status'] =
-                "You must work at least {$MIN_WORK_MINUTES} minutes before time out. Wait {$remaining} more minutes.";
-
+            $_SESSION['status'] = "You must work at least {$MIN_WORK_MINUTES} minutes before time out. Wait {$remaining} more minutes.";
             echo $_SESSION['status'];
             exit();
         }
@@ -369,19 +220,9 @@ if (isset($_POST['rfid'])) {
         $totalWorkedSeconds = $finalOut - $firstIn;
 
         if ($row['lunch_break_out'] && $row['lunch_break_in']) {
-
             $lunchOut = strtotime($row['lunch_break_out']);
             $lunchIn = strtotime($row['lunch_break_in']);
-
             $totalWorkedSeconds -= ($lunchIn - $lunchOut);
-        }
-
-        if ($row['snack_break_out'] && $row['snack_break_in']) {
-
-            $snackOut = strtotime($row['snack_break_out']);
-            $snackIn = strtotime($row['snack_break_in']);
-
-            $totalWorkedSeconds -= ($snackIn - $snackOut);
         }
 
         $totalHours = round($totalWorkedSeconds / 3600, 2);
@@ -391,7 +232,6 @@ if (isset($_POST['rfid'])) {
         }
 
         $totalHours = roundHoursWithThreshold($totalHours);
-
         $creditedHours = round($totalHours * $hourMultiplier, 2);
 
         $remarks = "Completed {$totalHours} hours for the day";
@@ -401,14 +241,10 @@ if (isset($_POST['rfid'])) {
 
         $stmt = $conn->prepare("
             UPDATE attendance_logs
-            SET
-                final_time_out = NOW(),
-                current_state = 'TIMED_OUT',
-                total_hours = ?,
-                remarks = ?
+            SET final_time_out = NOW(), current_state = 'TIMED_OUT',
+                total_hours = ?, remarks = ?
             WHERE attendanceID = ?
         ");
-
         $stmt->bind_param("dsi", $creditedHours, $remarks, $row['attendanceID']);
         $stmt->execute();
 
@@ -426,18 +262,13 @@ if (isset($_POST['rfid'])) {
         exit();
     }
 
-    // time out validations
-      if ($state == 'TIMED_OUT') {
-
-        $_SESSION['status'] =
-            "You are already timed out today.";
-            echo $_SESSION['status'];
+    if ($state == 'TIMED_OUT') {
+        $_SESSION['status'] = "You are already timed out today.";
+        echo $_SESSION['status'];
         exit();
     }
 }
 $_SESSION['status'] = "Invalid scan action!";
 echo $_SESSION['status'];
 exit();
-// echo $_SESSION['status'] ?? "UNKNOWN STATUS";
-// exit();
 ?>
