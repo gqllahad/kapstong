@@ -403,173 +403,56 @@ function closeAttendanceExcuseModal() {
 }
 
 
+// alerts
+function handleAlertAction(btn) {
+    const action = btn.dataset.action;
+    const id = btn.dataset.id;
+
+    if (!action) return;
+
+    if (typeof window[action] === 'function') {
+        window[action](id);
+    } else {
+        console.error(`Function "${action}" not found.`);
+    }
+}
+
+function remindStudent(studentID, alertType, btn) {
+    btn.disabled = true;
+    fetch('functions/remindStudent.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ studentID, alertType })
+    })
+    .then(r => r.text())
+    .then(txt => {
+        let d;
+        try { d = JSON.parse(txt); } catch (e) { d = { status: 'error', message: 'Bad response' }; }
+        btn.textContent = d.status === 'ok' ? 'Reminded ✔' : (d.message || 'Failed');
+        if (d.status !== 'ok') btn.disabled = false;
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btn.textContent = 'Failed';
+    });
+}
 
 
-
-
-// function goToStep(step) {
-//     currentStep = step;
- 
-//     document.querySelectorAll('.ct-panel').forEach(p => {
-//       p.classList.toggle('active', Number(p.dataset.panel) === step);
-//     });
-//     document.querySelectorAll('.ct-step').forEach(s => {
-//       const n = Number(s.dataset.step);
-//       s.classList.toggle('active', n === step);
-//       s.classList.toggle('done', n < step);
-//       s.querySelector('.step-num').textContent = n < step ? '✓' : n;
-//     });
- 
-//     document.getElementById('ctSubtitle').textContent =
-//       step === 1 ? 'Step 1 of 2 — fill in the task details'
-//                  : 'Step 2 of 2 — choose who this task goes to';
- 
-//     renderFooter();
- 
-//     document.getElementById('create-task-container').scrollTop = 0;
-//   }
-
-//   function renderFooter() {
-//     const actions = document.getElementById('ctFooterActions');
-//     if (currentStep === 1) {
-//       actions.innerHTML = `
-//         <button type="button" class="ct-cancel-btn" onclick="closeTaskModal()">Cancel</button>
-//         <button type="button" class="submit-btn" onclick="tryAdvance();">Next: Assign Students <i class="bi bi-arrow-right"></i></button>
-//       `;
-//       document.getElementById('ctNextBtn').addEventListener('click', tryAdvance);
-//     } else {
-//       actions.innerHTML = `
-//         <button type="button" class="ct-back-btn" id="ctBackBtn"><i class="bi bi-arrow-left"></i> Back</button>
-//         <button type="button" class="submit-btn" id="ctSubmitBtn" disabled><i class="bi bi-send"></i> Create &amp; Assign</button>
-//       `;
-//       document.getElementById('ctBackBtn').addEventListener('click', () => goToStep(1));
-//       document.getElementById('ctSubmitBtn').addEventListener('click', trySubmit);
-//       updateSelectionState();
-//     }
-//   }
-
-//   function validateStep1() {
-//     const title = document.getElementById('ct-title');
-//     const due   = document.getElementById('due_date');
-//     let ok = true;
- 
-//     [{ el: title, fid: 'field-title' }, { el: due, fid: 'field-due' }].forEach(({ el, fid }) => {
-//       const wrap = document.getElementById(fid);
-//       const valid = el.value.trim().length > 0;
-//       wrap.classList.toggle('invalid', !valid);
-//       if (!valid) ok = false;
-//     });
-//     return ok;
-//   }
-//   function tryAdvance() {
-//     if (validateStep1()) goToStep(2);
-//   }
-
-//     function goTo(n) {
-//         document.getElementById(steps[current]).classList.remove('active');
-//         current = n;
-//         document.getElementById(steps[current]).classList.add('active');
-//         updateStepper();
-//         window.scrollTo({
-//             top: 0,
-//             behavior: 'smooth'
-//         });
-//     }
-
-
-
-
- 
-//   ['ct-title', 'due_date'].forEach(id => {
-//     document.getElementById(id).addEventListener('input', () => {
-//       document.getElementById('field-' + (id === 'due_date' ? 'due' : 'title')).classList.remove('invalid');
-//     });
-//   });
-
-//   function bindCounter(inputId, countId, max) {
-//     const el = document.getElementById(inputId), out = document.getElementById(countId);
-//     el.addEventListener('input', () => {
-//       const n = el.value.length;
-//       out.textContent = `${n} / ${max}`;
-//       out.classList.toggle('warn', n > max * .85);
-//     });
-//   }
-//   bindCounter('ct-title', 'titleCount', 120);
-//   bindCounter('ct-desc', 'descCount', 600);
- 
-//   /* ── Priority buttons ── */
-//   ['low', 'medium', 'high'].forEach(p => {
-//     document.getElementById('p-' + p).addEventListener('click', () => {
-//       ['low', 'medium', 'high'].forEach(pp => {
-//         const btn = document.getElementById('p-' + pp);
-//         btn.className = 'ct-priority-btn';
-//         if (pp === p) btn.classList.add('sel-' + pp);
-//       });
-//       document.getElementById('ct-priority').value = p;
-//     });
-//   });
-
-
-//   /* ── Student search (client-side filter over whatever the list contains) ── */
-//   document.getElementById('taskStudentSearch').addEventListener('input', function () {
-//     const q = this.value.toLowerCase();
-//     document.querySelectorAll('#taskStudentList [data-name]').forEach(row => {
-//       row.style.display = row.dataset.name.includes(q) ? '' : 'none';
-//     });
-//   });
- 
-//   /* ── Selection counter — delegated to whatever checkboxes render inside
-//         #taskStudentList, so it works regardless of PHP markup shape ── */
-//   const list = document.getElementById('taskStudentList');
-//   list.addEventListener('change', e => {
-//     if (e.target.name === 'student_ids[]') updateSelectionState();
-//   });
- 
-//   document.getElementById('clearSel').addEventListener('click', () => {
-//     list.querySelectorAll('input[name="student_ids[]"]').forEach(cb => cb.checked = false);
-//     updateSelectionState();
-//   });
- 
-//   function getSelectedCount() {
-//     return list.querySelectorAll('input[name="student_ids[]"]:checked').length;
-//   }
- 
-//   function updateSelectionState() {
-//     const count = getSelectedCount();
-//     const badge = document.getElementById('selBadge');
-//     badge.textContent = count;
-//     badge.classList.add('pop');
-//     setTimeout(() => badge.classList.remove('pop'), 260);
- 
-//     document.getElementById('clearSel').classList.toggle('visible', count > 0);
-//     document.getElementById('assignEmptyHint').style.display = 'none';
- 
-//     const submitBtn = document.getElementById('ctSubmitBtn');
-//     if (submitBtn) submitBtn.disabled = count === 0;
-//   }
- 
-//   /* ── Final submit ── */
-//   function trySubmit() {
-//     if (getSelectedCount() === 0) {
-//       document.getElementById('assignEmptyHint').style.display = 'flex';
-//       return;
-//     }
-//     /* No preventDefault — let this fall through to whatever handler your
-//        app already binds to #createTaskForm (native submit or AJAX). */
-//     document.getElementById('createTaskForm').requestSubmit
-//       ? document.getElementById('createTaskForm').requestSubmit()
-//       : document.getElementById('createTaskForm').submit();
-//   }
- 
-//   /* Demo-only: prevent the stub form from actually navigating away */
-//   document.getElementById('createTaskForm').addEventListener('submit', e => {
-//     e.preventDefault();
-//     closeTaskModal();
-//     alert(`Task created and assigned to ${getSelectedCount()} student(s).`);
-//   });
- 
-//   /* Min date = today */
-//   document.getElementById('due_date').min = new Date().toISOString().split('T')[0];
+function escalateStudent(studentID, btn) {
+    if (!confirm('Escalate this student to HR?')) return;
+    btn.disabled = true;
+    fetch('functions/escalateStudent.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ studentID })
+    })
+    .then(r => r.json())
+    .then(d => {
+        btn.textContent = d.status === 'ok' ? 'Escalated ✔' : (d.message || 'Failed');
+        if (d.status !== 'ok') btn.disabled = false;
+    })
+    .catch(() => { btn.disabled = false; btn.textContent = 'Failed'; });
+}
 
 // charts
 
@@ -1663,7 +1546,16 @@ function loadTaskProgressChart() {
                                 color: '#9ca3af',
                                 font: {
                                     size: 11
-                                }
+                                },
+                                callback: function(value, index) {
+                                const label = this.getLabelForValue(value);
+                                const maxLength = 10;
+                                return label.length > maxLength 
+                                    ? label.substring(0, maxLength) + '…' 
+                                    : label;
+                            },
+                            maxRotation: 45, 
+                            minRotation: 45
                             },
 
                             grid: {
@@ -1671,6 +1563,7 @@ function loadTaskProgressChart() {
                             }
 
                         },
+                        
 
                         y: {
 

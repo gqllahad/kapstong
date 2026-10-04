@@ -1151,6 +1151,84 @@ foreach ($nameParts as $part) {
 
                 </section>
 
+
+                <?php
+                    $alerts = getSupervisorAlerts($conn, $superID);
+                    $activities = getSupervisorActivities($conn, $superID);
+                ?>
+               <div class="dashboard-bottom">
+                    <div class="alerts-container">
+                        <div class="panel-heading">
+                            <h3><i class="bi bi-exclamation-triangle-fill"></i> Alerts</h3>
+                            <span class="panel-count-badge"><?= count($alerts) ?></span>
+                        </div>
+
+                        <ul class="alerts-list scrollable">
+
+                            <?php if (count($alerts) > 0): ?>
+                                <?php foreach ($alerts as $alert): ?>
+                                    <li class="alert-item <?= htmlspecialchars($alert['type']) ?>">
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                        <span class="alert-item-text"><?= htmlspecialchars($alert['message']) ?></span>
+                                        <button class="alert-btn"
+                                            data-action="<?= htmlspecialchars($alert['action'] ?? '') ?>"
+                                            data-id="<?= htmlspecialchars((string) $alert['id']) ?>"
+                                            onclick="handleAlertAction(this)">
+                                            View
+                                        </button>
+                                        <?php if ($alert['type'] === 'critical'): ?>
+                                            <button class="escalate-btn"
+                                                data-student="<?= htmlspecialchars((string) $alert['studentID'], ENT_QUOTES) ?>"
+                                                onclick="escalateStudent(this.dataset.student, this)">
+                                                <i class="bi bi-arrow-up-circle"></i> <span>Escalate</span>
+                                            </button>
+                                        <?php else: ?>
+                                            <button class="remind-btn"
+                                                data-student="<?= htmlspecialchars((string) $alert['studentID'], ENT_QUOTES) ?>"
+                                                data-type="<?= htmlspecialchars($alert['type']) ?>"
+                                                onclick="remindStudent(this.dataset.student, this.dataset.type, this)">
+                                                <i class="bi bi-bell"></i> <span>Remind</span>
+                                            </button>
+                                        <?php endif; ?>
+                                        
+                                    </li>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <li class="alert-item success">
+                                    <i class="bi bi-clock-history"></i>
+                                    <span class="alert-item-text">No issues detected. All students are active.</span>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+
+                    <div class="activity-container">
+                        <div class="panel-heading">
+                            <h3><i class="bi bi-clock-history"></i> Recent Activity</h3>
+                            <span class="panel-count-badge"><?= count($activities) ?></span>
+                        </div>
+
+                        <ul class="activity-list scrollable">
+                            <?php if (count($activities) > 0): ?>
+                                <?php foreach ($activities as $act): ?>
+                                    <li class="activity-item <?= htmlspecialchars($act['type']) ?>">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                        <div class="activity-item-body">
+                                            <span><?= htmlspecialchars($act['message']) ?></span>
+                                            <small><?= htmlspecialchars($act['time']) ?></small>
+                                        </div>
+                                    </li>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <li class="activity-item success">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <span>No recent activity</span>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                </div>
+
                 <section class="dashboard-charts">
 
                     <section class="wrapper line-chart">
@@ -1220,11 +1298,6 @@ foreach ($nameParts as $part) {
                                 <span>RFID</span>
                             </button>
 
-                            <!-- <button id="darkModeToggle" class="dark-toggle">
-                                <i class="bi bi-moon-fill"></i>
-                                <span>Darkmode</span>
-                            </button> -->
-
                             <button onclick="generateReport()">
                                 <i class="bi bi-bar-chart-fill"></i>
                                 <span>Reports</span>
@@ -1253,78 +1326,6 @@ foreach ($nameParts as $part) {
                         <canvas id="barChart"></canvas>
                     </section>
                 </section>
-
-
-                <div class="dashboard-bottom">
-                    <!-- ALERTS -->
-                    <div class="alerts-container">
-                        <h3>Alerts</h3>
-
-                        <ul class="alerts-list scrollable">
-
-                            <?php
-                            $alerts = getSupervisorAlerts($conn, $superID);
-
-                            if (count($alerts) > 0):
-
-                                foreach ($alerts as $alert):
-                            ?>
-
-                                    <li class="alert-item <?= $alert['type'] ?>">
-
-                                        <i class="bi bi-exclamation-triangle"></i> <?= htmlspecialchars($alert['message']) ?>
-
-                                        <button class="alert-btn"
-                                            onclick="<?= $alert['action'] ? $alert['action'] . '(' . $alert['id'] . ')' : '' ?>">
-                                            View
-                                        </button>
-
-                                    </li>
-
-                                <?php
-                                endforeach;
-                            else:
-                                ?>
-
-                                <li class="alert-item success">
-                                    <i class="bi bi-check-circle"></i> No issues detected. All students are active.
-                                </li>
-
-                            <?php endif; ?>
-
-                        </ul>
-                    </div>
-
-                    <!-- activity logs (recent) -->
-                    <div class="activity-container">
-                        <h3>Recent Activity</h3>
-
-                        <ul class="activity-list scrollable">
-
-                            <?php
-                            $activities = getSupervisorActivities($conn, $superID);
-
-                            if (count($activities) > 0):
-                                foreach ($activities as $act):
-                            ?>
-
-                                    <li class="activity-item <?= $act['type'] ?>">
-                                        <i class="bi bi-app-indicator"></i> <?= htmlspecialchars($act['message']) ?>
-                                        <small><?= $act['time'] ?></small>
-                                    </li>
-
-                                <?php endforeach;
-                            else: ?>
-
-                                <li class="activity-item success">
-                                    <i class="bi bi-check-circle"></i> No recent activity
-                                </li>
-
-                            <?php endif; ?>
-
-                        </ul>
-                    </div>
-                </div>
 
             </section>
 

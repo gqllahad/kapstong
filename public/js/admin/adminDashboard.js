@@ -216,12 +216,9 @@ function exportEvaluation(id) {
     })
     .then(res => res.text())
     .then(text => {
-        console.log(text);              
-        const data = JSON.parse(text);
         showToast(data.message, data.status === "success" ? "success" : "error");
     })
     .catch(err => {
-        console.error(err);
         showToast("Export failed", "error");
     });
 }

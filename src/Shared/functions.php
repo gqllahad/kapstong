@@ -1,6 +1,8 @@
 <?php
 
 
+use setasign\Fpdi\Fpdi;
+
 function logout()
 {
     if (session_status() === PHP_SESSION_NONE) {
@@ -1775,6 +1777,103 @@ function renderManualAttendanceWatchlist($conn, $threshold = 3, $daysWindow = 90
     return $summaryBar . "<div class='risk-list'>{$cardsHtml}</div>";
 }
 
+
+function renderHRAlertWatchlist($conn, $threshold = 2, $daysWindow = 7, $department = '')
+{
+    $sql = "
+        SELECT 
+            os.studentID,
+            os.name,
+            os.course,
+            sup.name AS supervisor_name,
+            sup.department,
+            SUM(wl.warning_type IN ('INACTIVE_ATTENDANCE', 'OVERDUE_TASK')) AS reminder_count,
+            MAX(wl.warning_type = 'ESCALATED_TO_HR') AS escalated,
+            MAX(wl.sent_at) AS last_sent
+        FROM warning_logs wl
+        INNER JOIN student_supervisor ss 
+            ON ss.studentID = wl.studentID AND ss.status = 'ACTIVE'
+        INNER JOIN ojtstudent os 
+            ON os.studentID = wl.studentID
+        INNER JOIN supervisor sup 
+            ON sup.superID = ss.superID
+        WHERE wl.sent_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+          AND NOT EXISTS (
+              SELECT 1 FROM attendance_logs a
+              WHERE a.studentID = wl.studentID
+                AND a.log_date >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+          )
+    ";
+
+    $params = [$daysWindow];
+    $types = "i";
+
+    if (!empty($department)) {
+        $sql .= " AND sup.department = ?";
+        $params[] = $department;
+        $types .= "s";
+    }
+
+    $sql .= "
+        GROUP BY os.studentID, os.name, os.course, sup.name, sup.department
+        HAVING reminder_count >= ? OR escalated = 1
+        ORDER BY escalated DESC, reminder_count DESC, last_sent DESC
+    ";
+    $params[] = $threshold;
+    $types .= "i";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+    $total = $result->num_rows;
+    $cards = '';
+
+    while ($row = $result->fetch_assoc()) {
+        $initial = strtoupper(substr($row['name'], 0, 1));
+        $risk = $row['escalated'] ? 'critical' : 'high';
+        $badge = $row['escalated']
+            ? 'Escalated by supervisor'
+            : $row['reminder_count'] . 'x Reminded';
+
+        $cards .= "
+        <div class='ris-card risk-{$risk}'>
+            <div class='ris-top'>
+                <div class='ris-avatar'>{$initial}</div>
+                <div class='ris-identity'>
+                    <span class='ris-name'>" . $h($row['name']) . "</span>
+                    <span class='ris-meta'>" . $h($row['studentID']) . " • " . $h($row['course']) . "</span>
+                </div>
+                <div class='ris-badges'>
+                    <span class='ris-risk-badge risk-{$risk}'>{$badge}</span>
+                </div>
+            </div>
+            <div class='watchlist-actions'>
+                <span class='watchlist-last-seen'>
+                    Supervisor: " . $h($row['supervisor_name']) . " (" . $h($row['department']) . ")
+                    • Last action: " . $h(date('M d, Y', strtotime($row['last_sent']))) . "
+                </span>
+            </div>
+        </div>";
+    }
+
+    $summary = "
+    <div class='risk-summary-bar'>
+        <div class='rsb-item rsb-critical'>
+            <span class='rsb-count'>{$total}</span>
+            <span class='rsb-label'>Students needing HR attention</span>
+        </div>
+    </div>";
+
+    if ($total === 0) {
+        return $summary . "<div class='risk-empty'><p>No students need HR follow-up right now.</p></div>";
+    }
+
+    return $summary . "<div class='risk-list'>{$cards}</div>";
+}
+
 // function renderDepartmentOptions($conn)
 // {
 //     $sql = "SELECT DISTINCT prg_department, prg_department_code FROM program";
@@ -2715,6 +2814,43 @@ function buildEvaluationDocument($r) {
          . "</body></html>";
 }
 
+function generateCertificatePdf($conn, $studentName, $studentID, $courseName = '') {
+    $stmt = $conn->prepare("SELECT file_path FROM certificate_template ORDER BY uploaded_at DESC LIMIT 1");
+    $stmt->execute();
+    $templateRow = $stmt->get_result()->fetch_assoc();
+
+    if (!$templateRow || !file_exists($templateRow['file_path'])) {
+        return null; 
+    }
+
+    $pdf = new Fpdi();
+    $pageCount = $pdf->setSourceFile($templateRow['file_path']);
+
+    for ($i = 1; $i <= $pageCount; $i++) {
+        $templateId = $pdf->importPage($i);
+        $size = $pdf->getTemplateSize($templateId);
+
+        $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+        $pdf->useTemplate($templateId);
+
+        
+        if ($i === 1) {
+            $pdf->SetFont('Helvetica', 'B', 28);
+            $pdf->SetTextColor(20, 30, 70);
+
+            
+            $pdf->SetXY(0, $size['height'] / 2 - 10);
+            $pdf->Cell($size['width'], 10, $studentName, 0, 1, 'C');
+
+            $pdf->SetFont('Helvetica', '', 12);
+            $pdf->SetXY(0, $size['height'] / 2 + 10);
+            $pdf->Cell($size['width'], 8, "Student ID: {$studentID}" . ($courseName ? " | {$courseName}" : ""), 0, 1, 'C');
+        }
+    }
+
+    return $pdf->Output('S'); 
+}
+
 
 
 
@@ -3431,20 +3567,88 @@ function timeAgo($datetime)
 function getSupervisorAlerts($conn, $superID)
 {
     $alerts = [];
+    $criticalIDs = [];
+
+    $remindedIDs = [];
+    $stmtR = $conn->prepare("
+        SELECT DISTINCT studentID FROM warning_logs 
+        WHERE superID = ? 
+          AND warning_type IN ('INACTIVE_ATTENDANCE', 'OVERDUE_TASK')
+          AND sent_at > NOW() - INTERVAL 7 DAY
+    ");
+    $stmtR->bind_param("i", $superID);
+    $stmtR->execute();
+    $resR = $stmtR->get_result();
+    while ($r = $resR->fetch_assoc()) {
+        $remindedIDs[] = $r['studentID'];
+    }
+
+    $sql3 = "
+        SELECT x.studentID, x.name
+        FROM (
+            SELECT s.studentID, s.name,
+                   COALESCE(
+                       (SELECT MAX(a.log_date) FROM attendance_logs a WHERE a.studentID = s.studentID),
+                       DATE(ss.date_assigned)
+                   ) AS ref_date
+            FROM ojtstudent s
+            INNER JOIN student_supervisor ss 
+                ON ss.studentID = s.studentID
+            WHERE ss.superID = ?
+              AND ss.status = 'ACTIVE'
+              AND NOT EXISTS (
+                  SELECT 1 FROM attendance_logs a
+                  WHERE a.studentID = s.studentID
+                    AND a.log_date >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+              )
+              AND NOT EXISTS (
+                  SELECT 1 FROM student_tasks t
+                  WHERE t.studentID = s.studentID
+                    AND t.status IN ('IN PROGRESS', 'SUBMITTED', 'APPROVED')
+              )
+        ) x
+        WHERE x.ref_date < DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+          AND x.ref_date >= DATE_SUB(CURDATE(), INTERVAL 26 DAY)
+    ";
+
+    $stmt3 = $conn->prepare($sql3);
+    $stmt3->bind_param("i", $superID);
+    $stmt3->execute();
+    $result3 = $stmt3->get_result();
+
+    while ($row = $result3->fetch_assoc()) {
+        $criticalIDs[] = $row['studentID'];
+
+        $alerts[] = [
+            "type" => "critical",
+            "priority" => 3,
+            "message" => $row['name'] . " is inactive (no attendance + no task activity)",
+            "action" => "viewStudentProgress",
+            "id" => $row['studentID'],
+            "studentID" => $row['studentID'],                              
+            "reminded" => in_array($row['studentID'], $remindedIDs)       
+        ];
+    }
 
     $sql1 = "
         SELECT s.studentID, s.name,
-       MAX(a.log_date) as last_attendance
+               MAX(a.log_date) AS last_attendance,
+               MAX(ss.date_assigned) AS assigned_on
         FROM ojtstudent s
         INNER JOIN student_supervisor ss 
             ON ss.studentID = s.studentID
         LEFT JOIN attendance_logs a 
             ON s.studentID = a.studentID
         WHERE ss.superID = ?
-        AND ss.status = 'ACTIVE'
-        GROUP BY s.studentID
-        HAVING last_attendance IS NULL 
-        OR last_attendance < DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+          AND ss.status = 'ACTIVE'
+        GROUP BY s.studentID, s.name
+        HAVING 
+            (last_attendance IS NULL 
+                AND DATE(assigned_on) < DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+                AND DATE(assigned_on) >= DATE_SUB(CURDATE(), INTERVAL 26 DAY))
+            OR
+            (last_attendance < DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+                AND last_attendance >= DATE_SUB(CURDATE(), INTERVAL 26 DAY))
     ";
 
     $stmt1 = $conn->prepare($sql1);
@@ -3453,27 +3657,31 @@ function getSupervisorAlerts($conn, $superID)
     $result1 = $stmt1->get_result();
 
     while ($row = $result1->fetch_assoc()) {
+        if (in_array($row['studentID'], $criticalIDs)) continue;
+
         $alerts[] = [
             "type" => "warning",
             "priority" => 1,
             "message" => $row['name'] . " has not recorded attendance for 5 days",
             "action" => "viewStudentProgress",
-            "id" => $row['studentID']
+            "id" => $row['studentID'],
+            "studentID" => $row['studentID']                              
         ];
     }
 
     $sql2 = "
-    SELECT s.name, t.title, t.taskID
-    FROM student_tasks t
-    INNER JOIN ojtstudent s 
-        ON t.studentID = s.studentID
-    INNER JOIN student_supervisor ss 
-        ON ss.studentID = s.studentID
-    WHERE ss.superID = ?
-      AND ss.status = 'ACTIVE'
-      AND t.status IN ('NOT STARTED', 'IN PROGRESS')
-      AND t.due_date < CURDATE()
-";
+        SELECT s.studentID, s.name, t.title, t.taskID                    
+        FROM student_tasks t
+        INNER JOIN ojtstudent s 
+            ON t.studentID = s.studentID
+        INNER JOIN student_supervisor ss 
+            ON ss.studentID = s.studentID
+        WHERE ss.superID = ?
+          AND ss.status = 'ACTIVE'
+          AND t.status IN ('NOT STARTED', 'IN PROGRESS')
+          AND t.due_date < CURDATE()
+          AND t.due_date >= DATE_SUB(CURDATE(), INTERVAL 21 DAY)
+    ";
 
     $stmt2 = $conn->prepare($sql2);
     $stmt2->bind_param("i", $superID);
@@ -3484,51 +3692,16 @@ function getSupervisorAlerts($conn, $superID)
         $alerts[] = [
             "type" => "danger",
             "priority" => 2,
-            "message" => $row['name'] . " - Task '" . $row['title'] . "'  is overdue",
+            "message" => $row['name'] . " - Task '" . $row['title'] . "' is overdue",
             "action" => "viewTask",
-            "id" => $row['taskID']
-        ];
-    }
-
-
-    $sql3 = "
-        SELECT s.studentID, s.name
-        FROM ojtstudent s
-        INNER JOIN student_supervisor ss 
-            ON ss.studentID = s.studentID
-        WHERE ss.superID = ?
-          AND ss.status = 'ACTIVE'
-          AND NOT EXISTS (
-              SELECT 1 FROM attendance_logs a
-              WHERE a.studentID = s.studentID
-                AND a.log_date >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
-          )
-          AND NOT EXISTS (
-              SELECT 1 FROM student_tasks t
-              WHERE t.studentID = s.studentID
-                AND t.status IN ('IN PROGRESS', 'SUBMITTED', 'APPROVED')
-          )
-    ";
-
-    $stmt3 = $conn->prepare($sql3);
-    $stmt3->bind_param("i", $superID);
-    $stmt3->execute();
-    $result3 = $stmt3->get_result();
-
-    while ($row = $result3->fetch_assoc()) {
-        $alerts[] = [
-            "type" => "critical",
-            "priority" => 3,
-            "message" => $row['name'] . " is inactive (no attendance + no task activity)",
-            "action" => "viewStudentProgress",
-            "id" => $row['studentID']
+            "id" => $row['taskID'],
+            "studentID" => $row['studentID']                            
         ];
     }
 
     usort($alerts, function ($a, $b) {
         return $b['priority'] <=> $a['priority'];
     });
-
 
     return $alerts;
 }

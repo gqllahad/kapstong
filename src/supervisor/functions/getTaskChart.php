@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once("../../Shared/kapstongConnection.php");
+require_once("../../auth/supervisor_auth.php");
 
 header('Content-Type: application/json');
 
@@ -18,7 +19,7 @@ if (!$superID) {
 
 $sql = "
 SELECT 
-    ss.studentID,
+    ss.studentID, o.name,
 
     COUNT(st.taskID) AS total_tasks,
 
@@ -42,6 +43,8 @@ LEFT JOIN student_tasks st
     ON ss.studentID = st.studentID
     AND st.superID = ss.superID
 
+INNER JOIN ojtstudent o ON ss.studentID = o.studentID
+
 WHERE ss.superID = ?
 AND ss.status = 'ACTIVE'
 
@@ -61,7 +64,7 @@ $progress = [];
 
 while ($row = $result->fetch_assoc()) {
 
-    $labels[] = $row['studentID'];
+    $labels[] = $row['name'];
     $completed[] = (int)$row['completed_tasks'];
     $pending[] = (int)$row['pending_tasks'];
 

@@ -1,12 +1,16 @@
 # Kapstong — Requirements
 
 ## Runtime
+
 - PHP 8.0+
 - MySQL/MariaDB
 - Apache (XAMPP)
 - Composer
 
+composer require setasign/fpdi // need for the certification export
+
 ## PHP extensions (php.ini)
+
 ```
 extension=zip
 extension=pdo_mysql
@@ -15,6 +19,7 @@ extension=gd
 ```
 
 ## Composer packages
+
 ```
 composer require vlucas/phpdotenv
 composer require phpmailer/phpmailer
@@ -22,6 +27,7 @@ composer require dompdf/dompdf
 ```
 
 ## .env
+
 ```
 APP_ENV=local
 APP_URL=http://localhost/kapstong
@@ -39,12 +45,14 @@ MAIL_ENCRYPTION=tls
 ```
 
 ## .gitignore
+
 ```
 /vendor/
 .env
 ```
 
 ## Setup
+
 ```bash
 git clone <repo-url> kapstong
 cd kapstong

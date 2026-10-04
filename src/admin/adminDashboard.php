@@ -892,7 +892,7 @@ if ($_SESSION['role'] !== "ADMIN") {
             <!-- evaluation modal -->
              <div id="evalPreviewModal" class="eval-preview-modal">
                 <div class="modal-header">
-                <h3>Certificate of Completion</h3>
+                <h3>Final Evaluation</h3>
                 <button id="closeEvalPreview" class="modal-close">&times;</button>
             </div>
                 <div class="modal-box">
@@ -2013,8 +2013,6 @@ if ($_SESSION['role'] !== "ADMIN") {
 
         resetTimer();
     }
-
-    console.log("Current location:", window.location.href);
 
     window.onload = resetTimer;
     document.onmousemove = resetTimer;

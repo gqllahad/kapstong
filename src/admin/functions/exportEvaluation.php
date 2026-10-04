@@ -3,18 +3,15 @@ require_once("../../Shared/kapstongConnection.php");
 require_once("../../auth/admin_auth.php");
 require_once("../../Shared/functions.php");
 require_once("../../../vendor/autoload.php");
-
 require_once("../../Shared/config.php");
 
 use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
+use Dompdf\Dompdf;
 
 require_once __DIR__ . '/../../../PHPMailer/src/PHPMailer.php';
 require_once __DIR__ . '/../../../PHPMailer/src/SMTP.php';
 require_once __DIR__ . '/../../../PHPMailer/src/Exception.php';
-
-
-use Dompdf\Dompdf;
-use PHPMailer\PHPMailer\PHPMailer;
 
 header('Content-Type: application/json');
 
@@ -26,11 +23,20 @@ if (!$row) {
     exit;
 }
 
+// ── Build evaluation PDF ──
 $dompdf = new Dompdf();
 $dompdf->loadHtml(buildEvaluationDocument($row));
 $dompdf->setPaper('A4');
 $dompdf->render();
-$pdf = $dompdf->output();
+$evaluationPdf = $dompdf->output();
+
+// ── Build certificate PDF (if a template exists) ──
+$certificatePdf = generateCertificatePdf(
+    $conn,
+    $row['student_name'],
+    $row['studentID'],
+    $row['course'] ?? ''
+);
 
 try {
     $mail = new PHPMailer(true);
@@ -43,13 +49,28 @@ try {
     $mail->Port       = 587;
 
     $mail->setFrom(MAIL_USERNAME, 'OJT Monitoring System');
-    $mail->addAddress(MAIL_USERNAME); //coordinator
+    $mail->addAddress(MAIL_USERNAME); // coordinator
     $mail->Subject = "OJT Final Evaluation - {$row['student_name']}";
-    $mail->Body    = "Attached is the final OJT evaluation of {$row['student_name']} ({$row['studentID']}).";
-    $mail->addStringAttachment($pdf, "Evaluation_{$row['studentID']}.pdf");
+
+    $bodyText = "Attached is the final OJT evaluation of {$row['student_name']} ({$row['studentID']}).";
+    if ($certificatePdf) {
+        $bodyText .= " A certificate of completion is also included.";
+    }
+    $mail->Body = $bodyText;
+
+    $mail->addStringAttachment($evaluationPdf, "Evaluation_{$row['studentID']}.pdf");
+
+    if ($certificatePdf) {
+        $mail->addStringAttachment($certificatePdf, "Certificate_{$row['studentID']}.pdf");
+    }
+
     $mail->send();
 
-    echo json_encode(["status" => "success", "message" => "Evaluation sent to coordinator"]);
+    $message = $certificatePdf
+        ? "Evaluation and certificate sent to coordinator"
+        : "Evaluation sent to coordinator (no certificate template found)";
+
+    echo json_encode(["status" => "success", "message" => $message]);
 } catch (Exception $ex) {
     echo json_encode(["status" => "error", "message" => "Failed to send email"]);
 }
