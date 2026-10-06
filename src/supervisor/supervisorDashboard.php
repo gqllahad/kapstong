@@ -1169,7 +1169,14 @@ foreach ($nameParts as $part) {
                                 <?php foreach ($alerts as $alert): ?>
                                     <li class="alert-item <?= htmlspecialchars($alert['type']) ?>">
                                         <i class="bi bi-exclamation-circle-fill"></i>
-                                        <span class="alert-item-text"><?= htmlspecialchars($alert['message']) ?></span>
+                                        <span class="alert-item-text">
+                                            <?= htmlspecialchars($alert['message']) ?>
+                                            <?php if (!empty($alert['notified'])): ?>
+                                                <small class="alert-notified">
+                                                    <i class="bi bi-envelope-check"></i> Student emailed · <?= timeAgo($alert['notified']) ?>
+                                                </small>
+                                            <?php endif; ?>
+                                        </span>
                                         <button class="alert-btn"
                                             data-action="<?= htmlspecialchars($alert['action'] ?? '') ?>"
                                             data-id="<?= htmlspecialchars((string) $alert['id']) ?>"
@@ -1181,13 +1188,6 @@ foreach ($nameParts as $part) {
                                                 data-student="<?= htmlspecialchars((string) $alert['studentID'], ENT_QUOTES) ?>"
                                                 onclick="escalateStudent(this.dataset.student, this)">
                                                 <i class="bi bi-arrow-up-circle"></i> <span>Escalate</span>
-                                            </button>
-                                        <?php else: ?>
-                                            <button class="remind-btn"
-                                                data-student="<?= htmlspecialchars((string) $alert['studentID'], ENT_QUOTES) ?>"
-                                                data-type="<?= htmlspecialchars($alert['type']) ?>"
-                                                onclick="remindStudent(this.dataset.student, this.dataset.type, this)">
-                                                <i class="bi bi-bell"></i> <span>Remind</span>
                                             </button>
                                         <?php endif; ?>
                                         

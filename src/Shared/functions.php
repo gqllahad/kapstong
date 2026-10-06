@@ -3568,20 +3568,22 @@ function getSupervisorAlerts($conn, $superID)
 {
     $alerts = [];
     $criticalIDs = [];
-
-    $remindedIDs = [];
-    $stmtR = $conn->prepare("
-        SELECT DISTINCT studentID FROM warning_logs 
-        WHERE superID = ? 
-          AND warning_type IN ('INACTIVE_ATTENDANCE', 'OVERDUE_TASK')
-          AND sent_at > NOW() - INTERVAL 7 DAY
-    ");
-    $stmtR->bind_param("i", $superID);
-    $stmtR->execute();
-    $resR = $stmtR->get_result();
-    while ($r = $resR->fetch_assoc()) {
-        $remindedIDs[] = $r['studentID'];
-    }
+    $notifiedMap = [];
+    $stmtN = $conn->prepare("
+            SELECT wl.studentID, wl.warning_type, wl.ref_id, MAX(wl.sent_at) AS last_sent
+            FROM warning_logs wl
+            INNER JOIN student_supervisor ss 
+                ON ss.studentID = wl.studentID AND ss.status = 'ACTIVE'
+            WHERE ss.superID = ?
+            AND wl.sent_at > NOW() - INTERVAL 30 DAY
+            GROUP BY wl.studentID, wl.warning_type, wl.ref_id
+        ");
+        $stmtN->bind_param("i", $superID);
+        $stmtN->execute();
+        $resN = $stmtN->get_result();
+        while ($r = $resN->fetch_assoc()) {
+            $notifiedMap[$r['studentID'] . '|' . $r['warning_type'] . '|' . ($r['ref_id'] ?? '')] = $r['last_sent'];
+        }
 
     $sql3 = "
         SELECT x.studentID, x.name
@@ -3626,7 +3628,7 @@ function getSupervisorAlerts($conn, $superID)
             "action" => "viewStudentProgress",
             "id" => $row['studentID'],
             "studentID" => $row['studentID'],                              
-            "reminded" => in_array($row['studentID'], $remindedIDs)       
+            "notified" => $notifiedMap[$row['studentID'] . '|INACTIVE_ATTENDANCE|'] ?? null  
         ];
     }
 
@@ -3665,7 +3667,8 @@ function getSupervisorAlerts($conn, $superID)
             "message" => $row['name'] . " has not recorded attendance for 5 days",
             "action" => "viewStudentProgress",
             "id" => $row['studentID'],
-            "studentID" => $row['studentID']                              
+            "studentID" => $row['studentID'],
+            "notified" => $notifiedMap[$row['studentID'] . '|INACTIVE_ATTENDANCE|'] ?? null                          
         ];
     }
 
@@ -3680,7 +3683,7 @@ function getSupervisorAlerts($conn, $superID)
           AND ss.status = 'ACTIVE'
           AND t.status IN ('NOT STARTED', 'IN PROGRESS')
           AND t.due_date < CURDATE()
-          AND t.due_date >= DATE_SUB(CURDATE(), INTERVAL 21 DAY)
+          AND t.due_date >= DATE_SUB(CURDATE(), INTERVAL 2 DAY)
     ";
 
     $stmt2 = $conn->prepare($sql2);
@@ -3695,7 +3698,43 @@ function getSupervisorAlerts($conn, $superID)
             "message" => $row['name'] . " - Task '" . $row['title'] . "' is overdue",
             "action" => "viewTask",
             "id" => $row['taskID'],
-            "studentID" => $row['studentID']                            
+            "studentID" => $row['studentID'],
+            "notified" => $notifiedMap[$row['studentID'] . '|OVERDUE_TASK|' . $row['taskID']] ?? null                           
+        ];
+    }
+
+    $sqlSoon = "
+    SELECT s.studentID, s.name, t.title, t.taskID,
+           DATEDIFF(t.due_date, CURDATE()) AS days_left
+    FROM student_tasks t
+    INNER JOIN ojtstudent s 
+        ON t.studentID = s.studentID
+    INNER JOIN student_supervisor ss 
+        ON ss.studentID = s.studentID
+    WHERE ss.superID = ?
+      AND ss.status = 'ACTIVE'
+      AND t.status IN ('NOT STARTED', 'IN PROGRESS')
+      AND t.due_date >= CURDATE()
+      AND t.due_date < DATE_ADD(CURDATE(), INTERVAL 4 DAY)
+";
+
+    $stmtSoon = $conn->prepare($sqlSoon);
+    $stmtSoon->bind_param("i", $superID);
+    $stmtSoon->execute();
+    $resultSoon = $stmtSoon->get_result();
+
+    while ($row = $resultSoon->fetch_assoc()) {
+        $d = (int) $row['days_left'];
+        $when = $d === 0 ? 'today' : ($d === 1 ? 'tomorrow' : "in {$d} days");
+
+        $alerts[] = [
+            "type" => "warning",
+            "priority" => 1,
+            "message" => $row['name'] . " - Task '" . $row['title'] . "' is due " . $when,
+            "action" => "viewTask",
+            "id" => $row['taskID'],
+            "studentID" => $row['studentID'],
+            "notified" => $notifiedMap[$row['studentID'] . '|TASK_DUE_SOON|' . $row['taskID']] ?? null
         ];
     }
 
@@ -4312,6 +4351,7 @@ function getSupervisorOptions($conn)
 }
 
 // academic year options
+//  TODO: DRop column start_date and End_date ojtsettings
 function academicYearOptions($conn)
 {
      $sql = "SELECT academic_year FROM ojt_settings WHERE status = 'ACTIVE' LIMIT 1";
@@ -4403,100 +4443,133 @@ function renderAttendanceCalendar($conn, $year, $month) {
     $output .= '</div>';
     return $output;
 }
-// function renderAttendanceCalendar($conn, $year, $month) {
-//     function e($val) {
-//         return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
-//     }
 
-//     $firstDay = "$year-$month-01";
-//     $daysInMonth = date('t', strtotime($firstDay));
-//     $startWeekday = date('w', strtotime($firstDay));
+// predictive attendance eval
+function getStudentForecast($conn, $studentID, $minDays = 14, $windowDays = 28, $graceDays = 7)
+{
+    $today = new DateTimeImmutable('today');
 
-//     $stmt = $conn->prepare("
-//         SELECT event_date, type, label, hour_multiplier 
-//         FROM calendar_events 
-//         WHERE event_date BETWEEN ? AND ?
-//     ");
-//     $lastDay = date('Y-m-t', strtotime($firstDay));
-//     $stmt->bind_param("ss", $firstDay, $lastDay);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
+    $stmt = $conn->prepare("
+        SELECT sp.required_hours,
+               COALESCE(sp.completed_hours, 0) AS completed_hours,
+               COALESCE(
+                   o.end_date,
+                   (SELECT end_date FROM ojt_settings WHERE status = 'ACTIVE' ORDER BY settingID DESC LIMIT 1)
+               ) AS end_date
+        FROM student_progress sp
+        LEFT JOIN ojt_settings o ON o.settingID = sp.settingID
+        WHERE sp.studentID = ?
+        LIMIT 1
+    ");
+    $stmt->bind_param("s", $studentID);
+    $stmt->execute();
+    $p = $stmt->get_result()->fetch_assoc();
+    if (!$p) return null;
 
-//     $events = [];
-//     while ($row = $result->fetch_assoc()) {
-//         $events[$row['event_date']] = $row;
-//     }
+    $required  = (float) $p['required_hours'];
+    $completed = (float) $p['completed_hours'];
+    $remaining = max(0, $required - $completed);
+    $endDate   = $p['end_date'] ? new DateTimeImmutable($p['end_date']) : null;
 
-//     $today = date('Y-m-d');
-//     $output = '<div class="calendar-grid">';
+    $base = [
+        'completed' => $completed,
+        'required'  => $required,
+        'remaining' => $remaining,
+        'end_date'  => $endDate ? $endDate->format('Y-m-d') : null,
+        'projected_date' => null,
+        'hours_per_week' => null,
+        'hours_per_day'  => null,
+        'needed_per_day' => null,
+        'days_late'      => null,
+    ];
 
-//     $weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-//     foreach ($weekdays as $wd) {
-//         $output .= "<div class='calendar-weekday'>" . e($wd) . "</div>";
-//     }
+    if ($remaining <= 0) return ['status' => 'COMPLETED'] + $base;
 
-//     for ($i = 0; $i < $startWeekday; $i++) {
-//         $output .= "<div class='calendar-day empty'></div>";
-//     }
+    $stmt = $conn->prepare("
+        SELECT MIN(log_date) AS first_log 
+        FROM attendance_logs 
+        WHERE studentID = ? AND status <> 'voided'
+    ");
+    $stmt->bind_param("s", $studentID);
+    $stmt->execute();
+    $firstLog = $stmt->get_result()->fetch_assoc()['first_log'] ?? null;
+    if (!$firstLog) return ['status' => 'NOT_ENOUGH_DATA'] + $base;
 
-//     for ($d = 1; $d <= $daysInMonth; $d++) {
-//         $dateStr = sprintf("%s-%s-%02d", $year, $month, $d);
-//         $event = $events[$dateStr] ?? null;
+    $first     = new DateTimeImmutable($firstLog);
+    $yesterday = $today->modify('-1 day');
+    $daysTracked = (int) $first->diff($yesterday)->format('%r%a') + 1;
+    if ($daysTracked < $minDays) return ['status' => 'NOT_ENOUGH_DATA'] + $base;
 
-//         $classes = ['calendar-day'];
-//         $badge = '';
+    $windowStart = max($first, $today->modify("-{$windowDays} days"));
 
-//         if ($dateStr < $today) {
-//             $classes[] = 'past';
-//         } elseif ($dateStr === $today) {
-//             $classes[] = 'today';
-//         } else {
-//             $classes[] = 'future';
-//         }
+    $events = [];
+    $stmt = $conn->prepare("SELECT event_date, type FROM calendar_events WHERE event_date >= ?");
+    $ws = $windowStart->format('Y-m-d');
+    $stmt->bind_param("s", $ws);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    while ($r = $res->fetch_assoc()) {
+        $events[$r['event_date']] = $r['type'];
+    }
 
-//         $isWeekend = in_array(date('w', strtotime($dateStr)), [0, 6]);
-//         if ($isWeekend) $classes[] = 'weekend';
+    $isWorkday = function (DateTimeImmutable $d) use ($events) {
+        $key = $d->format('Y-m-d');
+        if (isset($events[$key])) return $events[$key] === 'WORKDAY';
+        return (int) $d->format('N') <= 5;   
+    };
 
-//         if ($event) {
-//             $classes[] = 'has-event';
-//             $classes[] = 'event-' . strtolower($event['type']);
+    $workdaysWindow = 0;
+    for ($d = $windowStart; $d <= $yesterday; $d = $d->modify('+1 day')) {
+        if ($isWorkday($d)) $workdaysWindow++;
+    }
+    if ($workdaysWindow === 0) return ['status' => 'NOT_ENOUGH_DATA'] + $base;
 
-//             $icon = $event['type'] === 'HOLIDAY' ? 'bx-star' : 'bx-moon';
-//             $multiplierText = ($event['type'] === 'HOLIDAY' && $event['hour_multiplier'] > 1)
-//                 ? '<span class="calendar-multiplier">' . e($event['hour_multiplier']) . 'x</span>'
-//                 : '';
+    $stmt = $conn->prepare("
+        SELECT COALESCE(SUM(total_hours), 0) AS hrs
+        FROM attendance_logs
+        WHERE studentID = ? AND status <> 'voided'
+          AND log_date BETWEEN ? AND ?
+    ");
+    $ye = $yesterday->format('Y-m-d');
+    $stmt->bind_param("sss", $studentID, $ws, $ye);
+    $stmt->execute();
+    $hoursWindow = (float) $stmt->get_result()->fetch_assoc()['hrs'];
 
-//             $badge = "<div class='calendar-event-badge'><i class='bx {$icon}'></i>" . e($event['label']) . "{$multiplierText}</div>";
-//         }
+    $pace = $hoursWindow / $workdaysWindow;               
+    $windowLen = (int) $windowStart->diff($yesterday)->format('%a') + 1;
+    $base['hours_per_day']  = round($pace, 1);
+    $base['hours_per_week'] = round($hoursWindow / ($windowLen / 7), 1);
 
-//         $classAttr = implode(' ', $classes);
-//         $jsDate = json_encode($dateStr);
+    if ($endDate) {
+        $daysLeft = 0;
+        for ($d = $today->modify('+1 day'); $d <= $endDate; $d = $d->modify('+1 day')) {
+            if ($isWorkday($d)) $daysLeft++;
+        }
+        $base['needed_per_day'] = $daysLeft > 0 ? round($remaining / $daysLeft, 1) : null;
+    }
 
-//         $output .= "
-//             <div class='{$classAttr}' onclick='openDayModal({$jsDate})'>
-//                 <span class='calendar-date-number'>{$d}</span>
-//                 {$badge}
-//             </div>";
-//     }
+    if ($pace <= 0) return ['status' => 'STALLED'] + $base;
 
-//     $output .= '</div>';
-//     return $output;
-// }
+    $acc = 0.0;
+    $d = $today->modify('+1 day');
+    $guard = 0;
+    while ($guard < 730) {
+        if ($isWorkday($d)) $acc += $pace;
+        if ($acc >= $remaining) break;
+        $d = $d->modify('+1 day');
+        $guard++;
+    }
+    if ($guard >= 730) return ['status' => 'STALLED'] + $base;
 
+    $base['projected_date'] = $d->format('Y-m-d');
 
-// rfid setting up for calendar connections
-// function isNonWorkDay($conn, $dateStr) {
-//     $stmt = $conn->prepare("SELECT type FROM calendar_events WHERE event_date = ?");
-//     $stmt->bind_param("s", $dateStr);
-//     $stmt->execute();
-//     $row = $stmt->get_result()->fetch_assoc();
+    if (!$endDate) return ['status' => 'NO_DEADLINE'] + $base;
 
-//     if ($row) {
-//         return in_array($row['type'], ['NO_WORK', 'HOLIDAY']);
-//     }
-//     $weekday = date('w', strtotime($dateStr));
-//     return in_array($weekday, [0, 6]); 
-// }
+    $daysLate = (int) $endDate->diff($d)->format('%r%a');   
+    $base['days_late'] = $daysLate;
+
+    return ['status' => $daysLate > $graceDays ? 'AT_RISK' : 'ON_TRACK'] + $base;
+}
 
 
 // rfid hours recalculation

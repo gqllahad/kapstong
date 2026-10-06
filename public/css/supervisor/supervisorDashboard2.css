@@ -1484,6 +1484,18 @@ body.dark-mode .escalate-btn:hover {
   font-size: 13px;
 }
 
+.alert-notified {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.75;
+}
+.alert-item .alert-notified i {
+  color: inherit;
+  font-size: 12px;
+}
+
 /* ══════════════════════════════════════════════════════════════
    TABLES — MASTERCLASS REDESIGN
 ══════════════════════════════════════════════════════════════ */
