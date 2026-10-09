@@ -105,6 +105,8 @@ const AssignCloseBtn = document.getElementById("closeAssignModal");
 
 const ojtSetupBtn = document.getElementById("ojt-program-btn");
 const closeOjtSetupBtn = document.getElementById("closeOjtProgramModal");
+const filterSettingsBody = document.getElementById("filterSettingsBody");
+const editSettingsModal = document.getElementById("edit-settings-modal");
 
 const departmentManagementBtn = document.getElementById("department-management-btn");
 const departmentManagementModal = document.getElementById("department-management-modal");
@@ -2132,94 +2134,238 @@ function saveRfidSettings() {
 
 // ojt settings
 
-function loadActiveOJTCard() {
+// function loadActiveOJTCard() {
 
-    fetch("functions/getActiveOJTCard.php")
-    .then(res => res.text())
-    .then(html => {
+//     fetch("functions/getActiveOJTCard.php")
+//     .then(res => res.text())
+//     .then(html => {
 
-        document.getElementById("activeOJTContainer").innerHTML = html;
+//         document.getElementById("activeOJTContainer").innerHTML = html;
 
-    })
-    .catch(err => {
-        showToast(err, "error");
-    });
+//     })
+//     .catch(err => {
+//         showToast(err, "error");
+//     });
+// }
+
+function loadOJTSetting(settingID) {
+    return fetch("functions/getOjtSetting.php?id=" + encodeURIComponent(settingID))
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                showToast(data.message, "error");
+                return;
+            }
+            document.getElementById("edit_settingID").value      = data.settingID;
+            document.getElementById("edit_programID").value      = data.programID;
+            document.getElementById("edit_academic_year").value  = data.academic_year;
+            document.getElementById("edit_semester").value       = data.semester;
+            document.getElementById("edit_required_hours").value = data.required_hours;
+            document.getElementById("edit_start_date").value     = data.start_date;
+            document.getElementById("edit_end_date").value       = data.end_date;
+            document.getElementById("edit_status").value         = data.status;
+        })
+        .catch(() => showToast("Failed to load setting", "error"));
 }
 
-function loadOJTSettings() {
+function openEditSettingsModal(btn) {
+    if (!editSettingsModal) {
+        showToast("Edit Settings Modal not found", "error");
+        return;
+    }
 
-    fetch("functions/getOjtSettings.php")
-    .then(res => res.json())
-    .then(data => {
+    document.getElementById("edit_settingID").value      = btn.dataset.id;
+    document.getElementById("edit_programID").value      = btn.dataset.program;
+    document.getElementById("edit_academic_year").value  = btn.dataset.year;
+    document.getElementById("edit_semester").value       = btn.dataset.semester;
+    document.getElementById("edit_required_hours").value = btn.dataset.hours;
+    document.getElementById("edit_start_date").value     = btn.dataset.start;
+    document.getElementById("edit_end_date").value       = btn.dataset.end;
+    document.getElementById("edit_status").value         = btn.dataset.status;
 
-        if (data.success) {
-
-            document.getElementById("academicYear").value =
-                data.academic_year || "";
-
-            document.getElementById("requiredHours").value =
-                data.required_hours || "";
-
-            document.getElementById("status").value =
-                data.status || "ACTIVE";
-        }
-
-    });
-
+    ojtSetup.classList.remove("show");
+    editSettingsModal.classList.add("show");
 }
 
-function saveOJTSettings() {
+document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".edit-settings-btn");
+    if (btn) openEditSettingsModal(btn);
+});
 
-    const academicYear = document.getElementById("academicYear").value;
-    const requiredHours = document.getElementById("requiredHours").value;
-    const status = document.getElementById("status").value;
+document.getElementById("closeEditSettingsModal").addEventListener("click", () => {
+    editSettingsModal.classList.remove("show");
+    ojtSetup.classList.add("show");
+});
 
-    if (!academicYear && !requiredHours && !status) {
-        showToast("Please enter one field!", "error");
+
+function updateOJTSettings() {
+    const settingID     = document.getElementById("edit_settingID").value;
+    const programID     = document.getElementById("edit_programID").value;
+    const academicYear  = document.getElementById("edit_academic_year").value.trim();
+    const semester      = document.getElementById("edit_semester").value.trim() || "N/A";
+    const requiredHours = document.getElementById("edit_required_hours").value;
+    const startDate     = document.getElementById("edit_start_date").value;
+    const endDate       = document.getElementById("edit_end_date").value;
+    const status        = document.getElementById("edit_status").value;
+
+    if (!settingID || !programID || !academicYear || !requiredHours || !startDate || !endDate) {
+        showToast("Please complete all fields.", "error");
+        return;
+    }
+
+    if (endDate <= startDate) {
+        showToast("End date must be after the start date.", "error");
         return;
     }
 
     const formData = new URLSearchParams();
+    formData.append("settingID", settingID);
+    formData.append("programID", programID);
+    formData.append("academic_year", academicYear);
+    formData.append("semester", semester);
+    formData.append("required_hours", requiredHours);
+    formData.append("start_date", startDate);
+    formData.append("end_date", endDate);
+    formData.append("status", status);
 
-    if (academicYear) {
-        formData.append("academic_year", academicYear);
-    }
-
-    if (requiredHours) {
-        formData.append("required_hours", requiredHours);
-    }
-
-    if (status) {
-        formData.append("status", status);
-    }
-
-    fetch("functions/saveOjtSettings.php", {
+    fetch("functions/updateOJTSettings.php", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
     })
     .then(res => res.json())
     .then(data => {
-       showToast(data.message, data.success ? "success" : "error");
-       if (data.success) {
+        showToast(data.message, data.success ? "success" : "error");
 
-        loadActiveOJTCard();
-        loadOJTSettings();
+        if (data.success) {
+            editSettingsModal.classList.remove("show");
+            filterSettingsPrograms();  
 
-        ojtSetup.classList.remove("show");
-        setTimeout(() => {
-            
-             ojtSetup.classList.add("show");
-        }, 500);
-        
-    }
+            setTimeout(() => {
+                ojtSetup.classList.add("show");
+            }, 500);
+        }
     })
-    .catch(err => {
-       showToast(err, "error");
+    .catch(() => {
+        showToast("Server error occurred.", "error");
     });
 }
+
+function saveOJTSettings() {
+    const programID     = document.getElementById("settingProgram").value;
+    const academicYear  = document.getElementById("academicYear").value.trim();
+    const semester      = document.getElementById("semester").value.trim() || "N/A";
+    const requiredHours = document.getElementById("requiredHours").value;
+    const startDate     = document.getElementById("settingStart").value;
+    const endDate       = document.getElementById("settingEnd").value;
+    const status        = document.getElementById("settingStatus").value;
+
+    if (!programID || !academicYear || !requiredHours || !startDate || !endDate) {
+        showToast("Please complete all fields.", "error");
+        return;
+    }
+
+    if (!/^\d{4}\s*-\s*\d{4}$/.test(academicYear)) {
+        showToast("Academic year must look like 2026-2027.", "error");
+        return;
+    }
+
+    if (endDate <= startDate) {
+        showToast("End date must be after the start date.", "error");
+        return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("programID", programID);
+    formData.append("academic_year", academicYear.replace(/\s+/g, "")); 
+    formData.append("semester", semester);
+    formData.append("required_hours", requiredHours);
+    formData.append("start_date", startDate);
+    formData.append("end_date", endDate);
+    formData.append("status", status);
+
+    fetch("functions/saveOJTSettings.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        showToast(data.message, data.success ? "success" : "error");
+
+        if (data.success) {
+            resetSettingsForm();
+            document.getElementById("create-settings-modal").classList.remove("show");
+            filterSettingsPrograms();  
+
+            setTimeout(() => {
+                ojtSetup.classList.add("show");
+            }, 500);
+        }
+    })
+    .catch(() => showToast("Server error occurred.", "error"));
+}
+
+// ojt settings modal
+function openCreateSettingsModal() {
+    const modal = document.getElementById("create-settings-modal");
+
+    if (!modal) {
+        showToast("Create Settings Modal not found", "error");
+        return;
+    }
+
+    resetSettingsForm();
+    ojtSetup.classList.remove("show");
+    modal.classList.add("show");
+}
+
+function resetSettingsForm() {
+    ["settingProgram", "academicYear", "semester",
+     "requiredHours", "settingStart", "settingEnd"].forEach(id => {
+        document.getElementById(id).value = "";
+    });
+    document.getElementById("settingStatus").value = "ACTIVE";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const closeBtn = document.getElementById("closeCreateSettingsModal");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            document.getElementById("create-settings-modal").classList.remove("show");
+            ojtSetup.classList.add("show");
+        });
+    }
+});
+
+function filterSettingsPrograms() {
+    const department = document.getElementById("settingsFilter").value;
+
+    clearTimeout(searchTimer);
+
+    searchTimer = setTimeout(() => {
+        filterSettingsBody.classList.add("fade-out");
+
+        fetch("functions/filterSettings.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "department=" + encodeURIComponent(department)
+        })
+        .then(res => res.text())
+        .then(data => {
+            setTimeout(() => {
+                filterSettingsBody.innerHTML = data;
+                filterSettingsBody.classList.remove("fade-out");
+                filterSettingsBody.classList.add("fade-in");
+                setTimeout(() => filterSettingsBody.classList.remove("fade-in"), 200);
+            }, 200);
+        })
+        .catch(() => showToast("Failed to load data", "error"));
+    }, 300);
+}
+
+
+// department management
 
 function filterPrograms() {
 
@@ -2339,7 +2485,7 @@ function openCreateCourseModal(){
     const exitModal = document.getElementById("closeCreateCourseModal");
 
     if (!modal) {
-        showToast("Create Course Modal not found", "error");
+        showToast("Create Settings Modal not found", "error");
         return;
     }
 
@@ -2415,6 +2561,8 @@ function saveCourse() {
         showToast(err, "error");
     });
 }
+
+
 
 // bar chart (go)
 // document.addEventListener("DOMContentLoaded", loadChart, loadPieChart);
@@ -3578,7 +3726,7 @@ ojtSetupBtn.addEventListener("click", () => {
     overlay.classList.add("show");
     ojtSetup.classList.add("show");
 
-    loadOJTSettings();
+    filterSettingsPrograms();
 });
 closeOjtSetupBtn.addEventListener("click", () => {
     overlay.classList.remove("show");

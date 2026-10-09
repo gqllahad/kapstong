@@ -554,53 +554,179 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 </div>
 
-                
-
-                
-
             </div>
 
             <!-- systemconfig modals -->
 
-            <!-- ojt setup -->
+            <!-- ojt setup  inigo -->
+
             <div class="ojt-program-container" id="ojt-program-container">
                 <div class="modal-header">
                     <h3>OJT Program Setup</h3>
                     <button id="closeOjtProgramModal" class="modal-close">&times;</button>
                 </div>
 
+                <div class="settings-management">
+                    <div class="search-filter">
+
+                        <div class="search-container">
+
+                            <i class="bi bi-funnel search-icon"></i>
+
+                            <select id="settingsFilter" onchange="filterSettingsPrograms()">
+                                <?php echo renderDepartmentOptions($conn); ?>
+                            </select>
+
+                        </div>
+
+                    </div>
+                    <button class="settings-btn" onclick="openCreateSettingsModal()">
+                        <span class="icon">+</span>
+                        <span class="text">Add settings</span>
+                    </button>
+                </div>
+
                 <div class="ojt-program-body">
 
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Setting ID</th>
+                                        <th>Program</th>
+                                        <th>Academic Year</th>
+                                        <th>Semester</th>
+                                        <th>Required Hours</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
 
-                    <div class="current-ojt-card" id="activeOJTContainer">
-                        <?php echo renderActiveOJTCard($conn); ?>
-                    </div>
+                                <tbody id="filterSettingsBody">
+                                    <?php echo renderOJTSettingsTable($conn); ?>
+                                </tbody>
+                            </table>
+                        </div>
+                </div>
+            </div>
+
+            <!-- edit ojt settings modal -->
+            <div class="create-settings-modal" id="edit-settings-modal">
+                <div class="modal-header">
+                    <h3>Edit OJT Settings</h3>
+                    <button id="closeEditSettingsModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="edit_settingID">
 
                     <div class="form-grid">
                         <div class="form-group">
+                            <label>Program</label>
+                            <select id="edit_programID">
+                                <?php echo renderProgramOptions($conn); ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label>Academic Year</label>
-                            <input type="text" id="academicYear" placeholder="e.g. 2026 - 2027" pattern="\d{4}\s*-\s*\d{4}">
+                            <input type="text" id="edit_academic_year" placeholder="e.g. 2026-2027">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Semester</label>
+                            <input type="text" id="edit_semester" placeholder="e.g. 2nd Semester or N/A">
                         </div>
 
                         <div class="form-group">
                             <label>Required OJT Hours</label>
-                            <input type="number" id="requiredHours" placeholder="e.g. 600">
+                            <input type="number" id="edit_required_hours" placeholder="e.g. 600">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" id="edit_start_date">
+                        </div>
+
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" id="edit_end_date">
                         </div>
 
                         <div class="form-group">
                             <label>Status</label>
-                            <select id="status">
+                            <select id="edit_status">
                                 <option value="ACTIVE">Active</option>
                                 <option value="INACTIVE">Inactive</option>
                             </select>
                         </div>
                     </div>
+
+                    <div class="ojt-actions">
+                        <button type="button" class="save-btn" onclick="updateOJTSettings()">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ojt settings modal -->
+            <div class="create-settings-modal" id="create-settings-modal">
+                <div class="modal-header">
+                    <h3>Create New Settings</h3>
+                    <button id="closeCreateSettingsModal" class="modal-close">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Program</label>
+                            <select id="settingProgram">
+                                <?php echo renderProgramOptions($conn); ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Academic Year</label>
+                            <input type="text" id="academicYear" placeholder="e.g. 2026-2027">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Semester</label>
+                            <input type="text" id="semester" placeholder="e.g. 2nd Semester or N/A">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Required OJT Hours</label>
+                            <input type="number" id="requiredHours" placeholder="e.g. 600" min="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" id="settingStart">
+                        </div>
+
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" id="settingEnd">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="settingStatus">
+                                <option value="ACTIVE">Active</option>
+                                <option value="INACTIVE">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="ojt-actions">
                         <button type="button" onclick="saveOJTSettings()" class="save-btn">
                             Save Setup
                         </button>
                     </div>
-
                 </div>
             </div>
 

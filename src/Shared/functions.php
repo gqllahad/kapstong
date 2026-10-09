@@ -2950,6 +2950,150 @@ function generateCertificatePdf($conn, $studentName, $studentID, $courseName = '
 // }
 
 // ojt settings
+
+
+// function renderOJTSettingsTable($conn)
+// {
+//     $sql = "SELECT
+//                 os.settingID,
+//                 os.academic_year,
+//                 os.semester,
+//                 os.required_hours,
+//                 os.start_date,
+//                 os.end_date,
+//                 os.status,
+//                 p.prg_acro
+//             FROM ojt_settings AS os
+//             LEFT JOIN program AS p
+//                 ON os.programID = p.program_id
+//             ORDER BY os.settingID DESC";
+
+//     $result = $conn->query($sql);
+
+//     if (!$result || $result->num_rows === 0) {
+//         return '
+//             <tr>
+//                 <td colspan="8" style="text-align: center;">
+//                     No OJT settings found.
+//                 </td>
+//             </tr>
+//         ';
+//     }
+
+//     $html = '';
+
+//     while ($row = $result->fetch_assoc()) {
+//         $settingID = htmlspecialchars((string) $row['settingID'], ENT_QUOTES, 'UTF-8');
+//         $program = htmlspecialchars($row['prg_acro'] ?? 'Not Assigned', ENT_QUOTES, 'UTF-8');
+//         $academicYear = htmlspecialchars($row['academic_year'], ENT_QUOTES, 'UTF-8');
+//         $semester = htmlspecialchars($row['semester'] ?? 'N/A', ENT_QUOTES, 'UTF-8');
+//         $hours = htmlspecialchars((string) $row['required_hours'], ENT_QUOTES, 'UTF-8');
+//         $startDate = htmlspecialchars($row['start_date'], ENT_QUOTES, 'UTF-8');
+//         $endDate = htmlspecialchars($row['end_date'], ENT_QUOTES, 'UTF-8');
+//         $status = htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8');
+
+//         $html .= '
+//             <tr>
+//                 <td>' . $settingID . '</td>
+//                 <td>' . $program . '</td>
+//                 <td>' . $academicYear . '</td>
+//                 <td>' . $semester . '</td>
+//                 <td>' . $hours . '</td>
+//                 <td>' . $startDate . '</td>
+//                 <td>' . $endDate . '</td>
+//                 <td>
+//                     <span class="ojt-status ' . strtolower($status) . '">
+//                         ' . $status . '
+//                     </span>
+//                 </td>
+//                 <td><button>Edit</button></td>
+//             </tr>
+//         ';
+//     }
+
+//     return $html;
+// }
+
+function renderOJTSettingsTable($conn, $department = '')
+{
+    $where = "";
+
+    if (!empty($department)) {
+        $where = "WHERE p.prg_department = '" . $conn->real_escape_string($department) . "'";
+    }
+
+    $sql = "SELECT s.settingID, s.programID, p.prg_acro, p.prg_name,
+                   s.academic_year, s.semester, s.required_hours,
+                   s.start_date, s.end_date, s.status
+            FROM ojt_settings s
+            LEFT JOIN program p ON p.program_id = s.programID
+            $where
+            ORDER BY s.created_at DESC";
+
+    $result = $conn->query($sql);
+
+    $output = '';
+
+    if ($result && $result->num_rows > 0) {
+
+        while ($row = $result->fetch_assoc()) {
+
+            $status = strtoupper($row['status'] ?? '');
+            $statusColor = ($status == "ACTIVE") ? "#22C55E" : "#EF4444";
+
+            $output .= '
+            <tr>
+                <td>' . (int)$row['settingID'] . '</td>
+
+                <td>
+                    ' . htmlspecialchars($row['prg_acro'] ?? 'N/A') . '
+                    <small style="color:gray;">' . htmlspecialchars($row['prg_name'] ?? '') . '</small>
+                </td>
+
+                <td>' . htmlspecialchars($row['academic_year']) . '</td>
+
+                <td>' . htmlspecialchars($row['semester'] ?? 'N/A') . '</td>
+
+                <td>' . (int)$row['required_hours'] . ' hrs</td>
+
+                <td>' . date('M d, Y', strtotime($row['start_date'])) . '</td>
+
+                <td>' . date('M d, Y', strtotime($row['end_date'])) . '</td>
+
+                <td style="color: ' . $statusColor . '; font-weight:600;">
+                    ' . htmlspecialchars($row['status'] ?? '') . '
+                </td>
+
+                <td>
+                    <button
+                        class="edit-settings-btn"
+                        data-id="' . (int)$row['settingID'] . '"
+                        data-program="' . (int)$row['programID'] . '"
+                        data-year="' . htmlspecialchars($row['academic_year']) . '"
+                        data-semester="' . htmlspecialchars($row['semester'] ?? '') . '"
+                        data-hours="' . (int)$row['required_hours'] . '"
+                        data-start="' . htmlspecialchars($row['start_date']) . '"
+                        data-end="' . htmlspecialchars($row['end_date']) . '"
+                        data-status="' . htmlspecialchars($row['status'] ?? '') . '">
+                        Edit
+                    </button>
+                    <button class="delete-settings-btn" data-id="' . (int)$row['settingID'] . '">Delete</button>
+                </td>
+            </tr>';
+        }
+    } else {
+
+        $output .= '
+        <tr>
+            <td colspan="9" style="text-align:center; padding:15px;">
+                No settings found
+            </td>
+        </tr>';
+    }
+
+    return $output;
+}
+
 function renderActiveOJTCard($conn)
 {
     $sql = "SELECT academic_year, required_hours, start_date, end_date, status
@@ -3097,6 +3241,19 @@ function renderDepartmentOptions($conn)
     return $output;
 }
 
+
+function renderProgramOptions($conn)
+{
+    $result = $conn->query("SELECT program_id, prg_acro, prg_name FROM program WHERE status = 'ACTIVE' ORDER BY prg_name");
+    $output = '<option value="">Select program</option>';
+    while ($row = $result->fetch_assoc()) {
+        $output .= '<option value="' . (int)$row['program_id'] . '">'
+                 . htmlspecialchars($row['prg_acro']) . ' - ' . htmlspecialchars($row['prg_name'])
+                 . '</option>';
+    }
+    return $output;
+}
+
 // function renderProgramOptions($conn){
 
 //     $sql = "
@@ -3121,35 +3278,6 @@ function renderDepartmentOptions($conn)
 //                 <option value="' . htmlspecialchars($row['prg_acro']) . '">
 //                     ' . htmlspecialchars($row['prg_name']) . ' 
 //                     (' . htmlspecialchars($row['prg_acro']) . ')
-//                 </option>
-//             ';
-//         }
-//     }
-
-//     return $output;
-// }
-
-// function renderYearLevelOptions($conn){
-
-//     $sql = "
-//         SELECT DISTINCT yearLevel
-//         FROM ojtstudent
-//         WHERE yearLevel IS NOT NULL
-//         AND yearLevel != ''
-//         ORDER BY yearLevel ASC
-//     ";
-
-//     $result = $conn->query($sql);
-
-//     $output = '<option value="">All Year Levels</option>';
-
-//     if($result && $result->num_rows > 0){
-
-//         while($row = $result->fetch_assoc()){
-
-//             $output .= '
-//                 <option value="' . htmlspecialchars($row['yearLevel']) . '">
-//                     ' . htmlspecialchars($row['yearLevel']) . '
 //                 </option>
 //             ';
 //         }
@@ -4448,7 +4576,7 @@ function renderAttendanceCalendar($conn, $year, $month) {
 function getStudentForecast($conn, $studentID, $minDays = 14, $windowDays = 28, $graceDays = 7)
 {
     $today = new DateTimeImmutable('today');
-
+    //TODO:Chagen this to start_date end_date in the student progress
     $stmt = $conn->prepare("
         SELECT sp.required_hours,
                COALESCE(sp.completed_hours, 0) AS completed_hours,
