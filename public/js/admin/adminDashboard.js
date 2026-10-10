@@ -153,6 +153,10 @@ const closeDownloadAllSupervisor = document.getElementById("closeAllSupervisorDo
 let selectedStudentIDs = [];
 let selectedSupervisorID = null;
 
+// risks
+let allRiskData = [];
+let riskTimer;
+
 // form
 const supervisorForm = document.getElementById("createSupervisorForm");
 
@@ -1511,203 +1515,146 @@ function openStudentAssign(){
 // }
 
 // at risk students
-function loadRiskStudents() {
 
-    fetch("functions/getAtRiskStudents.php")
-        .then(res => res.json())
-        .then(data => {
+document.addEventListener("input", (e) => {
+    if (e.target.id === "riskSearch") {
+        clearTimeout(riskTimer);
+        riskTimer = setTimeout(applyRiskFilters, 200);
+    }
+});
+document.addEventListener("change", (e) => {
+    if (e.target.id === "riskFilter") applyRiskFilters();
+});
 
-            const container = document.getElementById("risk-list");
-
-            if (!data.length) {
-                container.innerHTML = `
-                    <div class="risk-empty">
-                        <i class='bx bx-check-shield'></i>
-                        <p>No students currently flagged. Everyone is on track.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const cardsHtml = data.map(student => {
-
-                const progress = parseFloat(student.progress_percent) || 0;
-                const initial = (student.name || '?').charAt(0).toUpperCase();
-
-                let riskLevel = 'low';
-                let badgeText = 'ON TRACK';
-                let progFillClass = 'bar-track';
-
-                if (progress < 75) {
-                    riskLevel = (student.overdue_tasks > 2 || student.absents > 3) ? 'critical' : 'high';
-                    badgeText = 'BEHIND';
-                    progFillClass = 'bar-behind';
-                } else if (progress < 90) {
-                    riskLevel = 'medium';
-                    badgeText = 'DUE SOON';
-                    progFillClass = 'bar-soon';
-                }
-
-                const hasFlags = student.absents > 0 || student.lates > 0 || student.overdue_tasks > 0;
-
-                return `
-                    <div class="ris-card risk-${riskLevel}">
-
-                        <div class="ris-top">
-                            <div class="ris-avatar">${initial}</div>
-
-                            <div class="ris-identity">
-                                <span class="ris-name">${student.name}</span>
-                                <span class="ris-meta">${student.role}</span>
-                            </div>
-
-                            <div class="ris-badges">
-                                <span class="ris-risk-badge risk-${riskLevel}">${badgeText}</span>
-                            </div>
-                        </div>
-
-                        <div class="ris-progress-row">
-                            <div class="ris-prog-header">
-                                <span class="ris-prog-label prog-${progFillClass === 'bar-track' ? 'track' : progFillClass === 'bar-soon' ? 'soon' : 'behind'}">
-                                    <i class='bx bx-time-five'></i> Progress
-                                </span>
-                                <span class="ris-prog-hours">${student.completed_hours} / ${student.required_hours} hrs</span>
-                                <span class="ris-prog-pct">${progress}%</span>
-                            </div>
-                            <div class="ris-bar-track">
-                                <div class="ris-bar-fill ${progFillClass}" style="width:${progress}%"></div>
-                            </div>
-                        </div>
-
-                        ${hasFlags ? `
-                        <div class="ris-stats">
-                            <div class="ris-stat ${student.absents > 0 ? 'stat-warn' : ''} absent">
-                                <i class='bx bx-calendar-x'></i>
-                                <div>
-                                    <span class="stat-val">${student.absents}</span>
-                                    <span class="stat-key">Absents</span>
-                                </div>
-                            </div>
-                            <div class="ris-stat ${student.lates > 0 ? 'stat-warn' : ''} late">
-                                <i class='bx bx-time'></i>
-                                <div>
-                                    <span class="stat-val">${student.lates}</span>
-                                    <span class="stat-key">Lates</span>
-                                </div>
-                            </div>
-                            <div class="ris-stat ${student.overdue_tasks > 0 ? 'stat-warn' : ''} task">
-                                <i class='bx bx-task-x'></i>
-                                <div>
-                                    <span class="stat-val">${student.overdue_tasks}</span>
-                                    <span class="stat-key">Overdue</span>
-                                </div>
-                            </div>
-                        </div>
-                        ` : ''}
-
-                    </div>
-                `;
-            }).join('');
-
-            container.innerHTML = cardsHtml;
-        })
-        .catch(() => {
-            document.getElementById("risk-list").innerHTML = `
-                <div class="risk-empty risk-error">
-                    <i class='bx bx-error-circle'></i>
-                    <p>Failed to load student data. Try refreshing.</p>
-                </div>
-            `;
-        });
+function _fmtDate(d) {
+    return new Date(d + "T00:00:00").toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" });
+}
+function esc(t) {
+    return String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-// function loadAllRiskStudents() {
+// function loadRiskStudents() {
 
-//     fetch("functions/getAllAtRiskStudent.php")
+//     fetch("functions/getAtRiskStudents.php")
 //         .then(res => res.json())
 //         .then(data => {
 
-//             const container = document.getElementById("all-risk-list");
+//             const container = document.getElementById("risk-list");
 
-//             container.innerHTML = "";
+//             if (!data.length) {
+//                 container.innerHTML = `
+//                     <div class="risk-empty">
+//                         <i class='bx bx-check-shield'></i>
+//                         <p>No students currently flagged. Everyone is on track.</p>
+//                     </div>
+//                 `;
+//                 return;
+//             }
 
-//             data.forEach(student => {
+//             const cardsHtml = data.map(student => {
 
-//                 const progress = parseFloat(student.progress_percent);
+//                 const progress = parseFloat(student.progress_percent) || 0;
+//                 const initial = (student.name || '?').charAt(0).toUpperCase();
 
-//                 let badgeClass = "track";
-//                 let badgeText = "ON TRACK";
-//                 let progressClass = "good";
+//                 let riskLevel = 'low';
+//                 let badgeText = 'ON TRACK';
+//                 let progFillClass = 'bar-track';
 
 //                 if (progress < 75) {
-//                     badgeClass = "behind";
-//                     badgeText = "BEHIND";
-//                     progressClass = "low";
+//                     riskLevel = (student.overdue_tasks > 2 || student.absents > 3) ? 'critical' : 'high';
+//                     badgeText = 'BEHIND';
+//                     progFillClass = 'bar-behind';
+//                 } else if (progress < 90) {
+//                     riskLevel = 'medium';
+//                     badgeText = 'DUE SOON';
+//                     progFillClass = 'bar-soon';
 //                 }
-//                 else if (progress < 90) {
-//                     badgeClass = "soon";
-//                     badgeText = "DUE SOON";
-//                     progressClass = "medium";
-//                 }
 
-//                 container.innerHTML += `
-//                     <div class="task-item">
+//                 const hasFlags = student.absents > 0 || student.lates > 0 || student.overdue_tasks > 0;
 
-//                         <div class="student-top">
+//                 return `
+//                     <div class="ris-card risk-${riskLevel}">
 
-//                             <div class="student-info">
-//                                 <strong>${student.name}</strong>
-//                                 <span class="student-role">
-//                                     ${student.role}
-//                                 </span>
+//                         <div class="ris-top">
+//                             <div class="ris-avatar">${initial}</div>
+
+//                             <div class="ris-identity">
+//                                 <span class="ris-name">${student.name}</span>
+//                                 <span class="ris-meta">${student.role}</span>
 //                             </div>
 
-//                             <span class="status-badge ${badgeClass}">
-//                                 ${badgeText}
-//                             </span>
-
+//                             <div class="ris-badges">
+//                                 <span class="ris-risk-badge risk-${riskLevel}">${badgeText}</span>
+//                             </div>
 //                         </div>
 
-//                         <div class="progress-wrapper">
-
-//                             <div class="progress-label">
-//                                 <span>
-//                                     ${student.completed_hours} / 
-//                                     ${student.required_hours} Hours
+//                         <div class="ris-progress-row">
+//                             <div class="ris-prog-header">
+//                                 <span class="ris-prog-label prog-${progFillClass === 'bar-track' ? 'track' : progFillClass === 'bar-soon' ? 'soon' : 'behind'}">
+//                                     <i class='bx bx-time-five'></i> Progress
 //                                 </span>
-
-//                                 <span>
-//                                     ${progress}%
-//                                 </span>
+//                                 <span class="ris-prog-hours">${student.completed_hours} / ${student.required_hours} hrs</span>
+//                                 <span class="ris-prog-pct">${progress}%</span>
 //                             </div>
+//                             <div class="ris-bar-track">
+//                                 <div class="ris-bar-fill ${progFillClass}" style="width:${progress}%"></div>
+//                             </div>
+//                         </div>
 
-//                             <div class="progress-bar">
-//                                <div 
-//                                     class="progress-fill ${progressClass}"
-//                                     style="width:${student.progress_percent}%">
+//                         ${hasFlags ? `
+//                         <div class="ris-stats">
+//                             <div class="ris-stat ${student.absents > 0 ? 'stat-warn' : ''} absent">
+//                                 <i class='bx bx-calendar-x'></i>
+//                                 <div>
+//                                     <span class="stat-val">${student.absents}</span>
+//                                     <span class="stat-key">Absents</span>
 //                                 </div>
 //                             </div>
-
-//                         <div class="student-meta">
-//                             <span class="meta-pill">
-//                                 Absents: ${student.absents}
-//                             </span>
-
-//                             <span class="meta-pill">
-//                                 Lates: ${student.lates}
-//                             </span>
-
-//                             <span class="meta-pill">
-//                                 ${student.overdue_tasks} Overdue Tasks
-//                             </span>
+//                             <div class="ris-stat ${student.lates > 0 ? 'stat-warn' : ''} late">
+//                                 <i class='bx bx-time'></i>
+//                                 <div>
+//                                     <span class="stat-val">${student.lates}</span>
+//                                     <span class="stat-key">Lates</span>
+//                                 </div>
+//                             </div>
+//                             <div class="ris-stat ${student.overdue_tasks > 0 ? 'stat-warn' : ''} task">
+//                                 <i class='bx bx-task-x'></i>
+//                                 <div>
+//                                     <span class="stat-val">${student.overdue_tasks}</span>
+//                                     <span class="stat-key">Overdue</span>
+//                                 </div>
+//                             </div>
 //                         </div>
+//                         ` : ''}
 
 //                     </div>
 //                 `;
-//             });
+//             }).join('');
+
+//             container.innerHTML = cardsHtml;
+//         })
+//         .catch(() => {
+//             document.getElementById("risk-list").innerHTML = `
+//                 <div class="risk-empty risk-error">
+//                     <i class='bx bx-error-circle'></i>
+//                     <p>Failed to load student data. Try refreshing.</p>
+//                 </div>
+//             `;
 //         });
 // }
 
+function _forecastLabel(s) {
+    if (s.forecast === "COMPLETED")   return "Completed";
+    if (s.forecast === "NOT STARTED") return "Not started";
+    if (s.forecast === "Not progressing")     return "No hours in 4 weeks";
+    if (s.gap_days === null)          return "Estimated";
+    if (s.gap_days <= 0)              return `${Math.abs(s.gap_days)}d ahead`;
+    return `${s.gap_days}d late`;
+}
+function _forecastCls(f) {
+    return { "ON TRACK": "fc-ok", "COMPLETED": "fc-ok", "AT RISK": "fc-warn",
+             "BEHIND": "fc-bad", "Not progressing": "fc-bad" }[f] || "fc-none";
+}
 function _riskConfig(risk) {
     const map = {
         CRITICAL: { cls: "risk-critical", icon: "bi-exclamation-octagon-fill", label: "CRITICAL" },
@@ -1746,174 +1693,22 @@ function _attendanceBar(rate) {
         </div>`;
 }
  
-/* ── main renderer ───────────────────────────────────────────── */
+/*risk students */
 function loadAllRiskStudents() {
- 
+
     const container = document.getElementById("all-risk-list");
     container.innerHTML = `
         <div class="risk-loading">
             <div class="risk-spinner"></div>
             <span>Loading intern data…</span>
         </div>`;
- 
+
     fetch("functions/getAllAtRiskStudent.php")
         .then(res => res.json())
         .then(data => {
- 
-            container.innerHTML = "";
- 
-            if (!data.length) {
-                container.innerHTML = `
-                    <div class="risk-empty">
-                        <i class="bi bi-shield-check"></i>
-                        <p>All interns are on track — no at-risk students found.</p>
-                    </div>`;
-                return;
-            }
- 
-            const critical = data.filter(s => s.risk === "CRITICAL").length;
-            const high     = data.filter(s => s.risk === "HIGH").length;
-            const medium   = data.filter(s => s.risk === "MEDIUM").length;
-            const low      = data.filter(s => s.risk === "LOW").length;
- 
-            container.innerHTML = `
-                <div class="risk-summary-bar">
-                    <div class="rsb-item rsb-critical">
-                        <span class="rsb-count">${critical}</span>
-                        <span class="rsb-label">Critical</span>
-                    </div>
-                    <div class="rsb-item rsb-high">
-                        <span class="rsb-count">${high}</span>
-                        <span class="rsb-label">High</span>
-                    </div>
-                    <div class="rsb-item rsb-medium">
-                        <span class="rsb-count">${medium}</span>
-                        <span class="rsb-label">Medium</span>
-                    </div>
-                    <div class="rsb-item rsb-low">
-                        <span class="rsb-count">${low}</span>
-                        <span class="rsb-label">Low</span>
-                    </div>
-                    <div class="rsb-total">
-                        <span class="rsb-count">${data.length}</span>
-                        <span class="rsb-label">Total flagged</span>
-                    </div>
-                </div>`;
- 
-            /* ── student cards ───────────────────────────── */
-            data.forEach(s => {
- 
-                const rc  = _riskConfig(s.risk);
-                const pc  = _progressConfig(s.progress_status);
-                const ini = _initials(s.name);
-                const pct = parseFloat(s.progress_percent);
- 
-                const taskPct = s.total_tasks > 0
-                    ? Math.round((s.completed_tasks / s.total_tasks) * 100)
-                    : 0;
- 
-                const card = document.createElement("div");
-                card.className = `ris-card ${rc.cls}`;
- 
-                card.innerHTML = `
- 
-                    <!-- top row -->
-                    <div class="ris-top">
- 
-                        <div class="ris-avatar">${ini}</div>
- 
-                        <div class="ris-identity">
-                            <strong class="ris-name">${s.name}</strong>
-                            <span class="ris-meta">${s.course} · ${s.yearLevel} · ID: ${s.studentID}</span>
-                        </div>
- 
-                        <div class="ris-badges">
-                            <span class="ris-risk-badge ${rc.cls}">
-                                <i class="bi ${rc.icon}"></i>
-                                ${rc.label}
-                            </span>
-                            <span class="ris-score-badge" title="Risk score">${s.risk_score}/100</span>
-                        </div>
- 
-                    </div>
- 
-                    <!-- progress row -->
-                    <div class="ris-progress-row">
- 
-                        <div class="ris-prog-header">
-                            <span class="ris-prog-label">
-                                <i class="bi ${pc.icon} ${pc.cls}"></i>
-                                ${s.progress_status}
-                            </span>
-                            <span class="ris-prog-hours">${s.completed_hours} / ${s.required_hours} hrs</span>
-                            <span class="ris-prog-pct">${pct}%</span>
-                        </div>
- 
-                        <div class="ris-bar-track">
-                            <div class="ris-bar-fill ${pc.barCls}" style="width:${pct}%"></div>
-                        </div>
- 
-                    </div>
- 
-                    <!-- stats grid -->
-                    <div class="ris-stats">
- 
-                        <div class="ris-stat absent ${s.absents >= 3 ? 'stat-warn' : ''}">
-                            <i class="bi bi-calendar-x-fill"></i>
-                            <div>
-                                <span class="stat-val">${s.absents}</span>
-                                <span class="stat-key">Absents</span>
-                            </div>
-                            ${s.recent_absents > 0 ? `<span class="stat-recent">+${s.recent_absents} this week</span>` : ""}
-                        </div>
- 
-                        <div class="ris-stat late ${s.lates >= 5 ? 'stat-warn' : ''}">
-                            <i class="bi bi-clock-history"></i>
-                            <div>
-                                <span class="stat-val">${s.lates}</span>
-                                <span class="stat-key">Late</span>
-                            </div>
-                        </div>
- 
-                        <div class="ris-stat task ${s.overdue_tasks >= 1 ? 'stat-warn' : ''}">
-                            <i class="bi bi-clipboard-x-fill"></i>
-                            <div>
-                                <span class="stat-val">${s.overdue_tasks}</span>
-                                <span class="stat-key">Overdue</span>
-                            </div>
-                        </div>
- 
-                        <div class="ris-stat tasks-done">
-                            <i class="bi bi-clipboard-check-fill"></i>
-                            <div>
-                                <span class="stat-val">${s.completed_tasks}<span class="stat-of">/${s.total_tasks}</span></span>
-                                <span class="stat-key">Tasks done</span>
-                            </div>
-                        </div>
- 
-                        <div class="ris-stat attendance">
-                            <i class="bi bi-person-check-fill"></i>
-                            <div>
-                                <span class="stat-val">${s.attendance_rate}%</span>
-                                <span class="stat-key">Attendance</span>
-                                ${_attendanceBar(s.attendance_rate)}
-                            </div>
-                        </div>
- 
-                        <div class="ris-stat last-seen">
-                            <i class="bi bi-calendar2-week-fill"></i>
-                            <div>
-                                <span class="stat-val">${_lastSeenLabel(s.days_since_last_seen)}</span>
-                                <span class="stat-key">Last seen</span>
-                            </div>
-                        </div>
- 
-                    </div>
- 
-                `;
- 
-                container.appendChild(card);
-            });
+            if (data.error) throw new Error(data.error);
+            allRiskData = data;
+            applyRiskFilters();  
         })
         .catch(err => {
             container.innerHTML = `
@@ -1924,8 +1719,131 @@ function loadAllRiskStudents() {
             console.error("Risk student fetch error:", err);
         });
 }
+
+function renderRiskCards(list) {
+    const container = document.getElementById("all-risk-list");
+    container.innerHTML = "";
+
+    const flagged  = allRiskData.filter(s => s.flagged);
+    const critical = flagged.filter(s => s.risk === "CRITICAL").length;
+    const high     = flagged.filter(s => s.risk === "HIGH").length;
+    const medium   = flagged.filter(s => s.risk === "MEDIUM").length;
+    const low      = flagged.filter(s => s.risk === "LOW").length;
+
+    container.innerHTML = `
+        <div class="risk-summary-bar">
+            <div class="rsb-item rsb-critical"><span class="rsb-count">${critical}</span><span class="rsb-label">Critical</span></div>
+            <div class="rsb-item rsb-high"><span class="rsb-count">${high}</span><span class="rsb-label">High</span></div>
+            <div class="rsb-item rsb-medium"><span class="rsb-count">${medium}</span><span class="rsb-label">Medium</span></div>
+            <div class="rsb-item rsb-low"><span class="rsb-count">${low}</span><span class="rsb-label">Low</span></div>
+            <div class="rsb-total"><span class="rsb-count">${flagged.length}</span><span class="rsb-label">Total flagged</span></div>
+        </div>`;
+
+    if (!list.length) {
+        container.insertAdjacentHTML("beforeend", `
+            <div class="risk-empty">
+                <i class="bi bi-search"></i>
+                <p>No students match your search.</p>
+            </div>`);
+        return;
+    }
+
+    list.forEach(s => {
+        const rc  = _riskConfig(s.risk);
+        const pc  = _progressConfig(s.progress_status);
+        const ini = _initials(s.name);
+        const pct = parseFloat(s.progress_percent);
+
+        const card = document.createElement("div");
+        card.className = `ris-card ${rc.cls}`;
+
+        card.innerHTML = `
+            <div class="ris-top">
+                <div class="ris-avatar">${esc(ini)}</div>
+                <div class="ris-identity">
+                    <strong class="ris-name">${esc(s.name)}</strong>
+                    <span class="ris-meta">${esc(s.course)} · ${esc(s.yearLevel)} · ID: ${esc(s.studentID)}</span>
+                </div>
+                <div class="ris-badges">
+                    <span class="ris-risk-badge ${rc.cls}"><i class="bi ${rc.icon}"></i> ${rc.label}</span>
+                    <span class="ris-score-badge" title="Risk score">${s.risk_score}/100</span>
+                </div>
+            </div>
+
+            <div class="ris-progress-row">
+                <div class="ris-prog-header">
+                    <span class="ris-prog-label"><i class="bi ${pc.icon} ${pc.cls}"></i> ${s.progress_status}</span>
+                    <span class="ris-prog-hours">${s.completed_hours} / ${s.required_hours} hrs</span>
+                    <span class="ris-prog-pct">${pct}%</span>
+                </div>
+                <div class="ris-bar-track"><div class="ris-bar-fill ${pc.barCls}" style="width:${pct}%"></div></div>
+            </div>
+
+            <div class="ris-forecast ${_forecastCls(s.forecast)}">
+                <div>
+                    <span class="stat-key">Hours to go</span>
+                    <strong>${s.remaining_hours} hrs</strong>
+                </div>
+                <div>
+                    <span class="stat-key">Expected finish</span>
+                    <strong>${s.projected_finish ? _fmtDate(s.projected_finish) : "—"}</strong>
+                    ${s.deadline ? `<small>Deadline ${_fmtDate(s.deadline)}</small>` : ""}
+                </div>
+                <div>
+                    <span class="stat-key">Pace</span>
+                    <strong>${s.weekly_pace} hrs/wk</strong>
+                    ${s.required_pace ? `<small>needs ${s.required_pace}</small>` : ""}
+                </div>
+                <span class="ris-forecast-badge">${_forecastLabel(s)}</span>
+            </div>
+
+            <div class="ris-stats">
+                <div class="ris-stat absent ${s.absents >= 3 ? "stat-warn" : ""}">
+                    <i class="bi bi-calendar-x-fill"></i>
+                    <div><span class="stat-val">${s.absents}</span><span class="stat-key">Absents</span></div>
+                    ${s.recent_absents > 0 ? `<span class="stat-recent">+${s.recent_absents} this week</span>` : ""}
+                </div>
+                <div class="ris-stat late ${s.lates >= 5 ? "stat-warn" : ""}">
+                    <i class="bi bi-clock-history"></i>
+                    <div><span class="stat-val">${s.lates}</span><span class="stat-key">Late</span></div>
+                </div>
+                <div class="ris-stat task ${s.overdue_tasks >= 1 ? "stat-warn" : ""}">
+                    <i class="bi bi-clipboard-x-fill"></i>
+                    <div><span class="stat-val">${s.overdue_tasks}</span><span class="stat-key">Overdue</span></div>
+                </div>
+                <div class="ris-stat tasks-done">
+                    <i class="bi bi-clipboard-check-fill"></i>
+                    <div><span class="stat-val">${s.completed_tasks}<span class="stat-of">/${s.total_tasks}</span></span><span class="stat-key">Tasks done</span></div>
+                </div>
+                <div class="ris-stat attendance">
+                    <i class="bi bi-person-check-fill"></i>
+                    <div><span class="stat-val">${s.attendance_rate}%</span><span class="stat-key">Attendance</span>${_attendanceBar(s.attendance_rate)}</div>
+                </div>
+                <div class="ris-stat last-seen">
+                    <i class="bi bi-calendar2-week-fill"></i>
+                    <div><span class="stat-val">${_lastSeenLabel(s.days_since_last_seen)}</span><span class="stat-key">Last seen</span></div>
+                </div>
+            </div>`;
+
+        container.appendChild(card);
+    });
+}
+
+function applyRiskFilters() {
+    const q = document.getElementById("riskSearch").value.trim().toLowerCase();
+    const f = document.getElementById("riskFilter").value;
+
+    const list = allRiskData.filter(s => {
+        const text = `${s.name} ${s.studentID} ${s.course}`.toLowerCase();
+        if (q && !text.includes(q)) return false;
+        if (f === "flagged") return s.flagged;
+        if (f) return s.forecast === f;
+        return true;
+    });
+
+    renderRiskCards(list);
+}
  
-/* ── also update the mini dashboard widget ───────────────────── */
 function loadRiskStudents() {
  
     fetch("functions/getAtRiskStudents.php")
@@ -1966,6 +1884,10 @@ function loadRiskStudents() {
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width:${pct}%"></div>
                             </div>
+                        </div>
+                        <div class="student-forecast">
+                            <span>${s.remaining_hours} hrs to go</span>
+                            <span>${s.projected_finish ? "Est. finish " + _fmtDate(s.projected_finish) : _forecastLabel(s)}</span>
                         </div>
                         <div class="student-meta">
                             <span class="meta-pill"><i class="bi bi-calendar-x"></i> ${s.absents} Absents</span>
@@ -2134,19 +2056,57 @@ function saveRfidSettings() {
 
 // ojt settings
 
-// function loadActiveOJTCard() {
+function toLocalISO(d) {
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+}
 
-//     fetch("functions/getActiveOJTCard.php")
-//     .then(res => res.text())
-//     .then(html => {
+function nextDay(dateStr) {
+    const d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + 1);
+    return toLocalISO(d);
+}
 
-//         document.getElementById("activeOJTContainer").innerHTML = html;
+function academicYearFor(dateStr) {
+    const [y, m] = dateStr.split("-").map(Number);
+    return m >= 6 ? `${y}-${y + 1}` : `${y - 1}-${y}`;
+}
 
-//     })
-//     .catch(err => {
-//         showToast(err, "error");
-//     });
-// }
+document.addEventListener("DOMContentLoaded", () => {
+    const start = document.getElementById("settingStart");
+    const end   = document.getElementById("settingEnd");
+    const ay    = document.getElementById("academicYear");
+
+    if (!start) return;
+
+    start.addEventListener("change", () => {
+        if (!start.value) {
+            end.value = "";
+            ay.value = "";
+        } else {
+            ay.value = academicYearFor(start.value);
+            if (end.value && end.value <= start.value) end.value = ""; 
+        }
+        applySettingsDateRules();
+    });
+});
+
+function applySettingsDateRules() {
+    const start = document.getElementById("settingStart");
+    const end   = document.getElementById("settingEnd");
+
+    start.min = toLocalISO(new Date()); 
+    end.disabled = !start.value;
+    end.min = start.value ? nextDay(start.value) : "";
+}
+
+function resetSettingsForm() {
+    ["settingProgram", "academicYear", "semester",
+     "requiredHours", "settingStart", "settingEnd"].forEach(id => {
+        document.getElementById(id).value = "";
+    });
+    document.getElementById("settingStatus").value = "ACTIVE";
+    applySettingsDateRules();
+}
 
 function loadOJTSetting(settingID) {
     return fetch("functions/getOjtSetting.php?id=" + encodeURIComponent(settingID))
@@ -2202,7 +2162,7 @@ function updateOJTSettings() {
     const settingID     = document.getElementById("edit_settingID").value;
     const programID     = document.getElementById("edit_programID").value;
     const academicYear  = document.getElementById("edit_academic_year").value.trim();
-    const semester      = document.getElementById("edit_semester").value.trim() || "N/A";
+    const semester = document.getElementById("edit_semester").value;
     const requiredHours = document.getElementById("edit_required_hours").value;
     const startDate     = document.getElementById("edit_start_date").value;
     const endDate       = document.getElementById("edit_end_date").value;
@@ -2254,13 +2214,13 @@ function updateOJTSettings() {
 function saveOJTSettings() {
     const programID     = document.getElementById("settingProgram").value;
     const academicYear  = document.getElementById("academicYear").value.trim();
-    const semester      = document.getElementById("semester").value.trim() || "N/A";
+    const semester = document.getElementById("semester").value;
     const requiredHours = document.getElementById("requiredHours").value;
     const startDate     = document.getElementById("settingStart").value;
     const endDate       = document.getElementById("settingEnd").value;
     const status        = document.getElementById("settingStatus").value;
 
-    if (!programID || !academicYear || !requiredHours || !startDate || !endDate) {
+    if (!programID || !academicYear || !semester || !requiredHours || !startDate || !endDate) {
         showToast("Please complete all fields.", "error");
         return;
     }
@@ -3782,6 +3742,8 @@ closeEvaluationSettingsBtn.addEventListener("click", () => {
 viewAllBtn.addEventListener("click", () => {
     overlay.classList.add("show");
     viewAll.classList.add("show");
+    document.getElementById("riskSearch").value = "";
+    document.getElementById("riskFilter").value = "";
     loadAllRiskStudents();
 }); 
 

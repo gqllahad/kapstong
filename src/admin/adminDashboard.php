@@ -110,7 +110,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <tr>
                                 <th>Student ID</th>
                                 <th>Name</th>
-                                <th>Email</th>
                                 <th>Course</th>
                                 <th>Year</th>
                                 <th>Status</th>
@@ -155,7 +154,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <tr>
                                 <th>Supervisor ID</th>
                                 <th>Name</th>
-                                <th>Email</th>
                                 <th>Mobile Number</th>
                                 <th>Handled Course</th>
                                 <th>Company Name</th>
@@ -264,7 +262,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <tr>
                                 <th>Student ID</th>
                                 <th>Name</th>
-                                <th>Email</th>
                                 <th>Course</th>
                                 <th>Year</th>
                                 <th>Status</th>
@@ -592,7 +589,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Setting ID</th>
                                         <th>Program</th>
                                         <th>Academic Year</th>
                                         <th>Semester</th>
@@ -632,12 +628,16 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                         <div class="form-group">
                             <label>Academic Year</label>
-                            <input type="text" id="edit_academic_year" placeholder="e.g. 2026-2027">
+                            <input type="text" id="edit_academic_year" placeholder="Auto-filled from start date" readonly>
                         </div>
 
                         <div class="form-group">
                             <label>Semester</label>
-                            <input type="text" id="edit_semester" placeholder="e.g. 2nd Semester or N/A">
+                            <select id="edit_semester">
+                                <option value="">Select semester</option>
+                                <option value="1st Semester">1st Semester</option>
+                                <option value="2nd Semester">2nd Semester</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -690,12 +690,16 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                         <div class="form-group">
                             <label>Academic Year</label>
-                            <input type="text" id="academicYear" placeholder="e.g. 2026-2027">
+                            <input type="text" id="academicYear" placeholder="Auto-filled from start date" readonly>
                         </div>
 
                         <div class="form-group">
                             <label>Semester</label>
-                            <input type="text" id="semester" placeholder="e.g. 2nd Semester or N/A">
+                            <select id="semester">
+                                <option value="">Select semester</option>
+                                <option value="1st Semester">1st Semester</option>
+                                <option value="2nd Semester">2nd Semester</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -1087,14 +1091,23 @@ if ($_SESSION['role'] !== "ADMIN") {
             <!-- viewall -->
             <div class="view-all-modal" id="view-all-modal">
                 <div class="modal-header">
-                    <h3>Intern Progress</h3>
+                    <h3>Student Progress</h3>
                     <button id="closeViewAllModal" class="modal-close">&times;</button>
                 </div>
 
-                <div class="view-all-container">
-                    <div id="all-risk-list" class="risk-list"></div>
+                 <div class="risk-toolbar">
+                    <input type="text" id="riskSearch" placeholder="Search name, ID, or course…">
+                    <select id="riskFilter" autocomplete="off">
+                        <option value="">All students</option>
+                        <option value="flagged">Flagged only</option>
+                        <option value="BEHIND">Behind schedule</option>
+                        <option value="AT RISK">At risk</option>
+                        <option value="Not progressing">Not progressing</option>
+                        <option value="ON TRACK">On track</option>
+                    </select>
                 </div>
 
+                <div id="all-risk-list" class="risk-list"></div>
 
             </div>
 
@@ -1394,7 +1407,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                         <div class="deadline-header">
                             <div>
-                                <p class="deadline-title">Intern Progress</p>
+                                <p class="deadline-title">OJT Student Progress</p>
                                 <span class="deadline-subtitle">
                                     Monitor intern completion status and risk levels
                                 </span>
@@ -1530,7 +1543,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                                 <tr>
                                     <th>Student ID</th>
                                     <th>Name</th>
-                                    <th>Email</th>
                                     <th>Course</th>
                                     <th>Year</th>
                                     <th>Status</th>

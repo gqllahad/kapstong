@@ -220,8 +220,7 @@ function renderApprovalTable($conn, $type, $verifiedFilter, $search)
     if (!empty($search)) {
         $where .= " AND (
         users.userID LIKE '%$search%' OR
-        users.name LIKE '%$search%' OR
-        users.email LIKE '%$search%'
+        users.name LIKE '%$search%'
     )";
     }
 
@@ -235,7 +234,6 @@ function renderApprovalTable($conn, $type, $verifiedFilter, $search)
     $sql = "SELECT 
         users.studentID,
         users.name,
-        users.email,
         users.isVerified,
         students.course,
         students.yearLevel
@@ -258,7 +256,6 @@ function renderApprovalTable($conn, $type, $verifiedFilter, $search)
             <tr>
                 <td>' . $row['studentID'] . '</td>
                 <td>' . $row['name'] . '</td>
-                <td>' . $row['email'] . '</td>
                 <td>' . ($row['course'] ?? '-') . '</td>
                 <td>' . ($row['yearLevel'] ?? '-') . '</td>
                 <td>
@@ -291,8 +288,7 @@ function renderStudentTable($conn, $type, $verifiedFilter, $search)
     if (!empty($search)) {
         $where .= " AND (
         users.userID LIKE '%$search%' OR
-        users.name LIKE '%$search%' OR
-        users.email LIKE '%$search%'
+        users.name LIKE '%$search%'
     )";
     }
 
@@ -306,7 +302,6 @@ function renderStudentTable($conn, $type, $verifiedFilter, $search)
     $sql = "SELECT 
         users.studentID,
         users.name,
-        users.email,
         users.isVerified,
         students.course,
         students.yearLevel,
@@ -332,7 +327,6 @@ function renderStudentTable($conn, $type, $verifiedFilter, $search)
             <tr>
                 <td>' . $row['studentID'] . '</td>
                 <td>' . $row['name'] . '</td>
-                <td>' . $row['email'] . '</td>
                 <td>' . ($row['course'] ?? '-') . '</td>
                 <td>' . ($row['yearLevel'] ?? '-') . '</td>
                 <td>
@@ -369,7 +363,6 @@ function renderSupervisorTable($conn, $search = '')
         $where .= " AND (
             supervisor.superID LIKE '%$search%' OR
             supervisor.name LIKE '%$search%' OR
-            supervisor.email LIKE '%$search%' OR
             supervisor.department LIKE '%$search%' OR
             supervisor.company_name LIKE '%$search%' OR
             supervisor.position LIKE '%$search%'
@@ -379,7 +372,6 @@ function renderSupervisorTable($conn, $search = '')
     $sql = "SELECT 
                 supervisor.superID,
                 supervisor.name,
-                supervisor.email,
                 supervisor.number,
                 supervisor.department,
                 supervisor.company_name,
@@ -400,7 +392,6 @@ function renderSupervisorTable($conn, $search = '')
             <tr>
                 <td>' . $row['superID'] . '</td>
                 <td>' . $row['name'] . '</td>
-                <td>' . $row['email'] . '</td>
                 <td>' . $row['number'] . '</td>
                 <td>' . $row['department'] . '</td>
                 <td>' . $row['company_name'] . '</td>
@@ -3032,6 +3023,9 @@ function renderOJTSettingsTable($conn, $department = '')
 
     $result = $conn->query($sql);
 
+    date_default_timezone_set('Asia/Manila');
+    $today = date('Y-m-d');
+
     $output = '';
 
     if ($result && $result->num_rows > 0) {
@@ -3041,12 +3035,18 @@ function renderOJTSettingsTable($conn, $department = '')
             $status = strtoupper($row['status'] ?? '');
             $statusColor = ($status == "ACTIVE") ? "#22C55E" : "#EF4444";
 
+            if ($row['status'] !== 'ACTIVE')         $phase = 'Inactive';
+            elseif ($today < $row['start_date'])     $phase = 'Upcoming';
+            elseif ($today <= $row['end_date'])      $phase = 'Ongoing';
+            else                                     $phase = 'Ended';
+
+            $phaseClass = strtolower($phase);
+
             $output .= '
             <tr>
-                <td>' . (int)$row['settingID'] . '</td>
 
                 <td>
-                    ' . htmlspecialchars($row['prg_acro'] ?? 'N/A') . '
+                    ' . htmlspecialchars($row['prg_acro'] ?? 'N/A') . ' <br>
                     <small style="color:gray;">' . htmlspecialchars($row['prg_name'] ?? '') . '</small>
                 </td>
 
@@ -3060,9 +3060,7 @@ function renderOJTSettingsTable($conn, $department = '')
 
                 <td>' . date('M d, Y', strtotime($row['end_date'])) . '</td>
 
-                <td style="color: ' . $statusColor . '; font-weight:600;">
-                    ' . htmlspecialchars($row['status'] ?? '') . '
-                </td>
+                <td><span class="status-pill ' . $phaseClass . '">' . $phase . '</span></td>
 
                 <td>
                     <button
@@ -3077,7 +3075,6 @@ function renderOJTSettingsTable($conn, $department = '')
                         data-status="' . htmlspecialchars($row['status'] ?? '') . '">
                         Edit
                     </button>
-                    <button class="delete-settings-btn" data-id="' . (int)$row['settingID'] . '">Delete</button>
                 </td>
             </tr>';
         }
@@ -3938,34 +3935,34 @@ function getStudentAlerts($conn, $studentID)
 {
     $alerts = [];
 
-    $sql1 = "
-        SELECT COUNT(*) AS attendance_count
-        FROM attendance_logs
-        WHERE studentID = ?
-        AND log_date >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
-    ";
+    // $sql1 = "
+    //     SELECT COUNT(*) AS attendance_count
+    //     FROM attendance_logs
+    //     WHERE studentID = ?
+    //     AND log_date >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+    // ";
 
-    $stmt1 = $conn->prepare($sql1);
+    // $stmt1 = $conn->prepare($sql1);
 
-    if (!$stmt1) {
-        die("SQL1 Error: " . $conn->error);
-    }
+    // if (!$stmt1) {
+    //     die("SQL1 Error: " . $conn->error);
+    // }
 
-    $stmt1->bind_param("s", $studentID);
-    $stmt1->execute();
+    // $stmt1->bind_param("s", $studentID);
+    // $stmt1->execute();
 
-    $attendanceData = $stmt1->get_result()->fetch_assoc();
+    // $attendanceData = $stmt1->get_result()->fetch_assoc();
 
-    if ($attendanceData['attendance_count'] == 0) {
+    // if ($attendanceData['attendance_count'] == 0) {
 
-        $alerts[] = [
-            "type" => "warning",
-            "priority" => 1,
-            "message" => "You have no attendance recorded in the last 5 days.",
-            "action" => "openAttendance",
-            "id" => null
-        ];
-    }
+    //     $alerts[] = [
+    //         "type" => "warning",
+    //         "priority" => 1,
+    //         "message" => "You have no attendance recorded in the last 5 days.",
+    //         "action" => "openAttendance",
+    //         "id" => null
+    //     ];
+    // }
 
     $sql2 = "
         SELECT taskID, title
@@ -4038,7 +4035,7 @@ function getStudentAlerts($conn, $studentID)
     }
 
     $sqlNotif = "
-        SELECT notificationID, title, message, type, created_at
+        SELECT notificationID, title, message, type, is_read, created_at
         FROM notifications
         WHERE userID = ?
         ORDER BY created_at DESC
@@ -4046,24 +4043,19 @@ function getStudentAlerts($conn, $studentID)
     ";
 
     $stmtNotif = $conn->prepare($sqlNotif);
-
-    if (!$stmtNotif) {
-        die("Notification SQL Error: " . $conn->error);
-    }
-
     $stmtNotif->bind_param("s", $studentID);
     $stmtNotif->execute();
-
     $notifResult = $stmtNotif->get_result();
 
     while ($n = $notifResult->fetch_assoc()) {
-
         $alerts[] = [
-            "type" => "info",
-            "priority" => 5,
+            "type" => $n['type'] ?: "info",
+            "priority" => $n['is_read'] ? 1 : 5,
             "message" => $n['title'] . ": " . $n['message'],
             "action" => "viewNotification",
-            "id" => $n['notificationID']
+            "id" => $n['notificationID'],
+            "is_read" => (int) $n['is_read'],
+            "time" => timeAgo($n['created_at'])
         ];
     }
 

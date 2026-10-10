@@ -28,7 +28,7 @@ function logSent($conn, $studentID, $type, $refID)
 
 function sendReminderEmail($to, $name, $subject, $body)
 {
-    // use your existing mailer / PHPMailer here, return true on success
+    // 
 }
 
 $res = $conn->query("

@@ -461,9 +461,8 @@ foreach ($nameParts as $part) {
                                 0% Completed
                             </p>
 
-                            <p class="progress-text">
-                                You're steadily progressing through your OJT requirements.
-                            </p>
+                            <div id="progressForecast" class="progress-forecast"></div>
+
                         </div>
 
                     </div>
@@ -472,6 +471,7 @@ foreach ($nameParts as $part) {
             </div>
 
             <!-- notification modal -->
+             <!-- //TODO:NOTIFICATION RIGHT SIDE PROFILE FIX -->
             <div class="notification-container" id="notification-container">
                 <div class="modal-header">
                     <h3>Notifications</h3>
@@ -482,66 +482,79 @@ foreach ($nameParts as $part) {
                     </button>
                 </div>
 
-                <div class="notification-modal-content">
-
                     <?php
-                    $alerts = getStudentAlerts($conn, $studentID);
-                    ?>
+                        $alerts = getStudentAlerts($conn, $studentID);
 
-                    <ul class="alerts-list scrollable">
+                        $icons = [
+                            'warning'  => 'bi-exclamation-triangle-fill',
+                            'danger'   => 'bi-alarm-fill',
+                            'critical' => 'bi-exclamation-octagon-fill',
+                            'success'  => 'bi-check-circle-fill',
+                            'info'     => 'bi-info-circle-fill',
+                        ];
 
-                        <?php if (count($alerts) > 0): ?>
+                        foreach ($alerts as &$a) {
+                            $a['type'] = isset($icons[$a['type']]) ? $a['type'] : 'info';
+                            $a['counts'] = isset($a['is_read'])
+                                ? !$a['is_read']
+                                : in_array($a['type'], ['warning', 'danger', 'critical'], true);
+                        }
+                        unset($a);
 
-                            <?php foreach ($alerts as $alert): ?>
+                        $badgeCount = count(array_filter($alerts, fn($a) => $a['counts']));
+                        ?>
 
-                                <li class="alert-item <?= htmlspecialchars($alert['type']) ?>">
+                        <button class="notif-bell" id="notifBell" onclick="openNotifications()" aria-label="Notifications">
+                            <i class="bi bi-bell-fill"></i>
+                            <span class="notif-badge" id="notifBadge"<?= $badgeCount ? '' : ' style="display:none"' ?>><?= $badgeCount ?></span>
+                        </button>
 
-                                    <div class="alert-content">
+                        <div class="notif-backdrop" id="notifBackdrop" onclick="closeNotifications()"></div>
 
-                                        <span class="alert-icon">
-                                            <?php
-                                            if ($alert['type'] === 'warning') {
-                                                echo "⚠️";
-                                            } elseif ($alert['type'] === 'danger') {
-                                                echo "⏰";
-                                            } elseif ($alert['type'] === 'critical') {
-                                                echo "🚨";
-                                            } else {
-                                                echo "ℹ️";
-                                            }
-                                            ?>
-                                        </span>
+                        <aside class="notif-drawer" id="notifDrawer">
+                            <div class="notif-header">
+                                <h3><i class="bi bi-bell-fill"></i> Notifications</h3>
+                                <div class="notif-header-actions">
+                                    <button class="notif-markall" onclick="markAllNotificationsRead()">Mark all read</button>
+                                    <button class="notif-close" onclick="closeNotifications()">&times;</button>
+                                </div>
+                            </div>
 
-                                        <span class="alert-message">
-                                            <?= htmlspecialchars($alert['message']) ?>
-                                        </span>
+                            <ul class="notif-list">
+                                <?php if (count($alerts) > 0): ?>
+                                    <?php foreach ($alerts as $alert): ?>
+                                        <li class="notif-item <?= $alert['type'] ?><?= !empty($alert['is_read']) ? ' read' : '' ?>"
+                                            data-counts="<?= (int) $alert['counts'] ?>"
+                                            data-notif="<?= isset($alert['is_read']) ? 1 : 0 ?>">
 
-                                    </div>
+                                            <i class="bi <?= $icons[$alert['type']] ?> notif-icon"></i>
 
-                                    <?php if (!empty($alert['action'])): ?>
+                                            <div class="notif-body">
+                                                <span class="notif-message"><?= htmlspecialchars($alert['message']) ?></span>
+                                                <?php if (!empty($alert['time'])): ?>
+                                                    <small><?= htmlspecialchars($alert['time']) ?></small>
+                                                <?php endif; ?>
+                                            </div>
 
-                                        <button class="alert-btn"
-                                            onclick="handleAlert('<?= $alert['action'] ?>','<?= $alert['id'] ?? '' ?>')">
-                                            View
-                                        </button>
+                                            <?php if (!empty($alert['action'])): ?>
+                                                <button class="notif-view"
+                                                    data-action="<?= htmlspecialchars($alert['action']) ?>"
+                                                    data-id="<?= htmlspecialchars((string) ($alert['id'] ?? '')) ?>">
+                                                    View
+                                                </button>
+                                            <?php endif; ?>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li class="notif-empty">
+                                        <i class="bi bi-bell-slash"></i>
+                                        <p>No notifications right now.</p>
+                                    </li>
+                                <?php endif; ?>
+                            </ul>
+                        </aside>
 
-                                    <?php endif; ?>
-
-                                </li>
-
-                            <?php endforeach; ?>
-
-                        <?php else: ?>
-
-                            <li class="alert-item success">
-                                🎉 No notifications right now.
-                            </li>
-
-                        <?php endif; ?>
-
-                    </ul>
-
-                </div>
+               
             </div>
 
             <!-- attendance modal -->

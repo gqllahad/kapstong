@@ -124,6 +124,9 @@ const notificationCardBtn = document.getElementById("notification-btn");
 const notificationCard = document.getElementById("notification-container");
 const closeNotificationCard = document.getElementById("closeNotificationViewModal");
 
+const notifDrawer = document.getElementById('notifDrawer');
+const notifBackdrop = document.getElementById('notifBackdrop');
+
 const attendanceCardBtn = document.getElementById("attendance-btn");
 const attendanceCard = document.getElementById("attendance-container");
 const closeAttendanceCard = document.getElementById("closeAttendanceViewModal");
@@ -709,10 +712,6 @@ function handleAlert(action, id = null) {
             }
             break;
 
-        case "openAttendance":
-            openAttendanceModal();
-            break;
-
         case "viewProgress":
             openProgressModal();
             break;
@@ -721,18 +720,72 @@ function handleAlert(action, id = null) {
             openStageModal();
             break;
         }
-} 
+
+    } 
+
+    // notif
+
+    function openNotifications() {
+    notifDrawer.classList.add('show');
+    notifBackdrop.classList.add('show');
+}
+
+function closeNotifications() {
+    notifDrawer.classList.remove('show');
+    notifBackdrop.classList.remove('show');
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeNotifications();
+});
+
+function refreshNotifBadge() {
+    const n = document.querySelectorAll('.notif-item[data-counts="1"]:not(.read)').length;
+    const badge = document.getElementById('notifBadge');
+    badge.textContent = n;
+    badge.style.display = n ? '' : 'none';
+}
+
+function markNotificationRead(id) {
+    return fetch('functions/markNotificationRead.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id=' + encodeURIComponent(id || 0)
+    }).then(res => res.json());
+}
+
+function markAllNotificationsRead() {
+    markNotificationRead(0).then(data => {
+        if (!data.success) return;
+        document.querySelectorAll('.notif-item[data-notif="1"]').forEach(i => i.classList.add('read'));
+        refreshNotifBadge();
+    });
+}
+
+if(document.querySelector('.notif-list')){
+document.querySelector('.notif-list').addEventListener('click', e => {
+    const btn = e.target.closest('.notif-view');
+    if (!btn) return;
+
+    const item = btn.closest('.notif-item');
+
+    if (item.dataset.notif === '1') {
+        markNotificationRead(btn.dataset.id).then(() => {
+            item.classList.add('read');
+            refreshNotifBadge();
+        });
+    }
+
+    closeNotifications();
+    handleAlert(btn.dataset.action, btn.dataset.id);
+});
+}
 
 function openProgressModal(){
     notificationCard.classList.remove("show");
     progressCard.classList.add("show");
 
     loadStudentProgressChart(studentID);
-}
-
-function  openAttendanceModal(){
-    notificationCard.classList.remove("show");
-    attendanceCard.classList.add("show");
 }
 
 function openStageModal(){
@@ -1192,11 +1245,70 @@ function loadStudentProgressChart(studentID) {
         const remaining = Math.max(required - completed, 0);
 
         const percent = required > 0
-            ? ((completed / required) * 100).toFixed(1)
+            ? Math.min(100, (completed / required) * 100).toFixed(1)
             : 0;
 
-        document.getElementById("progressPercent").innerText =
-        `${percent}% Completed`;
+        document.getElementById("progressPercent").innerText = `${percent}% Completed`;
+        renderStudentForecast(data);
+        
+        
+
+        function renderStudentForecast(d) {
+
+            if (!d.forecast) { box.innerHTML = ""; return; }
+
+            const box = document.getElementById("progressForecast");
+            if (!box) return;
+
+            const fmt = s => new Date(s + "T00:00:00")
+                .toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" });
+
+            let cls = "fc-none", title = "Estimated finish", value = "—", note = "";
+
+            switch (d.forecast) {
+                case "COMPLETED":
+                    cls = "fc-ok"; title = "OJT complete"; value = "Done";
+                    note = "You've completed your required hours. Congratulations!";
+                    break;
+
+                case "NOT STARTED":
+                    note = "Your estimate appears after your first attendance log.";
+                    break;
+
+                case "STALLED":
+                    cls = "fc-bad";
+                    note = "No hours logged in the last 4 weeks. Log your attendance to get an estimate.";
+                    break;
+
+                default: {
+                    value = d.projected_finish ? fmt(d.projected_finish) : "—";
+                    const gap = d.gap_days;
+
+                    if (gap == null) {
+                        note = "Based on your hours over the last 4 weeks.";
+                    } else if (gap <= 0) {
+                        cls = "fc-ok";
+                        note = gap === 0
+                            ? "You're on pace to finish right on your deadline."
+                            : `You're on pace to finish ${Math.abs(gap)} day${Math.abs(gap) === 1 ? "" : "s"} before your deadline.`;
+                    } else {
+                        cls = gap <= 14 ? "fc-warn" : "fc-bad";
+                        note = `At your current pace you'd finish ${gap} day${gap === 1 ? "" : "s"} after your deadline (${fmt(d.deadline)}).`;
+                        if (d.required_pace) {
+                            note += ` Aim for about ${d.required_pace} hrs/week (around ${(d.required_pace / 5).toFixed(1)} hrs a day).`;
+                        }
+                    }
+                }
+            }
+
+            box.className = `progress-forecast ${cls}`;
+            box.innerHTML = `
+                <div class="pf-main">
+                    <span class="pf-label">${title}</span>
+                    <strong class="pf-value">${value}</strong>
+                </div>
+                <p class="pf-note">${note}</p>`;
+        }
 
         window.progressChartInstance = new Chart(ctx, {
             type: 'doughnut',
@@ -1213,9 +1325,9 @@ function loadStudentProgressChart(studentID) {
                 cutout: '75%',
                 plugins: {
                     legend: {
-                        position: 'bottom',
-                        color: getChartTextColor()
-                    },
+                            position: 'bottom',
+                            labels: { color: getChartTextColor() }   
+                        },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
@@ -1240,7 +1352,7 @@ function loadStudentProgressChart(studentID) {
                     const textX = Math.round((width - ctx.measureText(text).width) / 2);
                     const textY = chart.height / 2;
 
-                    ctx.fillStyle = "#111827";
+                    ctx.fillStyle = getChartTextColor();
                     ctx.fillText(text, textX, textY);
                     ctx.save();
                 }
