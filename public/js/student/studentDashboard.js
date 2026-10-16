@@ -725,7 +725,7 @@ function handleAlert(action, id = null) {
 
     // notif
 
-    function openNotifications() {
+function openNotifications() {
     notifDrawer.classList.add('show');
     notifBackdrop.classList.add('show');
 }
@@ -746,21 +746,21 @@ function refreshNotifBadge() {
     badge.style.display = n ? '' : 'none';
 }
 
-function markNotificationRead(id) {
-    return fetch('functions/markNotificationRead.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'id=' + encodeURIComponent(id || 0)
-    }).then(res => res.json());
-}
+// function markNotificationRead(id) {
+//     return fetch('functions/markNotificationRead.php', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+//         body: 'id=' + encodeURIComponent(id || 0)
+//     }).then(res => res.json());
+// }
 
-function markAllNotificationsRead() {
-    markNotificationRead(0).then(data => {
-        if (!data.success) return;
-        document.querySelectorAll('.notif-item[data-notif="1"]').forEach(i => i.classList.add('read'));
-        refreshNotifBadge();
-    });
-}
+// function markAllNotificationsRead() {
+//     markNotificationRead(0).then(data => {
+//         if (!data.success) return;
+//         document.querySelectorAll('.notif-item[data-notif="1"]').forEach(i => i.classList.add('read'));
+//         refreshNotifBadge();
+//     });
+// }
 
 if(document.querySelector('.notif-list')){
 document.querySelector('.notif-list').addEventListener('click', e => {
@@ -791,6 +791,54 @@ function openProgressModal(){
 function openStageModal(){
     notificationCard.classList.remove("show");
     reportCard.classList.add("show");
+}
+
+function updateNotifBadge() {
+    const count = document.querySelectorAll('.notif-item[data-counts="1"]').length;
+    const badge = document.getElementById('notifBadge');
+    badge.textContent = count;
+    badge.style.display = count ? '' : 'none';
+
+    const list = document.querySelector('.notif-list');
+    if (!list.querySelector('.notif-item') && !list.querySelector('.notif-empty')) {
+        list.innerHTML = '<li class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications right now.</p></li>';
+    }
+}
+
+function removeNotifItem(li) {
+    li.classList.add('removing');
+    setTimeout(() => { li.remove(); updateNotifBadge(); }, 200);
+}
+
+// fix this
+
+function markNotificationRead(id, btn) {
+    btn.disabled = true;
+    fetch('student_functions/markNotificationRead.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ id })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.status === 'ok') removeNotifItem(btn.closest('.notif-item'));
+        else btn.disabled = false;
+    })
+    .catch(() => { btn.disabled = false; });
+}
+
+function markAllNotificationsRead() {
+    fetch('student_functions/markNotificationRead.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ all: '1' })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.status === 'ok') {
+            document.querySelectorAll('.notif-item[data-notif="1"]').forEach(removeNotifItem);
+        }
+    });
 }
 
 // reports
@@ -2284,10 +2332,10 @@ overlay.addEventListener('click', () => {
     progressCard?.classList.remove("show");
     notificationCard?.classList.remove("show");
     attendanceCard?.classList.remove("show");
-     reportCard?.classList.remove("show");
-     document.getElementById("reportFormPanel")?.classList.remove("show");
-     document.getElementById("download-attendance-modal")?.classList.remove("show");
-
+    reportCard?.classList.remove("show");
+    document.getElementById("reportFormPanel")?.classList.remove("show");
+    document.getElementById("download-attendance-modal")?.classList.remove("show");
+        
     if (editForm) editForm.reset();
 });
 };

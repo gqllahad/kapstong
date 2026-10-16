@@ -4035,12 +4035,13 @@ function getStudentAlerts($conn, $studentID)
     }
 
     $sqlNotif = "
-        SELECT notificationID, title, message, type, is_read, created_at
-        FROM notifications
-        WHERE userID = ?
-        ORDER BY created_at DESC
-        LIMIT 10
-    ";
+    SELECT notificationID, title, message, type, created_at
+    FROM notifications
+    WHERE userID = ?
+      AND is_read = 0
+    ORDER BY created_at DESC
+    LIMIT 10
+";
 
     $stmtNotif = $conn->prepare($sqlNotif);
     $stmtNotif->bind_param("s", $studentID);
@@ -4049,12 +4050,12 @@ function getStudentAlerts($conn, $studentID)
 
     while ($n = $notifResult->fetch_assoc()) {
         $alerts[] = [
-            "type" => $n['type'] ?: "info",
-            "priority" => $n['is_read'] ? 1 : 5,
+            "type" => "info",
+            "priority" => 5,
             "message" => $n['title'] . ": " . $n['message'],
             "action" => "viewNotification",
             "id" => $n['notificationID'],
-            "is_read" => (int) $n['is_read'],
+            "is_read" => 0,
             "time" => timeAgo($n['created_at'])
         ];
     }
@@ -4130,6 +4131,36 @@ function getStudentAlerts($conn, $studentID)
     });
 
     return $alerts;
+}
+
+
+function prepareStudentAlerts($conn, $studentID)
+{
+    $icons = [
+        'warning'  => 'bi-exclamation-triangle-fill',
+        'danger'   => 'bi-alarm-fill',
+        'critical' => 'bi-exclamation-octagon-fill',
+        'success'  => 'bi-check-circle-fill',
+        'info'     => 'bi-info-circle-fill',
+    ];
+
+    $alerts = getStudentAlerts($conn, $studentID);
+
+    foreach ($alerts as &$a) {
+        $a['type'] = isset($icons[$a['type']]) ? $a['type'] : 'info';
+        $a['counts'] = isset($a['is_read'])
+            ? !$a['is_read']
+            : in_array($a['type'], ['warning', 'danger', 'critical'], true);
+    }
+    unset($a);
+
+    $badgeCount = count(array_filter($alerts, fn($a) => $a['counts']));
+
+    return [
+        'alerts'     => $alerts,
+        'icons'      => $icons,
+        'badgeCount' => $badgeCount,
+    ];
 }
 
 // student attendance card

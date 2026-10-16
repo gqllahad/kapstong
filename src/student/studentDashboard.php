@@ -42,6 +42,8 @@ foreach ($nameParts as $part) {
     }
 }
 
+['alerts' => $alerts, 'icons' => $icons, 'badgeCount' => $badgeCount] = prepareStudentAlerts($conn, $studentID);
+
 ?>
 
 
@@ -75,7 +77,19 @@ foreach ($nameParts as $part) {
     </header> -->
 
     <div class="layout">
+        
         <aside class="sidebar">
+            <div class="sidebar-notifications">
+                <button class="icon-btn" id="notifBell"
+                        onclick="openNotifications()"
+                        aria-label="Notifications">
+                    <i class="bi bi-bell"></i>
+                    <span class="notif-badge" id="notifBadge"
+                        <?= $badgeCount ? '' : ' style="display:none"' ?>>
+                        <?= $badgeCount ?>
+                    </span>
+                </button>
+            </div>
             <ul class="menu">
                 <li class="active">
                     <button id="student-dashboard-btn"><i class="bi bi-house"></i> Home Page</button>
@@ -83,9 +97,11 @@ foreach ($nameParts as $part) {
                 <li>
                     <button id="student-tasks-btn"> <i class="bi bi-list-check"></i> My Tasks</button>
                 </li>
+                <li></li>
                 <li><button id="student-documents-btn"> <i class="bi bi-folder2-open"></i>My Documents</button></li>
                 <li><button id="student-attendance-btn"><i class="bi bi-calendar-check"></i> Attendance logs</button></li>
                 <li><button id="student-activity-btn"><i class="bi bi-activity"></i> Activity logs</button></li>
+                
             </ul>
 
             <div class="sidebar-profile">
@@ -99,9 +115,11 @@ foreach ($nameParts as $part) {
                         <small>Student</small>
                     </div>
                 </div>
-                <button id="menuToggle" class="profile-trigger">
-                    ☰
-                </button>
+                
+                    <button class="icon-btn" id="menuToggle" aria-label="Menu">
+                        <i class="bi bi-list"></i>
+                    </button>
+               
 
                 <nav class="profile-menu" id="profileMenu" hidden>
                     <a id="openProfileBtn">
@@ -471,8 +489,8 @@ foreach ($nameParts as $part) {
             </div>
 
             <!-- notification modal -->
-             <!-- //TODO:NOTIFICATION RIGHT SIDE PROFILE FIX -->
-            <div class="notification-container" id="notification-container">
+
+            <!-- <div class="notification-container" id="notification-container">
                 <div class="modal-header">
                     <h3>Notifications</h3>
 
@@ -480,34 +498,30 @@ foreach ($nameParts as $part) {
                         class="modal-close-profile">
                         &times;
                     </button>
-                </div>
+                </div> -->
+                    
 
                     <?php
-                        $alerts = getStudentAlerts($conn, $studentID);
+                        // $alerts = getStudentAlerts($conn, $studentID);
 
-                        $icons = [
-                            'warning'  => 'bi-exclamation-triangle-fill',
-                            'danger'   => 'bi-alarm-fill',
-                            'critical' => 'bi-exclamation-octagon-fill',
-                            'success'  => 'bi-check-circle-fill',
-                            'info'     => 'bi-info-circle-fill',
-                        ];
+                        // $icons = [
+                        //     'warning'  => 'bi-exclamation-triangle-fill',
+                        //     'danger'   => 'bi-alarm-fill',
+                        //     'critical' => 'bi-exclamation-octagon-fill',
+                        //     'success'  => 'bi-check-circle-fill',
+                        //     'info'     => 'bi-info-circle-fill',
+                        // ];
 
-                        foreach ($alerts as &$a) {
-                            $a['type'] = isset($icons[$a['type']]) ? $a['type'] : 'info';
-                            $a['counts'] = isset($a['is_read'])
-                                ? !$a['is_read']
-                                : in_array($a['type'], ['warning', 'danger', 'critical'], true);
-                        }
-                        unset($a);
+                        // foreach ($alerts as &$a) {
+                        //     $a['type'] = isset($icons[$a['type']]) ? $a['type'] : 'info';
+                        //     $a['counts'] = isset($a['is_read'])
+                        //         ? !$a['is_read']
+                        //         : in_array($a['type'], ['warning', 'danger', 'critical'], true);
+                        // }
+                        // unset($a);
 
-                        $badgeCount = count(array_filter($alerts, fn($a) => $a['counts']));
-                        ?>
-
-                        <button class="notif-bell" id="notifBell" onclick="openNotifications()" aria-label="Notifications">
-                            <i class="bi bi-bell-fill"></i>
-                            <span class="notif-badge" id="notifBadge"<?= $badgeCount ? '' : ' style="display:none"' ?>><?= $badgeCount ?></span>
-                        </button>
+                        // $badgeCount = count(array_filter($alerts, fn($a) => $a['counts']));
+                    ?>
 
                         <div class="notif-backdrop" id="notifBackdrop" onclick="closeNotifications()"></div>
 
@@ -537,11 +551,12 @@ foreach ($nameParts as $part) {
                                             </div>
 
                                             <?php if (!empty($alert['action'])): ?>
-                                                <button class="notif-view"
-                                                    data-action="<?= htmlspecialchars($alert['action']) ?>"
-                                                    data-id="<?= htmlspecialchars((string) ($alert['id'] ?? '')) ?>">
-                                                    View
-                                                </button>
+                                                <?php if (isset($alert['is_read'])): ?>
+                                                    <button class="notif-read-btn" title="Mark as read"
+                                                        onclick="markNotificationRead(<?= (int) $alert['id'] ?>, this)">
+                                                        <i class="bi bi-check2"></i>
+                                                    </button>
+                                                <?php endif; ?>
                                             <?php endif; ?>
                                         </li>
                                     <?php endforeach; ?>
@@ -554,8 +569,10 @@ foreach ($nameParts as $part) {
                             </ul>
                         </aside>
 
+                        <!-- TODO:mark the reads fix that and do the reports next -->
+
                
-            </div>
+            <!-- </div> -->
 
             <!-- attendance modal -->
             <!-- <div class="attendance-container" id="attendance-container">
@@ -730,10 +747,10 @@ foreach ($nameParts as $part) {
                         <h3>OJT Progress</h3>
                         <p>Track your hours and training progress.</p>
                     </div>
-                    <div class="card notification" id="notification-btn">
+                    <!-- <div class="card notification" id="notification-btn">
                         <h3>Notifications</h3>
                         <p>Check announcements from your mentor.</p>
-                    </div>
+                    </div> -->   
 
                     <!-- <div class="card attendance" id="attendance-btn">
                         <h3>Attendance</h3>
@@ -744,6 +761,8 @@ foreach ($nameParts as $part) {
                         <h3>Reports</h3>
                         <p>Upload or review submitted reports.</p>
                     </div>
+
+
                 </section>
 
 
