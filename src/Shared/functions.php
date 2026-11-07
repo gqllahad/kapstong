@@ -3893,6 +3893,7 @@ function getSupervisorActivities($conn, $superID)
                 AND ss.status = 'ACTIVE'
             )
         )
+        AND al.created_at >= NOW() - INTERVAL 3 DAY
 
         ORDER BY al.created_at DESC
         LIMIT 10
@@ -4148,9 +4149,7 @@ function prepareStudentAlerts($conn, $studentID)
 
     foreach ($alerts as &$a) {
         $a['type'] = isset($icons[$a['type']]) ? $a['type'] : 'info';
-        $a['counts'] = isset($a['is_read'])
-            ? !$a['is_read']
-            : in_array($a['type'], ['warning', 'danger', 'critical'], true);
+        $a['counts'] = isset($a['is_read']) ? !$a['is_read'] : false;
     }
     unset($a);
 

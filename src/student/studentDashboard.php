@@ -79,17 +79,6 @@ foreach ($nameParts as $part) {
     <div class="layout">
         
         <aside class="sidebar">
-            <div class="sidebar-notifications">
-                <button class="icon-btn" id="notifBell"
-                        onclick="openNotifications()"
-                        aria-label="Notifications">
-                    <i class="bi bi-bell"></i>
-                    <span class="notif-badge" id="notifBadge"
-                        <?= $badgeCount ? '' : ' style="display:none"' ?>>
-                        <?= $badgeCount ?>
-                    </span>
-                </button>
-            </div>
             <ul class="menu">
                 <li class="active">
                     <button id="student-dashboard-btn"><i class="bi bi-house"></i> Home Page</button>
@@ -738,7 +727,18 @@ foreach ($nameParts as $part) {
             <!-- dashboard -->
             <section class="student-dashboard" id="student-dashboard">
                 <section class="title-header">
-                    <h2>Welcome, <?php echo htmlspecialchars($studentName); ?>!</h2>
+                    <div class="welcome-row">
+                        <h2>Welcome, <?php echo htmlspecialchars($studentName); ?>!</h2>
+                        <button class="icon-btn" id="notifBell"
+                                onclick="openNotifications()"
+                                aria-label="Notifications">
+                            <i class="bi bi-bell"></i>
+                            <span class="notif-badge" id="notifBadge"
+                                <?= $badgeCount ? '' : ' style="display:none"' ?>>
+                                <?= $badgeCount ?>
+                            </span>
+                        </button>
+                    </div>
                     <p>Here's your OJT progress and tasks.</p>
                 </section>
 

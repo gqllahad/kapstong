@@ -1,7 +1,8 @@
 <?php
+session_start();
+require_once __DIR__ . "/../../Shared/kapstongConnection.php";
+require_once __DIR__ . "/../../Session/sessionTimeout.php";
 header('Content-Type: application/json');
-
-enforceSessionTimeout('student');
 
 $studentID = $_SESSION['studentID'] ?? '';   
 if ($studentID === '') {
@@ -19,4 +20,5 @@ if (($_POST['all'] ?? '') === '1') {
 }
 $stmt->execute();
 
-echo json_encode(["status" => "ok"]);
+
+echo json_encode(["status" => "ok", "updated" => $stmt->affected_rows]);

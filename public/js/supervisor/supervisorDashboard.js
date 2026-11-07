@@ -454,6 +454,55 @@ function escalateStudent(studentID, btn) {
     .catch(() => { btn.disabled = false; btn.textContent = 'Failed'; });
 }
 
+let feedLastFocus = null;
+
+function openFeed(tab = 'alerts') {
+    feedLastFocus = document.activeElement;
+    switchFeedTab(tab);
+    document.getElementById('feedBackdrop').classList.add('open');
+    const d = document.getElementById('feedDrawer');
+    d.removeAttribute('inert');
+    d.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    d.querySelector('.feed-close').focus();
+}
+
+function closeFeed() {
+    const d = document.getElementById('feedDrawer');
+    if (feedLastFocus) feedLastFocus.focus();   // move focus out first
+    else document.activeElement.blur();
+    d.classList.remove('open');
+    d.setAttribute('inert', '');
+    document.getElementById('feedBackdrop').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// function openFeed(tab = 'alerts') {
+//     switchFeedTab(tab);
+//     document.getElementById('feedBackdrop').classList.add('open');
+//     const d = document.getElementById('feedDrawer');
+//     d.classList.add('open');
+//     d.setAttribute('aria-hidden', 'false');
+//     document.body.style.overflow = 'hidden';
+// }
+
+// function closeFeed() {
+//     document.getElementById('feedBackdrop').classList.remove('open');
+//     const d = document.getElementById('feedDrawer');
+//     d.classList.remove('open');
+//     d.setAttribute('aria-hidden', 'true');
+//     document.body.style.overflow = '';
+// }
+
+function switchFeedTab(tab) {
+    document.querySelectorAll('.feed-tab').forEach(b =>
+        b.classList.toggle('active', b.dataset.tab === tab));
+    document.querySelectorAll('.feed-pane').forEach(p =>
+        p.classList.toggle('active', p.id === 'feedPane-' + tab));
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFeed(); });
+
 // charts
 
 // student view charts 
@@ -3073,55 +3122,55 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // self task search
-document.addEventListener("DOMContentLoaded", function () {
+// document.addEventListener("DOMContentLoaded", function () {
 
-    const searchInput = document.getElementById("selfSearch");
-    const statusFilter = document.getElementById("selfStatusFilter");
-    const dateInput = document.getElementById("selfDate");
+//     const searchInput = document.getElementById("selfSearch");
+//     const statusFilter = document.getElementById("selfStatusFilter");
+//     const dateInput = document.getElementById("selfDate");
     
-    const tableBody = document.getElementById("selfTaskBody");
+//     const tableBody = document.getElementById("selfTaskBody");
 
     
 
-    if (!searchInput || !statusFilter || !tableBody || !dateInput) return;
+//     if (!searchInput || !statusFilter || !tableBody || !dateInput) return;
 
-    let timer;
+//     let timer;
 
-    function fetchSelfTask() {
+//     function fetchSelfTask() {
 
-        const search = searchInput.value;
-        const status = statusFilter.value;
-        const date = dateInput.value;
+//         const search = searchInput.value;
+//         const status = statusFilter.value;
+//         const date = dateInput.value;
 
-        fetch("functions/searchSelfTask.php", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body:
-                "search=" + encodeURIComponent(search) +
-                "&status=" + encodeURIComponent(status) + 
-                "&date=" + encodeURIComponent(date)
-        })
-        .then(res => res.text())
-        .then(data => {
-            tableBody.innerHTML = data;
-        })
-        .catch(err => {
-            console.error("Attendance fetch error:", err);
-        });
-    }
+//         fetch("functions/searchSelfTask.php", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/x-www-form-urlencoded"
+//             },
+//             body:
+//                 "search=" + encodeURIComponent(search) +
+//                 "&status=" + encodeURIComponent(status) + 
+//                 "&date=" + encodeURIComponent(date)
+//         })
+//         .then(res => res.text())
+//         .then(data => {
+//             tableBody.innerHTML = data;
+//         })
+//         .catch(err => {
+//             console.error("Attendance fetch error:", err);
+//         });
+//     }
 
-    searchInput.addEventListener("keyup", function () {
-        clearTimeout(timer);
-        timer = setTimeout(fetchSelfTask, 300);
-    });
+//     searchInput.addEventListener("keyup", function () {
+//         clearTimeout(timer);
+//         timer = setTimeout(fetchSelfTask, 300);
+//     });
 
-    statusFilter.addEventListener("change", fetchSelfTask);
-    dateInput.addEventListener("change", fetchSelfTask);
+//     statusFilter.addEventListener("change", fetchSelfTask);
+//     dateInput.addEventListener("change", fetchSelfTask);
 
-    fetchSelfTask();
-});
+//     fetchSelfTask();
+// });
 
 document.addEventListener("DOMContentLoaded", function () {
 

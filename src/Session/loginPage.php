@@ -135,10 +135,7 @@ if (isset($_GET['locked']) && isset($_GET['email'])) {
           <span class="sign-feature-icon"><i class='bx bx-wifi'></i></span>
           RFID tap-to-log attendance
         </li>
-        <li class="sign-feature-item">
-          <span class="sign-feature-icon"><i class='bx bx-time-five'></i></span>
-          Automatic time-in &amp; time-out
-        </li>
+
         <li class="sign-feature-item">
           <span class="sign-feature-icon"><i class='bx bx-bar-chart-alt-2'></i></span>
           Live performance tracking

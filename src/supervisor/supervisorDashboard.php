@@ -1153,77 +1153,58 @@ foreach ($nameParts as $part) {
 
 
                 <?php
-                    $alerts = getSupervisorAlerts($conn, $superID);
+                    $alerts     = getSupervisorAlerts($conn, $superID);
                     $activities = getSupervisorActivities($conn, $superID);
+                    $sevLabels  = ['critical' => 'High severity', 'danger' => 'Overdue', 'warning' => 'Warning'];
+                    $preview    = array_slice($alerts, 0, 3);
                 ?>
                <div class="dashboard-bottom">
+
+                    <!-- ALERTS  -->
                     <div class="alerts-container">
                         <div class="panel-heading">
                             <h3><i class="bi bi-exclamation-triangle-fill"></i> Alerts</h3>
-                            <span class="panel-count-badge"><?= count($alerts) ?></span>
+                            <?php if ($alerts): ?>
+                                <span class="panel-count-badge"><?= count($alerts) ?> requiring attention</span>
+                            <?php endif; ?>
+                            <button class="panel-link" onclick="openFeed('alerts')">View in Drawer <i class="bi bi-chevron-right"></i></button>
                         </div>
 
-                        <ul class="alerts-list scrollable">
-
-                            <?php if (count($alerts) > 0): ?>
-                                <?php foreach ($alerts as $alert): ?>
-                                    <li class="alert-item <?= htmlspecialchars($alert['type']) ?>">
-                                        <i class="bi bi-exclamation-circle-fill"></i>
-                                        <span class="alert-item-text">
-                                            <?= htmlspecialchars($alert['message']) ?>
-                                            <?php if (!empty($alert['notified'])): ?>
-                                                <small class="alert-notified">
-                                                    <i class="bi bi-envelope-check"></i> Student emailed · <?= timeAgo($alert['notified']) ?>
-                                                </small>
-                                            <?php endif; ?>
-                                        </span>
-                                        <button class="alert-btn"
-                                            data-action="<?= htmlspecialchars($alert['action'] ?? '') ?>"
-                                            data-id="<?= htmlspecialchars((string) $alert['id']) ?>"
-                                            onclick="handleAlertAction(this)">
-                                            View
-                                        </button>
-                                        <?php if ($alert['type'] === 'critical'): ?>
-                                            <button class="escalate-btn"
-                                                data-student="<?= htmlspecialchars((string) $alert['studentID'], ENT_QUOTES) ?>"
-                                                onclick="escalateStudent(this.dataset.student, this)">
-                                                <i class="bi bi-arrow-up-circle"></i> <span>Escalate</span>
-                                            </button>
-                                        <?php endif; ?>
-                                        
-                                    </li>
-                                <?php endforeach; ?>
-                            <?php else: ?>
+                        <ul class="alerts-list">
+                            <?php if ($preview): foreach ($preview as $a): $t = htmlspecialchars($a['type']); ?>
+                                <li class="alert-item <?= $t ?>">
+                                    <div class="alert-item-text">
+                                        <strong class="sev-label <?= $t ?>"><?= $sevLabels[$a['type']] ?? 'Notice' ?></strong>
+                                        <?= htmlspecialchars($a['message']) ?>
+                                    </div>
+                                    <button class="alert-btn" onclick="openFeed('alerts')">Open</button>
+                                </li>
+                            <?php endforeach; else: ?>
                                 <li class="alert-item success">
-                                    <i class="bi bi-clock-history"></i>
+                                    <i class="bi bi-check-circle-fill"></i>
                                     <span class="alert-item-text">No issues detected. All students are active.</span>
                                 </li>
                             <?php endif; ?>
                         </ul>
                     </div>
 
+                    <!-- ACTIVITY  -->
                     <div class="activity-container">
                         <div class="panel-heading">
                             <h3><i class="bi bi-clock-history"></i> Recent Activity</h3>
-                            <span class="panel-count-badge"><?= count($activities) ?></span>
+                            <button class="panel-link" onclick="openFeed('activity')">View all <?= count($activities) ?> <i class="bi bi-chevron-right"></i></button>
                         </div>
-
-                        <ul class="activity-list scrollable">
-                            <?php if (count($activities) > 0): ?>
-                                <?php foreach ($activities as $act): ?>
-                                    <li class="activity-item <?= htmlspecialchars($act['type']) ?>">
-                                        <i class="bi bi-arrow-repeat"></i>
-                                        <div class="activity-item-body">
-                                            <span><?= htmlspecialchars($act['message']) ?></span>
-                                            <small><?= htmlspecialchars($act['time']) ?></small>
-                                        </div>
-                                    </li>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <li class="activity-item success">
-                                    <i class="bi bi-check-circle-fill"></i>
-                                    <span>No recent activity</span>
+                        <ul class="activity-list">
+                            <?php if ($activities): foreach (array_slice($activities, 0, 3) as $act): ?>
+                                <li class="activity-item <?= htmlspecialchars($act['type']) ?>">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    <div class="activity-item-body">
+                                        <span><?= htmlspecialchars($act['message']) ?></span>
+                                        <small><?= htmlspecialchars($act['time']) ?></small>
+                                    </div>
                                 </li>
+                            <?php endforeach; else: ?>
+                                <li class="activity-item success"><i class="bi bi-check-circle-fill"></i><span>No recent activity</span></li>
                             <?php endif; ?>
                         </ul>
                     </div>
@@ -1356,9 +1337,6 @@ foreach ($nameParts as $part) {
                             Task Submission
                         </button>
 
-                        <button class="tab-btn" data-tab="self" onclick="showSelfTable()">
-                            Self-Initiated Tasks
-                        </button>
                     </div>
                     <div class="top-bar">
 
@@ -1409,10 +1387,6 @@ foreach ($nameParts as $part) {
 
                         <button class="tab-btn" data-tab="submitted" onclick="showSubmittedTable()">
                             Task Submission
-                        </button>
-
-                        <button class="tab-btn" data-tab="self" onclick="showSelfTable()">
-                            Self-Initiated Tasks
                         </button>
                     </div>
                     <div class="top-bar">
@@ -1484,81 +1458,6 @@ foreach ($nameParts as $part) {
                         </table>
                     </div>
                 </div>
-
-                <!-- Self Tasks inigo -->
-                <!-- <div class="table-view" id="task-self-table">
-                    
-                    <div class="table-switcher">
-                        <button class="tab-btn active" data-tab="manage" onclick="showManageTable()">
-                            Task Management
-                        </button>
-
-                        <button class="tab-btn" data-tab="submitted" onclick="showSubmittedTable()">
-                            Task Submission
-                        </button>
-
-                        <button class="tab-btn" data-tab="self" onclick="showSelfTable()">
-                            Self-Initiated Tasks
-                        </button>
-                    </div>
-                    
-                    <div class="top-bar">
-
-                        <div class="top-header">
-                            <h3 class="table-title">Self-Initiated tasks</h3>
-                            <p>Search and review student self-tasks.</p>
-                        </div>
-
-                        <div class="search-filter">
-                            <div class="search-container">
-                                <i class="bi bi-search search-icon"></i>
-                                <input type="text" id="selfSearch"
-                                    placeholder="Search by ID or Name...">
-                            </div>
-
-                            <div class="filter-group">
-
-                                <select id="selfStatusFilter">
-                                    <option value="">All Status</option>
-                                    <option value="PENDING">Pending</option>
-                                    <option value="REJECTED">Rejected</option>
-                                    <option value="APPROVED">Approved</option>
-                                </select>
-
-                            </div>
-
-                            <div class="filter-group">
-                                <input type="date" id="selfDate" title="From date">
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Activity Title</th>
-                                    <th>Student</th>
-                                    <th>Date Performed</th>
-                                    <th>Hours</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="selfTaskBody">
-                                <?php
-                                // $selfSearch = $_POST['search'] ?? '';
-                                // $selfStatus = $_POST['status'] ?? '';
-                                // $selfDate = $_POST['date'] ?? '';
-                                // echo renderSelfTaskList($conn, $superID, $selfSearch, $selfStatus, $selfDate);
-                                ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div> -->
 
             </section>
 
@@ -1944,6 +1843,93 @@ foreach ($nameParts as $part) {
         </main>
 
     </div>
+
+
+    <!-- DRAWER -->
+    <div class="feed-backdrop" id="feedBackdrop" onclick="closeFeed()"></div>
+
+    <aside class="feed-drawer" id="feedDrawer" aria-hidden="true">
+        <div class="feed-header">
+            <div class="feed-title">
+                <span class="feed-title-icon"><i class="bi bi-bell"></i></span>
+                <div>
+                    <h3>System Feed</h3>
+                    <small>Alerts &amp; Historical Audit Log</small>
+                </div>
+            </div>
+            <button class="feed-close" onclick="closeFeed()" aria-label="Close">&times;</button>
+        </div>
+
+        <div class="feed-tabs">
+            <button class="feed-tab" data-tab="activity" onclick="switchFeedTab('activity')">
+                Recent Activity <span class="tab-count"><?= count($activities) ?></span>
+            </button>
+            <button class="feed-tab active" data-tab="alerts" onclick="switchFeedTab('alerts')">
+                Alerts <span class="tab-count danger"><?= count($alerts) ?> Active</span>
+            </button>
+        </div>
+
+        <!-- ALERTS  -->
+        <div class="feed-pane active" id="feedPane-alerts">
+            <p class="feed-sub">Active Trainee Escalations (<?= count($alerts) ?>)</p>
+
+            <?php if ($alerts): foreach ($alerts as $a): $t = htmlspecialchars($a['type']); ?>
+                <article class="feed-card <?= $t ?>">
+                    <div class="feed-card-top">
+                        <span class="sev-badge <?= $t ?>"><?= $sevLabels[$a['type']] ?? 'Notice' ?></span>
+                    </div>
+                    <p class="feed-card-msg"><?= htmlspecialchars($a['message']) ?></p>
+
+                    <?php if (!empty($a['notified'])): ?>
+                        <small class="alert-notified">
+                            <i class="bi bi-envelope-check"></i> Student emailed · <?= timeAgo($a['notified']) ?>
+                        </small>
+                    <?php endif; ?>
+
+                    <div class="feed-card-actions">
+                        <?php if (!empty($a['action'])): ?>
+                            <button class="fbtn primary"
+                                data-action="<?= htmlspecialchars($a['action']) ?>"
+                                data-id="<?= htmlspecialchars((string) $a['id']) ?>"
+                                onclick="handleAlertAction(this)">View</button>
+                        <?php endif; ?>
+
+                        <?php if (!empty($a['studentID'])): ?>
+                            <button class="fbtn ghost"
+                                data-student="<?= htmlspecialchars((string) $a['studentID'], ENT_QUOTES) ?>"
+                                data-type="<?= $t ?>"
+                                onclick="remindStudent(this.dataset.student, this.dataset.type, this)">Remind</button>
+                        <?php endif; ?>
+
+                        <?php if ($a['type'] === 'critical' && !empty($a['studentID'])): ?>
+                            <button class="fbtn danger"
+                                data-student="<?= htmlspecialchars((string) $a['studentID'], ENT_QUOTES) ?>"
+                                onclick="escalateStudent(this.dataset.student, this)">
+                                <i class="bi bi-arrow-up-circle"></i> Escalate
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                </article>
+            <?php endforeach; else: ?>
+                <div class="feed-empty"><i class="bi bi-check-circle"></i><p>No issues detected.</p></div>
+            <?php endif; ?>
+        </div>
+
+        <!-- ACTIVITY  -->
+        <div class="feed-pane" id="feedPane-activity">
+            <?php if ($activities): foreach ($activities as $act): ?>
+                <div class="feed-activity <?= htmlspecialchars($act['type']) ?>">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <div>
+                        <span><?= htmlspecialchars($act['message']) ?></span>
+                        <small><?= htmlspecialchars($act['time']) ?></small>
+                    </div>
+                </div>
+            <?php endforeach; else: ?>
+                <div class="feed-empty"><i class="bi bi-clock-history"></i><p>No activity in the last 3 days.</p></div>
+            <?php endif; ?>
+        </div>
+    </aside>
 
 </body>
 <script>
