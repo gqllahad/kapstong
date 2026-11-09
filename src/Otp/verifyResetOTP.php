@@ -28,7 +28,7 @@ unset($_SESSION['reset_otp_error']);
 
     <div class="otp-container">
 
-        <h2>🔐 Reset Password OTP</h2>
+        <h2> Reset Password OTP</h2>
 
         <p>Enter the code sent to your email</p>
 

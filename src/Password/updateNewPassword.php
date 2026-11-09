@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once("../../Shared/kapstongConnection.php");
+require_once("../Shared/kapstongConnection.php");
 
 if(!isset($_SESSION['verified_reset'])) {
     header("Location: forgotPassword.php");

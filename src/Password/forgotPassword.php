@@ -70,7 +70,7 @@ if (isset($_GET['error'])) {
             </div>
 
             <form
-                action="sendResetOTP.php"
+                action="../Otp/sendResetOTP.php"
                 method="POST" id="submitEmail">
 
                 <div class="reset-login-box">

@@ -23,7 +23,7 @@ if (isset($_POST['otp'])) {
     
     $_SESSION['verified_reset'] = true;
 
-    header("Location: createNewPassword.php");
+    header("Location: ../Password/createNewPassword.php");
     exit();
 }
 ?>

@@ -36,7 +36,7 @@ unset($_SESSION['reset_password_error']);
 
             <div class="login-header">
 
-                <h2>🔐 Create New Password</h2>
+                <h2> Create New Password</h2>
 
                 <p>Choose a strong password for your account</p>
 

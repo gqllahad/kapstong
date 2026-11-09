@@ -151,7 +151,7 @@ if (isset($_POST['otp'])) {
 
     <div class="otp-container">
 
-        <h2>🔐 Email Verification</h2>
+        <h2> Email Verification</h2>
         <p>Enter the 6-digit code sent to your email</p>
 
         <form method="POST">

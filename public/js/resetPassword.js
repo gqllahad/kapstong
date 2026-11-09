@@ -43,7 +43,7 @@ if (invalidEmail && modalInvader) {
   });
 
   setTimeout(() => {
-    window.location.href = "Password/forgotPassword.php";
+    window.location.href = "forgotPassword.php";
   },1500);
 }
 

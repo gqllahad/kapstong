@@ -3607,11 +3607,14 @@ function getSupervisorIDByUserID($conn, $userID)
 function countTotalAssignedStudents($conn, $superID)
 {
     $stmt = $conn->prepare("
-        SELECT COUNT(*) AS total FROM student_supervisor WHERE superID = ?;
+        SELECT COUNT(DISTINCT ss.studentID) AS total
+        FROM student_supervisor ss
+        INNER JOIN users u ON u.studentID = ss.studentID
+        WHERE ss.superID = ?
     ");
     $stmt->bind_param("i", $superID);
     $stmt->execute();
-    return $stmt->get_result()->fetch_assoc()['total'];
+    return (int) $stmt->get_result()->fetch_assoc()['total'];
 }
 
 function countTotalActiveStudents($conn, $superID)

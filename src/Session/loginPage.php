@@ -93,21 +93,21 @@ if (isset($_GET['locked']) && isset($_GET['email'])) {
 
    <?php if ($wrongPassword): ?>
       <div class="incorrectLogin-box" id="incorrectLogin">
-        <p>⚠ Incorrect Email or Password!</p>
+        <p> Incorrect Email or Password!</p>
       </div>
 
     <?php endif; ?>
 
     <?php if ($successSignUp): ?>
       <div class="signSuccess-box" id="signSuccess">
-        <p>✅ Account Created Successfully!</p>
+        <p> Account Created Successfully!</p>
       </div>
 
     <?php endif; ?>
 
     <?php if ($successForget): ?>
       <div class="signSuccess-box" id="signSuccess">
-        <p>✅ Account Password Successfully Resetted!</p>
+        <p> Account Password Successfully Resetted!</p>
       </div>
 
     <?php endif; ?>

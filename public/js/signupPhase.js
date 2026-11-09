@@ -89,7 +89,7 @@
             return;
         }
 
-        fetch(`checkStudentID.php?email=${encodeURIComponent(email)}`)
+        fetch(`../Shared/checkStudentID.php?email=${encodeURIComponent(email)}`)
             .then(res => res.json())
             .then(data => {
                 if (data.exists) {
@@ -205,7 +205,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const courseSelect = document.getElementById('signCourse');
 
-        fetch('getCourses.php')
+        fetch('../Shared/getCourses.php')
             .then(res => res.json())
             .then(data => {
                 courseSelect.innerHTML = '<option value="" disabled selected hidden></option>';
