@@ -66,6 +66,9 @@ if (isset($_POST['otp'])) {
             );
 
             $sqlInsertUsers->execute();
+
+            $newUserID = $conn->insert_id;
+
             $sqlInsertStudent->execute();
 
             $ip = getUserIP();
@@ -92,8 +95,6 @@ if (isset($_POST['otp'])) {
             $target_type = "student";
             $target_id = $studentID;
 
-            $newUserID = $conn->insert_id;
-
             $log->bind_param(
                 "isssssss",
                 $newUserID,
@@ -118,6 +119,7 @@ if (isset($_POST['otp'])) {
             exit();
         } catch (Exception $e) {
             $conn->rollback();
+            die($e->getMessage());
             header("Location: ../Signup/signupStudent.php?error=Database+error");
             exit();
         }

@@ -51,8 +51,8 @@ const loginPass = document.getElementById("loginPassword");
 const forgotPasswordLink = document.getElementById("forgotPasswordLink");
 
 // theme change
-const themeToggle = document.getElementById("themeToggle");
-const themeIcon = themeToggle?.querySelector("i");
+// const themeToggle = document.getElementById("themeToggle");
+// const themeIcon = themeToggle?.querySelector("i");
 
 // functions
 
@@ -150,21 +150,21 @@ if (lockoutBox && lockoutCountdown) {
 }
 
 // theme toggle
-function applyTheme(mode) {
-  document.body.classList.toggle("light-mode", mode === "light");
-  if (themeIcon)
-    themeIcon.className = mode === "light" ? "bx bx-moon" : "bx bx-sun";
-}
+// function applyTheme(mode) {
+//   document.body.classList.toggle("light-mode", mode === "light");
+//   if (themeIcon)
+//     themeIcon.className = mode === "light" ? "bx bx-moon" : "bx bx-sun";
+// }
 
-applyTheme(localStorage.getItem("kapstong-theme") || "dark");
+// applyTheme(localStorage.getItem("kapstong-theme") || "dark");
 
-themeToggle?.addEventListener("click", () => {
-  const next = document.body.classList.contains("light-mode")
-    ? "dark"
-    : "light";
-  applyTheme(next);
-  localStorage.setItem("kapstong-theme", next);
-});
+// themeToggle?.addEventListener("click", () => {
+//   const next = document.body.classList.contains("light-mode")
+//     ? "dark"
+//     : "light";
+//   applyTheme(next);
+//   localStorage.setItem("kapstong-theme", next);
+// });
 
 // login invader
 if (invaderLogin && modalInvader) {

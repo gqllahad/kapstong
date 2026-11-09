@@ -59,19 +59,6 @@ foreach ($nameParts as $part) {
 
 <body>
 
-    <!-- <header class="navbar">
-        <div class="header-title">
-            <img src="../../../public/kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
-            <h1>Student Dashboard</h1>
-        </div>
-        <button id="menuToggle">☰</button>
-        <nav class="profile-menu" id="profileMenu" hidden>
-            <a id="openProfilePendingBtn">Profile</a>
-            <hr style="width: 75%; text-align: left;">
-            <a href="../../Session/logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
-        </nav>
-    </header> -->
-
     <div class="layout">
         <aside class="sidebar">
             <ul class="menu">
@@ -81,7 +68,7 @@ foreach ($nameParts as $part) {
                 <li>
                     <button id="unverified-student-documents-button"><i class="bi bi-journal-text"></i>My Documents</button>
                 </li>
-                <li><button id="unverified-student-messages-button"><i class="bi bi-chat-left-text"></i> Messages</button></li>
+                <!-- <li><button id="unverified-student-messages-button"><i class="bi bi-chat-left-text"></i> Messages</button></li> -->
             </ul>
 
             <div class="sidebar-profile">
@@ -104,10 +91,7 @@ foreach ($nameParts as $part) {
                         <i class="bi bi-person"></i>
                         Profile
                     </a>
-                    <!-- <a id="openAccountSettingsBtn">
-                        <i class="bi bi-gear"></i>
-                        Account Settings
-                    </a> -->
+               
                     <a id="darkModeToggle" class="dark-toggle">
                         <i class="bi bi-moon-fill"></i>
                         Dark Mode

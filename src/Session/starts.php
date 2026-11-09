@@ -271,7 +271,7 @@ if (isset($_POST['signupForm'])) {
         exit();
     }
 
-    $mobile = $_POST['rawTel'];
+    $mobile = $_POST['signTel'];
     $gender = $_POST['gender'];
     $birth = $_POST['signBirth'];
 

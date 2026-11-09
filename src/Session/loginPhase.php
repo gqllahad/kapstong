@@ -61,7 +61,7 @@ include("../Shared/kapstongConnection.php");
         <a href="#log-help" class="tooltip" data-tooltip="Get help with the system">Help</a>
         <!-- <a href="#log-container" class="tooltip" data-tooltip="Sign in to your account" id="login">Login</a> -->
          <a class="tooltip" data-tooltip="Sign in to your account" id="login">Login</a>
-        <button id="themeToggle" class="theme-toggle tooltip" data-tooltip="Toggle light and dark mode" type="button" aria-label="Toggle light and dark mode">
+        <!-- <button id="themeToggle" class="theme-toggle tooltip" data-tooltip="Toggle light and dark mode" type="button" aria-label="Toggle light and dark mode"> -->
   <i class='bx bx-sun'></i>
 </button> 
       </nav>
