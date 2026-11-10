@@ -1,7 +1,12 @@
 <?php
+session_start();
+session_regenerate_id(true);
 require_once("../Shared/kapstongConnection.php");
 require_once("../Shared/functions.php");
 
+
+$flashError = $_SESSION['signup_error'] ?? '';
+unset($_SESSION['signup_error']);
 
 $currentAcademicYear = academicYearOptions($conn);
 
@@ -115,19 +120,19 @@ $currentAcademicYear = academicYearOptions($conn);
                     <div class="form-step active" id="step1">
                         <div class="glass-card">
                             <h3 class="step-heading">Personal Information</h3>
-                            <p class="step-subheading">Tell us about yourself — all fields marked are required</p>
+                            <p class="step-subheading">Tell us about yourself</p>
                             <div class="divider"></div>
 
                             <div class="field-grid col-3" style="margin-bottom:14px;">
                                 <div class="field" id="f-lastName">
                                     <i class="ti ti-user field-icon" aria-hidden="true"></i>
                                     <input class="field-input name-input" id="lastName" name="lastName" type="text" placeholder=" " autocomplete="off">
-                                    <label class="field-label" for="lastName">Last Name *</label>
+                                    <label class="field-label" for="lastName">Last Name <b style="color:red;">*</b></label>
                                 </div>
                                 <div class="field" id="f-firstName">
                                     <i class="ti ti-user field-icon" aria-hidden="true"></i>
                                     <input class="field-input name-input" id="firstName" name="firstName" type="text" placeholder=" " autocomplete="off">
-                                    <label class="field-label" for="firstName">First Name *</label>
+                                    <label class="field-label" for="firstName">First Name <b style="color:red;">*</b></label>
                                 </div>
                                 <div class="field">
                                     <i class="ti ti-user field-icon" aria-hidden="true"></i>
@@ -140,13 +145,13 @@ $currentAcademicYear = academicYearOptions($conn);
                                 <div class="field" id="f-email">
                                     <i class="ti ti-mail field-icon" aria-hidden="true"></i>
                                     <input class="field-input" id="signEmail" name="signEmail" type="email" placeholder=" " autocomplete="off">
-                                    <label class="field-label" for="signEmail">Email Address *</label>
+                                    <label class="field-label" for="signEmail">Email Address <b style="color:red;">*</b></label>
                                     <p class="field-warning">Please enter a valid email address</p>
                                 </div>
                                 <div class="field" id="f-mobile">
                                     <i class="ti ti-device-mobile field-icon" aria-hidden="true"></i>
                                     <input class="field-input" id="signTel" name="signTel" type="tel" placeholder=" " maxlength="14" autocomplete="off">
-                                    <label class="field-label" for="signTel">Mobile Number *</label>
+                                    <label class="field-label" for="signTel">Mobile Number <b style="color:red;">*</b></label>
                                     <p class="field-warning">Must start with 09 and be 11 digits</p>
                                 </div>
                             </div>
@@ -155,7 +160,7 @@ $currentAcademicYear = academicYearOptions($conn);
                                 <div class="field" id="f-birth">
                                     <i class="ti ti-calendar field-icon" aria-hidden="true"></i>
                                     <input class="field-input" id="signBirth" name="signBirth" type="date" max="2008-05-28" autocomplete="off">
-                                    <label class="field-label" for="signBirth" style="top:10px;font-size:9.5px;color:var(--accent-cyan);letter-spacing:0.5px;transform:none;">Birthdate *</label>
+                                    <label class="field-label" for="signBirth" style="top:10px;font-size:9.5px;color:var(--accent-cyan);letter-spacing:0.5px;transform:none;">Birthdate <b style="color:red;">*</b></label>
                                     <p class="field-warning">You must be at least 15 years old</p>
                                 </div>
                                 <div>
@@ -172,7 +177,7 @@ $currentAcademicYear = academicYearOptions($conn);
                                 <div class="field">
                                     <i class="ti ti-map-pin field-icon" aria-hidden="true"></i>
                                     <input class="field-input" id="signAddress" name="signAddress" type="text" placeholder=" " autocomplete="off">
-                                    <label class="field-label" for="signAddress">Full Address (Barangay, City) *</label>
+                                    <label class="field-label" for="signAddress">Full Address (Barangay, City) <b style="color:red;">*</b></label>
                                 </div>
                             </div>
                         </div>
@@ -196,7 +201,7 @@ $currentAcademicYear = academicYearOptions($conn);
                                 <div class="field" id="f-studentID">
                                     <i class="ti ti-id-badge field-icon" aria-hidden="true"></i>
                                     <input class="field-input" id="studentID" name="studentID" type="text" placeholder=" " autocomplete="off">
-                                    <label class="field-label" for="studentID">Student ID *</label>
+                                    <label class="field-label" for="studentID">Student ID <b style="color:red;">*</b></label>
                                     <p class="field-warning">Student ID already taken</p>
                                 </div>
                                 <div class="field" style="position:relative;">
@@ -204,7 +209,7 @@ $currentAcademicYear = academicYearOptions($conn);
                                     <select class="field-select" id="signCourse" name="signCourse">
                                         <option value="" disabled selected hidden></option>
                                     </select>
-                                    <label class="field-label" for="signCourse">Program *</label>
+                                    <label class="field-label" for="signCourse">Program <b style="color:red;">*</b></label>
                                     <i class="ti ti-chevron-down select-arrow" aria-hidden="true"></i>
                                 </div>
                             </div>
@@ -214,12 +219,9 @@ $currentAcademicYear = academicYearOptions($conn);
                                     <i class="ti ti-school field-icon" aria-hidden="true"></i>
                                     <select class="field-select" id="signLevel" name="signLevel">
                                         <option value="" disabled selected hidden></option>
-                                        <option value="1st year">1st Year</option>
-                                        <option value="2nd year">2nd Year</option>
-                                        <option value="3rd year">3rd Year</option>
                                         <option value="4th year">4th Year</option>
                                     </select>
-                                    <label class="field-label" for="signLevel">Year Level *</label>
+                                    <label class="field-label" for="signLevel">Year Level <b style="color:red;">*</b></label>
                                     <i class="ti ti-chevron-down select-arrow" aria-hidden="true"></i>
                                 </div>
                                 <div class="field" style="position:relative;">
@@ -229,7 +231,7 @@ $currentAcademicYear = academicYearOptions($conn);
                                         <option value="1st semester">1st Semester</option>
                                         <option value="2nd semester">2nd Semester</option>
                                     </select>
-                                    <label class="field-label" for="signSemester">Semester *</label>
+                                    <label class="field-label" for="signSemester">Semester <b style="color:red;">*</b></label>
                                     <i class="ti ti-chevron-down select-arrow" aria-hidden="true"></i>
                                 </div>
                             </div>
@@ -271,7 +273,7 @@ $currentAcademicYear = academicYearOptions($conn);
                                 <div class="field" id="f-pw">
                                     <i class="ti ti-lock field-icon" aria-hidden="true"></i>
                                     <input class="field-input pw-input" id="passwordInput" name="signPassword" type="password" placeholder=" " autocomplete="new-password">
-                                    <label class="field-label" for="passwordInput">Password *</label>
+                                    <label class="field-label" for="passwordInput">Password <b style="color:red;">*</b></label>
                                     <button type="button" class="toggle-pw" onclick="togglePw('passwordInput',this)" aria-label="Toggle password visibility">
                                         <i class="ti ti-eye" style="font-size:16px;" aria-hidden="true"></i>
                                     </button>
@@ -291,7 +293,7 @@ $currentAcademicYear = academicYearOptions($conn);
                                 <div class="field" id="f-cpw">
                                     <i class="ti ti-lock-check field-icon" aria-hidden="true"></i>
                                     <input class="field-input pw-input" id="confirmPw" name="signConfirmPassword" type="password" placeholder=" " autocomplete="new-password">
-                                    <label class="field-label" for="confirmPw">Confirm Password *</label>
+                                    <label class="field-label" for="confirmPw">Confirm Password <b style="color:red;">*</b></label>
                                     <button type="button" class="toggle-pw" onclick="togglePw('confirmPw',this)" aria-label="Toggle confirm password visibility">
                                         <i class="ti ti-eye" style="font-size:16px;" aria-hidden="true"></i>
                                     </button>
@@ -311,7 +313,6 @@ $currentAcademicYear = academicYearOptions($conn);
                     <!-- STEP 4: CONFIRMATION -->
                     <div class="form-step" id="step4">
                         <div class="glass-card">
-                            <div class="success-icon-wrap">✦</div>
                             <h3 class="step-heading" style="text-align:center;margin-bottom:4px;">Almost done!</h3>
                             <p class="step-subheading" style="text-align:center;margin-bottom:24px;">Please review your information before submitting</p>
                             <div class="divider"></div>
@@ -330,6 +331,9 @@ $currentAcademicYear = academicYearOptions($conn);
         </div>
     </form>
 </body>
+<?php if ($flashError): ?>
+<script>window.__flashError = <?php echo json_encode($flashError); ?>;</script>
+<?php endif; ?>
 <script src="../../public/js/signupPhase.js"></script>
 
 </html>

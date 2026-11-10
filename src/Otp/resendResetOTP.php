@@ -21,7 +21,7 @@ if (!isset($_SESSION['reset_email'])) {
 
 $email = $_SESSION['reset_email'];
 
-$otp = rand(100000, 999999);
+$otp = random_int(100000, 999999);
 
 $_SESSION['reset_otp'] = $otp;
 $_SESSION['reset_expiry'] = time() + 300;

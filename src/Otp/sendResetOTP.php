@@ -42,7 +42,7 @@ if(isset($_POST['send-reset'])) {
 
     if($result->num_rows > 0) {
 
-        $otp = rand(100000, 999999);
+        $otp = random_int(100000, 999999);
 
         $_SESSION['reset_otp'] = $otp;
 

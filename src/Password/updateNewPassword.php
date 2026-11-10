@@ -32,9 +32,11 @@ if(isset($_POST['newPassword'], $_POST['confirmPassword'])) {
 
     $sql->execute();
 
-    session_destroy();
+    unset($_SESSION['verified_reset'], $_SESSION['reset_email'], $_SESSION['reset_otp'], $_SESSION['reset_expiry']);
 
-    header("Location: ../Session/loginPage.php?success_forget=Password+Updated!");
+    $_SESSION['auth_success'] = ['type' => 'password_reset', 'time' => time()];
+
+    header("Location: ../Session/accountSuccess.php");
     exit();
 }
 ?>

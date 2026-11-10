@@ -1,6 +1,6 @@
 <?php
-include("kapstongConnection.php");
-include("functions.php");
+include("../Shared/kapstongConnection.php");
+include("../Shared/functions.php");
 
 if (isset($_GET['id'])) {
 

@@ -13,13 +13,13 @@ if (!isset($_SESSION['signup_data'])) {
 
 $data = $_SESSION['signup_data'];
 
-$otp = rand(100000, 999999);
+$otp = random_int(100000, 999999);
 $_SESSION['signup_otp'] = $otp;
 $_SESSION['otp_expiry'] = time() + 300;
 
-require '../PHPMailer/src/PHPMailer.php';
-require '../PHPMailer/src/SMTP.php';
-require '../PHPMailer/src/Exception.php';
+require '../../PHPMailer/src/PHPMailer.php';
+require '../../PHPMailer/src/SMTP.php';
+require '../../PHPMailer/src/Exception.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 

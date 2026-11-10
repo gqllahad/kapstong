@@ -2094,7 +2094,7 @@ function viewTask(taskID) {
                     warningBox.classList.add("success");
 
                     warningText.innerHTML =
-                        "⚠ This task is approved.";
+                        "This task is approved.";
                 }
 
                 if(taskStatus === "REJECTED"){
@@ -2102,7 +2102,7 @@ function viewTask(taskID) {
                     warningBox.classList.add("danger");
 
                     warningText.innerHTML =
-                        "⚠ This task is rejected.";
+                        "This task is rejected.";
                 }
             }
 

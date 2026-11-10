@@ -11,6 +11,13 @@ require_once("../Shared/kapstongConnection.php");
 require_once("../Shared/functions.php");
 require_once("../Shared/config.php");
 
+function backWithError($msg) {
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    $_SESSION['signup_error'] = $msg;
+    header("Location: ../Signup/signupStudent.php");
+    exit();
+}
+
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 
@@ -255,55 +262,74 @@ if (isset($_POST['login-submit'])) {
     }
 }
 
+
 if (isset($_POST['signupForm'])) {
     session_start();
 
-    //Student Information 
-    $fName = $_POST['firstName'];
-    $lName = $_POST['lastName'];
-    $mName = $_POST['middleName'] ?? 'N/A';
-    $fullName = $lName . " " .  $fName . " " . $mName;
+    $fName = mb_strtoupper(trim($_POST['firstName'] ?? ''), 'UTF-8');
+    $lName = mb_strtoupper(trim($_POST['lastName'] ?? ''), 'UTF-8');
+    $mName = mb_strtoupper(trim($_POST['middleName'] ?? ''), 'UTF-8');
+    if ($mName === '') $mName = 'N/A';
 
-    $email = filter_var($_POST['signEmail'], FILTER_VALIDATE_EMAIL);
+    if ($fName === '' || $lName === '') backWithError('Name is required');
+    $nameRe = "/^[A-ZÑ\s.\-']+$/u";
+    if (!preg_match($nameRe, $fName) || !preg_match($nameRe, $lName)
+        || ($mName !== 'N/A' && !preg_match($nameRe, $mName))) {
+        backWithError('Name contains invalid characters');
+    }
+    $fullName = $lName . " " . $fName . " " . $mName;
 
-    if (!$email) {
-        header("Location: ../Signup/signupStudent.php?error=Invalid+email");
-        exit();
+    $email = filter_var(trim($_POST['signEmail'] ?? ''), FILTER_VALIDATE_EMAIL);
+    if (!$email) backWithError('Invalid email');
+    $email = strtolower($email);
+
+    $mobile = preg_replace('/\D/', '', $_POST['signTel'] ?? '');
+    if (!preg_match('/^09\d{9}$/', $mobile)) backWithError('Invalid mobile number');
+
+    $gender = $_POST['gender'] ?? '';
+    if (!in_array($gender, ['Male', 'Female', 'Others'], true)) backWithError('Invalid sex');
+
+    $birth = $_POST['signBirth'] ?? '';
+    $dob = DateTime::createFromFormat('Y-m-d', $birth);
+    if (!$dob || $dob->format('Y-m-d') !== $birth || $dob->diff(new DateTime())->y < 15) {
+        backWithError('You must be at least 15 years old');
     }
 
-    $mobile = $_POST['signTel'];
-    $gender = $_POST['gender'];
-    $birth = $_POST['signBirth'];
-
-    $province = $_POST['province'];
-    $city = $_POST['signAddress'];
-
+    $province = 'Cavite'; 
+    $city = trim($_POST['signAddress'] ?? '');
+    if ($city === '' || mb_strlen($city) > 150) backWithError('Address is required');
     $fullAddress = $city . ", " . $province;
 
-    // Academic Information
-    $course = $_POST['signCourse'];
-    $level = $_POST['signLevel'];
-    $semester = $_POST['signSemester'];
-    $schoolYear = $_POST['signSY'];
+    $course = trim($_POST['signCourse'] ?? '');
+    if ($course === '') backWithError('Please select a program');
 
-    // Account Details
-    $studentID = $_POST['studentID'];
-    $studentID = trim($studentID);
+    $level = $_POST['signLevel'] ?? '';
+    if (!in_array($level, ['1st year', '2nd year', '3rd year', '4th year'], true)) backWithError('Invalid year level');
 
-    $password = password_hash($_POST['signPassword'], PASSWORD_DEFAULT);
+    $semester = $_POST['signSemester'] ?? '';
+    if (!in_array($semester, ['1st semester', '2nd semester'], true)) backWithError('Invalid semester');
+
+    $y = (int)date('Y');
+    $schoolYear = ((int)date('n') >= 6) ? "$y-" . ($y + 1) : ($y - 1) . "-$y";
+
+    $studentID = trim($_POST['studentID'] ?? '');
+    if ($studentID === '' || strlen($studentID) > 30) backWithError('Student ID is required');
+
+    $rawPass = $_POST['signPassword'] ?? '';
+    if (strlen($rawPass) < 8 || !preg_match('/[A-Za-z]/', $rawPass) || !preg_match('/\d/', $rawPass)) {
+        backWithError('Password must be 8+ characters with letters and numbers');
+    }
+    if ($rawPass !== ($_POST['signConfirmPassword'] ?? '')) backWithError('Passwords do not match');
+    $password = password_hash($rawPass, PASSWORD_DEFAULT);
 
     $sqlCheck = $conn->prepare("SELECT COUNT(*) FROM users WHERE email = ? OR studentID = ?");
-
     $sqlCheck->bind_param("ss", $email, $studentID);
     $sqlCheck->execute();
     $sqlCheck->bind_result($checkCount);
     $sqlCheck->fetch();
     $sqlCheck->close();
 
-    if ($checkCount > 0) {
-        header("Location: ../Signup/signupStudent.php?error=ID+Already+Exists.");
-        exit();
-    }
+    if ($checkCount > 0) backWithError('Email or Student ID already exists');
 
     $_SESSION['signup_data'] = [
 
@@ -330,7 +356,7 @@ if (isset($_POST['signupForm'])) {
         "password" => $password
     ];
 
-    $otp = rand(100000, 999999);
+    $otp = random_int(100000, 999999);
 
     $_SESSION['signup_otp'] = $otp;
     $_SESSION['otp_expiry'] = time() + 300;
@@ -372,7 +398,6 @@ if (isset($_POST['signupForm'])) {
         exit();
     } catch (Exception $e) {
 
-        header("Location: ../Signup/signupStudent.php?error=OTP+Email+Failed");
-        exit();
+        backWithError('OTP email failed. Please try again.');
     }
 };

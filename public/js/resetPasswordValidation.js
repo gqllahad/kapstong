@@ -7,26 +7,26 @@ const strengthText = document.getElementById("passwordStrength");
 
 const loadingScreen = document.getElementById("resetLoadingScreen");
 
-document.addEventListener("DOMContentLoaded", () => {
+// document.addEventListener("DOMContentLoaded", () => {
 
-    const toast = document.getElementById("toast");
+//     const toast = document.getElementById("toast");
 
-    function showToast(message) {
-        toast.textContent = message;
-        toast.classList.add("show");
+//     function showToast(message) {
+//         toast.textContent = message;
+//         toast.classList.add("show");
 
-        setTimeout(() => {
-            toast.classList.remove("show");
-        }, 3000);
-    }
+//         setTimeout(() => {
+//             toast.classList.remove("show");
+//         }, 3000);
+//     }
 
-    const error = "<?= $resetPasswordError ?>";
+//     const error = "<?= $resetPasswordError ?>";
 
-    if (error === "mismatch") {
-        showToast("❌ Passwords do not match");
-    }
+//     if (error === "mismatch") {
+//         showToast(" Passwords do not match");
+//     }
 
-});
+// });
 
 form.addEventListener("submit", function (e) {
 

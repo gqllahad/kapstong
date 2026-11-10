@@ -1,4 +1,4 @@
- let current = 0;
+    let current = 0;
     const totalSteps = 4;
     const steps = ['step1', 'step2', 'step3', 'step4'];
     const dots = [0, 1, 2, 3].map(i => document.getElementById('dot' + i));
@@ -7,6 +7,78 @@
     let genderVal = 'Male';
     const form = document.getElementById('signupForm');
     const loadingScreen = document.getElementById('loadingOverlay');
+
+
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const MIN_AGE = 15;
+     let emailTimer, idTimer;
+
+    function setField(id, state) { 
+        const f = document.getElementById(id);
+        f.classList.remove('error', 'valid');
+        if (state) f.classList.add(state);
+    }
+
+    async function isTaken(param, value) {
+        try {
+            const res = await fetch(`checkStudentID.php?${param}=${encodeURIComponent(value)}`);
+            const data = await res.json();
+            return !!data.exists;
+        } catch (err) {
+            console.error(err);
+            return false; 
+        }
+    }
+
+    function isOldEnough(dateStr, years) {
+        const d = new Date(dateStr);
+        if (isNaN(d) || d.getFullYear() < 1900) return false;
+        const cutoff = new Date();
+        cutoff.setFullYear(cutoff.getFullYear() - years);
+        return d <= cutoff;
+    }
+
+    (() => {
+        const c = new Date();
+        c.setFullYear(c.getFullYear() - MIN_AGE);
+        document.getElementById('signBirth').max = c.toISOString().split('T')[0];
+    })();
+
+
+    async function checkEmail() {
+        const fld = document.getElementById('f-email');
+        const warn = fld.querySelector('.field-warning');
+        const email = emailIn.value.trim();
+
+        if (!EMAIL_RE.test(email)) {
+            warn.textContent = 'Please enter a valid email address';
+            setField('f-email', 'error');
+            return false;
+        }
+        if (await isTaken('email', email)) {
+            warn.textContent = 'Email already registered';
+            setField('f-email', 'error');
+            return false;
+        }
+        setField('f-email', 'valid');
+        return true;
+    }
+
+    async function checkStudentId() {
+        const idIn = document.getElementById('studentID');
+        const id = idIn.value.trim();
+        if (!id) { setField('f-studentID', 'error'); return false; }
+
+        if (await isTaken('id', id)) {
+            setField('f-studentID', 'error');
+            return false;
+        }
+        setField('f-studentID', 'valid');
+        return true;
+    }
+
+
+
 
     function goTo(n) {
         document.getElementById(steps[current]).classList.remove('active');
@@ -50,8 +122,8 @@
 
     // Name
     document.querySelectorAll('.name-input').forEach(inp => {
-        inp.addEventListener('input', function() {
-            this.value = this.value.toUpperCase().replace(/[^A-Z\s]/g, '');
+        inp.addEventListener('input', function () {
+            this.value = this.value.toUpperCase().replace(/[^A-ZÑ\s.\-']/g, '');
         });
     });
 
@@ -80,29 +152,36 @@
 
     // Email
     const emailIn = document.getElementById('signEmail');
-    emailIn.addEventListener('input', function() {
-        const email = emailIn.value.trim();
-        const fld = document.getElementById('f-email');
-        const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value);
-        if (!this.value) {
-            fld.classList.remove('error', 'valid');
-            return;
-        }
+    // emailIn.addEventListener('input', function() {
+    //     const email = emailIn.value.trim();
+    //     const fld = document.getElementById('f-email');
+    //     const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value);
+    //     if (!this.value) {
+    //         fld.classList.remove('error', 'valid');
+    //         return;
+    //     }
 
-        fetch(`../Shared/checkStudentID.php?email=${encodeURIComponent(email)}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.exists) {
-                    fld.classList.add('error');
-                    fld.classList.remove('valid');
-                    return;
-                }
-            })
-            .catch(err => console.error(err));
+    //     fetch(`checkStudentID.php?email=${encodeURIComponent(email)}`)
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             if (data.exists) {
+    //                 fld.classList.add('error');
+    //                 fld.classList.remove('valid');
+    //                 return;
+    //             }
+    //         })
+    //         .catch(err => console.error(err));
 
-        fld.classList.toggle('error', !ok);
-        fld.classList.toggle('valid', ok);
-        document.getElementById('email_ro').value = this.value;
+    //     fld.classList.toggle('error', !ok);
+    //     fld.classList.toggle('valid', ok);
+    //     document.getElementById('email_ro').value = this.value;
+    // });
+   
+    emailIn.addEventListener('input', function () {
+        clearTimeout(emailTimer);
+        document.getElementById('email_ro').value = this.value.trim();
+        if (!this.value.trim()) return setField('f-email', '');
+        emailTimer = setTimeout(checkEmail, 350);
     });
 
     // Selects
@@ -178,27 +257,33 @@
     }
 
     // studentID
-    document.getElementById('studentID').addEventListener('input', function() {
+    // document.getElementById('studentID').addEventListener('input', function() {
 
-        const fld = document.getElementById('f-studentID');
+    //     const fld = document.getElementById('f-studentID');
 
-        const studentID = document.getElementById('studentID').value.trim();
-        if (studentID === "") return;
+    //     const studentID = document.getElementById('studentID').value.trim();
+    //     if (studentID === "") return;
 
-        fetch(`checkStudentID.php?id=${encodeURIComponent(studentID)}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.exists) {
-                    fld.classList.add('error');
-                    fld.classList.remove('valid');
-                    return;
-                }
-            })
-            .catch(err => console.error(err));
+    //     fetch(`checkStudentID.php?id=${encodeURIComponent(studentID)}`)
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             if (data.exists) {
+    //                 fld.classList.add('error');
+    //                 fld.classList.remove('valid');
+    //                 return;
+    //             }
+    //         })
+    //         .catch(err => console.error(err));
 
-        fld.classList.remove('error');
-        fld.classList.add('valid');
-        document.getElementById('studentID_ro').value = this.value;
+    //     fld.classList.remove('error');
+    //     fld.classList.add('valid');
+    //     document.getElementById('studentID_ro').value = this.value;
+    // });
+    document.getElementById('studentID').addEventListener('input', function () {
+        clearTimeout(idTimer);
+        document.getElementById('studentID_ro').value = this.value.trim();
+        if (!this.value.trim()) return setField('f-studentID', '');
+        idTimer = setTimeout(checkStudentId, 350);
     });
 
     // courses
@@ -233,66 +318,104 @@
     document.getElementById('academic-year').value = getAcademicYear();
 
     // Validations
-    function validateStep1() {
-        if (!document.getElementById('lastName').value.trim()) {
-            showToast('Last name is required');
-            return false;
-        }
-        if (!document.getElementById('firstName').value.trim()) {
-            showToast('First name is required');
-            return false;
-        }
-        const email = document.getElementById('signEmail').value.trim();
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            showToast('Enter a valid email address');
-            return false;
-        }
+    async function validateStep1() {
+        if (!document.getElementById('lastName').value.trim()) { showToast('Last name is required'); return false; }
+        if (!document.getElementById('firstName').value.trim()) { showToast('First name is required'); return false; }
+
         const tel = document.getElementById('signTel').value.replace(/\D/g, '');
         if (tel.length !== 11 || !tel.startsWith('09')) {
             showToast('Enter a valid 11-digit mobile number starting with 09');
             return false;
         }
-        if (!document.getElementById('signBirth').value) {
-            showToast('Birthdate is required');
+
+        const birth = document.getElementById('signBirth').value;
+        if (!birth) { showToast('Birthdate is required'); return false; }
+        if (!isOldEnough(birth, MIN_AGE)) {
+            setField('f-birth', 'error');
+            showToast(`You must be at least ${MIN_AGE} years old`);
             return false;
         }
-        if (!document.getElementById('signAddress').value.trim()) {
-            showToast('Address is required');
+        setField('f-birth', 'valid');
+
+        if (!document.getElementById('signAddress').value.trim()) { showToast('Address is required'); return false; }
+
+        if (!(await checkEmail())) {
+            showToast(document.querySelector('#f-email .field-warning').textContent);
             return false;
         }
         return true;
     }
 
-    function validateStep2() {
-        if (!document.getElementById('studentID').value.trim()) {
-            showToast('Student ID is required');
-            return false;
-        }
-        if (!document.getElementById('signCourse').value) {
-            showToast('Please select a program');
-            return false;
-        }
-        if (!document.getElementById('signLevel').value) {
-            showToast('Please select year level');
-            return false;
-        }
-        if (!document.getElementById('signSemester').value) {
-            showToast('Please select semester');
-            return false;
-        }
+    // function validateStep2() {
+    //     if (document.getElementById('f-email').classList.contains('error')) {
+    //         showToast('Fix your email first'); 
+    //         return false;
+    //     }
+
+    //     if (document.getElementById('f-studentID').classList.contains('error')) {
+    //         showToast('Student ID already taken'); return false;
+    //     }
+
+    //     if (!document.getElementById('studentID').value.trim()) {
+    //         showToast('Student ID is required');
+    //         return false;
+    //     }
+    //     if (!document.getElementById('signCourse').value) {
+    //         showToast('Please select a program');
+    //         return false;
+    //     }
+    //     if (!document.getElementById('signLevel').value) {
+    //         showToast('Please select year level');
+    //         return false;
+    //     }
+    //     if (!document.getElementById('signSemester').value) {
+    //         showToast('Please select semester');
+    //         return false;
+    //     }
+    //     return true;
+    // }
+
+    // function validateStep3() {
+    //     if (pwIn.value.length < 8) {
+    //         showToast('Password must be at least 8 characters');
+    //         return false;
+    //     }
+    //     if (pwIn.value !== cpwIn.value) {
+    //         showToast('Passwords do not match');
+    //         return false;
+    //     }
+    //     return true;
+    // }
+    async function validateStep2() {
+        if (!document.getElementById('studentID').value.trim()) { showToast('Student ID is required'); return false; }
+        if (!document.getElementById('signCourse').value) { showToast('Please select a program'); return false; }
+        if (!document.getElementById('signLevel').value) { showToast('Please select year level'); return false; }
+        if (!document.getElementById('signSemester').value) { showToast('Please select semester'); return false; }
+
+        if (!(await checkStudentId())) { showToast('Student ID already taken'); return false; }
         return true;
     }
 
     function validateStep3() {
-        if (pwIn.value.length < 8) {
-            showToast('Password must be at least 8 characters');
-            return false;
-        }
-        if (pwIn.value !== cpwIn.value) {
-            showToast('Passwords do not match');
-            return false;
-        }
+        const v = pwIn.value;
+        if (v.length < 8) { showToast('Password must be at least 8 characters'); return false; }
+        if (!/[A-Za-z]/.test(v) || !/\d/.test(v)) { showToast('Password needs letters and numbers'); return false; }
+        if (v !== cpwIn.value) { showToast('Passwords do not match'); return false; }
         return true;
+    }
+
+    // ---------- nav (REPLACES next1/next2/next3 listeners) ----------
+    function guardedNext(btnId, validator, onPass) {
+        const btn = document.getElementById(btnId);
+        btn.addEventListener('click', async () => {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            try {
+                if (await validator()) onPass();
+            } finally {
+                btn.disabled = false;
+            }
+        });
     }
 
     function buildConfirm() {
@@ -317,42 +440,58 @@
     }
 
     // nav
-    document.getElementById('next1').addEventListener('click', () => {
-        if (validateStep1()) goTo(1);
+    // document.getElementById('next1').addEventListener('click', () => {
+    //     if (validateStep1()) goTo(1);
+    // });
+    // document.getElementById('next2').addEventListener('click', () => {
+    //     if (validateStep2()) goTo(2);
+    // });
+    // document.getElementById('next3').addEventListener('click', () => {
+    //     if (validateStep3()) {
+    //         buildConfirm();
+    //         goTo(3);
+    //     }
+    // });
+     guardedNext('next1', validateStep1, () => goTo(1));
+    guardedNext('next2', validateStep2, () => goTo(2));
+    guardedNext('next3', async () => validateStep3(), () => { buildConfirm(); goTo(3); });
+
+    form.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') e.preventDefault();
     });
-    document.getElementById('next2').addEventListener('click', () => {
-        if (validateStep2()) goTo(2);
-    });
-    document.getElementById('next3').addEventListener('click', () => {
-        if (validateStep3()) {
-            buildConfirm();
-            goTo(3);
-        }
-    });
+
 
     document.getElementById('prev2').addEventListener('click', () => goTo(0));
     document.getElementById('prev3').addEventListener('click', () => goTo(1));
     document.getElementById('prev4').addEventListener('click', () => goTo(2));
 
-    document.getElementById('signupForm').addEventListener('submit', function() {
-        showToast('Account created successfully! Welcome aboard.');
-
-        setTimeout(() => {
-            loadingScreen.classList.add("show");
-        }, 5500);
-    });
-
-    // document.getElementById('submitBtn').addEventListener('click', () => {
-
-    //     document.getElementById('loadingOverlay').classList.add('show');
+    // document.getElementById('signupForm').addEventListener('submit', function() {
+    //     showToast('Account created successfully!');
 
     //     setTimeout(() => {
-    //         document.getElementById('loadingOverlay').classList.remove('show');
-    //         showToast('Account created successfully! Welcome aboard.');
-    //         document.getElementById('signupForm').submit();
-
-    //     }, 2500);
+    //         loadingScreen.classList.add("show");
+    //     }, 5500);
     // });
+    let validated = false;
+    form.addEventListener('submit', async function (e) {
+        if (validated) return; 
+        e.preventDefault();
+        const submitter = e.submitter;
+
+        let bad = -1;
+        if (!(await validateStep1())) bad = 0;
+        else if (!(await validateStep2())) bad = 1;
+        else if (!validateStep3()) bad = 2;
+
+        if (bad !== -1) { goTo(bad); return; }
+
+        validated = true;
+        loadingScreen.classList.add('show');
+        form.requestSubmit(submitter); 
+    });
+
+
+    if (window.__flashError) showToast(window.__flashError, 5000);
 
     function showToast(msg, dur = 3000) {
         const t = document.getElementById('toast');
@@ -360,3 +499,11 @@
         t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), dur);
     }
+
+
+    window.addEventListener('pageshow', e => {
+        if (e.persisted) {
+            validated = false;
+            loadingScreen.classList.remove('show');
+        }
+    });
