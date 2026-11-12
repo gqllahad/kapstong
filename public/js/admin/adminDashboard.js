@@ -146,9 +146,9 @@ const downloadAllStudentBtn = document.getElementById("downloadAllStudentBtn");
 const downloadAllStudent = document.getElementById("download-all-student-modal");
 const closeDownloadAllStudent = document.getElementById("closeAllStudentDownloadModal");
 
-const downloadAllSupervisorBtn = document.getElementById("downloadAllSupervisorBtn");
-const downloadAllSupervisor = document.getElementById("download-all-supervisor-modal");
-const closeDownloadAllSupervisor = document.getElementById("closeAllSupervisorDownloadModal");
+// const downloadAllSupervisorBtn = document.getElementById("downloadAllSupervisorBtn");
+// const downloadAllSupervisor = document.getElementById("download-all-supervisor-modal");
+// const closeDownloadAllSupervisor = document.getElementById("closeAllSupervisorDownloadModal");
 
 let selectedStudentIDs = [];
 let selectedSupervisorID = null;
@@ -211,7 +211,9 @@ function showToast(title, type = "success", detail = "") {
     t.className = "show " + type;
 
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(hideToast, 3500);
+    if (type !== "loading") {
+        toastTimer = setTimeout(hideToast, 3500);
+    }
 }
 
 function hideToast() {
@@ -230,20 +232,31 @@ function previewEvaluation(id) {
         });
 }
 
-function exportEvaluation(id) {
-    fetch("functions/exportEvaluation.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "evaluationID=" + encodeURIComponent(id)
-    })
-    .then(res => res.json())
-    .then(data => {
-        showToast(data.message, data.status === "success" ? "success" : "error", "Please try again.");
-    })
-    .catch(err => {
-        console.error(err);
-        showToast("Export failed", "error", "Please try again.");
-    });
+function exportEvaluation(id, btn) {
+    if (btn) btn.disabled = true;
+
+        showToast("Exporting evaluation", "loading", "Generating PDF and sending email...");
+
+        fetch("functions/exportEvaluation.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "evaluationID=" + encodeURIComponent(id)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                showToast("Export complete", "success", data.message);
+            } else {
+                showToast("Export failed", "error", data.message || "");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showToast("Export failed", "error", "Please try again.");
+        })
+        .finally(() => {
+            if (btn) btn.disabled = false;
+        });
 }
 // reload charts
 function reloadAllCharts() {
@@ -2457,13 +2470,13 @@ overlay.addEventListener('click', () => {
       evaluationSettings.classList.remove("show")
       viewAll.classList.remove("show")
       downloadAllStudent.classList.remove("show")
-      downloadAllSupervisor.classList.remove("show")
+    //   downloadAllSupervisor.classList.remove("show")
       rfidRegister.classList.remove("show");
       lostRfidRegister.classList.remove("show");
       certificateComplete.classList.remove("show");
       document.getElementById("attendance-download-modal").classList.remove("show");
       document.getElementById("evalPreviewModal").classList.remove("show");
-      document.getElementById("evaluation-download-modal").classList.remove("show");
+    //   document.getElementById("evaluation-download-modal").classList.remove("show");
 });
 
 allStudentBtn.addEventListener("click", () => {
@@ -3324,15 +3337,15 @@ document.addEventListener('click', function (e) {
 
 
 // evaluation
-function openEvaluationDownloadModal() {
-    document.getElementById("evaluation-download-modal").classList.add("show");
-    overlay.classList.add("show");
-}
+// function openEvaluationDownloadModal() {
+//     document.getElementById("evaluation-download-modal").classList.add("show");
+//     overlay.classList.add("show");
+// }
 
-function closeEvaluationDownloadModal() {
-    document.getElementById("evaluation-download-modal").classList.remove("show");
-    overlay.classList.remove("show");
-}
+// function closeEvaluationDownloadModal() {
+//     document.getElementById("evaluation-download-modal").classList.remove("show");
+//     overlay.classList.remove("show");
+// }
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -3375,23 +3388,23 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchEvaluations();
 });
 
-function downloadEvaluationPDF(){
+// function downloadEvaluationPDF(){
     
-    const course = document.getElementById("downloadCourseEvaluation").value;
-    const supervisor = document.getElementById("downloadSupervisorEvaluation").value;
+//     const course = document.getElementById("downloadCourseEvaluation").value;
+//     const supervisor = document.getElementById("downloadSupervisorEvaluation").value;
 
 
-    const url = 
-        `functions/download_all_evaluation_report.php?` +
-        `course=${encodeURIComponent(course)}` +
-        `&superID=${encodeURIComponent(supervisor)}`;
+//     const url = 
+//         `functions/download_all_evaluation_report.php?` +
+//         `course=${encodeURIComponent(course)}` +
+//         `&superID=${encodeURIComponent(supervisor)}`;
 
 
-     window.open(url, "_blank");
+//      window.open(url, "_blank");
 
-     closeEvaluationDownloadModal();
+//      closeEvaluationDownloadModal();
 
-}
+// }
 
 
 // system config buttons
@@ -3483,15 +3496,15 @@ closeDownloadAllStudent.addEventListener("click", () => {
     allStudent.classList.add("show");
 });
 
-downloadAllSupervisorBtn.addEventListener("click", () => {
-    allSupervisor.classList.remove("show");
-    downloadAllSupervisor.classList.add("show");
-});
+// downloadAllSupervisorBtn.addEventListener("click", () => {
+//     allSupervisor.classList.remove("show");
+//     downloadAllSupervisor.classList.add("show");
+// });
 
-closeDownloadAllSupervisor.addEventListener("click", () => {
-    downloadAllSupervisor.classList.remove("show");
-    allSupervisor.classList.add("show");
-});
+// closeDownloadAllSupervisor.addEventListener("click", () => {
+//     downloadAllSupervisor.classList.remove("show");
+//     allSupervisor.classList.add("show");
+// });
 
 // reigister rfid
 closeRfidRegister.addEventListener("click", () => {

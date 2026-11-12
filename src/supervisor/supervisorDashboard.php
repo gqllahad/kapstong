@@ -135,7 +135,7 @@ foreach ($nameParts as $part) {
                 </li>
                 <li><button id="supervisor-students-btn"><i class="bi bi-people"></i>Students</button></li>
                 <li><button id="supervisor-attendance-btn"><i class="bi bi-calendar-check"></i> Attendance Log</button></li>
-                <li><button id="supervisor-evaluation-btn"><i class="bi bi-clipboard-data"></i> Reports / Evaluation</button></li>
+                <li><button id="supervisor-evaluation-btn"><i class="bi bi-clipboard-data"></i> Evaluation</button></li>
                 <li><button id="supervisor-activity-btn"> <i class="bi bi-activity"></i> Activity Log</button></li>
             </ul>
 
@@ -735,7 +735,6 @@ foreach ($nameParts as $part) {
                         <label>Hour Multiplier</label>
                         <select id="dayEditMultiplier">
                             <option value="1.0">1x (Normal)</option>
-                            <option value="1.5">1.5x</option>
                             <option value="2.0">2x (Double)</option>
                         </select>
                     </div>
@@ -1275,10 +1274,10 @@ foreach ($nameParts as $part) {
                                 <span>RFID</span>
                             </button>
 
-                            <button onclick="generateReport()">
+                            <!-- <button onclick="generateReport()">
                                 <i class="bi bi-bar-chart-fill"></i>
                                 <span>Reports</span>
-                            </button>
+                            </button> -->
 
                             <button onclick="openStudents()">
                                 <i class="bi bi-people-fill"></i>
@@ -1636,22 +1635,12 @@ foreach ($nameParts as $part) {
             <!-- reports evaluation -->
             <section class="supervisor-evaluation" id="supervisor-evaluation">
                 <div class="title-block-bot">
-                    <h2>Reports & Evaluation</h2>
+                    <h2>Evaluation</h2>
                     <p>Monitor Students reports and evaluations.</p>
                 </div>
 
 
                 <div class="table-view show" id="evaluation-table">
-                    <div class="table-switcher">
-                        <button type="button" class="tab-btn active" data-tab="evaluation" onclick="showEvaluation()" >
-                            Evaluations
-                        </button>
-
-                        <button type="button" class="tab-btn" data-tab="reports" onclick="showReports()">
-                            Reports
-                        </button>
-                    </div>
-
                     <div class="top-bar">
 
                         <div class="top-header">
@@ -1704,20 +1693,6 @@ foreach ($nameParts as $part) {
                         </table>
                     </div>
                 </div>
-
-
-                <!-- reports -->
-                 <div class="table-view" id="reports-table">
-                    <div class="table-switcher">
-                        <button type="button" class="tab-btn" data-tab="evaluation" onclick="showEvaluation()" >
-                            Evaluations
-                        </button>
-
-                        <button type="button" class="tab-btn active" data-tab="reports" onclick="showReports()">
-                            Reports
-                        </button>
-                    </div>
-                 </div>
                   
 
             </section>

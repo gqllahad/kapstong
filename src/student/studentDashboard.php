@@ -61,21 +61,6 @@ foreach ($nameParts as $part) {
 
 <body data-student-id="<?= $studentID ?>">
 
-    <!-- <header class="navbar">
-        <div class="header-title">
-            <img src="../../kapstongImage/download (1).jpg" class="logo-img" style="border-radius: 50%;">
-            <h1>Student Dashboard</h1>
-        </div>
-
-        <button id="menuToggle">☰</button>
-        <nav class="profile-menu" id="profileMenu" hidden>
-            <a id="openProfileBtn">Profile</a>
-            <a id="openAccountSettingsBtn">Account Setting</a>
-            <hr style="width: 75%; text-align: left;">
-            <a href="../logoutPhase.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
-        </nav>
-    </header> -->
-
     <div class="layout">
         
         <aside class="sidebar">
@@ -624,7 +609,7 @@ foreach ($nameParts as $part) {
              </div> -->
 
             <!-- reports -->
-            <div class="reports-container" id="reports-container">
+            <!-- <div class="reports-container" id="reports-container">
                 <div class="modal-header">
                     <h3>Internship Reports</h3>
 
@@ -634,14 +619,7 @@ foreach ($nameParts as $part) {
                     </button>
                 </div>
 
-
-
-                <?php
-                echo renderProgressHeader($conn, $studentID);
-                echo renderReports($conn, $studentID);
-                ?>
-
-            </div>
+            </div> -->
 
             <!-- REPORT FORM PANEL -->
             <div class="report-form-panel" id="reportFormPanel">
@@ -757,10 +735,10 @@ foreach ($nameParts as $part) {
                         <p>View your daily time-in and time-out logs.</p>
                     </div> -->
 
-                    <div class="card submitted-task" id="reports-btn">
+                    <!-- <div class="card submitted-task" id="reports-btn">
                         <h3>Reports</h3>
                         <p>Upload or review submitted reports.</p>
-                    </div>
+                    </div> -->
 
 
                 </section>
@@ -972,7 +950,7 @@ foreach ($nameParts as $part) {
                             </div>
 
                             <div class="doc-card">
-                                <p><strong>Registration Form</strong></p>
+                                <p><strong>Memorandum of Agreement</strong></p>
 
                                 <?php if (!empty($documents['regFormUpload'])): ?>
                                     <button class="btn-preview"

@@ -33,16 +33,15 @@ $result = $stmt->get_result();
 
 if ($row = $result->fetch_assoc()) {
 
-    // Build a safe URL + JS-safe encoded version for each document, once
     $docs = ['idUpload' => 'Student ID', 'regFormUpload' => 'Registration Form', 'profilePicture' => 'Student Picture'];
     $docData = [];
     foreach ($docs as $field => $label) {
-        $hasFile = !empty($row[$field]); // check RAW value, not escaped
+        $hasFile = !empty($row[$field]); 
         $path = $hasFile ? '../../uploads/student_uploads/' . $studentID . '/' . $row[$field] : '';
         $docData[$field] = [
             'label' => $label,
             'hasFile' => $hasFile,
-            'jsPath' => json_encode($path), // safe for onclick
+            'jsPath' => json_encode($path),
         ];
     }
 ?>
@@ -141,7 +140,7 @@ if ($row = $result->fetch_assoc()) {
                 <!-- Registration Form -->
                 <div class="doc-card">
                     <div class="doc-header">
-                        <span class="doc-title">Registration Form</span>
+                        <span class="doc-title">Memorandum of Agreement</span>
                     </div>
 
                     <?php if (!empty(e($row['regFormUpload']))): ?>

@@ -2661,7 +2661,7 @@ function renderAdminFinalEvaluation($conn, $search = '', $course = '', $superID 
                     <button class='btn-preview' onclick='previewEvaluation({$row['evaluationID']})'>
                         <i class='bi bi-eye'></i> Preview
                     </button>
-                    <button class='btn-export' onclick='exportEvaluation({$row['evaluationID']})'>
+                    <button class='btn-export' onclick='exportEvaluation({$row['evaluationID']}, this)'>
                         <i class='bi bi-envelope-paper'></i> Export
                     </button>
                 </td>

@@ -2453,27 +2453,27 @@ document.getElementById('calNextBtn').addEventListener('click', () => {
 
 // reports switcher
 
-function showEvaluation(){
-    evaluationTable.classList.remove("show");
-    // certificateComplete.classList.remove("show");
-    evaluationTable.classList.add("show");
+// function showEvaluation(){
+//     evaluationTable.classList.remove("show");
+//     // certificateComplete.classList.remove("show");
+//     evaluationTable.classList.add("show");
 
-    document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
-    document.querySelector('[data-tab="evaluation"]').classList.add('active');
+//     document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+//     document.querySelector('[data-tab="evaluation"]').classList.add('active');
 
-    setActiveTab("evaluation");
-}
+//     setActiveTab("evaluation");
+// }
 
-function showReports(){
-    evaluationTable.classList.remove("show");
-    // certificateComplete.classList.remove("show");
-    reportsTable.classList.add("show");
+// function showReports(){
+//     evaluationTable.classList.remove("show");
+//     // certificateComplete.classList.remove("show");
+//     reportsTable.classList.add("show");
 
-    document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
-    document.querySelector('[data-tab="reports"]').classList.add('active');
+//     document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+//     document.querySelector('[data-tab="reports"]').classList.add('active');
 
-    setActiveTab("reports");
-}
+//     setActiveTab("reports");
+// }
 
 // function showCompletion(){
 //     reportsTable.classList.remove("show");

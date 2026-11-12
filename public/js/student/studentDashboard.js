@@ -788,10 +788,10 @@ function openProgressModal(){
     loadStudentProgressChart(studentID);
 }
 
-function openStageModal(){
-    notificationCard.classList.remove("show");
-    reportCard.classList.add("show");
-}
+// function openStageModal(){
+//     notificationCard.classList.remove("show");
+//     reportCard.classList.add("show");
+// }
 
 function updateNotifBadge() {
     const count = document.querySelectorAll('.notif-item[data-counts="1"]').length;
@@ -858,186 +858,186 @@ reportFileInput.addEventListener("change", function (e) {
 });
 }
 
-function openReportForm(reportType, stageID) {
+// function openReportForm(reportType, stageID) {
 
-    document.getElementById("reportFormPanel").classList.add("show");
+//     document.getElementById("reportFormPanel").classList.add("show");
 
-    reportCard.classList.remove("show");
+//     reportCard.classList.remove("show");
 
-    document.getElementById("report_type").value =
-        reportType;
+//     document.getElementById("report_type").value =
+//         reportType;
 
-    document.getElementById("stageID").value =
-        stageID;
+//     document.getElementById("stageID").value =
+//         stageID;
 
-    const titles = {
+//     const titles = {
 
-        "ORIENTATION_REPORT": "Orientation Report",
+//         "ORIENTATION_REPORT": "Orientation Report",
 
-        "WEEKLY_REPORT": "Weekly Training Report",
+//         "WEEKLY_REPORT": "Weekly Training Report",
 
-        "FINAL_REPORT": "Final Internship Report"
-    };
+//         "FINAL_REPORT": "Final Internship Report"
+//     };
 
-    const stages = {
+//     const stages = {
 
-        1: "Orientation",
-        2: "Training",
-        3: "Deployment",
-        4: "Final"
-    };
+//         1: "Orientation",
+//         2: "Training",
+//         3: "Deployment",
+//         4: "Final"
+//     };
 
-    document.getElementById("formTitle").innerText =
-        "Submit " + titles[reportType];
+//     document.getElementById("formTitle").innerText =
+//         "Submit " + titles[reportType];
 
-    document.getElementById("reportTitle").value =
-        titles[reportType];
+//     document.getElementById("reportTitle").value =
+//         titles[reportType];
 
-    document.getElementById("reportTypeLabel").innerText =
-        titles[reportType];
+//     document.getElementById("reportTypeLabel").innerText =
+//         titles[reportType];
 
-    document.getElementById("stageLabel").innerText =
-        stages[stageID];
-}
+//     document.getElementById("stageLabel").innerText =
+//         stages[stageID];
+// }
 
-function renderReportFile() {
+// function renderReportFile() {
 
-    const container = document.getElementById("reportFilePreview");
+//     const container = document.getElementById("reportFilePreview");
 
-    container.innerHTML = "";
+//     container.innerHTML = "";
 
-    if (!selectedFile) return;
+//     if (!selectedFile) return;
 
-    const chip = document.createElement("div");
+//     const chip = document.createElement("div");
 
-    chip.className = "file-chip";
+//     chip.className = "file-chip";
 
-    chip.innerHTML = `
+//     chip.innerHTML = `
     
-        <span title="${selectedFile.name}">
-            ${selectedFile.name}
-        </span>
+//         <span title="${selectedFile.name}">
+//             ${selectedFile.name}
+//         </span>
 
-        <button
-            type="button"
-            onclick="removeReportFile()">
+//         <button
+//             type="button"
+//             onclick="removeReportFile()">
 
-            ×
+//             ×
 
-        </button>
-    `;
+//         </button>
+//     `;
 
-    container.appendChild(chip);
-}
+//     container.appendChild(chip);
+// }
 
-function removeReportFile() {
+// function removeReportFile() {
 
-    selectedFile = null;
+//     selectedFile = null;
 
-    reportFileInput.value = "";
+//     reportFileInput.value = "";
 
-    renderReportFile();
-}
+//     renderReportFile();
+// }
 
-function submitReport() {
+// function submitReport() {
 
-    const report_type = document.getElementById("report_type").value;
-    const stageID = document.getElementById("stageID").value;
-    const title = document.getElementById("reportTitle").value.trim();
-    const content = document.getElementById("reportContent").value.trim();
+//     const report_type = document.getElementById("report_type").value;
+//     const stageID = document.getElementById("stageID").value;
+//     const title = document.getElementById("reportTitle").value.trim();
+//     const content = document.getElementById("reportContent").value.trim();
 
-    if (title === "") {
+//     if (title === "") {
 
-        showToast("Report title is required.", "warning");
+//         showToast("Report title is required.", "warning");
 
-        return;
-    }
+//         return;
+//     }
 
-    if (content === "") {
+//     if (content === "") {
 
-        showToast("Report content is required.", "warning");
+//         showToast("Report content is required.", "warning");
 
-        return;
-    }
+//         return;
+//     }
 
-    submitReport.disabled = true;
+//     submitReport.disabled = true;
 
-    submitReport.innerText = "Submitting...";
+//     submitReport.innerText = "Submitting...";
 
-    const formData = new FormData();
+//     const formData = new FormData();
 
-    formData.append("report_type", report_type);
+//     formData.append("report_type", report_type);
 
-    formData.append("stageID", stageID);
+//     formData.append("stageID", stageID);
 
-    formData.append("title", title);
+//     formData.append("title", title);
 
-    formData.append("content", content);
+//     formData.append("content", content);
 
-    if (selectedFile) {
+//     if (selectedFile) {
 
-        formData.append(
-            "attachment",
-            selectedFile
-        );
-    }
+//         formData.append(
+//             "attachment",
+//             selectedFile
+//         );
+//     }
 
-    fetch("student_functions/submitReports.php", {
+//     fetch("student_functions/submitReports.php", {
 
-        method: "POST",
+//         method: "POST",
 
-        body: formData
-    })
+//         body: formData
+//     })
 
-    .then(response => response.json())
+//     .then(response => response.json())
 
-    .then(data => {
+//     .then(data => {
 
-        submitReport.disabled = false;
+//         submitReport.disabled = false;
 
-        submitReport.innerText = "Submit Report";
+//         submitReport.innerText = "Submit Report";
 
-        if (data.status === "success") {
+//         if (data.status === "success") {
 
-            showToast(data.message, "success");
+//             showToast(data.message, "success");
 
-            resetReportForm();
+//             resetReportForm();
 
-        } else {
+//         } else {
 
-            showToast(data.message, "warning");
-        }
+//             showToast(data.message, "warning");
+//         }
 
-    })
+//     })
 
-    .catch(error => {
+//     .catch(error => {
 
-        submitReport.disabled = false;
+//         submitReport.disabled = false;
 
-        submitReport.innerText = "Submit Report";
+//         submitReport.innerText = "Submit Report";
 
-        showToast("Upload failed.", "error");
-    });
-}
+//         showToast("Upload failed.", "error");
+//     });
+// }
 
-function resetReportForm() {
+// function resetReportForm() {
 
-    document.getElementById("reportTitle").value = "";
+//     document.getElementById("reportTitle").value = "";
 
-    document.getElementById("reportContent").value = "";
+//     document.getElementById("reportContent").value = "";
 
-    document.getElementById("report_type").value = "";
+//     document.getElementById("report_type").value = "";
 
-    document.getElementById("stageID").value = "";
+//     document.getElementById("stageID").value = "";
 
-    selectedFile = null;
+//     selectedFile = null;
 
-    reportFileInput.value = "";
+//     reportFileInput.value = "";
 
-    renderReportFile();
+//     renderReportFile();
 
-    closeReportForm();
-}
+//     // closeReportForm();
+// }
 
 // function openReportForm(reportType, stageID) {
 
@@ -1126,10 +1126,10 @@ function resetReportForm() {
 //     document.getElementById("reportFile").files = dt.files;
 // }
 
-function closeReportForm() {
-    document.getElementById("reportFormPanel").classList.remove("show");
-    reportCard.classList.add("show");
-}
+// function closeReportForm() {
+//     document.getElementById("reportFormPanel").classList.remove("show");
+//     reportCard.classList.add("show");
+// }
 
 
 
@@ -2332,7 +2332,7 @@ overlay.addEventListener('click', () => {
     progressCard?.classList.remove("show");
     notificationCard?.classList.remove("show");
     attendanceCard?.classList.remove("show");
-    reportCard?.classList.remove("show");
+    // reportCard?.classList.remove("show");
     document.getElementById("reportFormPanel")?.classList.remove("show");
     document.getElementById("download-attendance-modal")?.classList.remove("show");
         
@@ -2456,17 +2456,17 @@ if(attendanceCardBtn){
 });
 }
 
-if(reportCardBtn){
-    reportCardBtn.addEventListener("click", () => {
-        overlay.classList.add("show");
-        reportCard.classList.add("show");
-    });
+// if(reportCardBtn){
+//     reportCardBtn.addEventListener("click", () => {
+//         overlay.classList.add("show");
+//         reportCard.classList.add("show");
+//     });
 
-    closeReportCard.addEventListener("click", () => {
-        overlay.classList.remove("show");
-        reportCard.classList.remove("show");
-    })
-}
+//     closeReportCard.addEventListener("click", () => {
+//         overlay.classList.remove("show");
+//         reportCard.classList.remove("show");
+//     })
+// }
 
 
 // dark mode

@@ -5020,6 +5020,38 @@ body.dark-mode .delete-cert-confirm:hover {
 .toast-close:hover {
   color: #fff;
 }
+#toast {
+  overflow: hidden;
+}
+
+#toast.loading::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 40%;
+  background: #22d3ee;
+  border-radius: 3px;
+  animation: toast-progress 1.2s ease-in-out infinite;
+}
+@keyframes toast-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+#toast.loading .toast-dot {
+  animation: toast-pulse 1s ease-in-out infinite;
+}
+@keyframes toast-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
 
 /* ══════════════════════════════════════════════════════════════
    INACTIVITY MODAL

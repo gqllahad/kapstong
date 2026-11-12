@@ -139,10 +139,10 @@ if ($_SESSION['role'] !== "ADMIN") {
                     <h3>Supervisors</h3>
 
                     <div class="header-actions">
-                        <button id="downloadAllSupervisorBtn" class="download-btn">
+                        <!-- <button id="downloadAllSupervisorBtn" class="download-btn">
                             <i class="bi bi-download"></i>
                             Download All
-                        </button>
+                        </button> -->
 
                         <button id="closeAllSupervisorModal" class="modal-close">&times;</button>
                     </div>
@@ -180,7 +180,7 @@ if ($_SESSION['role'] !== "ADMIN") {
             </div>
 
             <!-- download supervisor data -->
-            <div class="download-all-supervisor-modal" id="download-all-supervisor-modal">
+            <!-- <div class="download-all-supervisor-modal" id="download-all-supervisor-modal">
 
                 <div class="download-content">
 
@@ -240,7 +240,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                 </div>
 
-            </div>
+            </div> -->
 
             <!-- student accounts -->
             <div class="all-student-modal" id="all-student-modal">
@@ -1699,15 +1699,15 @@ if ($_SESSION['role'] !== "ADMIN") {
             <section class="admin-reports" id="admin-reports">
                 <div class="user-management">
                     <div class="title-block">
-                        <h2>Student Reports Management</h2>
-                        <p>Monitor, review, and manage attendance records of all OJT students.</p>
+                       <h2>Final Student Evaluation</h2>
+                        <p>Review and assess OJT students' overall performance and completion of their internship requirements.</p>
                     </div>
-                    <div class="user-action-btn">
+                    <!-- <div class="user-action-btn">
                         <button class="download-btn" onclick="openEvaluationDownloadModal()">
                             <i class="bi bi-download"></i>
                             Download Evaluation
                         </button>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="top-bar">
@@ -1764,7 +1764,7 @@ if ($_SESSION['role'] !== "ADMIN") {
 
 
             <!-- download evaluation  -->
-            <div id="evaluation-download-modal" class="evaluation-download-modal">
+            <!-- <div id="evaluation-download-modal" class="evaluation-download-modal">
 
                 <div class="download-box">
 
@@ -1816,7 +1816,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                     </div>
                 </div>
 
-            </div>
+            </div> -->
 
 
             <!-- attendance logs -->
