@@ -184,22 +184,38 @@ function openRfid(){
 }
 
 // toast
-function showToast(message, type = "success") {
-    const toast = document.getElementById("toast");
+// function showToast(message, type = "success") {
+//     const toast = document.getElementById("toast");
 
-    toast.innerText = message;
+//     toast.innerText = message;
 
-    toast.style.background =
-        type === "success" ? "#28a745" :
-        type === "error" ? "#dc3545" :
-        type === "warning" ? "#ffc107" :
-        "#333";
+//     toast.style.background =
+//         type === "success" ? "#28a745" :
+//         type === "error" ? "#dc3545" :
+//         type === "warning" ? "#ffc107" :
+//         "#333";
 
-    toast.classList.add("show");
+//     toast.classList.add("show");
 
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3000);
+//     setTimeout(() => {
+//         toast.classList.remove("show");
+//     }, 3000);
+// }
+
+let toastTimer;
+
+function showToast(title, type = "success", detail = "") {
+    const t = document.getElementById("toast");
+    t.querySelector(".toast-title").textContent = title;
+    t.querySelector(".toast-detail").textContent = detail;
+    t.className = "show " + type;
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 3500);
+}
+
+function hideToast() {
+    document.getElementById("toast").classList.remove("show");
 }
 
 // evaluation export
@@ -220,15 +236,15 @@ function exportEvaluation(id) {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "evaluationID=" + encodeURIComponent(id)
     })
-    .then(res => res.text())
-    .then(text => {
-        showToast(data.message, data.status === "success" ? "success" : "error");
+    .then(res => res.json())
+    .then(data => {
+        showToast(data.message, data.status === "success" ? "success" : "error", "Please try again.");
     })
     .catch(err => {
-        showToast("Export failed", "error");
+        console.error(err);
+        showToast("Export failed", "error", "Please try again.");
     });
 }
-
 // reload charts
 function reloadAllCharts() {
 
@@ -308,7 +324,7 @@ function submitRFIDRegister()
 
     if(rfid_uid === "")
     {
-        showToast("Please scan RFID first", "warning"); 
+        showToast("Please scan RFID first", "warning", "Please try again."); 
         return;
     }
 
@@ -326,7 +342,7 @@ function submitRFIDRegister()
 
         if(data === "success")
         {
-            showToast("RFID Registered Successfully", "success");
+            showToast("RFID Registered Successfully", "success", "RFID registered!");
 
 
             setTimeout(() => {
@@ -336,13 +352,13 @@ function submitRFIDRegister()
         }
         else
         {
-            showToast(data, "error");
+            showToast(data, "error", "Please try again.");
         }
 
     })
     .catch(error => {
 
-        showToast(error, "error");
+        showToast(error, "error", "Please try again.");
     });
 }
 
@@ -385,7 +401,7 @@ function viewAssignedStudents(superID) {
     .then(data => {
         superAssignedView.innerHTML = data;
     }).catch(() => {
-            showToast("Server error occurred, cannot load students.", "error");
+            showToast("Server error occurred, cannot load students.", "error", "Please try again.");
         });
 }
 
@@ -409,16 +425,8 @@ function approveUser(studentID) {
 
          initApproveModal(studentID);
 
-        // const checkbox = document.getElementById("confirmApprove");
-        // const btn = document.getElementById("approveBtn");
-
-        // if (checkbox && btn) {
-        //     checkbox.addEventListener("change", () => {
-        //         btn.disabled = !checkbox.checked;
-        //     });
-        // }
     }).catch(() => {
-            showToast("Server error occurred", "error");
+            showToast("Server error occurred", "error", "Please try again.");
         });
 };
 
@@ -478,7 +486,7 @@ function approveStudent(studentID) {
     const rfid = rfidInput?.value.trim();
 
     if (!rfid) {
-        showToast("Please scan RFID first or use 'Approve Without RFID'.", "error");
+        showToast("Please scan RFID first or use 'Approve Without RFID'.", "error", "Please try again.");
         return;
     }
 
@@ -494,12 +502,12 @@ function approveStudent(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-        showToast(response, "success");
+        showToast("Approve student - ", "success", response);
         closeApproveModal();
         location.reload();
     })
     .catch(err => {
-        showToast(err, "error");
+        showToast(err, "error", "Please try again.");
         approveBtn.disabled = false;
     });
 }
@@ -527,11 +535,11 @@ function approveWithoutRFID(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-        showToast(response, "success");
+        showToast("Approved Without RFID - ", "success", response);
         closeApproveModal();
         location.reload();
     })
-    showToast(err, "error");
+    showToast(err, "error", "Please try again.");
 }
 
 
@@ -570,7 +578,7 @@ function rejectStudent(studentID) {
     const note = document.getElementById("rejectNote").value;
 
     if (!reason) {
-        showToast("Please select a rejection reason", "error");
+        showToast("Please select a rejection reason", "error", "Please try again.");
         return;
     }
 
@@ -585,12 +593,12 @@ function rejectStudent(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-        showToast("Student rejected successfully!", "success");
+        showToast("Student rejected successfully!", "success", "Rejected.");
 
         closeRejectModal();
         location.reload();
     })
-    showToast(err, "error");
+    showToast(err, "error", "Please try again.");
 }
 
 function closeSuperViewModal() {
@@ -666,10 +674,6 @@ function initSupervisorForm() {
     });
 }
 // preview Image
-// function previewImage(src) {
-//     document.getElementById("previewImg").src = src;
-//     document.getElementById("imagePreviewModal").style.display = "flex";
-// }
 
 function previewFile(src) {
 
@@ -729,19 +733,6 @@ document.getElementById("imagePreviewModal").addEventListener("click", function 
     }
 });
 
-// document.addEventListener("click", function (e) {
-
-//     if (e.target.id === "closeImagePreview") {
-//         document.getElementById("imagePreviewModal").style.display = "none";
-//         document.getElementById("previewImg").src = "";
-//     }
-
-//     if (e.target.id === "imagePreviewModal") {
-//         document.getElementById("imagePreviewModal").style.display = "none";
-//         document.getElementById("previewImg").src = "";
-//     }
-// });
-
 function toggleSection(header) {
     const card = header.parentElement;
 
@@ -772,7 +763,7 @@ function reAssignUser(studentID) {
     .then(data => {
         
         if (data.status === "success") {
-            showToast("Student Reassigning...", "success");
+            showToast("Student Reassigning...", "success", "Re-assigned!");
 
              isReassignMode = true;
 
@@ -786,7 +777,7 @@ function reAssignUser(studentID) {
             AssignCloseBtn.style.display = "none";
 
         } else {
-            showToast(data.message, "error");
+            showToast(data.message, "error", "Please try again.");
         }
 
     })
@@ -882,7 +873,7 @@ function loadLineChart() {
         .then(data => {
 
             if (!data.labels || !data.values || data.labels.length === 0) {
-                showToast("No attendance data for this month.", "info");
+                showToast("No attendance data for this month.", "info", "Please try again.");
                 return;
             }
 
@@ -959,7 +950,7 @@ function loadLineChart() {
         })
         .catch(err => {
             console.error("Line chart error:", err);
-            showToast("Failed to load chart data.", "error");
+            showToast("Failed to load chart data.", "error", "Please try again.");
         });
 }
 
@@ -969,7 +960,7 @@ function downloadChartCSV() {
         document.getElementById("monthSelector").value;
 
     if (!selectedMonth) {
-        showToast("Missing month.", "warning");
+        showToast("Missing month.", "warning", "Please try again.");
         return;
     }
 
@@ -1016,191 +1007,6 @@ function populateMonthDropdown() {
     });
 
 }
-// function loadLineChart() {
-//     fetch("functions/getLineChartData.php")
-//         .then(res => res.json())
-//         .then(data => {
-
-//             const ctx = document.getElementById('lineChart');
-
-//             if (window.lineChartInstance) {
-//                 window.lineChartInstance.destroy();
-//             }
-
-//             window.lineChartInstance = new Chart(ctx, {
-//                 type: 'line',
-//                 data: {
-//                     labels: data.labels,
-//                     datasets: [{
-//                         label: 'Attendance Trend (Last 30 Days)',
-//                         data: data.values,
-
-//                         borderColor: '#60a5fa',
-//                         backgroundColor: 'rgba(96, 165, 250, 0.2)',
-
-//                         fill: true,
-//                         tension: 0.4,
-
-//                         pointRadius: 5,
-//                         pointHoverRadius: 7
-//                     }]
-//                 },
-//                 options: {
-//                     responsive: true,
-//                     maintainAspectRatio: false,
-
-//                     interaction: {
-//                         mode: 'index',
-//                         intersect: false
-//                     },
-
-//                     plugins: {
-//                         legend: {
-//                             position: 'bottom'
-//                         }
-//                     },
-
-//                     scales: {
-//                         y: {
-//                             beginAtZero: true
-//                         }
-//                     }
-//                 }
-//             });
-
-//         let existing = document.querySelector(".chart-empty-message");
-
-//         if (existing) {
-//             existing.remove();
-//         }
-
-//         if (data.empty) {
-
-//             const message = document.createElement("p");
-
-//             message.className = "chart-empty-message";
-
-//             message.textContent =
-//                 "No Attendance record trends yet.";
-
-//             ctx.parentNode.appendChild(message);
-//         }
-
-//         })
-//         .catch(err => console.error("Line chart error:", err));
-// }
-
-
-// pie chart
-// function loadPieChart() {
-//     fetch("functions/getDonutChartData.php")
-//         .then(res => res.json())
-//         .then(data => {
-
-//             const ctx = document.getElementById('pieChart');
-
-//             if (window.pieChartInstance) {
-//                 window.pieChartInstance.destroy();
-//             }
-
-//             const colors = {
-//                  Present: "#3b82f6",
-//                 Late: "#93c5fd",
-//                 Absent: "#1d4ed8",
-//                 Excused: "#bfdbfe"
-//             };
-
-//             window.pieChartInstance = new Chart(ctx, {
-//                 type: 'doughnut',
-//                 data: {
-//                     labels: data.labels,
-//                     datasets: [{
-//                         data: data.values,
-//                         backgroundColor: data.labels.map(l => colors[l] || "#94a3b8"),
-//                         borderWidth: 0
-//                     }]
-//                 },
-//                 options: {
-
-//                     responsive: true,
-//                     maintainAspectRatio: false,
-
-//                     layout: {
-//                         padding: 10
-//                     },
-
-//                     plugins: {
-
-//                         legend: {
-//                             display: false
-//                         },
-
-//                         tooltip: {
-
-//                             backgroundColor: '#111827',
-
-//                             padding: 12,
-
-//                             titleColor: '#fff',
-//                             bodyColor: '#fff',
-
-//                             borderColor: 'rgba(255,255,255,0.08)',
-//                             borderWidth: 1,
-
-//                             callbacks: {
-//                                 label: function(context) {
-//                                     return `${context.label}: ${context.raw}`;
-//                                 }
-//                             }
-//                         }
-
-//                     },
-
-//                     cutout: '72%'
-//                 }
-//             });
-
-//         let existing = document.querySelector(".chart-empty-message");
-
-//         if (existing) {
-//             existing.remove();
-//         }
-
-//         if (data.empty) {
-
-//             const message = document.createElement("p");
-
-//             message.className = "chart-empty-message";
-
-//             message.textContent =
-//                 "No Attendance Overview available yet.";
-
-//             ctx.parentNode.appendChild(message);
-//         }
-
-//         })
-//         .catch(err => console.error("Donut chart error:", err));
-// }
-
-// doughnut chart health score
-// function loadHealthScore() {
-
-//     fetch("functions/getAttendanceHealthScore.php")
-//         .then(res => res.json())
-//         .then(data => {
-
-//             document.getElementById("health-score").innerText = data.score + "%";
-
-//             const total =
-//                 Number(data.present) +
-//                 Number(data.late) +
-//                 Number(data.absent) +
-//                 Number(data.excused);
-
-//             document.getElementById("total-attendance").innerText =
-//                 total + " Records";
-//         });
-// }
 
 function loadPieChart() {
  
@@ -1359,14 +1165,11 @@ function _removePieEmpty(wrapper) {
 }
  
 /**
- * Hide the real canvas, show a centred empty-state card inside
- * the same wrapper, and reset the summary labels.
- *
- * @param {HTMLElement} ctx       - the <canvas> element
- * @param {HTMLElement} wrapper   - the .pie-canvas-wrapper parent
- * @param {HTMLElement} healthEl  - #health-score
- * @param {HTMLElement} totalEl   - #total-attendance
- * @param {boolean}     isError   - show error copy instead of "no data"
+ * @param {HTMLElement} ctx      
+ * @param {HTMLElement} wrapper   
+ * @param {HTMLElement} healthEl  
+ * @param {HTMLElement} totalEl   
+ * @param {boolean}     isError   
  */
 
 function _showPieEmpty(ctx, wrapper, healthEl, totalEl, isError = false) {
@@ -1510,10 +1313,6 @@ function openStudentAssign(){
     overlay.classList.add("show");
 }
 
-// function openRFIDSettings() {
-//     window.location.href = "rfidSettings.php";
-// }
-
 // at risk students
 
 document.addEventListener("input", (e) => {
@@ -1532,116 +1331,6 @@ function _fmtDate(d) {
 function esc(t) {
     return String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
-
-// function loadRiskStudents() {
-
-//     fetch("functions/getAtRiskStudents.php")
-//         .then(res => res.json())
-//         .then(data => {
-
-//             const container = document.getElementById("risk-list");
-
-//             if (!data.length) {
-//                 container.innerHTML = `
-//                     <div class="risk-empty">
-//                         <i class='bx bx-check-shield'></i>
-//                         <p>No students currently flagged. Everyone is on track.</p>
-//                     </div>
-//                 `;
-//                 return;
-//             }
-
-//             const cardsHtml = data.map(student => {
-
-//                 const progress = parseFloat(student.progress_percent) || 0;
-//                 const initial = (student.name || '?').charAt(0).toUpperCase();
-
-//                 let riskLevel = 'low';
-//                 let badgeText = 'ON TRACK';
-//                 let progFillClass = 'bar-track';
-
-//                 if (progress < 75) {
-//                     riskLevel = (student.overdue_tasks > 2 || student.absents > 3) ? 'critical' : 'high';
-//                     badgeText = 'BEHIND';
-//                     progFillClass = 'bar-behind';
-//                 } else if (progress < 90) {
-//                     riskLevel = 'medium';
-//                     badgeText = 'DUE SOON';
-//                     progFillClass = 'bar-soon';
-//                 }
-
-//                 const hasFlags = student.absents > 0 || student.lates > 0 || student.overdue_tasks > 0;
-
-//                 return `
-//                     <div class="ris-card risk-${riskLevel}">
-
-//                         <div class="ris-top">
-//                             <div class="ris-avatar">${initial}</div>
-
-//                             <div class="ris-identity">
-//                                 <span class="ris-name">${student.name}</span>
-//                                 <span class="ris-meta">${student.role}</span>
-//                             </div>
-
-//                             <div class="ris-badges">
-//                                 <span class="ris-risk-badge risk-${riskLevel}">${badgeText}</span>
-//                             </div>
-//                         </div>
-
-//                         <div class="ris-progress-row">
-//                             <div class="ris-prog-header">
-//                                 <span class="ris-prog-label prog-${progFillClass === 'bar-track' ? 'track' : progFillClass === 'bar-soon' ? 'soon' : 'behind'}">
-//                                     <i class='bx bx-time-five'></i> Progress
-//                                 </span>
-//                                 <span class="ris-prog-hours">${student.completed_hours} / ${student.required_hours} hrs</span>
-//                                 <span class="ris-prog-pct">${progress}%</span>
-//                             </div>
-//                             <div class="ris-bar-track">
-//                                 <div class="ris-bar-fill ${progFillClass}" style="width:${progress}%"></div>
-//                             </div>
-//                         </div>
-
-//                         ${hasFlags ? `
-//                         <div class="ris-stats">
-//                             <div class="ris-stat ${student.absents > 0 ? 'stat-warn' : ''} absent">
-//                                 <i class='bx bx-calendar-x'></i>
-//                                 <div>
-//                                     <span class="stat-val">${student.absents}</span>
-//                                     <span class="stat-key">Absents</span>
-//                                 </div>
-//                             </div>
-//                             <div class="ris-stat ${student.lates > 0 ? 'stat-warn' : ''} late">
-//                                 <i class='bx bx-time'></i>
-//                                 <div>
-//                                     <span class="stat-val">${student.lates}</span>
-//                                     <span class="stat-key">Lates</span>
-//                                 </div>
-//                             </div>
-//                             <div class="ris-stat ${student.overdue_tasks > 0 ? 'stat-warn' : ''} task">
-//                                 <i class='bx bx-task-x'></i>
-//                                 <div>
-//                                     <span class="stat-val">${student.overdue_tasks}</span>
-//                                     <span class="stat-key">Overdue</span>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                         ` : ''}
-
-//                     </div>
-//                 `;
-//             }).join('');
-
-//             container.innerHTML = cardsHtml;
-//         })
-//         .catch(() => {
-//             document.getElementById("risk-list").innerHTML = `
-//                 <div class="risk-empty risk-error">
-//                     <i class='bx bx-error-circle'></i>
-//                     <p>Failed to load student data. Try refreshing.</p>
-//                 </div>
-//             `;
-//         });
-// }
 
 function _forecastLabel(s) {
     if (s.forecast === "COMPLETED")   return "Completed";
@@ -1919,7 +1608,7 @@ function saveEvaluationSettings() {
     const task = document.getElementById("taskWeight").value / 100;
 
      if (isNaN(attendance) || isNaN(progress) || isNaN(task)) {
-        showToast("Please enter valid values.", "error");
+        showToast("Please enter valid values.", "error", "Please try again.");
         return;
     }
 
@@ -1937,7 +1626,7 @@ function saveEvaluationSettings() {
     })
     .then(res => res.json())
     .then(data => {
-        showToast(data.message, data.status ? "success" : "error");
+        showToast("Save Evaluation Settings -", data.status ? "success" : "error", data.message);
         
         if (data.status) {
             setTimeout(() => {
@@ -1948,7 +1637,7 @@ function saveEvaluationSettings() {
         }
 
     }).catch(() => {
-    showToast("Server error occurred", "error");
+    showToast("Server error occurred", "error", "Please try again.");
     });
 }
 
@@ -2039,7 +1728,7 @@ function saveRfidSettings() {
     .then(res => res.json())
     .then(data => {
 
-        showToast(data.message, data.status ? "success" : "error");
+        showToast("Save RFID Settings - ", data.status ? "success" : "error", data.message);
 
         if (data.status) {
             setTimeout(() => {
@@ -2050,7 +1739,7 @@ function saveRfidSettings() {
 
     })
     .catch(() => {
-        showToast("Server error occurred", "error");
+        showToast("Server error occurred", "error", "Please try again.");
     });
 }
 
@@ -2113,7 +1802,7 @@ function loadOJTSetting(settingID) {
         .then(res => res.json())
         .then(data => {
             if (!data.success) {
-                showToast(data.message, "error");
+                showToast(data.message, "error", "Please try again." );
                 return;
             }
             document.getElementById("edit_settingID").value      = data.settingID;
@@ -2125,12 +1814,12 @@ function loadOJTSetting(settingID) {
             document.getElementById("edit_end_date").value       = data.end_date;
             document.getElementById("edit_status").value         = data.status;
         })
-        .catch(() => showToast("Failed to load setting", "error"));
+        .catch(() => showToast("Failed to load setting", "error" , "Please try again."));
 }
 
 function openEditSettingsModal(btn) {
     if (!editSettingsModal) {
-        showToast("Edit Settings Modal not found", "error");
+        showToast("Edit Settings Modal not found", "error" , "Please try again.");
         return;
     }
 
@@ -2169,12 +1858,12 @@ function updateOJTSettings() {
     const status        = document.getElementById("edit_status").value;
 
     if (!settingID || !programID || !academicYear || !requiredHours || !startDate || !endDate) {
-        showToast("Please complete all fields.", "error");
+        showToast("Please complete all fields.", "error", "Please try again.");
         return;
     }
 
     if (endDate <= startDate) {
-        showToast("End date must be after the start date.", "error");
+        showToast("End date must be after the start date.", "error", "Please try again." );
         return;
     }
 
@@ -2195,7 +1884,7 @@ function updateOJTSettings() {
     })
     .then(res => res.json())
     .then(data => {
-        showToast(data.message, data.success ? "success" : "error");
+        showToast(data.message, data.success ? "success" : "error", "Please try again." );
 
         if (data.success) {
             editSettingsModal.classList.remove("show");
@@ -2207,7 +1896,7 @@ function updateOJTSettings() {
         }
     })
     .catch(() => {
-        showToast("Server error occurred.", "error");
+        showToast("Server error occurred.", "error" , "Please try again.");
     });
 }
 
@@ -2221,17 +1910,17 @@ function saveOJTSettings() {
     const status        = document.getElementById("settingStatus").value;
 
     if (!programID || !academicYear || !semester || !requiredHours || !startDate || !endDate) {
-        showToast("Please complete all fields.", "error");
+        showToast("Please complete all fields.", "error" , "Please try again.");
         return;
     }
 
     if (!/^\d{4}\s*-\s*\d{4}$/.test(academicYear)) {
-        showToast("Academic year must look like 2026-2027.", "error");
+        showToast("Academic year must look like 2026-2027.", "error" , "Please try again.");
         return;
     }
 
     if (endDate <= startDate) {
-        showToast("End date must be after the start date.", "error");
+        showToast("End date must be after the start date.", "error" , "Please try again.");
         return;
     }
 
@@ -2251,7 +1940,7 @@ function saveOJTSettings() {
     })
     .then(res => res.json())
     .then(data => {
-        showToast(data.message, data.success ? "success" : "error");
+        showToast("Save Settings - ", data.success ? "success" : "error", data.message);
 
         if (data.success) {
             resetSettingsForm();
@@ -2263,7 +1952,7 @@ function saveOJTSettings() {
             }, 500);
         }
     })
-    .catch(() => showToast("Server error occurred.", "error"));
+    .catch(() => showToast("Server error occurred.", "error", "Please try again."));
 }
 
 // ojt settings modal
@@ -2271,7 +1960,7 @@ function openCreateSettingsModal() {
     const modal = document.getElementById("create-settings-modal");
 
     if (!modal) {
-        showToast("Create Settings Modal not found", "error");
+        showToast("Create Settings Modal not found", "error", "Please try again.");
         return;
     }
 
@@ -2320,7 +2009,7 @@ function filterSettingsPrograms() {
                 setTimeout(() => filterSettingsBody.classList.remove("fade-in"), 200);
             }, 200);
         })
-        .catch(() => showToast("Failed to load data", "error"));
+        .catch(() => showToast("Failed to load data", "error", "Please try again."));
     }, 300);
 }
 
@@ -2362,7 +2051,7 @@ function filterPrograms() {
         
     })
     .catch(() => {
-        showToast("Failed to load data", "error");
+        showToast("Failed to load data", "error", "Please try again.");
     });
     }, 300);
 }
@@ -2393,7 +2082,7 @@ function updateProgram() {
         !departmentCode ||
         !status
     ) {
-        showToast("Please complete all fields.", "error");
+        showToast("Please complete all fields.", "error", "Please try again.");
         return;
     }
 
@@ -2414,7 +2103,7 @@ function updateProgram() {
     })
     .then(res => res.json())
     .then(data => {
-        showToast(data.message, data.success ? "success" : "error");
+        showToast( "Update Program - ",data.success ? "success" : "error",data.message,);
 
         if (data.success) {
 
@@ -2436,7 +2125,7 @@ function updateProgram() {
         }
     })
     .catch(() => {
-        showToast("Server error occurred.", "error");
+        showToast("Server error occurred.", "error", "Please try again.");
     });
 }
 
@@ -2445,7 +2134,7 @@ function openCreateCourseModal(){
     const exitModal = document.getElementById("closeCreateCourseModal");
 
     if (!modal) {
-        showToast("Create Settings Modal not found", "error");
+        showToast("Create Settings Modal not found", "error", "Please try again.");
         return;
     }
 
@@ -2473,10 +2162,8 @@ function saveCourse() {
     const prg_department_code = document.getElementById("prg_department_code_create").value.trim();
     const prg_status = document.getElementById("prg_status_create").value;
 
-    console.log(prg_name, "HAHA");
-
     if (!prg_name || !prg_acro || !prg_department || !prg_department_code) {
-        showToast("Please complete all fields!!", "error");
+        showToast("Please complete all fields.", "error", "Please try again");
         return;
     }
 
@@ -2498,7 +2185,7 @@ function saveCourse() {
     .then(res => res.json())
     .then(data => {
 
-        showToast(data.message, data.success ? "success" : "error");
+        showToast( "Save Course",data.success ? "success" : "error",data.message,);
 
         if (data.success) {
 
@@ -2518,7 +2205,7 @@ function saveCourse() {
 
     })
     .catch(err => {
-        showToast(err, "error");
+        showToast("Something went wrong.", "error", err);
     });
 }
 
@@ -2596,19 +2283,46 @@ window.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("click", function (e) {
 
-    if (e.target.classList.contains("edit-program-btn")) {
-
-        const btn = e.target;
-
+    // EDIT
+    const editBtn = e.target.closest(".edit-program-btn");
+    if (editBtn) {
         departmentManagement.classList.remove("show");
         departmentManagementModal.classList.add("show");
 
-        document.getElementById("program_id").value = btn.dataset.id;
-        document.getElementById("prg_name").value = btn.dataset.name;
-        document.getElementById("prg_acro").value = btn.dataset.acro;
-        document.getElementById("prg_department").value = btn.dataset.department;
-        document.getElementById("prg_department_code").value = btn.dataset.departmentcode;
-        document.getElementById("prg_status").value = btn.dataset.status || "ACTIVE";
+        document.getElementById("program_id").value = editBtn.dataset.id;
+        document.getElementById("prg_name").value = editBtn.dataset.name;
+        document.getElementById("prg_acro").value = editBtn.dataset.acro;
+        document.getElementById("prg_department").value = editBtn.dataset.department;
+        document.getElementById("prg_department_code").value = editBtn.dataset.departmentcode;
+        document.getElementById("prg_status").value = editBtn.dataset.status || "ACTIVE";
+        return;
+    }
+
+    // DELETE
+    const delBtn = e.target.closest(".delete-program-btn");
+    if (delBtn) {
+        if (!confirm("Delete this program? This can't be undone.")) return;
+
+        delBtn.disabled = true;
+
+        fetch("functions/deleteProgram.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ program_id: delBtn.dataset.id })
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.status === "ok") {
+                delBtn.closest("tr").remove();
+            } else {
+                alert(d.message || "Delete failed");
+                delBtn.disabled = false;
+            }
+        })
+        .catch(() => {
+            alert("Something went wrong.");
+            delBtn.disabled = false;
+        });
     }
 });
 
@@ -3186,7 +2900,7 @@ supervisorForm.addEventListener("submit", function (e) {
             overlay.classList.remove("show");
             superCreate.classList.remove("show");
 
-            showToast(data.message, data.status ? "success" : "error");
+            showToast("Supervisor Creation - ", data.status ? "success" : "error",data.message);
 
             setTimeout(() => {
     location.reload();
@@ -3197,7 +2911,7 @@ supervisorForm.addEventListener("submit", function (e) {
         }
     })
     .catch(err => {
-        showToast(err, "error");
+        showToast("Something went wrong.", "error", err);
     });
 });
 
@@ -3401,7 +3115,7 @@ function reRegisterRfid() {
     const btn = document.querySelector(".register-rfid-btn");
 
     if (rfid_uid === "") {
-        showToast("Please scan RFID first", "warning");
+        showToast("Please scan RFID first", "warning", "Please Try Again");
         return;
     }
 
@@ -3419,15 +3133,15 @@ function reRegisterRfid() {
     .then(response => response.text())
     .then(data => {
         if (data === "success") {
-            showToast("RFID re-registered successfully", "success");
+            showToast("Register RFID", "success","RFID re-registered successfully");
             setTimeout(() => location.reload(), 500);
         } else {
-            showToast(data, "error");
+            showToast("Something went wrong", "error", data);
             btn.disabled = false;
         }
     })
     .catch(error => {
-        showToast(error, "error");
+        showToast("Something went wrong", "error", error);
         btn.disabled = false;
     });
 }
@@ -3442,12 +3156,12 @@ function reRegisterRfid() {
 document.getElementById("assign-btn").addEventListener("click", function () {
 
     if (selectedStudentIDs.length === 0) {
-        showToast("Please select at least one student.", "error");
+        showToast("Select a student", "error", "Please select at least one student.");
         return;
     }
 
     if (!selectedSupervisorID) {
-        showToast("Please select a supervisor.", "error");
+         showToast("Select a supervisor", "error", "Please choose a supervisor first.");
         return;
     }
 
@@ -3467,7 +3181,7 @@ document.getElementById("assign-btn").addEventListener("click", function () {
     .then(data => {
 
         if (data.status === "success") {
-             showToast(data.message, "success");
+             showToast("Students Assigned", "success", data.message);
              setTimeout(() => {
                 location.reload();
              }, 500);
@@ -3475,7 +3189,7 @@ document.getElementById("assign-btn").addEventListener("click", function () {
         }
     })
     .catch(err => {
-        showToast("Something went wrong", "error");
+        showToast("Something went wrong", "error", "Please try again.");
     });
 
 });

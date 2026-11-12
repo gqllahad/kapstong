@@ -23,14 +23,12 @@ if (!$row) {
     exit;
 }
 
-// ── Build evaluation PDF ──
 $dompdf = new Dompdf();
 $dompdf->loadHtml(buildEvaluationDocument($row));
 $dompdf->setPaper('A4');
 $dompdf->render();
 $evaluationPdf = $dompdf->output();
 
-// ── Build certificate PDF (if a template exists) ──
 $certificatePdf = generateCertificatePdf(
     $conn,
     $row['student_name'],
@@ -49,7 +47,7 @@ try {
     $mail->Port       = 587;
 
     $mail->setFrom(MAIL_USERNAME, 'OJT Monitoring System');
-    $mail->addAddress(MAIL_USERNAME); // coordinator
+    $mail->addAddress(MAIL_USERNAME); 
     $mail->Subject = "OJT Final Evaluation - {$row['student_name']}";
 
     $bodyText = "Attached is the final OJT evaluation of {$row['student_name']} ({$row['studentID']}).";

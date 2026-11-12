@@ -469,7 +469,7 @@ function openFeed(tab = 'alerts') {
 
 function closeFeed() {
     const d = document.getElementById('feedDrawer');
-    if (feedLastFocus) feedLastFocus.focus();   // move focus out first
+    if (feedLastFocus) feedLastFocus.focus();   
     else document.activeElement.blur();
     d.classList.remove('open');
     d.setAttribute('inert', '');

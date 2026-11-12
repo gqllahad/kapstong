@@ -87,7 +87,13 @@ if ($_SESSION['role'] !== "ADMIN") {
 
         <!-- MAIN -->
         <main class="content">
-            <div id="toast"></div>
+            <div id="toast" role="status" aria-live="polite">
+                <span class="toast-dot"></span>
+                <span class="toast-title"></span>
+                <span class="toast-sep"></span>
+                <span class="toast-detail"></span>
+                <button class="toast-close" onclick="hideToast()" aria-label="Close">&times;</button>
+            </div>
 
             <div id="overlay" class="overlay"></div>
 
@@ -805,23 +811,23 @@ if ($_SESSION['role'] !== "ADMIN") {
 
 
                 <div class="user-management">
-                    <div class="search-filter">
-
-                        <div class="search-container">
-
-                            <i class="bi bi-funnel search-icon"></i>
-
-                            <select id="departmentFilter" onchange="filterPrograms(this.value)">
-                                <?php echo renderDepartmentOptions($conn); ?>
-                            </select>
-
-                        </div>
-
-                    </div>
+                   
                     <button class="assign-student-btn" onclick="openCreateCourseModal()">
                         <span class="icon">+</span>
                         <span class="text">Create Course</span>
                     </button>
+                   
+                    <div class="search-container">
+
+                        <i class="bi bi-funnel search-icon"></i>
+
+                        <select id="departmentFilter" onchange="filterPrograms(this.value)">
+                            <?php echo renderDepartmentOptions($conn); ?>
+                        </select>
+
+                    </div>
+                   
+                    
                 </div>
 
 
@@ -844,7 +850,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                         </tbody>
                     </table>
                 </div>
-                <!-- Dept	Code	Head	Programs	Status	Action -->
             </div>
 
             <div class="create-course-modal" id="create-course-modal">

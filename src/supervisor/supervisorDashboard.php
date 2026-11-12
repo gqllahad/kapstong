@@ -155,10 +155,6 @@ foreach ($nameParts as $part) {
                 </button>
 
                 <nav class="profile-menu" id="profileMenu" hidden>
-                    <a id="openProfileBtn">
-                        <i class="bi bi-person"></i>
-                        Profile
-                    </a>
                     <a id="openAccountSettingsBtn">
                         <i class="bi bi-gear"></i>
                         Account Settings
@@ -200,7 +196,7 @@ foreach ($nameParts as $part) {
             <div class="account-settings-modal" id="change-password-modal-supervisor">
                 <div class="modal-header">
                     <h3>Change Password</h3>
-                    <button id="backToAccountSettingsSupervisor" class="modal-close-profile-sub">&larr; Back</button>
+                    <button id="backToAccountSettingsSupervisor" class="modal-close-profile-sub"><i class="bi bi-chevron-left"></i></button>
                 </div>
 
                 <form action="functions/settings.php" method="POST" class="modal-form">
@@ -1156,7 +1152,7 @@ foreach ($nameParts as $part) {
                     $alerts     = getSupervisorAlerts($conn, $superID);
                     $activities = getSupervisorActivities($conn, $superID);
                     $sevLabels  = ['critical' => 'High severity', 'danger' => 'Overdue', 'warning' => 'Warning'];
-                    $preview    = array_slice($alerts, 0, 3);
+                    $preview    = array_slice($alerts, 0, 5);
                 ?>
                <div class="dashboard-bottom">
 
@@ -1840,12 +1836,8 @@ foreach ($nameParts as $part) {
                 <p>© 2026 OJT Tracking System</p>
             </footer>
 
-        </main>
 
-    </div>
-
-
-    <!-- DRAWER -->
+                                <!-- DRAWER -->
     <div class="feed-backdrop" id="feedBackdrop" onclick="closeFeed()"></div>
 
     <aside class="feed-drawer" id="feedDrawer" aria-hidden="true">
@@ -1930,6 +1922,24 @@ foreach ($nameParts as $part) {
             <?php endif; ?>
         </div>
     </aside>
+
+
+
+
+
+
+
+
+
+
+
+
+        </main>
+
+    </div>
+
+
+    
 
 </body>
 <script>
