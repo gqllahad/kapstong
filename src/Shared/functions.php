@@ -1077,7 +1077,7 @@ function renderEvaluationList($conn, $superID, $search = '', $reportsCourse = ''
             switch ($t['status']) {
 
                 case 'APPROVED':
-                    $statusScore = 90;
+                    $statusScore = 100;
                     break;
 
                 case 'SUBMITTED':
@@ -1100,7 +1100,7 @@ function renderEvaluationList($conn, $superID, $search = '', $reportsCourse = ''
                     $statusScore = 0;
             }
 
-            $taskSum += ($statusScore * 0.6);
+            $taskSum += $statusScore;
         }
 
         $taskScore = ($taskTotal > 0)

@@ -176,7 +176,13 @@ foreach ($nameParts as $part) {
         <main class="content">
 
             <div id="overlay" class="overlay"></div>
-            <div id="toast"></div>
+            <div id="toast" role="status" aria-live="polite">
+                <span class="toast-dot"></span>
+                <span class="toast-title"></span>
+                <span class="toast-sep"></span>
+                <span class="toast-detail"></span>
+                <button class="toast-close" onclick="hideToast()" aria-label="Close">&times;</button>
+            </div>
 
             <!-- modals -->
 

@@ -192,7 +192,7 @@ foreach ($nameParts as $part) {
             <div class="account-settings-modal" id="change-password-modal">
                 <div class="modal-header">
                     <h3>Change Password</h3>
-                    <button id="backToAccountSettings1" class="modal-close-profile-sub">&larr; Back</button>
+                    <button id="backToAccountSettings1" class="modal-close-profile-sub">&larr;</button>
                 </div>
                 <form action="student_functions/settings.php" method="POST" class="modal-form">
                     <div class="form-section-account">

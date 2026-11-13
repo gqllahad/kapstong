@@ -163,19 +163,7 @@ function loadAttendance() {
                     <tr>
 
                         <td>
-                            <div class="student-cell">
-
-                                <div class="student-avatar">
-                                    ${row.name.charAt(0)}
-                                </div>
-
-                                <div class="student-info">
-                                    <span class="student-name">
-                                        ${row.name}
-                                    </span>
-                                </div>
-
-                            </div>
+                            <span class="student-name">${row.name}</span>
                         </td>
 
                         <td>

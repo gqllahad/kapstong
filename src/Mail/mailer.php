@@ -2,11 +2,11 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once __DIR__ . '/../PHPMailer/src/PHPMailer.php';
-require_once __DIR__ . '/../PHPMailer/src/SMTP.php';
-require_once __DIR__ . '/../PHPMailer/src/Exception.php';
+require_once __DIR__ . '/../../PHPMailer/src/PHPMailer.php';
+require_once __DIR__ . '/../../PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/../../PHPMailer/src/Exception.php';
 
-require_once("../Shared/config.php");
+require_once __DIR__ . '/../Shared/config.php';
 
 function sendEvaluationEmail($toEmail, $studentName, $finalScore, $recommendationText)
 {
@@ -46,7 +46,8 @@ function sendEvaluationEmail($toEmail, $studentName, $finalScore, $recommendatio
         $mail->send();
         return true;
 
-    } catch (Exception $e) {
+    } catch (\Throwable $e) {
+        error_log("Mail error: " . $e->getMessage());
         return false;
     }
 }

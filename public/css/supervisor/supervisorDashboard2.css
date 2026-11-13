@@ -114,6 +114,7 @@ body.dark-mode {
 
 html {
   scroll-behavior: smooth;
+  zoom: 0.8;
 }
 
 body {
@@ -4191,6 +4192,34 @@ body.dark-mode .tab-btn.active {
   opacity: 0.9;
 }
 
+.evaluation-summary-card .evaluation-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.evaluation-summary-card .evaluation-table td {
+  color: #e5e7eb;
+  padding: 14px 16px;
+  vertical-align: top;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.evaluation-summary-card .evaluation-table .table-label {
+  width: 160px;
+  font-weight: 600;
+  color: #93c5fd;
+}
+
+.evaluation-summary-card .evaluation-table ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.evaluation-summary-card .evaluation-table {
+  visibility: visible;
+  opacity: 1;
+}
+
 /* ══════════════════════════════════════════════════════════════
    CHART VIEW TOGGLE (inside student progress modal)
 ══════════════════════════════════════════════════════════════ */
@@ -4440,25 +4469,122 @@ body.dark-mode .tab-btn.active {
 ══════════════════════════════════════════════════════════════ */
 #toast {
   position: fixed;
-  top: 74px;
-  right: 22px;
-  min-width: 260px;
-  padding: 13px 18px;
-  border-radius: var(--r-lg);
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-16px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 320px;
+  max-width: 92vw;
+  padding: 14px 18px 14px 20px;
+  background: rgba(10, 18, 32, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
   color: #fff;
-  font-family: "DejaVu Sans", sans-serif;
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 14px;
   opacity: 0;
-  transform: translateY(-12px) translateX(8px);
+  visibility: hidden;
+  pointer-events: none;
   transition: all 0.3s var(--ease);
   z-index: 9999;
-  box-shadow: var(--shadow-xl);
-  pointer-events: none;
 }
 #toast.show {
   opacity: 1;
-  transform: translateY(0) translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast-dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 10px #22d3ee;
+}
+#toast.success .toast-dot {
+  background: #22d3ee;
+  box-shadow: 0 0 10px #22d3ee;
+}
+#toast.error .toast-dot {
+  background: #ef4444;
+  box-shadow: 0 0 10px #ef4444;
+}
+
+.toast-title {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.toast-sep {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+.toast-detail {
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 400;
+}
+.toast-sep:has(+ .toast-detail:empty),
+.toast-detail:empty {
+  display: none;
+}
+
+.toast-close {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0 0 8px;
+}
+.toast-close:hover {
+  color: #fff;
+}
+#toast {
+  overflow: hidden;
+}
+
+#toast.loading::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 40%;
+  background: #22d3ee;
+  border-radius: 3px;
+  animation: toast-progress 1.2s ease-in-out infinite;
+}
+@keyframes toast-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+#toast.loading .toast-dot {
+  animation: toast-pulse 1s ease-in-out infinite;
+}
+@keyframes toast-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+#toast.warning .toast-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
 }
 
 /* ══════════════════════════════════════════════════════════════

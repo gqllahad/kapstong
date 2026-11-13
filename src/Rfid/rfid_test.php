@@ -184,16 +184,6 @@ $roleIcon = $isAdmin ? 'bx-shield-quarter' : 'bx-user-check';
 
 </div>
 
-<!-- <div id="statusModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-icon" id="modalIcon"></div>
-
-        <div id="modalText"></div>
-        <button onclick="closeModal()">OK</button>
-
-    </div>
-</div> -->
-
 <div id="toastContainer"></div>
 
 <div id="emergencyModal" class="emergency-modal">
@@ -248,8 +238,6 @@ $roleIcon = $isAdmin ? 'bx-shield-quarter' : 'bx-user-check';
         <h3><i class='bx bx-edit-alt'></i> Manual Attendance Entry</h3>
         <button onclick="closeManualAttendanceModal()" class="modal-close">&times;</button>
     </div>
-
-        
 
         <div class="form-group">
             <label>Student</label>

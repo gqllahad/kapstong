@@ -52,16 +52,15 @@ $attendanceScore = ($required > 0)
 
 
     $taskStmt = $conn->prepare("
-    SELECT 
-        title,
-        status,
-        rating,
-        supervisor_feedback,
-        completed_at
-    FROM student_tasks
-    WHERE studentID = ?
-    ORDER BY date_updated DESC
-");
+        SELECT
+            title,
+            status,
+            supervisor_feedback,
+            completed_at
+        FROM student_tasks
+        WHERE studentID = ?
+        ORDER BY date_updated DESC
+    ");
 $taskStmt->bind_param("s", $studentID);
 $taskStmt->execute();
 $taskResult = $taskStmt->get_result();
@@ -75,28 +74,18 @@ while ($t = $taskResult->fetch_assoc()) {
     $totalTasks++;
 
     switch ($t['status']) {
-        case 'APPROVED': $statusScore = 100; break;
-        case 'SUBMITTED': $statusScore = 75; break;
-        case 'IN PROGRESS': $statusScore = 50; break;
-        case 'NOT STARTED': $statusScore = 20; break;
-        case 'REJECTED': $statusScore = 0; break;
-        default: $statusScore = 0;
+        case 'APPROVED':    $taskFinal = 100; break;
+        case 'SUBMITTED':   $taskFinal = 75;  break;
+        case 'IN PROGRESS': $taskFinal = 50;  break;
+        case 'NOT STARTED': $taskFinal = 20;  break;
+        default:            $taskFinal = 0;
     }
-
-    $ratingScore = 0;
-
-    if (!empty($t['rating'])) {
-        $ratingScore = $t['rating'];
-    }
-
-    $taskFinal = ($statusScore * 0.6) + ($ratingScore * 0.4);
 
     $taskScoreSum += $taskFinal;
 
     $taskList[] = [
         "title" => $t['title'],
         "status" => $t['status'],
-        "rating" => $t['rating'],
         "feedback" => $t['supervisor_feedback'],
         "completed_at" => $t['completed_at'],
         "score" => round($taskFinal, 2)

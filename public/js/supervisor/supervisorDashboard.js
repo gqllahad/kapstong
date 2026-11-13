@@ -868,12 +868,12 @@ function saveFinalEvaluation() {
             overlay.classList.remove("show");
 
         } else {
-            showToast("Failed to save evaluation", "error");
+            showToast("Server error", "error", "Could not save the evaluation.");  
         }
 
     })
     .catch(err => {
-         showToast("Server error while saving evaluation", "error");
+         showToast("Server error", "error", "Could not save the evaluation.");  
     });
 }
 
@@ -892,7 +892,7 @@ function viewFinalReport(studentID) {
     .then(data => {
 
         if(!data.success){
-            showToast(data.message, "success");
+            showToast("Success", "success", data.message); 
             return;
         }
 
@@ -1011,7 +1011,7 @@ function downloadEvaluationReport() {
     const studentID = modal.getAttribute("data-student-id");
 
     if (!studentID) {
-        showToast("Student ID not found", "warning");
+       showToast("Student not found", "warning", "No student matches that ID.");
         return;
     }
 
@@ -1035,22 +1035,40 @@ function togglePassword(inputId, icon) {
 };
 
 // toast
-function showToast(message, type = "success") {
-     const toast = document.getElementById("toast");
+// function showToast(message, type = "success") {
+//      const toast = document.getElementById("toast");
 
-    toast.innerText = message;
+//     toast.innerText = message;
 
-    toast.style.background =
-        type === "success" ? "#28a745" :
-        type === "error" ? "#dc3545" :
-        type === "warning" ? "#ffc107" :
-        "#333";
+//     toast.style.background =
+//         type === "success" ? "#28a745" :
+//         type === "error" ? "#dc3545" :
+//         type === "warning" ? "#ffc107" :
+//         "#333";
 
-    toast.classList.add("show");
+//     toast.classList.add("show");
 
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3000);
+//     setTimeout(() => {
+//         toast.classList.remove("show");
+//     }, 3000);
+// }
+
+let toastTimer;
+
+function showToast(title, type = "success", detail = "") {
+    const t = document.getElementById("toast");
+    t.querySelector(".toast-title").textContent = title;
+    t.querySelector(".toast-detail").textContent = detail;
+    t.className = "show " + type;
+
+    clearTimeout(toastTimer);
+    if (type !== "loading") {
+        toastTimer = setTimeout(hideToast, 3500);
+    }
+}
+
+function hideToast() {
+    document.getElementById("toast").classList.remove("show");
 }
 
 // theme detector
@@ -1455,7 +1473,7 @@ function downloadAttendancePDF() {
     const month = window.currentMonth || document.getElementById("monthSelector").value;
 
     if (!superID || !month) {
-        showToast("Missing supervisor or month.", "error");
+        showToast("Missing details", "error", "Supervisor or month is missing.");
         return;
     }
 
@@ -1867,7 +1885,7 @@ function updateTaskStatus(taskID, status) {
     const feedback = document.getElementById("supervisorFeedback")?.value.trim() || "";
     
     if (status === "REJECTED" && !feedback) {
-        showToast("Please provide supervisor feedback before rejecting the task.", "warning");
+        showToast("Feedback required", "warning", "Add supervisor feedback before rejecting the task.");
         return;
     }
 
@@ -1889,7 +1907,7 @@ function updateTaskStatus(taskID, status) {
 })
     .then(data => {
         
-        showToast(data.message, "success");
+        showToast("Success", "success", data.message); 
 
         if (data.status === "success") {
             overlay.classList.remove("show");
@@ -1900,7 +1918,7 @@ function updateTaskStatus(taskID, status) {
         }
     }).catch(err => {
         console.error(err);
-        showToast("Something went wrong", "error");
+        showToast("Something went wrong", "error", "Please try again.");  
     });
 }
 
@@ -2175,7 +2193,7 @@ document.getElementById("confirmDeleteBtn").onclick = () => {
     .then(res => res.json())
     .then(data => {
 
-        showToast(data.message, data.status);
+       showToast(data.status === "success" ? "Success" : "Error", data.status, data.message);
 
         if (data.status === "success") {
         reloadTaskTable();
@@ -2842,7 +2860,7 @@ document.getElementById("createTaskForm").addEventListener("submit", function (e
     e.preventDefault();
 
     if (selectedTaskStudentIDs.length === 0) {
-        showToast("Please select at least one student.", "warning");
+        showToast("No students selected", "warning", "Select at least one student.");
         return;
     }
 
@@ -2876,11 +2894,11 @@ document.getElementById("createTaskForm").addEventListener("submit", function (e
         createTask.classList.remove("show");
         overlay.classList.remove("show");
 
-        showToast(data.message, "success");
+        showToast("Success", "success", data.message);
     }
 })
 .catch(err => {
-    showToast("Something went wrong.", "error");
+    showToast("Something went wrong", "error", "Please try again.");  
 });
     
 });
