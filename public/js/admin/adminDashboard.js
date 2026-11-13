@@ -155,7 +155,7 @@ let selectedSupervisorID = null;
 
 // risks
 let allRiskData = [];
-let riskTimer;
+let riskTimer = null;
 
 // form
 const supervisorForm = document.getElementById("createSupervisorForm");
@@ -413,9 +413,19 @@ function viewAssignedStudents(superID) {
     .then(res => res.text())
     .then(data => {
         superAssignedView.innerHTML = data;
+        
     }).catch(() => {
             showToast("Server error occurred, cannot load students.", "error", "Please try again.");
         });
+}
+
+function refreshAssignedStudent() {
+
+    AssignStudent.classList.remove("show");
+    superView.classList.remove("show");
+    superAssignedView.classList.remove("show");
+    allSupervisor.classList.remove("show");
+    overlay.classList.remove("show");
 }
 
 function approveUser(studentID) {
@@ -778,7 +788,7 @@ function reAssignUser(studentID) {
         if (data.status === "success") {
             showToast("Student Reassigning...", "success", "Re-assigned!");
 
-             isReassignMode = true;
+            isReassignMode = true;
 
             refreshAssignStudentList();
 
@@ -1335,6 +1345,7 @@ document.addEventListener("input", (e) => {
     }
 });
 document.addEventListener("change", (e) => {
+    console.log("change fired", e.target.id);
     if (e.target.id === "riskFilter") applyRiskFilters();
 });
 
@@ -1535,6 +1546,8 @@ function applyRiskFilters() {
     const q = document.getElementById("riskSearch").value.trim().toLowerCase();
     const f = document.getElementById("riskFilter").value;
 
+    
+
     const list = allRiskData.filter(s => {
         const text = `${s.name} ${s.studentID} ${s.course}`.toLowerCase();
         if (q && !text.includes(q)) return false;
@@ -1542,6 +1555,8 @@ function applyRiskFilters() {
         if (f) return s.forecast === f;
         return true;
     });
+
+    console.log(f, q, allRiskData.length, list.length);
 
     renderRiskCards(list);
 }
@@ -2476,6 +2491,9 @@ overlay.addEventListener('click', () => {
       certificateComplete.classList.remove("show");
       document.getElementById("attendance-download-modal").classList.remove("show");
       document.getElementById("evalPreviewModal").classList.remove("show");
+       AssignStudent.classList.remove("show");
+        superView.classList.remove("show");
+        superAssignedView.classList.remove("show");
     //   document.getElementById("evaluation-download-modal").classList.remove("show");
 });
 
@@ -3194,9 +3212,11 @@ document.getElementById("assign-btn").addEventListener("click", function () {
     .then(data => {
 
         if (data.status === "success") {
-             showToast("Students Assigned", "success", data.message);
+             
              setTimeout(() => {
-                location.reload();
+                // location.reload();
+                showToast("Students Assigned", "success", data.message);
+                refreshAssignedStudent();
              }, 500);
             
         }
@@ -3336,17 +3356,6 @@ document.addEventListener('click', function (e) {
 });
 
 
-// evaluation
-// function openEvaluationDownloadModal() {
-//     document.getElementById("evaluation-download-modal").classList.add("show");
-//     overlay.classList.add("show");
-// }
-
-// function closeEvaluationDownloadModal() {
-//     document.getElementById("evaluation-download-modal").classList.remove("show");
-//     overlay.classList.remove("show");
-// }
-
 document.addEventListener("DOMContentLoaded", function () {
 
     const searchInput = document.getElementById("evaluationSearch");
@@ -3387,25 +3396,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetchEvaluations();
 });
-
-// function downloadEvaluationPDF(){
-    
-//     const course = document.getElementById("downloadCourseEvaluation").value;
-//     const supervisor = document.getElementById("downloadSupervisorEvaluation").value;
-
-
-//     const url = 
-//         `functions/download_all_evaluation_report.php?` +
-//         `course=${encodeURIComponent(course)}` +
-//         `&superID=${encodeURIComponent(supervisor)}`;
-
-
-//      window.open(url, "_blank");
-
-//      closeEvaluationDownloadModal();
-
-// }
-
 
 // system config buttons
 

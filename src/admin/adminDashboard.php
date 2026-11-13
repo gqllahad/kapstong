@@ -528,7 +528,7 @@ if ($_SESSION['role'] !== "ADMIN") {
             <!-- assign student-supervisor -->
             <div class="assign-student-container" id="assign-student-container">
                 <div class="modal-header">
-                    <h3>👥 Student–Supervisor Assignment</h3>
+                    <h3><i class="bi bi-people-fill"></i> Student–Supervisor Assignment</h3>
                     <div class="assign-footer">
                     <button class="assign-btn" id="assign-btn"> <i class="bi bi-person-plus"></i> Assign Student</button>
                     <button id="closeAssignModal" class="modal-close">&times;</button>

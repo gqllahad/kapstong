@@ -4515,7 +4515,7 @@ function academicYearOptions($conn)
 
 
 // calendar (supervisor)
-function renderAttendanceCalendar($conn, $year, $month) {
+function renderAttendanceCalendar($conn, $year, $month, $ownerID) {
     function e($val) {
         return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
     }
@@ -4526,18 +4526,26 @@ function renderAttendanceCalendar($conn, $year, $month) {
     $startWeekday = date('w', strtotime($firstDay));
 
     $stmt = $conn->prepare("
-        SELECT event_date, type, label, hour_multiplier 
-        FROM calendar_events 
-        WHERE event_date BETWEEN ? AND ?
+        SELECT event_date, type, label, hour_multiplier, studentID
+        FROM calendar_events
+        WHERE event_date BETWEEN ? AND ? AND superID = ?
     ");
     $lastDay = date('Y-m-t', strtotime($firstDay));
-    $stmt->bind_param("ss", $firstDay, $lastDay);
+    $stmt->bind_param("ssi", $firstDay, $lastDay, $ownerID);
     $stmt->execute();
     $result = $stmt->get_result();
 
     $events = [];
     while ($row = $result->fetch_assoc()) {
-        $events[$row['event_date']] = $row;
+        $d = $row['event_date'];
+        if (!isset($events[$d])) {
+            $events[$d] = $row + ['count' => 0, 'all' => false];
+        }
+        if ($row['studentID'] === '') {
+            $events[$d]['all'] = true;
+        } else {
+            $events[$d]['count']++;
+        }
     }
 
     $today = date('Y-m-d');
@@ -4579,6 +4587,8 @@ function renderAttendanceCalendar($conn, $year, $month) {
             $multiplierText = ($event['type'] === 'HOLIDAY' && $event['hour_multiplier'] > 1)
                 ? '<span class="calendar-multiplier">' . e($event['hour_multiplier']) . 'x</span>'
                 : '';
+            
+            $scope = $event['all'] ? '' : " ({$event['count']} student" . ($event['count'] == 1 ? '' : 's') . ")";
 
             $badge = "<div class='calendar-event-badge'><i class='bx {$icon}'></i>" . e($event['label']) . "{$multiplierText}</div>";
         }

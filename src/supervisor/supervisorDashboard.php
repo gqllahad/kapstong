@@ -737,6 +737,27 @@ foreach ($nameParts as $part) {
                         <input type="text" id="dayEditLabel" placeholder="e.g. Independence Day, Team Bonding">
                     </div>
 
+                    <div class="form-group">
+                        <label>Applies to</label>
+                        <div class="applies-to">
+                            <div class="applies-head">
+                            <label class="all-toggle">
+                                <input type="checkbox" id="allStudents" checked>
+                                <span>All students</span>
+                            </label>
+                            <span class="count-pill" id="selectedCount">Everyone</span>
+                            </div>
+
+                            <div class="applies-body is-disabled" id="appliesBody">
+                            <div class="applies-search">
+                                <input type="text" id="studentSearch" placeholder="Search student…" autocomplete="off">
+                                <button type="button" id="clearStudents">Clear</button>
+                            </div>
+                            <div class="student-list" id="studentList"></div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group" id="multiplierGroup" style="display:none;">
                         <label>Hour Multiplier</label>
                         <select id="dayEditMultiplier">
@@ -750,7 +771,7 @@ foreach ($nameParts as $part) {
                         <button type="submit" class="submit-btn">Save</button>
                     </div>
                 </form>
-                    </div>
+            </div>
 
             <!-- create task -->
             <div class="create-task-container" id="create-task-container">
@@ -1178,7 +1199,7 @@ foreach ($nameParts as $part) {
                                         <strong class="sev-label <?= $t ?>"><?= $sevLabels[$a['type']] ?? 'Notice' ?></strong>
                                         <?= htmlspecialchars($a['message']) ?>
                                     </div>
-                                    <button class="alert-btn" onclick="openFeed('alerts')">Open</button>
+                                    <!-- <button class="alert-btn" onclick="openFeed('alerts')">Open</button> -->
                                 </li>
                             <?php endforeach; else: ?>
                                 <li class="alert-item success">
@@ -1271,7 +1292,7 @@ foreach ($nameParts as $part) {
 
                         <div class="quick-action-grid">
                             <button onclick="openCreateTask()">
-                                <i class="bi bi-person-plus-fill"></i>
+                                <i class="bi bi-clipboard-plus"></i>
                                 <span>Create Task</span>
                             </button>
 
@@ -1280,12 +1301,13 @@ foreach ($nameParts as $part) {
                                 <span>RFID</span>
                             </button>
 
+
                             <!-- <button onclick="generateReport()">
                                 <i class="bi bi-bar-chart-fill"></i>
                                 <span>Reports</span>
                             </button> -->
 
-                            <button onclick="openStudents()">
+                            <!-- <button onclick="openStudents()">
                                 <i class="bi bi-people-fill"></i>
                                 <span>Students</span>
                             </button>
@@ -1293,7 +1315,7 @@ foreach ($nameParts as $part) {
                             <button onclick="openLogs()">
                                 <i class="bi bi-journal-text"></i>
                                 <span>Logs</span>
-                            </button>
+                            </button> -->
 
                         </div>
                     </section>

@@ -84,6 +84,36 @@ if ($result->num_rows == 0) {
 $user      = $result->fetch_assoc();
 $studentID = $user['studentID'];
 
+$ownerStmt = $conn->prepare("
+    SELECT superID FROM student_supervisor
+    WHERE studentID = ? AND status = 'ACTIVE' LIMIT 1
+");
+$ownerStmt->bind_param("s", $studentID);
+$ownerStmt->execute();
+$studentSuperID = (int)($ownerStmt->get_result()->fetch_column() ?: 0);
+
+$calStmt = $conn->prepare("
+    SELECT type, label, hour_multiplier
+    FROM calendar_events
+    WHERE event_date = ?
+      AND superID IN (?, 0)
+      AND studentID IN (?, '')
+    ORDER BY (studentID <> '') DESC, superID DESC
+    LIMIT 1
+");
+$calStmt->bind_param("sis", $today, $studentSuperID, $studentID);
+$calStmt->execute();
+$calEvent = $calStmt->get_result()->fetch_assoc();
+
+$dayType        = $calEvent['type'] ?? 'WORKDAY';
+$hourMultiplier = $calEvent ? (float)$calEvent['hour_multiplier'] : 1.0;
+$dayLabel       = $calEvent['label'] ?? null;
+
+if ($dayType === 'NO_WORK') {
+    respond("Today is marked as a no-work day" . ($dayLabel ? " ({$dayLabel})" : "") . ". Attendance scanning is disabled.");
+}
+
+
 $progressCheck = $conn->prepare("
     SELECT completion_status FROM student_progress WHERE studentID = ? LIMIT 1
 ");
@@ -156,7 +186,19 @@ if (!$row) {
             VALUES (?, ?, ?, ?, ?, ?, ?, 'WORKING')
         ");
         $stmtIn->bind_param("sssssis", $studentID, $rfid, $today, $nowDt, $attStatus, $lateMinutes, $remarks);
-        $stmtIn->execute();
+        try {
+            $stmtIn->execute();
+
+            $setStart = $conn->prepare("
+                UPDATE student_progress
+                SET ojt_start_date = ?
+                WHERE studentID = ? AND ojt_start_date IS NULL
+            ");
+            $setStart->bind_param("ss", $today, $studentID);
+            $setStart->execute();
+        } catch (mysqli_sql_exception $e) {
+            respond($e->getCode() == 1062 ? "Already timed in today." : "Could not record time-in.");
+        }
     } catch (mysqli_sql_exception $e) {
         respond($e->getCode() == 1062 ? "Already timed in today." : "Could not record time-in.");
     }
@@ -204,10 +246,22 @@ if (in_array($state, ['WORKING', 'LUNCH_BREAK'], true)
 
     $totalHours    = roundHoursWithThreshold($totalHours);
     $creditedHours = round($totalHours * $hourMultiplier, 2);
+    $curStmt = $conn->prepare("SELECT COALESCE(completed_hours,0) AS done, required_hours FROM student_progress WHERE studentID = ?");
+    $curStmt->bind_param("s", $studentID);
+    $curStmt->execute();
+    $cur = $curStmt->get_result()->fetch_assoc();
+
+    if ($cur) {
+        $room = max(0, round($cur['required_hours'] - $cur['done'], 2));
+        $creditedHours = min($creditedHours, $room);
+    }
 
     $remarks = "Completed {$totalHours} hours for the day";
     if ($hourMultiplier != 1.0) {
         $remarks .= " — credited as {$creditedHours}h ({$hourMultiplier}x" . ($dayLabel ? ", {$dayLabel}" : "") . ")";
+    }
+    if ($cur && $creditedHours < round($totalHours * $hourMultiplier, 2)) {
+        $remarks .= " — capped at {$creditedHours}h (OJT hours reached)";
     }
 
     $stmt = $conn->prepare("
@@ -221,12 +275,12 @@ if (in_array($state, ['WORKING', 'LUNCH_BREAK'], true)
 
     $updateProgress = $conn->prepare("
         UPDATE student_progress
-        SET completed_hours   = completed_hours + ?,
-            remaining_hours   = GREATEST(required_hours - completed_hours, 0),
-            completion_status = IF(completed_hours >= required_hours, 'COMPLETED', completion_status)
+        SET completed_hours   = LEAST(required_hours, COALESCE(completed_hours, 0) + ?),
+            completion_status = IF(completed_hours >= required_hours, 'COMPLETED', completion_status),
+            ojt_end_date      = IF(completed_hours >= required_hours AND ojt_end_date IS NULL, ?, ojt_end_date)
         WHERE studentID = ?
     ");
-    $updateProgress->bind_param("ds", $creditedHours, $studentID);
+    $updateProgress->bind_param("dss", $creditedHours, $today, $studentID);
     $updateProgress->execute();
 
     respond("TIME OUT SUCCESS ({$creditedHours} hrs)" . ($hourMultiplier != 1.0 ? " [{$hourMultiplier}x applied]" : "") . ".");

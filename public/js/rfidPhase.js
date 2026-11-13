@@ -543,6 +543,92 @@ document.getElementById("emergencyModal").addEventListener("click", (e) => {
     e.stopPropagation();
 });
 
+// incomplete logs
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function loadIncompleteLogs() {
+    const panel = document.getElementById("incompletePanel");
+    const box   = document.getElementById("incomplete-list");
+    const badge = document.getElementById("incompleteBadge");
+
+    fetch("getIncompleteLogs.php")
+        .then(r => r.json())
+        .then(rows => {
+            badge.textContent = rows.length;
+            panel.hidden = !rows.length;
+            if (!rows.length) { box.innerHTML = ""; return; }
+
+            box.innerHTML = rows.map(r => {
+                const acked = !!r.ack_at;
+                const time  = acked ? r.ack_time_out.slice(0, 5) : "17:00";
+
+                const controls = IS_ADMIN
+                    ? `<input type="time" class="inc-time" value="${time}">
+                       <div class="inc-actions">
+                           <button class="inc-count" ${acked ? "" : "disabled title='Waiting for supervisor'"}>Count</button>
+                           <button class="inc-void">Void</button>
+                       </div>`
+                    : acked
+                        ? `<span class="inc-done">Acknowledged · ${esc(time)}</span>`
+                        : `<input type="time" class="inc-time" value="${time}">
+                           <input type="text" class="inc-note" placeholder="Note (optional)">
+                           <div class="inc-actions">
+                               <button class="inc-ack">Acknowledge</button>
+                           </div>`;
+
+                return `
+                    <div class="inc-row" data-id="${r.attendanceID}">
+                        <strong>${esc(r.name ?? "Unknown")}</strong>
+                        <span>${esc(r.studentID)} · ${esc(r.log_date)} · In ${esc(r.first_time_in.slice(11, 16))}</span>
+                        ${controls}
+                        ${r.ack_note ? `<small>${esc(r.ack_note)}</small>` : ""}
+                    </div>`;
+            }).join("");
+        })
+        .catch(err => {
+            panel.hidden = false;
+            box.innerHTML = "<p>Failed to load.</p>";
+            console.error(err);
+        });
+}
+
+function resolveLog(id, action, timeOut, note) {
+    const body = new URLSearchParams({ attendanceID: id, action });
+    if (timeOut) body.append("time_out", timeOut);
+    if (note) body.append("note", note);
+
+    return fetch("resolveIncompleteLog.php", { method: "POST", body })
+        .then(r => r.json())
+        .then(res => {
+            alert(res.message);
+            if (res.success) loadIncompleteLogs();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Request failed.");
+        });
+}
+
+document.addEventListener("click", (e) => {
+    const row = e.target.closest(".inc-row");
+    if (!row) return;
+    const id = row.dataset.id;
+
+    if (e.target.classList.contains("inc-count")) {
+        const t = row.querySelector(".inc-time").value;
+        if (confirm(`Count this log with time out at ${t}?`)) resolveLog(id, "count", t);
+    }
+    if (e.target.classList.contains("inc-void")) {
+        if (confirm("Void this log? No hours will be credited.")) resolveLog(id, "void");
+    }
+
+    if (e.target.classList.contains("inc-ack")) {
+        const t = row.querySelector(".inc-time").value;
+        const n = row.querySelector(".inc-note").value;
+        if (confirm(`Confirm the student actually left at ${t}?`)) resolveLog(id, "acknowledge", t, n);
+    }
+});
+
 
 // manual attendance
 function openManualAttendanceModal(){
@@ -568,6 +654,9 @@ function openManualAttendanceModal(){
         input.focus();
     }, 50);
 }
+
+
+
 
 
 function closeManualAttendanceModal() {

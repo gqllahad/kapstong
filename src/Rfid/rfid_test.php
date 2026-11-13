@@ -178,6 +178,16 @@ $roleIcon = $isAdmin ? 'bx-shield-quarter' : 'bx-user-check';
 
     </div>
 
+
+    <div class="incomplete-panel" id="incompletePanel" hidden>
+        <div class="incomplete-head">
+            <i class='bx bx-time-five'></i>
+            <h3>Forgot to time out</h3>
+            <span class="incomplete-badge" id="incompleteBadge">0</span>
+        </div>
+        <div id="incomplete-list"></div>
+    </div>
+
     <div class="table-wrapper">
         <div id="attendanceTable"></div>
     </div>
@@ -303,6 +313,7 @@ $roleIcon = $isAdmin ? 'bx-shield-quarter' : 'bx-user-check';
 </div>
 
 <!-- scroipts -->
+<script>const IS_ADMIN = <?= $isAdmin ? 'true' : 'false' ?>;</script>
 <script src="../../public/js/rfidPhase.js"></script>
 
 </body>

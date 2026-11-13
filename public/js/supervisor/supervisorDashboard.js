@@ -112,6 +112,14 @@ const taskSubmit = document.getElementById("task-submit-table");
 const attendanceTable = document.getElementById("attendance-table");
 const attendanceCalendar = document.getElementById("attendance-calendar");
 const attendanceCalendarModal = document.getElementById('day-edit-container');
+const allBox   = document.getElementById('allStudents');
+const bodyEl   = document.getElementById('appliesBody');
+const listEl   = document.getElementById('studentList');
+const searchEl = document.getElementById('studentSearch');
+const countEl  = document.getElementById('selectedCount');
+const selected_cl = new Set();
+let students = [];
+
 
 
 // reports switch
@@ -1913,6 +1921,7 @@ function updateTaskStatus(taskID, status) {
             overlay.classList.remove("show");
             studentApplicationApprove.classList.remove("show");
             reloadAllCharts();
+            reloadApprovalReportTable();
             loadSidebarNotifications();
             showToast("Task approved successfully.", "success");
         }
@@ -2352,6 +2361,7 @@ function showAttendanceCalendar() {
     document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
     document.querySelector('[data-tab="calendar"]').classList.add('active');
     loadCalendar();
+    loadStudents();
 
     setActiveTab("calendar");
 }
@@ -2382,8 +2392,7 @@ function openDayModal(dateStr) {
     }
 
     document.getElementById('dayEditDate').value = dateStr;
-    document.getElementById('dayEditDateLabel').textContent =
-        new Date(dateStr).toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    document.getElementById('dayEditDateLabel').textContent = new Date(dateStr).toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
     fetch('functions/getDayEvent.php', {
         method: 'POST',
@@ -2395,6 +2404,13 @@ function openDayModal(dateStr) {
         document.getElementById('dayEditLabel').value = data.label || '';
         document.getElementById('dayEditMultiplier').value = data.hour_multiplier || '1.0';
 
+        selected_cl.clear();
+        (data.students || []).forEach(id => selected_cl.add(String(id)));
+        allBox.checked = selected_cl.size === 0;
+        searchEl.value = '';
+        renderStudents();
+        updateState();
+
         const type = data.type || 'WORKDAY';
         document.getElementById('type' + type.charAt(0) + type.slice(1).toLowerCase().replace('_w', 'W')).checked = true;
 
@@ -2405,6 +2421,23 @@ function openDayModal(dateStr) {
     });
 }
 
+function loadStudents() {
+    fetch('functions/getMyStudents.php')
+        .then(res => res.json())
+        .then(list => {
+            students = list.map(s => ({ id: String(s.studentID), name: s.name }));
+            renderStudents();
+        });
+}
+
+// function syncStudentBoxes() {
+//     document.querySelectorAll('input[name="students[]"]').forEach(c => {
+//         c.disabled = allBox.checked;
+//         if (allBox.checked) c.checked = false;
+//     });
+// }
+
+
 function closeDayModal() {
     overlay.classList.remove('show');
     attendanceCalendarModal.classList.remove('show');
@@ -2414,6 +2447,69 @@ function toggleMultiplierField(type) {
     document.getElementById('multiplierGroup').style.display = type === 'HOLIDAY' ? 'block' : 'none';
 }
 
+function esc(str) {
+    return String(str ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+}
+
+function renderStudents() {
+    const q = searchEl.value.trim().toLowerCase();
+    const rows = students.filter(s => s.name.toLowerCase().includes(q));
+
+    listEl.innerHTML = rows.length
+        ? rows.map(s => `
+            <label class="student-row ${selected_cl.has(s.id) ? 'selected' : ''}">
+                <input type="checkbox" value="${esc(s.id)}" ${selected_cl.has(s.id) ? 'checked' : ''}>
+                <span class="student-name">${esc(s.name)}</span>
+            </label>`).join('')
+        : '<div class="student-empty">No students found</div>';
+}
+
+function updateState() {
+    const all = allBox.checked;
+    bodyEl.classList.toggle('is-disabled', all);
+    countEl.textContent = all ? 'Everyone' : `${selected_cl.size} selected`;
+}
+
+listEl.addEventListener('change', e => {
+    const id = e.target.value;
+    e.target.checked ? selected_cl.add(id) : selected_cl.delete(id);
+    e.target.closest('.student-row').classList.toggle('selected', e.target.checked);
+    updateState();
+});
+
+allBox.addEventListener('change', updateState);
+searchEl.addEventListener('input', renderStudents);
+
+document.getElementById('clearStudents').addEventListener('click', () => {
+    selected_cl.clear();
+    renderStudents();
+    updateState();
+});
+
+// document.getElementById('dayEditForm').addEventListener('submit', function (e) {
+//     e.preventDefault();
+
+//     const date = document.getElementById('dayEditDate').value;
+//     const type = document.querySelector('input[name="dayType"]:checked').value;
+//     const label = document.getElementById('dayEditLabel').value;
+//     const multiplier = document.getElementById('dayEditMultiplier').value;
+
+//     fetch('functions/saveDayEvent.php', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+//         body: `date=${encodeURIComponent(date)}&type=${type}&label=${encodeURIComponent(label)}&multiplier=${multiplier}`
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         showToast("Updated Calendar.", "success");
+//         closeDayModal();
+//         loadCalendar();
+//     });
+// });
+
+
 document.getElementById('dayEditForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -2422,16 +2518,38 @@ document.getElementById('dayEditForm').addEventListener('submit', function (e) {
     const label = document.getElementById('dayEditLabel').value;
     const multiplier = document.getElementById('dayEditMultiplier').value;
 
+    // const students = [...document.querySelectorAll('input[name="students[]"]:checked')].map(c => c.value);
+
+    const studentIds = allBox.checked ? [] : [...selected_cl];
+
+    if (!allBox.checked && studentIds.length === 0) {
+        showToast("Select at least one student.", "error");
+        return;
+    }
+
+    const params = new URLSearchParams({ date, type, label, multiplier });
+    studentIds.forEach(s => params.append('students[]', s));
+
+    if (!allBox.checked && students.length === 0) {
+        showToast("Select at least one student.", "error");
+        return;
+    }
+
     fetch('functions/saveDayEvent.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `date=${encodeURIComponent(date)}&type=${type}&label=${encodeURIComponent(label)}&multiplier=${multiplier}`
+        body: params.toString()
     })
     .then(res => res.json())
     .then(data => {
+        if (data.status !== 'success') {
+            showToast(data.message || "Failed to save.", "error");
+            return;
+        }
         showToast("Updated Calendar.", "success");
         closeDayModal();
         loadCalendar();
+       
     });
 });
 
@@ -2947,6 +3065,21 @@ closeEditTask.addEventListener("click", () => {
 
 });
 
+
+// view task btns
+document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".supervisor-tabs .tab-btn");
+    if (!btn) return;
+
+    const modal = btn.closest(".supervisor-tabs").parentElement;
+
+    modal.querySelectorAll(".supervisor-tabs .tab-btn")
+        .forEach(b => b.classList.toggle("active", b === btn));
+
+    modal.querySelectorAll(".tab-panel")
+        .forEach(p => p.classList.toggle("active", p.dataset.tab === btn.dataset.tab));
+});
+
 // activity search
 // document.getElementById("superActivityLogSearch").addEventListener("keyup", function () {
 
@@ -2987,6 +3120,7 @@ closeEditTask.addEventListener("click", () => {
 
 //     }, 300);
 // });
+
 
 
 // buttons student dashboard view

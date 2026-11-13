@@ -57,7 +57,7 @@ if ($row = $result->fetch_assoc()) {
     <div class="student-modal-content">
 
         <!-- TASK INFO TAB -->
-        <div class="tab-panel active" id="tab-info">
+        <div class="tab-panel active" data-tab="info">
             <div class="info-card">
                 <div class="card-body">
 
@@ -73,12 +73,12 @@ if ($row = $result->fetch_assoc()) {
 
                     <div class="info-row">
                         <span class="info-label">Task Title</span>
-                        <span class="info-value"><?= $row['title'] ?></span>
+                        <span class="info-value"><?= htmlspecialchars($row['title']) ?></span>
                     </div>
 
                     <div class="info-row">
                         <span class="info-label">Student Note</span>
-                        <span class="info-value"><?= $row['student_note'] ?: '-' ?></span>
+                        <span class="info-value"><?= htmlspecialchars($row['student_note']) ?: '-' ?></span>
                     </div>
 
                     <div class="info-row">
@@ -91,7 +91,7 @@ if ($row = $result->fetch_assoc()) {
         </div>
 
         <!-- FILE TAB -->
-        <div class="tab-panel" id="tab-file">
+        <div class="tab-panel" data-tab="file">
             <div class="documents-grid">
                 <div class="doc-card">
 
@@ -113,7 +113,7 @@ if ($row = $result->fetch_assoc()) {
         </div>
 
         <!-- FEEDBACK TAB -->
-        <div class="tab-panel" id="tab-feedback">
+        <div class="tab-panel" data-tab="feedback">
             <div class="info-card">
                 <div class="card-body">
 
