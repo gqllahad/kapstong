@@ -3008,6 +3008,40 @@ body.dark-mode .report-card h4 {
   color: var(--gray-600);
 }
 
+.pf-pace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin: 12px 0 4px;
+  text-align: center;
+}
+
+.pf-pace > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+}
+
+.pf-pace > div + div {
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pf-pace strong {
+  font-size: 16px;
+  color: var(--gray-900);
+}
+
+.pf-pace small {
+  opacity: 0.7;
+  font-size: 12px;
+}
+
+.pf-pace > div:only-child {
+  grid-column: 1 / -1;
+}
+
 body.dark-mode .pf-value {
   color: var(--navy-100);
 }
@@ -3593,6 +3627,20 @@ body.dark-mode .download-btn {
 }
 .fade-in {
   opacity: 1;
+}
+
+.view-progress-chart {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.view-progress-chart .chart-wrapper {
+  max-width: 220px;
+  margin: 0 auto;
+}
+
+.view-progress-chart .progress-card > h3 {
+  display: none;
 }
 
 /* ══════════════════════════════════════════════════════════════

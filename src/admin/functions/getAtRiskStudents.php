@@ -19,7 +19,7 @@ SELECT
     COALESCE(p.completed_hours, 0)  AS completed_hours,
     COALESCE(p.required_hours, 500) AS required_hours,
     p.ojt_start_date,
-    s.end_date AS deadline
+    COALESCE(s.end_date,(SELECT end_date FROM ojt_settings WHERE status = 'ACTIVE' ORDER BY settingID DESC LIMIT 1)) AS deadline
 FROM users u
 LEFT JOIN ojtstudent o ON o.studentID = u.studentID
 LEFT JOIN (

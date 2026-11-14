@@ -55,23 +55,6 @@ if ((int) getAttendanceSetting($conn, 'rfid_enabled', 1) !== 1) {
     respond("RFID scanning is currently disabled.");
 }
 
-$calStmt = $conn->prepare("
-    SELECT type, label, hour_multiplier
-    FROM calendar_events
-    WHERE event_date = ?
-");
-$calStmt->bind_param("s", $today);
-$calStmt->execute();
-$calEvent = $calStmt->get_result()->fetch_assoc();
-
-$dayType        = $calEvent['type'] ?? 'WORKDAY';
-$hourMultiplier = $calEvent ? (float) $calEvent['hour_multiplier'] : 1.0;
-$dayLabel       = $calEvent['label'] ?? null;
-
-if ($dayType === 'NO_WORK') {
-    respond("Today is marked as a no-work day" . ($dayLabel ? " ({$dayLabel})" : "") . ". Attendance scanning is disabled.");
-}
-
 $stmt = $conn->prepare("SELECT userID, studentID, name, role FROM users WHERE rfid_uid = ?");
 $stmt->bind_param("s", $rfid);
 $stmt->execute();

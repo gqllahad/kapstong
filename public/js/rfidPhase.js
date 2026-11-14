@@ -217,161 +217,11 @@ function loadAttendance() {
             if (err !== 'unauthorized') console.error(err);
         });
 }
-// function loadAttendance() {
-//     fetch("get_live_attendance.php")
-//         .then(res => res.json())
-//         .then(data => {
-//            const now = new Date();
-
-//             const formattedDate = now.toLocaleDateString('en-PH', {
-//                 weekday: 'long',
-//                 year: 'numeric',
-//                 month: 'long',
-//                 day: 'numeric'
-//             });
-
-//             let html = `
-
-//                 <div class="attendance-topbar">
-
-//                     <div class="attendance-day">
-//                         <i class='bx bx-calendar'></i>
-//                         <span>${formattedDate}</span>
-//                     </div>
-
-//                     <div class="attendance-count">
-//                         <i class='bx bx-user'></i>
-//                         <span>${data.length} Active Records</span>
-//                     </div>
-
-//                 </div>
-
-//                 <table class="attendance-table">
-
-//                     <thead>
-//                         <tr>
-//                             <th>Student</th>
-//                             <th>Time In</th>
-//                             <th>Time Out</th>
-//                             <th>Hours</th>
-//                             <th>Status</th>
-//                             <th>Current State</th>
-//                             <th>Remarks</th>
-//                         </tr>
-//                     </thead>
-
-//                     <tbody>
-//             `;
-
-//             data.forEach(row => {
-
-//                 let statusClass = "present";
-
-//                 if (row.status?.toLowerCase().includes("late")) {
-//                     statusClass = "late";
-//                 } else if (
-//                     row.remarks?.toLowerCase().includes("lunch")
-//                 ) {
-//                     statusClass = "lunch";
-//                 } else if (
-//                     row.remarks?.toLowerCase().includes("snack")
-//                 ) {
-//                     statusClass = "snack";
-//                 } else if (
-//                     row.remarks?.toLowerCase().includes("completed")
-//                 ) {
-//                     statusClass = "timeout";
-//                 }
-
-//                 const timeIn = row.first_time_in
-//                     ? new Date(row.first_time_in).toLocaleTimeString([], {
-//                         hour: '2-digit',
-//                         minute: '2-digit'
-//                     })
-//                     : '-';
-
-//                 const timeOut = row.final_time_out
-//                     ? new Date(row.final_time_out).toLocaleTimeString([], {
-//                         hour: '2-digit',
-//                         minute: '2-digit'
-//                     })
-//                     : '-';
-
-//                 html += `
-//                     <tr>
-
-//                         <td>
-//                             <div class="student-cell">
-
-//                                 <div class="student-avatar">
-//                                     ${row.name.charAt(0)}
-//                                 </div>
-
-//                                 <div class="student-info">
-//                                     <span class="student-name">
-//                                         ${row.name}
-//                                     </span>
-//                                 </div>
-
-//                             </div>
-//                         </td>
-
-//                         <td>
-//                             <span class="time-badge in">
-//                                 <i class='bx bx-log-in'></i>
-//                                 ${timeIn}
-//                             </span>
-//                         </td>
-
-//                         <td>
-//                             <span class="time-badge out">
-//                                 <i class='bx bx-log-out'></i>
-//                                 ${timeOut}
-//                             </span>
-//                         </td>
-
-//                         <td>
-//                             <span class="hours-pill">
-//                                 ${row.total_hours || 0} hrs
-//                             </span>
-//                         </td>
-
-//                         <td>
-//                             <span class="badge ${statusClass}">
-//                                 ${row.status}
-//                             </span>
-//                         </td>
-
-//                         <td>
-//                             <span class="badge ${statusClass}">
-//                                 ${row.current_state}
-//                             </span>
-//                         </td>
-
-//                         <td class="remarks">
-//                             ${row.remarks || '-'}
-//                         </td>
-
-//                     </tr>
-//                 `;
-//             });
-
-//             html += `
-//                     </tbody>
-//                 </table>
-//             `;
-
-//             document.getElementById("attendanceTable").innerHTML = html;
-//         });
-// }
-
-
 
 input.focus();
-document.addEventListener("click", () =>  {
-        if (allowRfidFocus) {
-        input.focus();
-    }
+document.addEventListener("click", (e) => {
+    if (e.target.closest("#incompletePanel, input, textarea, select, button")) return;
+    if (allowRfidFocus) input.focus();
 });
 
 window.addEventListener("pageshow", () => {
@@ -433,6 +283,7 @@ input.addEventListener("input", function () {
 
 function toggleDashboard() {
      const panel = document.getElementById("dashboardPanel");
+     const Incpanel = document.getElementById("incompletePanel");
     const table = document.getElementById("attendanceTable");
     const emergency = document.getElementById("emergency-panel");
     const manual = document.getElementById("manual-attendance-panel");
@@ -443,9 +294,14 @@ function toggleDashboard() {
         
         emergency.style.display = "flex";
         manual.style.display = "flex";
-
+        Incpanel.style.display = ""; 
         loadAttendance();
-       attendanceInterval = setInterval(loadAttendance, 5000);
+       loadAttendance();
+        loadIncompleteLogs();
+        attendanceInterval = setInterval(() => {
+            loadAttendance();
+            loadIncompleteLogs();
+        }, 5000);
     } 
     
     else {
@@ -454,6 +310,7 @@ function toggleDashboard() {
         table.innerHTML = "";
         emergency.style.display = "none";
         manual.style.display = "none";
+        Incpanel.style.display = "none";
 
     }
 }
@@ -505,6 +362,7 @@ function openEmergencyModal() {
     const panel = document.getElementById("dashboardPanel");
      const modal = document.getElementById("emergencyModal");
      const emergency = document.getElementById("emergency-panel");
+     const inc = document.getElementById("incompletePanel");
      const manual = document.getElementById("manual-attendance-panel");
     const input = document.getElementById("emergencyRfid");
     const table = document.getElementById("attendanceTable");
@@ -514,6 +372,7 @@ function openEmergencyModal() {
     clearInterval(attendanceInterval);
     table.innerHTML = "";
     emergency.style.display = "none";
+    inc.style.display = "none";
     manual.style.display = "none";
 
      modal.classList.add("show");
@@ -548,6 +407,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 
 function loadIncompleteLogs() {
     const panel = document.getElementById("incompletePanel");
+    if (panel.classList.contains("open") && panel.contains(document.activeElement)) return;
     const box   = document.getElementById("incomplete-list");
     const badge = document.getElementById("incompleteBadge");
 
@@ -592,6 +452,27 @@ function loadIncompleteLogs() {
         });
 }
 
+function confirmAction(title, text, danger = false) {
+    return new Promise(resolve => {
+        const modal = document.getElementById("confirmModal");
+        const ok = document.getElementById("confirmOk");
+        const cancel = document.getElementById("confirmCancel");
+
+        document.getElementById("confirmTitle").textContent = title;
+        document.getElementById("confirmText").textContent = text;
+        ok.classList.toggle("danger", danger);
+        modal.classList.add("show");
+
+        const close = result => {
+            modal.classList.remove("show");
+            ok.onclick = cancel.onclick = null;
+            resolve(result);
+        };
+        ok.onclick = () => close(true);
+        cancel.onclick = () => close(false);
+    });
+}
+
 function resolveLog(id, action, timeOut, note) {
     const body = new URLSearchParams({ attendanceID: id, action });
     if (timeOut) body.append("time_out", timeOut);
@@ -600,33 +481,41 @@ function resolveLog(id, action, timeOut, note) {
     return fetch("resolveIncompleteLog.php", { method: "POST", body })
         .then(r => r.json())
         .then(res => {
-            alert(res.message);
-            if (res.success) loadIncompleteLogs();
+            showToast(res.message, res.success ? "success" : "error");
+            if (res.success) loadIncompleteLogs(true);
         })
         .catch(err => {
             console.error(err);
-            alert("Request failed.");
+            showToast("Request failed.", "error");
         });
 }
 
-document.addEventListener("click", (e) => {
+document.addEventListener("click", async (e) => {
     const row = e.target.closest(".inc-row");
     if (!row) return;
     const id = row.dataset.id;
 
     if (e.target.classList.contains("inc-count")) {
         const t = row.querySelector(".inc-time").value;
-        if (confirm(`Count this log with time out at ${t}?`)) resolveLog(id, "count", t);
+        if (await confirmAction("Count this log?", `Time out will be set to ${t}.`))
+            resolveLog(id, "count", t);
     }
+
     if (e.target.classList.contains("inc-void")) {
-        if (confirm("Void this log? No hours will be credited.")) resolveLog(id, "void");
+        if (await confirmAction("Void this log?", "No hours will be credited.", true))
+            resolveLog(id, "void");
     }
 
     if (e.target.classList.contains("inc-ack")) {
         const t = row.querySelector(".inc-time").value;
         const n = row.querySelector(".inc-note").value;
-        if (confirm(`Confirm the student actually left at ${t}?`)) resolveLog(id, "acknowledge", t, n);
+        if (await confirmAction("Acknowledge this log?", `Confirm the student actually left at ${t}.`))
+            resolveLog(id, "acknowledge", t, n);
     }
+});
+
+document.querySelector(".incomplete-head").addEventListener("click", () => {
+    document.getElementById("incompletePanel").classList.toggle("open");
 });
 
 
@@ -636,6 +525,7 @@ function openManualAttendanceModal(){
     const panel = document.getElementById("dashboardPanel");
      const modal = document.getElementById("manual-attendance-modal");
      const emergency = document.getElementById("emergency-panel");
+     const inc = document.getElementById("incompletePanel")
      const manual = document.getElementById("manual-attendance-panel");
     const input = document.getElementById("emergencyRfid");
     const table = document.getElementById("attendanceTable");
@@ -645,6 +535,7 @@ function openManualAttendanceModal(){
     clearInterval(attendanceInterval);
     table.innerHTML = "";
     emergency.style.display = "none";
+    inc.style.display = "none";
     manual.style.display = "none";
 
      modal.classList.add("show");
@@ -654,9 +545,6 @@ function openManualAttendanceModal(){
         input.focus();
     }, 50);
 }
-
-
-
 
 
 function closeManualAttendanceModal() {

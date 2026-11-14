@@ -1522,9 +1522,14 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
     }
 
     if (!empty($status)) {
-        $sql .= " AND attendance_logs.status = ?";
+        if (in_array($status, ['incomplete', 'voided'], true)) {
+            $sql .= " AND attendance_logs.current_state = ?";
+            $params[] = strtoupper($status);
+        } else {
+            $sql .= " AND attendance_logs.status = ?";
+            $params[] = $status;
+        }
         $types .= "s";
-        $params[] = $status;
     }
 
     if (!empty($dateFromAttendance)) {
@@ -1551,14 +1556,21 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
 
-            $status = strtolower($row['status']);
+            $state = strtoupper($row['current_state'] ?? '');
 
-            switch ($status) {
-                case 'present': $color = '#059669'; break;
-                case 'late': $color = '#F59E0B'; break;
-                case 'absent': $color = '#EF4444'; break;
-                case 'excused': $color = '#3B82F6'; break;
-                default: $color = '#9CA3AF'; break;
+            if ($state === 'INCOMPLETE') {
+                $color = '#F59E0B'; $label = 'Incomplete';
+            } elseif ($state === 'VOIDED') {
+                $color = '#6B7280'; $label = 'Voided';
+            } else {
+                $label = $row['status'];
+                switch (strtolower($row['status'])) {
+                    case 'present': $color = '#059669'; break;
+                    case 'late': $color = '#F59E0B'; break;
+                    case 'absent': $color = '#EF4444'; break;
+                    case 'excused': $color = '#3B82F6'; break;
+                    default: $color = '#9CA3AF'; break;
+                }
             }
 
             $hasEmergency = $row['emergency_timeout'] == 1 || !empty($row['emergency_reason']);
@@ -1576,7 +1588,7 @@ function renderStudentMainAttendance($conn, $superID, $search = '', $status = ''
                 <td>" . e($timeOut) . "</td>
                 <td>
                     <span class='status-pill' style='background: " . e($color) . ";border: 1px solid " . e($color) . ";'>
-                        " . e($row['status']) . "
+                        " . e($label). "
                     </span>
                 </td>
                 <td>" . e(formatHoursMinutes($row['total_hours'])) . "</td>
@@ -1985,6 +1997,7 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
             attendance_logs.first_time_in,
             attendance_logs.final_time_out,
             attendance_logs.status,
+            attendance_logs.current_state,
             attendance_logs.total_hours,
             attendance_logs.remarks,
             attendance_logs.rfid_uid,
@@ -2047,7 +2060,7 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
     }
 
     if(!empty($entry)){
-        $sql .= " AND attendance_logs.entry_method <= ?";
+        $sql .= " AND attendance_logs.entry_method = ?";
         $types .= "s";
         $params[] = $entry;
     }
@@ -2073,28 +2086,21 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
 
         while ($row = $result->fetch_assoc()) {
 
-            $attendanceStatus = strtolower($row['status']);
+            $state = strtoupper($row['current_state'] ?? '');
 
-            switch ($attendanceStatus) {
-                case 'present':
-                    $color = '#059669';
-                    break;
-
-                case 'late':
-                    $color = '#F59E0B';
-                    break;
-
-                case 'absent':
-                    $color = '#EF4444';
-                    break;
-
-                case 'excused':
-                    $color = '#3B82F6';
-                    break;
-
-                default:
-                    $color = '#9CA3AF';
-                    break;
+            if ($state === 'INCOMPLETE') {
+                $color = '#F59E0B'; $label = 'Incomplete';
+            } elseif ($state === 'VOIDED') {
+                $color = '#6B7280'; $label = 'Voided';
+            } else {
+                $label = ucfirst($row['status']);
+                switch (strtolower($row['status'])) {
+                    case 'present': $color = '#059669'; break;
+                    case 'late':    $color = '#F59E0B'; break;
+                    case 'absent':  $color = '#EF4444'; break;
+                    case 'excused': $color = '#3B82F6'; break;
+                    default:        $color = '#9CA3AF'; break;
+                }
             }
 
             $timeIn = !empty($row['first_time_in'])
@@ -2112,7 +2118,7 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
                     <div class='student-name-cell'>
 
                         <div class='student-avatar'>
-                            " . e(strtoupper(substr($row['name'], 0, 1))) . "
+                            " . e(strtoupper(mb_substr($row['name'] ?? '?', 0, 1))) . "
                         </div>
 
                         <div class='student-info'>
@@ -2157,7 +2163,7 @@ function renderAdminStudentAttendance($conn, $search = '', $status = '', $course
                                color: {$color};
                                border: 1px solid {$color}30;'>
 
-                        " . e(ucfirst($row['status'])) . "
+                        " . e($label) . "
 
                     </span>
                 </td>
@@ -2202,19 +2208,21 @@ function renderAssignSupervisorList($conn, $search = '')
         )";
     }
 
-    $sql = "SELECT 
-                supervisor.superID,
-                supervisor.name,
-                supervisor.email,
-                supervisor.number,
-                supervisor.department,
-                supervisor.company_name,
-                supervisor.position
-            FROM supervisor
-            $where
-            ORDER BY supervisor.date_created DESC";
+    $sql = "SELECT superID, name, email, number, department, company_name, position
+        FROM supervisor";
+    $params = [];
 
-    $result = $conn->query($sql);
+    if (!empty($search)) {
+        $sql .= " WHERE superID LIKE ? OR name LIKE ? OR email LIKE ? OR department LIKE ?";
+        $like = "%$search%";
+        $params = [$like, $like, $like, $like];
+    }
+    $sql .= " ORDER BY date_created DESC";
+
+    $stmt = $conn->prepare($sql);
+    if ($params) $stmt->bind_param("ssss", ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     $output = '';
 
@@ -4665,19 +4673,28 @@ function getStudentForecast($conn, $studentID, $minDays = 14, $windowDays = 28, 
 
     $windowStart = max($first, $today->modify("-{$windowDays} days"));
 
+    $o = $conn->prepare("SELECT superID FROM student_supervisor WHERE studentID = ? AND status = 'ACTIVE' LIMIT 1");
+    $o->bind_param("s", $studentID);
+    $o->execute();
+    $ownerID = (int) ($o->get_result()->fetch_column() ?: 0);
+
     $events = [];
-    $stmt = $conn->prepare("SELECT event_date, type FROM calendar_events WHERE event_date >= ?");
+    $stmt = $conn->prepare("
+        SELECT event_date, type FROM calendar_events
+        WHERE event_date >= ? AND superID IN (?, 0) AND studentID IN (?, '')
+        ORDER BY (studentID <> '') ASC, superID ASC
+    ");
     $ws = $windowStart->format('Y-m-d');
-    $stmt->bind_param("s", $ws);
+    $stmt->bind_param("sis", $ws, $ownerID, $studentID);
     $stmt->execute();
     $res = $stmt->get_result();
     while ($r = $res->fetch_assoc()) {
-        $events[$r['event_date']] = $r['type'];
+        $events[$r['event_date']] = $r['type'];  
     }
 
     $isWorkday = function (DateTimeImmutable $d) use ($events) {
         $key = $d->format('Y-m-d');
-        if (isset($events[$key])) return $events[$key] === 'WORKDAY';
+        if (isset($events[$key])) return $events[$key] !== 'NO_WORK';
         return (int) $d->format('N') <= 5;   
     };
 

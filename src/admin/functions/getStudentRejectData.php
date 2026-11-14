@@ -215,7 +215,7 @@ if ($row = $result->fetch_assoc()) {
                 id="rejectBtn"
                 disabled
                 onclick="rejectStudent('<?= $row['studentID'] ?>')">
-                ✖ Reject Student
+                 Reject Student
             </button>
 
         </div>

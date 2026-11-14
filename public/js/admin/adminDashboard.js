@@ -356,11 +356,6 @@ function submitRFIDRegister()
         if(data === "success")
         {
             showToast("RFID Registered Successfully", "success", "RFID registered!");
-
-
-            setTimeout(() => {
-                location.reload();
-            }, 500);
             
         }
         else
@@ -527,7 +522,7 @@ function approveStudent(studentID) {
     .then(response => {
         showToast("Approve student - ", "success", response);
         closeApproveModal();
-        location.reload();
+        // location.reload();
     })
     .catch(err => {
         showToast(err, "error", "Please try again.");
@@ -560,7 +555,7 @@ function approveWithoutRFID(studentID) {
     .then(response => {
         showToast("Approved Without RFID - ", "success", response);
         closeApproveModal();
-        location.reload();
+        // location.reload();
     })
     showToast(err, "error", "Please try again.");
 }
@@ -616,10 +611,10 @@ function rejectStudent(studentID) {
     })
     .then(res => res.text())
     .then(response => {
-        showToast("Student rejected successfully!", "success", "Rejected.");
+        showToast("Student rejected successfully!", "success", response);
 
         closeRejectModal();
-        location.reload();
+        // location.reload();
     })
     showToast(err, "error", "Please try again.");
 }
@@ -1527,10 +1522,6 @@ function renderRiskCards(list) {
                 <div class="ris-stat tasks-done">
                     <i class="bi bi-clipboard-check-fill"></i>
                     <div><span class="stat-val">${s.completed_tasks}<span class="stat-of">/${s.total_tasks}</span></span><span class="stat-key">Tasks done</span></div>
-                </div>
-                <div class="ris-stat attendance">
-                    <i class="bi bi-person-check-fill"></i>
-                    <div><span class="stat-val">${s.attendance_rate}%</span><span class="stat-key">Attendance</span>${_attendanceBar(s.attendance_rate)}</div>
                 </div>
                 <div class="ris-stat last-seen">
                     <i class="bi bi-calendar2-week-fill"></i>
@@ -2932,10 +2923,8 @@ supervisorForm.addEventListener("submit", function (e) {
             superCreate.classList.remove("show");
 
             showToast("Supervisor Creation - ", data.status ? "success" : "error",data.message);
-
-            setTimeout(() => {
-    location.reload();
-}, 1000);
+            
+            
 
         } else {
             messageBox.style.color = "red";

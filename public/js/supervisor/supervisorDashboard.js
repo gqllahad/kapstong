@@ -2430,14 +2430,6 @@ function loadStudents() {
         });
 }
 
-// function syncStudentBoxes() {
-//     document.querySelectorAll('input[name="students[]"]').forEach(c => {
-//         c.disabled = allBox.checked;
-//         if (allBox.checked) c.checked = false;
-//     });
-// }
-
-
 function closeDayModal() {
     overlay.classList.remove('show');
     attendanceCalendarModal.classList.remove('show');

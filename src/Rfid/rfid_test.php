@@ -160,6 +160,8 @@ $roleIcon = $isAdmin ? 'bx-shield-quarter' : 'bx-user-check';
 
     </div>
 
+    
+
     <div class="manual-attendance-panel" id="manual-attendance-panel">
 
         <div class="manual-attendance-info">
@@ -241,6 +243,18 @@ $roleIcon = $isAdmin ? 'bx-shield-quarter' : 'bx-user-check';
     </div>
 
 </div>
+
+<!-- incomplee fonfirm -->
+ <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-box">
+            <h3 id="confirmTitle"></h3>
+            <p id="confirmText"></p>
+            <div class="confirm-actions">
+                <button type="button" id="confirmCancel">Cancel</button>
+                <button type="button" id="confirmOk">Confirm</button>
+            </div>
+        </div>
+    </div>
 
 <!-- manual attendance -->
 <div class="manual-attendance-modal" id="manual-attendance-modal">

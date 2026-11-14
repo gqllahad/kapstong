@@ -2,8 +2,12 @@
 require_once("kapstongConnection.php");
 date_default_timezone_set('Asia/Manila');
 
+$logDir  = 'C:/xampp/htdocs/kapstong/src/logs';
+$logFile = $logDir . '/autovoid.log';
+$log = fn($msg) => file_put_contents($logFile, date('Y-m-d H:i:s') . " $msg" . PHP_EOL, FILE_APPEND);
+
 if ($conn->connect_error) {
-    error_log("[auto-void] Connection failed: " . $conn->connect_error);
+    $log("Connection failed: " . $conn->connect_error);
     exit(1);
 }
 
@@ -20,9 +24,9 @@ $stmt = $conn->prepare("
 $stmt->bind_param("s", $today);
 
 if (!$stmt->execute()) {
-    error_log("[auto-void] Query failed: " . $stmt->error);
+    $log("Query failed: " . $stmt->error);
     exit(1);
 }
 
-error_log("[auto-void] Rows affected: " . $stmt->affected_rows . " at " . date('Y-m-d H:i:s'));
+$log("rows affected: " . $stmt->affected_rows);
 $conn->close();

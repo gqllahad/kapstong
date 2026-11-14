@@ -179,69 +179,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                 </div>
             </div>
 
-            <!-- download supervisor data -->
-            <!-- <div class="download-all-supervisor-modal" id="download-all-supervisor-modal">
-
-                <div class="download-content">
-
-                    <div class="download-header">
-
-                        <div class="download-title">
-
-                            <div class="icon-wrapper">
-                                <i class="bi bi-person-badge"></i>
-                            </div>
-
-                            <div class="title-text">
-                                <h2>Download Supervisor PDF</h2>
-                                <p>Export supervisor records and assigned data into PDF format</p>
-                            </div>
-
-                        </div>
-
-                        <button class="modal-close" id="closeAllSupervisorDownloadModal">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-
-                    </div>
-
-                    <form action="functions/download_all_supervisor_pdf.php" method="GET">
-
-                        <div class="form-group">
-                            <label>Department</label>
-
-                            <select name="department">
-                                <option value="">All Departments</option>
-                                <option value="COI">College of Informations</option>
-                                <option value="CCJ">College of Criminal Justice</option>
-                                <option value="CoI">College of Informatics</option>
-                            </select>
-
-                        </div>
-
-                        <div class="form-group">
-                            <label>Status</label>
-
-                            <select name="status">
-                                <option value="">All</option>
-                                <option value="ACTIVE">Active</option>
-                                <option value="COMPLETED">Completed</option>
-                            </select>
-
-                        </div>
-
-                        <div class="download-footer">
-                            <button type="submit" class="confirm-btn">
-                                Generate PDF
-                            </button>
-                        </div>
-
-                    </form>
-
-                </div>
-
-            </div> -->
-
             <!-- student accounts -->
             <div class="all-student-modal" id="all-student-modal">
                 <div class="modal-header">
@@ -1107,8 +1044,10 @@ if ($_SESSION['role'] !== "ADMIN") {
                         <option value="flagged">Flagged only</option>
                         <option value="BEHIND">Behind schedule</option>
                         <option value="AT RISK">At risk</option>
-                        <option value="Not progressing">Not progressing</option>
                         <option value="ON TRACK">On track</option>
+                        <option value="STALLED">Not progressing</option>
+                        <option value="ESTIMATED">No deadline set</option>
+                        <option value="COMPLETED">Completed</option>
                     </select>
                 </div>
 

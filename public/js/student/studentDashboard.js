@@ -1272,6 +1272,84 @@ function loadTasks() {
 
 
 // progress Chart View modal
+
+function renderStudentForecast(d) {
+            const box = document.getElementById("progressForecast");
+            if (!box) return;
+            if (!d || !d.status) { box.innerHTML = ""; return; }
+            
+
+            const fmt = s => new Date(s + "T00:00:00")
+                .toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" });
+            const plural = n => `${n} day${n === 1 ? "" : "s"}`;
+
+            let cls = "fc-none", title = "Estimated finish", value = "—", note = "";
+
+            switch (d.status) {
+                case "COMPLETED":
+                    cls = "fc-ok"; title = "OJT complete"; value = "Done";
+                    note = "You've completed your required hours. Congratulations!";
+                    break;
+
+                case "NOT_ENOUGH_DATA":
+                    note = "Your estimate appears after about 2 weeks of attendance.";
+                    break;
+
+                case "TOO_SLOW":
+                cls = "fc-bad";
+                note = "At your current pace, you won't finish within 2 years. Increase your daily hours to get an estimate.";
+                break;
+
+                case "STALLED":
+                    cls = "fc-bad";
+                    note = "No recent hours logged. Log your attendance to get an estimate.";
+                    break;
+
+                default: { 
+                    value = d.projected_date ? fmt(d.projected_date) : "—";
+                    const late = d.days_late;
+
+                    if (d.status === "NO_DEADLINE" || late == null) {
+                        note = "Based on your hours over the last 4 weeks.";
+                    } else if (late <= 0) {
+                        cls = "fc-ok";
+                        note = late === 0
+                            ? "You're on pace to finish right on your deadline."
+                            : `You're on pace to finish ${plural(Math.abs(late))} before your deadline.`;
+                    } else {
+                        cls = d.status === "AT_RISK" ? "fc-bad" : "fc-warn";
+                        note = `At your current pace you'd finish ${plural(late)} after your deadline (${fmt(d.end_date)}).`;
+                    }
+                }
+            }
+
+            let paceHtml = "";
+            if (d.hours_per_day != null) {
+                paceHtml = `
+                    <div class="pf-pace">
+                        <div>
+                            <span class="pf-label">Your pace</span>
+                            <strong>${d.hours_per_day} hrs/day</strong>
+                            <small>${d.hours_per_week} hrs/week</small>
+                        </div>
+                        ${d.needed_per_day != null ? `
+                        <div>
+                            <span class="pf-label">Needed</span>
+                            <strong>${d.needed_per_day} hrs/day</strong>
+                        </div>` : ""}
+                    </div>`;
+            }
+
+            box.className = `progress-forecast ${cls}`;
+            box.innerHTML = `
+                <div class="pf-main">
+                    <span class="pf-label">${title}</span>
+                    <strong class="pf-value">${value}</strong>
+                </div>
+                ${paceHtml}
+                <p class="pf-note">${note}</p>`;
+        }
+
 function loadStudentProgressChart(studentID) {
 
     fetch("student_functions/getStudentProgress.php?studentID=" + studentID, {
@@ -1296,67 +1374,10 @@ function loadStudentProgressChart(studentID) {
             ? Math.min(100, (completed / required) * 100).toFixed(1)
             : 0;
 
-        document.getElementById("progressPercent").innerText = `${percent}% Completed`;
-        renderStudentForecast(data);
+        // document.getElementById("progressPercent").innerText = `${percent}% Completed`;
+        console.log("progress data:", data);
+        renderStudentForecast(data.forecast);
         
-        
-
-        function renderStudentForecast(d) {
-
-            if (!d.forecast) { box.innerHTML = ""; return; }
-
-            const box = document.getElementById("progressForecast");
-            if (!box) return;
-
-            const fmt = s => new Date(s + "T00:00:00")
-                .toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" });
-
-            let cls = "fc-none", title = "Estimated finish", value = "—", note = "";
-
-            switch (d.forecast) {
-                case "COMPLETED":
-                    cls = "fc-ok"; title = "OJT complete"; value = "Done";
-                    note = "You've completed your required hours. Congratulations!";
-                    break;
-
-                case "NOT STARTED":
-                    note = "Your estimate appears after your first attendance log.";
-                    break;
-
-                case "STALLED":
-                    cls = "fc-bad";
-                    note = "No hours logged in the last 4 weeks. Log your attendance to get an estimate.";
-                    break;
-
-                default: {
-                    value = d.projected_finish ? fmt(d.projected_finish) : "—";
-                    const gap = d.gap_days;
-
-                    if (gap == null) {
-                        note = "Based on your hours over the last 4 weeks.";
-                    } else if (gap <= 0) {
-                        cls = "fc-ok";
-                        note = gap === 0
-                            ? "You're on pace to finish right on your deadline."
-                            : `You're on pace to finish ${Math.abs(gap)} day${Math.abs(gap) === 1 ? "" : "s"} before your deadline.`;
-                    } else {
-                        cls = gap <= 14 ? "fc-warn" : "fc-bad";
-                        note = `At your current pace you'd finish ${gap} day${gap === 1 ? "" : "s"} after your deadline (${fmt(d.deadline)}).`;
-                        if (d.required_pace) {
-                            note += ` Aim for about ${d.required_pace} hrs/week (around ${(d.required_pace / 5).toFixed(1)} hrs a day).`;
-                        }
-                    }
-                }
-            }
-
-            box.className = `progress-forecast ${cls}`;
-            box.innerHTML = `
-                <div class="pf-main">
-                    <span class="pf-label">${title}</span>
-                    <strong class="pf-value">${value}</strong>
-                </div>
-                <p class="pf-note">${note}</p>`;
-        }
 
         window.progressChartInstance = new Chart(ctx, {
             type: 'doughnut',

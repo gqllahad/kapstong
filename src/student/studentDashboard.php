@@ -442,16 +442,14 @@ foreach ($nameParts as $part) {
 
                     <div class="progress-card">
 
-                        <h3>OJT Progress</h3>
-
                         <div class="chart-wrapper">
                             <canvas id="progressChart"></canvas>
                         </div>
 
                         <div class="progress-summary">
-                            <p class="progress-percent" id="progressPercent">
+                            <!-- <p class="progress-percent" id="progressPercent">
                                 0% Completed
-                            </p>
+                            </p> -->
 
                             <div id="progressForecast" class="progress-forecast"></div>
 
@@ -463,39 +461,6 @@ foreach ($nameParts as $part) {
             </div>
 
             <!-- notification modal -->
-
-            <!-- <div class="notification-container" id="notification-container">
-                <div class="modal-header">
-                    <h3>Notifications</h3>
-
-                    <button id="closeNotificationViewModal"
-                        class="modal-close-profile">
-                        &times;
-                    </button>
-                </div> -->
-                    
-
-                    <?php
-                        // $alerts = getStudentAlerts($conn, $studentID);
-
-                        // $icons = [
-                        //     'warning'  => 'bi-exclamation-triangle-fill',
-                        //     'danger'   => 'bi-alarm-fill',
-                        //     'critical' => 'bi-exclamation-octagon-fill',
-                        //     'success'  => 'bi-check-circle-fill',
-                        //     'info'     => 'bi-info-circle-fill',
-                        // ];
-
-                        // foreach ($alerts as &$a) {
-                        //     $a['type'] = isset($icons[$a['type']]) ? $a['type'] : 'info';
-                        //     $a['counts'] = isset($a['is_read'])
-                        //         ? !$a['is_read']
-                        //         : in_array($a['type'], ['warning', 'danger', 'critical'], true);
-                        // }
-                        // unset($a);
-
-                        // $badgeCount = count(array_filter($alerts, fn($a) => $a['counts']));
-                    ?>
 
                         <div class="notif-backdrop" id="notifBackdrop" onclick="closeNotifications()"></div>
 

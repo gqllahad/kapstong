@@ -89,7 +89,7 @@ try {
         out(true, "Log voided.");
     }
 
-    if ($row['ack_at']) { $conn->rollback(); out(false, "Already acknowledged."); }
+    if (!$row['ack_at']) { $conn->rollback(); out(false, "Waiting for supervisor acknowledgment."); }
 
     if ($timeOutInput !== '' && !$validTime($timeOutInput)) { $conn->rollback(); out(false, "Invalid time."); }
 
@@ -117,8 +117,18 @@ try {
     $hours = min($hours, $MAX_HOURS_PER_DAY);
     $hours = roundHoursWithThreshold($hours);
 
-    $m = $conn->prepare("SELECT hour_multiplier FROM calendar_events WHERE event_date = ?");
-    $m->bind_param("s", $row['log_date']);
+    $o = $conn->prepare("SELECT superID FROM student_supervisor WHERE studentID = ? AND status = 'ACTIVE' LIMIT 1");
+    $o->bind_param("s", $studentID);
+    $o->execute();
+    $ownerID = (int)($o->get_result()->fetch_column() ?: 0);
+
+    $m = $conn->prepare("
+        SELECT hour_multiplier FROM calendar_events
+        WHERE event_date = ? AND superID IN (?, 0) AND studentID IN (?, '')
+        ORDER BY (studentID <> '') DESC, superID DESC
+        LIMIT 1
+    ");
+    $m->bind_param("sis", $row['log_date'], $ownerID, $studentID);
     $m->execute();
     $ev = $m->get_result()->fetch_assoc();
     $multiplier = $ev ? (float) $ev['hour_multiplier'] : 1.0;
