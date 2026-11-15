@@ -276,7 +276,7 @@ $roleIcon = $isAdmin ? 'bx-shield-quarter' : 'bx-user-check';
         <div class="form-row">
             <div class="form-group">
                 <label>Date</label>
-                <input type="date" id="manualDate" min="<?= date('Y-m-d', strtotime('-2 days')) ?>" max="<?= date('Y-m-d') ?>" required>
+                <input type="date" id="manualDate" min="<?= date('Y-m-d', strtotime('-10 days')) ?>" max="<?= date('Y-m-d') ?>" required>
             </div>
             <div class="form-group">
                 <label>Status</label>

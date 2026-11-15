@@ -15,21 +15,35 @@ function calcAttendanceScore($conn, $studentID) {
     return min((($r['p'] + $r['l'] * 0.75) / $counted) * 100, 100);
 }
 
+
 function calcProgressScore($conn, $studentID) {
-    $stmt = $conn->prepare("
-        SELECT ojt_start_date, ojt_end_date
-        FROM student_progress WHERE studentID = ? LIMIT 1
+   $stmt = $conn->prepare("
+        SELECT
+            COALESCE(sp.ojt_start_date, os.start_date) AS start_date,
+            COALESCE(sp.ojt_end_date,   os.end_date)   AS end_date
+        FROM student_progress sp
+        LEFT JOIN ojt_settings os ON os.settingID = sp.settingID
+        WHERE sp.studentID = ? LIMIT 1
     ");
     $stmt->bind_param("s", $studentID);
     $stmt->execute();
     $p = $stmt->get_result()->fetch_assoc();
 
-    if (empty($p['ojt_start_date']) || empty($p['ojt_end_date'])) return 0;
+    if (empty($p['start_date'])) return 0;
 
-    $start = new DateTime($p['ojt_start_date']);
-    $end   = min(new DateTime($p['ojt_end_date']), new DateTime('today'));
+    $start  = new DateTime($p['start_date']);
+    $endRaw = !empty($p['end_date']) ? $p['end_date'] : date('Y-m-d');
+    $end    = min(new DateTime($endRaw), new DateTime('today'));
     $s = $start->format('Y-m-d');
     $e = $end->format('Y-m-d');
+   
+
+    // if (empty($p['ojt_start_date']) || empty($p['ojt_end_date'])) return 0;
+
+    // $start = new DateTime($p['ojt_start_date']);
+    // $end   = min(new DateTime($p['ojt_end_date']), new DateTime('today'));
+    // $s = $start->format('Y-m-d');
+    // $e = $end->format('Y-m-d');
 
     $stmt = $conn->prepare("
         SELECT event_date, type FROM calendar_events

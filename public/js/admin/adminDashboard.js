@@ -522,8 +522,12 @@ function approveStudent(studentID) {
     .then(res => res.text())
     .then(response => {
         showToast("Approve student - ", "success", response);
-        closeApproveModal();
-         refreshTable();
+        
+        setTimeout(() => {
+            closeApproveModal();
+            refreshTable();
+        }, 1000)
+
         // location.reload();
     })
     .catch(err => {

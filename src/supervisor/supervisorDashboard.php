@@ -445,7 +445,7 @@ foreach ($nameParts as $part) {
                         </div>
 
                         <div class="metric-card-view">
-                            <span class="metric-label-view">Reports</span>
+                            <span class="metric-label-view">Performance</span>
                             <span class="metric-value-view" id="reportProgress">0%</span>
                         </div>
 
@@ -1642,7 +1642,7 @@ foreach ($nameParts as $part) {
                                 <tr>
                                     <th>Name</th>
                                     <th>Completion Status</th>
-                                    <th>Reports</th>
+                                    <th>Performance</th>
                                     <th>Tasks</th>
                                     <th>Final Grade</th>
                                     <th>Remarks</th>

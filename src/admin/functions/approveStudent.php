@@ -66,15 +66,19 @@ else {
 
     // settings
     $settingStmt = $conn->prepare("
-        SELECT settingID, required_hours
-        FROM ojt_settings
-        WHERE status = 'ACTIVE'
+        SELECT os.settingID, os.required_hours
+        FROM ojtstudent ojt
+        INNER JOIN program p ON p.prg_acro = ojt.course
+        INNER JOIN ojt_settings os
+            ON os.programID = p.program_id
+        AND os.status = 'ACTIVE'
+        WHERE ojt.studentID = ?
+        ORDER BY os.settingID DESC
         LIMIT 1
     ");
-
+    $settingStmt->bind_param("s", $studentID);
     $settingStmt->execute();
-    $settingResult = $settingStmt->get_result();
-    $settings = $settingResult->fetch_assoc();
+    $settings = $settingStmt->get_result()->fetch_assoc();
 
     $settingID     = $settings['settingID'] ?? null;
     $requiredHours = $settings ? (int)$settings['required_hours'] : 500;
