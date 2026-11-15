@@ -78,8 +78,38 @@ function calcProgressScore($conn, $studentID) {
     $today = date('Y-m-d');
     if (isset($expected[$today]) && !isset($rendered[$today])) unset($expected[$today]);
 
-    $total = count($expected) - count(array_diff_key($excused, $rendered));
+    $total = count($expected);
     if ($total <= 0) return 0;
 
     return min(count($rendered) / $total * 100, 100);
+}
+
+
+function calcFinalScores($conn, $studentID) {
+    $attendance = calcAttendanceScore($conn, $studentID);
+    $progress   = calcProgressScore($conn, $studentID);
+
+    $stmt = $conn->prepare("SELECT status FROM student_tasks WHERE studentID = ?");
+    $stmt->bind_param("s", $studentID);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $map = ['APPROVED'=>100,'SUBMITTED'=>75,'IN PROGRESS'=>50,'NOT STARTED'=>20,'REJECTED'=>0];
+    $n = 0; $sum = 0;
+    while ($t = $res->fetch_assoc()) { $n++; $sum += $map[$t['status']] ?? 0; }
+    $tasks = $n ? $sum / $n : 0;
+
+    $w = $conn->query("SELECT attendance_weight, progress_weight, task_weight
+                       FROM evaluation_settings WHERE superID IS NULL LIMIT 1")->fetch_assoc() ?? [];
+    $aw = floatval($w['attendance_weight'] ?? 0.33);
+    $pw = floatval($w['progress_weight'] ?? 0.33);
+    $tw = floatval($w['task_weight'] ?? 0.33);
+    $tot = $aw + $pw + $tw;
+    if ($tot > 0) { $aw /= $tot; $pw /= $tot; $tw /= $tot; }
+
+    return [
+        'attendance' => round($attendance, 2),
+        'progress'   => round($progress, 2),
+        'tasks'      => round($tasks, 2),
+        'final'      => round($attendance*$aw + $progress*$pw + $tasks*$tw, 2),
+    ];
 }

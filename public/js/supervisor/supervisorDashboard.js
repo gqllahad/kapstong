@@ -1658,8 +1658,6 @@ function loadStudentProgressChart(studentID) {
         .then(res => res.json())
         .then(data => {
 
-            console.log("Progress data:", data);
-
             const ctx = document.getElementById('progressChart');
 
             if (!ctx) {
@@ -1702,8 +1700,6 @@ function loadStudentAttendanceChart(studentID) {
     fetch("functions/getStudentAttendance.php?studentID=" + studentID, {credentials: "include"})
         .then(res => res.json())
         .then(data => {
-
-            console.log("Attendance data:", data);
 
             const ctx = document.getElementById('attendanceChart');
 
@@ -1800,8 +1796,6 @@ function viewEvaluationReport(studentID) {
         .then(res => res.json())
         .then(data => {
 
-            console.log(data.attendance.score);
-
             document.getElementById("reportSummary").innerHTML = `
                 <div class="report-card">
 
@@ -1824,7 +1818,7 @@ function viewEvaluationReport(studentID) {
                             <h3>Progress</h3>
                             <p><b>${data.progress.score.toFixed(2)}%</b></p>
                             <small>
-                                ${data.progress.completed} / ${data.progress.required} hours
+                                ${data.progress.completed ?? 0} / ${data.progress.required} hours
                             </small>
                         </div>
 
@@ -3252,57 +3246,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetchAttendance();
 });
-
-// self task search
-// document.addEventListener("DOMContentLoaded", function () {
-
-//     const searchInput = document.getElementById("selfSearch");
-//     const statusFilter = document.getElementById("selfStatusFilter");
-//     const dateInput = document.getElementById("selfDate");
-    
-//     const tableBody = document.getElementById("selfTaskBody");
-
-    
-
-//     if (!searchInput || !statusFilter || !tableBody || !dateInput) return;
-
-//     let timer;
-
-//     function fetchSelfTask() {
-
-//         const search = searchInput.value;
-//         const status = statusFilter.value;
-//         const date = dateInput.value;
-
-//         fetch("functions/searchSelfTask.php", {
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/x-www-form-urlencoded"
-//             },
-//             body:
-//                 "search=" + encodeURIComponent(search) +
-//                 "&status=" + encodeURIComponent(status) + 
-//                 "&date=" + encodeURIComponent(date)
-//         })
-//         .then(res => res.text())
-//         .then(data => {
-//             tableBody.innerHTML = data;
-//         })
-//         .catch(err => {
-//             console.error("Attendance fetch error:", err);
-//         });
-//     }
-
-//     searchInput.addEventListener("keyup", function () {
-//         clearTimeout(timer);
-//         timer = setTimeout(fetchSelfTask, 300);
-//     });
-
-//     statusFilter.addEventListener("change", fetchSelfTask);
-//     dateInput.addEventListener("change", fetchSelfTask);
-
-//     fetchSelfTask();
-// });
 
 document.addEventListener("DOMContentLoaded", function () {
 

@@ -4,6 +4,7 @@ session_start();
 require_once("../../auth/supervisor_auth.php");
 require_once("../../Shared/kapstongConnection.php");
 require_once("../../Shared/functions.php");
+require_once("../../Shared/evaluationCalc.php");
 
 header('Content-Type: application/json');
 
@@ -34,21 +35,8 @@ $studentStmt->bind_param("s", $studentID);
 $studentStmt->execute();
 $student = $studentStmt->get_result()->fetch_assoc();
 
-$progressStmt = $conn->prepare("
-    SELECT required_hours, completed_hours, completion_status
-    FROM student_progress
-    WHERE studentID = ?
-");
-$progressStmt->bind_param("s", $studentID);
-$progressStmt->execute();
-$progress = $progressStmt->get_result()->fetch_assoc();
-
-$required = floatval($progress['required_hours'] ?? 0);
-$completed = floatval($progress['completed_hours'] ?? 0);
-
-$attendanceScore = ($required > 0)
-    ? min(($completed / $required) * 100, 100)
-    : 0;
+$attendanceScore = calcAttendanceScore($conn, $studentID);
+$progressScore   = calcProgressScore($conn, $studentID);
 
 
     $taskStmt = $conn->prepare("
@@ -94,31 +82,6 @@ while ($t = $taskResult->fetch_assoc()) {
 
 $taskScore = ($totalTasks > 0)
     ? ($taskScoreSum / $totalTasks)
-    : 0;
-
-
-
-    $stageStmt = $conn->prepare("
-    SELECT status
-    FROM internship_stages
-    WHERE studentID = ?
-");
-$stageStmt->bind_param("s", $studentID);
-$stageStmt->execute();
-$stageResult = $stageStmt->get_result();
-
-$totalStages = 0;
-$completedStages = 0;
-
-while ($s = $stageResult->fetch_assoc()) {
-    $totalStages++;
-    if ($s['status'] === 'COMPLETED') {
-        $completedStages++;
-    }
-}
-
-$progressScore = ($totalStages > 0)
-    ? ($completedStages / $totalStages) * 100
     : 0;
 
     $weightData = $conn->query("

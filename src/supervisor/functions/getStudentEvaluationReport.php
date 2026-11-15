@@ -3,6 +3,7 @@
 header('Content-Type: application/json');
 require_once("../../auth/supervisor_auth.php");
 require_once("../../Shared/kapstongConnection.php");
+require_once("../../Shared/evaluationCalc.php");
 
 $studentID = $_GET['studentID'] ?? '';
 
@@ -11,101 +12,81 @@ if (empty($studentID)) {
     exit;
 }
 
-$attQuery = "
-SELECT 
-    COUNT(*) as total,
-    SUM(status='present') as present,
-    SUM(status='late') as late,
-    SUM(status='absent') as absent,
-    SUM(status='excused') as excused
-FROM attendance_logs
-WHERE studentID = '$studentID'
-";
+// attendance counts (display only)
+$stmt = $conn->prepare("
+    SELECT COUNT(*) total,
+        SUM(status='present') present,
+        SUM(status='late') late,
+        SUM(status='absent') absent,
+        SUM(status='excused') excused
+    FROM attendance_logs
+    WHERE studentID = ? AND status NOT IN ('voided','incomplete')
+");
+$stmt->bind_param("s", $studentID);
+$stmt->execute();
+$att = $stmt->get_result()->fetch_assoc();
 
-$att = $conn->query($attQuery)->fetch_assoc();
+$totalAttendance = (int)($att['total'] ?? 0);
+$present = (int)($att['present'] ?? 0);
+$late    = (int)($att['late'] ?? 0);
+$absent  = (int)($att['absent'] ?? 0);
+$excused = (int)($att['excused'] ?? 0);
 
-$totalAttendance = $att['total'] ?? 0;
-$present = $att['present'] ?? 0;
-$late = $att['late'] ?? 0;
-$absent = $att['absent'] ?? 0;
-$excused = $att['excused'] ?? 0;
-
-$attendanceScore = ($totalAttendance > 0)
-    ? ($present / $totalAttendance) * 100
-    : 0;
-
-$progQuery = "
-SELECT completed_hours, required_hours
-FROM student_progress
-WHERE studentID = '$studentID'
-LIMIT 1
-";
-
-$prog = $conn->query($progQuery)->fetch_assoc();
+// hours (display only)
+$stmt = $conn->prepare("SELECT completed_hours, required_hours FROM student_progress WHERE studentID = ? LIMIT 1");
+$stmt->bind_param("s", $studentID);
+$stmt->execute();
+$prog = $stmt->get_result()->fetch_assoc();
 
 $completed = $prog['completed_hours'] ?? 0;
-$required = $prog['required_hours'] ?? 500;
+$required  = $prog['required_hours'] ?? 500;
 
-$progressScore = ($required > 0)
-    ? ($completed / $required) * 100
-    : 0;
+// scores
+$attendanceScore = calcAttendanceScore($conn, $studentID);
+$progressScore   = calcProgressScore($conn, $studentID);
 
-$taskQuery = "
-SELECT status
-FROM student_tasks
-WHERE studentID = '$studentID'
-";
+// tasks
+$stmt = $conn->prepare("SELECT status FROM student_tasks WHERE studentID = ?");
+$stmt->bind_param("s", $studentID);
+$stmt->execute();
+$taskResult = $stmt->get_result();
 
-$taskResult = $conn->query($taskQuery);
+$map = ['APPROVED' => 100, 'SUBMITTED' => 75, 'IN PROGRESS' => 50, 'NOT STARTED' => 20, 'REJECTED' => 0];
 
 $totalTasks = 0;
 $approved = 0;
 $submitted = 0;
 $inProgress = 0;
+$taskSum = 0;
 
-while ($row = $taskResult->fetch_assoc()) {
+while ($t = $taskResult->fetch_assoc()) {
     $totalTasks++;
+    $taskSum += $map[$t['status']] ?? 0;
 
-    switch ($row['status']) {
-        case 'APPROVED':
-            $approved++;
-            break;
-        case 'SUBMITTED':
-            $submitted++;
-            break;
-        case 'NOT STARTED':
-            $inProgress++;
-            break;
-    }
+    if ($t['status'] === 'APPROVED') $approved++;
+    elseif ($t['status'] === 'SUBMITTED') $submitted++;
+    elseif ($t['status'] === 'IN PROGRESS') $inProgress++;
 }
 
-$taskScore =
-    ($totalTasks > 0)
-    ? (($approved * 100) + ($submitted * 75) + ($inProgress * 50)) / $totalTasks
-    : 0;
+$taskScore = ($totalTasks > 0) ? $taskSum / $totalTasks : 0;
 
-$weightQuery = "
+// weights (default row only)
+$weightRow = $conn->query("
     SELECT attendance_weight, progress_weight, task_weight
     FROM evaluation_settings
-    WHERE superID = (
-        SELECT superID FROM student_supervisor WHERE studentID = '$studentID' LIMIT 1
-    )
+    WHERE superID IS NULL
     LIMIT 1
-";
+")->fetch_assoc() ?? [];
 
-$weightResult = $conn->query($weightQuery);
-$weightRow = $weightResult->fetch_assoc();
+$attendanceW = floatval($weightRow['attendance_weight'] ?? 0.33);
+$progressW   = floatval($weightRow['progress_weight'] ?? 0.33);
+$taskW       = floatval($weightRow['task_weight'] ?? 0.33);
 
-$attendanceW = $weightRow['attendance_weight'] ?? 0.20;
-$progressW   = $weightRow['progress_weight'] ?? 0.30;
-$taskW       = $weightRow['task_weight'] ?? 0.50;
-
-$total = $attendanceW + $progressW + $taskW;
-
-if ($total > 0) {
-    $attendanceW /= $total;
-    $progressW   /= $total;
-    $taskW       /= $total;
+$totalW = $attendanceW + $progressW + $taskW;
+if ($totalW > 0) {
+    $attendanceW /= $totalW;
+    $progressW   /= $totalW;
+    $taskW       /= $totalW;
 }
 
 $finalGrade =

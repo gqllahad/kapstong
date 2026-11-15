@@ -113,11 +113,9 @@ if (lockoutBox && lockoutCountdown) {
   const loginSection = document.getElementById("log-container");
   if (loginSection) loginSection.scrollIntoView({ behavior: "smooth" });
 
-  console.log("Lockout box found, starting timer");
   lockoutBox.classList.add("active");
 
   let remaining = parseInt(lockoutBox.dataset.remaining, 10);
-  console.log("Initial remaining:", remaining);
 
   function formatTime(totalSeconds) {
     const mins = Math.floor(totalSeconds / 60);
@@ -130,41 +128,23 @@ if (lockoutBox && lockoutCountdown) {
     lockoutCountdown.textContent = formatTime(remaining);
 
     if (remaining <= 0) {
-      console.log("Countdown reached zero, clearing timer");
+  
       clearInterval(lockoutTimer);
-      lockoutBox.innerHTML = "<p>✅ You can try logging in again now.</p>";
+      lockoutBox.innerHTML = "<p> You can try logging in again now.</p>";
 
       setTimeout(() => {
-        console.log("Cleanup timeout firing now"); 
+    
         lockoutBox.classList.remove("active");
 
         const url = new URL(window.location);
         url.searchParams.delete("locked");
         url.searchParams.delete("email");
-        console.log("New URL after cleanup:", url.toString());
         window.history.replaceState({}, document.title, url.toString());
-        console.log("Actual address bar now:", window.location.href);
+
       }, 2000);
     }
   }, 1000);
 }
-
-// theme toggle
-// function applyTheme(mode) {
-//   document.body.classList.toggle("light-mode", mode === "light");
-//   if (themeIcon)
-//     themeIcon.className = mode === "light" ? "bx bx-moon" : "bx bx-sun";
-// }
-
-// applyTheme(localStorage.getItem("kapstong-theme") || "dark");
-
-// themeToggle?.addEventListener("click", () => {
-//   const next = document.body.classList.contains("light-mode")
-//     ? "dark"
-//     : "light";
-//   applyTheme(next);
-//   localStorage.setItem("kapstong-theme", next);
-// });
 
 // login invader
 if (invaderLogin && modalInvader) {

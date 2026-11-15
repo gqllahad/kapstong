@@ -1361,7 +1361,6 @@ document.addEventListener("input", (e) => {
     }
 });
 document.addEventListener("change", (e) => {
-    console.log("change fired", e.target.id);
     if (e.target.id === "riskFilter") applyRiskFilters();
 });
 
@@ -1568,7 +1567,6 @@ function applyRiskFilters() {
         return true;
     });
 
-    console.log(f, q, allRiskData.length, list.length);
 
     renderRiskCards(list);
 }
@@ -2652,7 +2650,6 @@ allSupervisorClose.addEventListener("click", () => {
     });
 
     removeBtn.addEventListener("click", async (e) => {
-         console.log("remove clicked", isSavedOnServer);
         e.stopPropagation();
 
         if (!isSavedOnServer) {

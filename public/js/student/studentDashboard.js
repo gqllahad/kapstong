@@ -1610,7 +1610,14 @@ removeFilesBtn?.addEventListener('click', () => {
 
     fetch("delete_documents_action.php", { method: "POST" })
         .then(res => res.text())
-        .then(() => window.location.reload())
+        .then(() => {
+            
+            overlay.classList.remove('show');
+        uploadModal.classList.remove('show');
+            // window.location.reload();
+
+        
+        })
         .catch(err => console.error(err));
 });
 
@@ -1821,22 +1828,6 @@ if(studentTasksBtn){
         }
     });
 });
-
-    // document.getElementById("submitTaskForm").addEventListener("submit", function (e) {
-    //     e.preventDefault();
-
-    //     const formData = new FormData(this);
-
-    //     fetch("student_functions/submitTask.php", {
-    //         method: "POST",
-    //         body: formData
-    //     })
-    //     .then(res => res.json())
-    //     .then(data => {
-    //         console.log(data);
-    //     });
-    // });
-
     closeSubmitTaskBtn.addEventListener("click", () => {
         submitTaskModal.classList.remove("show");
          viewTaskDetails.classList.add("show");

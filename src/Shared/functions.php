@@ -2,6 +2,7 @@
 
 
 use setasign\Fpdi\Fpdi;
+require_once __DIR__ . "/evaluationCalc.php";
 
 function logout()
 {
@@ -1016,50 +1017,19 @@ function renderEvaluationList($conn, $superID, $search = '', $reportsCourse = ''
 
     $output = '';
 
-    while ($row = $result->fetch_assoc()) {
+     while ($row = $result->fetch_assoc()) {
 
         $studentID = $row['studentID'];
 
+        $attendanceScore = calcAttendanceScore($conn, $studentID);
+        $progressScore   = calcProgressScore($conn, $studentID);
+
         $progressData = $conn->query("
-            SELECT required_hours, completed_hours, completion_status
+            SELECT completion_status
             FROM student_progress
             WHERE studentID = '$studentID'
             LIMIT 1
         ")->fetch_assoc();
-
-        $requiredHours = floatval($progressData['required_hours'] ?? 0);
-        $completedHours = floatval($progressData['completed_hours'] ?? 0);
-
-        if ($requiredHours <= 0) {
-            $attendanceScore = 0;
-        } else {
-            $attendanceScore = min(
-                ($completedHours / $requiredHours) * 100,
-                100
-            );
-        }
-
-        $stageResult = $conn->query("
-            SELECT status
-            FROM internship_stages
-            WHERE studentID = '$studentID'
-        ");
-
-        $totalStages = 0;
-        $completedStages = 0;
-
-        while ($s = $stageResult->fetch_assoc()) {
-
-            $totalStages++;
-
-            if ($s['status'] === 'COMPLETED') {
-                $completedStages++;
-            }
-        }
-
-        $progressScore = ($totalStages > 0)
-            ? ($completedStages / $totalStages) * 100
-            : 0;
 
         $taskResult = $conn->query("
             SELECT status
@@ -1107,18 +1077,17 @@ function renderEvaluationList($conn, $superID, $search = '', $reportsCourse = ''
             ? ($taskSum / $taskTotal)
             : 0;
 
-        $weightData = $conn->query("
+         $weightData = $conn->query("
             SELECT attendance_weight, progress_weight, task_weight
             FROM evaluation_settings
             WHERE superID IS NULL
             LIMIT 1
         ");
-
         $weightRow = $weightData->fetch_assoc() ?? [];
 
         $attendanceW = floatval($weightRow['attendance_weight'] ?? 0.33);
-        $progressW    = floatval($weightRow['progress_weight'] ?? 0.33);
-        $taskW        = floatval($weightRow['task_weight'] ?? 0.33);
+        $progressW   = floatval($weightRow['progress_weight'] ?? 0.33);
+        $taskW       = floatval($weightRow['task_weight'] ?? 0.33);
 
         $totalW = $attendanceW + $progressW + $taskW;
 

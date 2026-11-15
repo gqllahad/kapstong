@@ -212,12 +212,12 @@ ul {
 </div>
 
 <div class="card">
-    <div class="title">Recommendation</div>
+    <div class="title">Remarks</div>
     <p><b>'.$data['final_recommendation'].'</b></p>
 </div>
 
 <div class="card">
-    <div class="title">Remarks</div>
+    <div class="title">Recommendation</div>
     <p>'.$data['final_remarks'].'</p>
 </div>
 

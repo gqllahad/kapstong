@@ -3,6 +3,8 @@
 session_start();
 require_once("../../Shared/kapstongConnection.php");
 require_once("../../Mail/mailer.php");
+require_once("../../auth/supervisor_auth.php");
+require_once("../../Shared/evaluationCalc.php");
 
 header('Content-Type: application/json');
 
@@ -19,10 +21,11 @@ if (!$studentID) {
     exit();
 }
 
-$attendance = $_POST['attendance'] ?? 0;
-$progress = $_POST['progress'] ?? 0;
-$tasks = $_POST['tasks'] ?? 0;
-$final = $_POST['final'] ?? 0;
+$s = calcFinalScores($conn, $studentID);
+$attendance = $s['attendance'];
+$progress   = $s['progress'];
+$tasks      = $s['tasks'];
+$final      = $s['final'];
 
 $ethics = $_POST['ethics'] ?? 0;
 $communication = $_POST['communication'] ?? 0;
@@ -33,6 +36,14 @@ $recommendation = $_POST['recommendation'] ?? '';
 $remarks = $_POST['remarks'] ?? '';
 $rec_title = $_POST['rec_title'] ?? '';
 $rec_text = $_POST['rec_text'] ?? '';
+
+$dup = $conn->prepare("SELECT evaluationID FROM final_evaluation WHERE studentID = ? AND status = 'FINALIZED' LIMIT 1");
+$dup->bind_param("s", $studentID);
+$dup->execute();
+if ($dup->get_result()->num_rows > 0) {
+    echo json_encode(["success" => false, "message" => "Already evaluated"]);
+    exit();
+}
 
 try {
 
