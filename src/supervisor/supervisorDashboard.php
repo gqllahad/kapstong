@@ -492,7 +492,7 @@ foreach ($nameParts as $part) {
                         <p id="rRecommendationText"></p>
                     </div>
 
-                    <div class="section-title-view">Remarks</div>
+                    <div class="section-title-view">Comments</div>
 
                     <div class="card-view">
                         <p id="rRemarks"></p>

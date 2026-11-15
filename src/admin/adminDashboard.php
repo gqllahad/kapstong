@@ -1390,11 +1390,6 @@ if ($_SESSION['role'] !== "ADMIN") {
                                 <span>Settings</span>
                             </button>
 
-                            <button onclick="openEvaluationDownloadModal()">
-                                <i class="bi bi-bar-chart-fill"></i>
-                                <span>Download Reports</span>
-                            </button>
-
                             <button onclick="openStudentAssign()">
                                 <i class="bi bi-people-fill"></i>
                                 <span>Assign Students</span>
