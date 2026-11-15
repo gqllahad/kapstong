@@ -66,9 +66,9 @@ else {
 
     // settings
     $settingStmt = $conn->prepare("
-        SELECT required_hours 
-        FROM ojt_settings 
-        WHERE status = 'ACTIVE' 
+        SELECT settingID, required_hours
+        FROM ojt_settings
+        WHERE status = 'ACTIVE'
         LIMIT 1
     ");
 
@@ -76,6 +76,7 @@ else {
     $settingResult = $settingStmt->get_result();
     $settings = $settingResult->fetch_assoc();
 
+    $settingID     = $settings['settingID'] ?? null;
     $requiredHours = $settings ? (int)$settings['required_hours'] : 500;
 
     // student_progress
@@ -90,20 +91,13 @@ $checkStmt->execute();
 $checkResult = $checkStmt->get_result();
 
 if ($checkResult->num_rows == 0) {
-
     $progressStmt = $conn->prepare("
-        INSERT INTO student_progress (
-            studentID,
-            required_hours,
-            completed_hours,
-            completion_status
-        )
-        VALUES (?, ?, 0, 'ONGOING')
+        INSERT INTO student_progress
+            (studentID, settingID, required_hours, completed_hours, completion_status)
+        VALUES (?, ?, ?, 0, 'ONGOING')
     ");
-
-    $progressStmt->bind_param("si", $studentID, $requiredHours);
+    $progressStmt->bind_param("sii", $studentID, $settingID, $requiredHours);
     $progressStmt->execute();
-
 }
 
     echo $message;

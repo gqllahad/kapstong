@@ -27,7 +27,7 @@ if ($_SESSION['role'] !== "ADMIN") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Admin Dashboard</title>
-    <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
+    <link rel="icon" type="image/png" href="../../public/kapstongImage/Graduate Colleges Science Seal.png">
 
     <link rel="stylesheet" href="../../public/css/admin/adminDashboard3.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -975,44 +975,44 @@ if ($_SESSION['role'] !== "ADMIN") {
             <!-- completion certificate -->
             <div class="certificate-complete" id="certificate-complete">
 
-            <div class="modal-header">
-                <h3>Certificate of Completion</h3>
-                <button id="closeCertificateOfCompletionModal" class="modal-close">&times;</button>
-            </div>
-
-            <div class="cert-upload-wrap">
-
-                <div class="cert-dropzone" id="certDropzone">
-                    <input type="file" id="certFileInput" accept=".pdf,.png,.jpg,.jpeg" hidden>
-
-                    <div class="cert-dropzone-empty" id="certEmptyState">
-                        <i class="bi bi-file-earmark-arrow-up cert-upload-icon"></i>
-                        <p class="cert-upload-title">Drop your certificate template here</p>
-                        <p class="cert-upload-sub">PDF, PNG or JPG, up to 10MB</p>
-                        <button type="button" class="cert-browse-btn" id="certBrowseBtn">Browse file</button>
-                    </div>
-
-                    <div class="cert-dropzone-preview" id="certPreviewState" style="display:none;">
-                        <i class="bi bi-file-earmark-check cert-preview-icon"></i>
-                        <div class="cert-preview-info">
-                            <p class="cert-preview-name" id="certFileName"></p>
-                            <p class="cert-preview-size" id="certFileSize"></p>
-                        </div>
-                        <div class="cert-preview-actions">
-                            <button type="button" class="cert-replace-btn" id="certReplaceBtn">Replace</button>
-                            <button type="button" class="cert-remove-btn" id="certRemoveBtn">
-                                <i class="bi bi-trash3"></i>
-                            </button>
-                        </div>
-                    </div>
+                <div class="modal-header">
+                    <h3>Certificate of Completion</h3>
+                    <button id="closeCertificateOfCompletionModal" class="modal-close">&times;</button>
                 </div>
 
-                <div class="cert-upload-footer">
-                    <span class="cert-status" id="certStatus"></span>
-                    <button type="button" class="cert-save-btn" id="certSaveBtn" disabled>Save Template</button>
-                </div>
+                <div class="cert-upload-wrap">
 
-            </div>
+                        <div class="cert-dropzone" id="certDropzone">
+                                <input type="file" id="certFileInput" accept=".pdf,.png,.jpg,.jpeg" hidden>
+
+                                <div class="cert-dropzone-empty" id="certEmptyState">
+                                    <i class="bi bi-file-earmark-arrow-up cert-upload-icon"></i>
+                                    <p class="cert-upload-title">Drop your certificate template here</p>
+                                    <p class="cert-upload-sub">PDF, PNG or JPG, up to 10MB</p>
+                                    <button type="button" class="cert-browse-btn" id="certBrowseBtn">Browse file</button>
+                                </div>
+
+                                <div class="cert-dropzone-preview" id="certPreviewState" style="display:none;">
+                                    <i class="bi bi-file-earmark-check cert-preview-icon"></i>
+                                    <div class="cert-preview-info">
+                                        <p class="cert-preview-name" id="certFileName"></p>
+                                        <p class="cert-preview-size" id="certFileSize"></p>
+                                    </div>
+                                    <div class="cert-preview-actions">
+                                        <button type="button" class="cert-replace-btn" id="certReplaceBtn">Replace</button>
+                                        <button type="button" class="cert-remove-btn" id="certRemoveBtn">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                        </div>
+
+                        <div class="cert-upload-footer">
+                            <span class="cert-status" id="certStatus"></span>
+                            <button type="button" class="cert-save-btn" id="certSaveBtn" disabled>Save Template</button>
+                        </div>
+
+                    </div>
             </div>
 
             <!-- delete template -->

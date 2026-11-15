@@ -2664,7 +2664,6 @@ td {
 .rfid-attendance-container,
 .evaluation-settings-container,
 .certificate-complete,
-.delete-cert-modal,
 .requirements-setup-container,
 .create-course-modal,
 .create-settings-modal,
@@ -2712,7 +2711,6 @@ td {
 .rfid-attendance-container.show,
 .evaluation-settings-container.show,
 .certificate-complete.show,
-.delete-cert-modal.show,
 .requirements-setup-container.show,
 .create-course-modal.show,
 .create-settings-modal.show,
@@ -3046,11 +3044,21 @@ td {
 .delete-cert-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
+  opacity: 1;
+  visibility: visible;
+  z-index: 10000;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .delete-cert-box {

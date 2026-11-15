@@ -45,7 +45,7 @@ $roleIcon = $isAdmin ? 'bx-shield-quarter' : 'bx-user-check';
     <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OJT Attendance</title>
-    <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
+    <link rel="icon" type="image/png" href="../../public/kapstongImage/Graduate Colleges Science Seal.png">
      <link rel="stylesheet" href="../../public/css/rfid/rfidPhase2.css" />
      <link
   href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
@@ -68,7 +68,7 @@ $roleIcon = $isAdmin ? 'bx-shield-quarter' : 'bx-user-check';
 <div class="container"> 
     
     <div class="header">
-            <img class="scanner-logo" src="../../public/kapstongImage/logo.jpg" alt="Logo">
+            <img class="scanner-logo" src="../../public/kapstongImage/Graduate Colleges Science Seal.png" alt="Logo">
         
 
         <h1>Granby On-the-Job Training Attendance System</h1>

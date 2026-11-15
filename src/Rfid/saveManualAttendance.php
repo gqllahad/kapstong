@@ -82,7 +82,37 @@ if ($workedSeconds < 0) {
     respond(false, 'Break duration exceeds total time worked.');
 }
 
-$totalHours = round($workedSeconds / 3600, 2);
+$maxPerDay  = (int) getAttendanceSetting($conn, 'max_hours_per_day', 8);
+$totalHours = roundHoursWithThreshold(min(round($workedSeconds / 3600, 2), $maxPerDay));
+
+$ownerStmt = $conn->prepare("SELECT superID FROM student_supervisor WHERE studentID = ? AND status = 'ACTIVE' LIMIT 1");
+$ownerStmt->bind_param("s", $studentID);
+$ownerStmt->execute();
+$studentSuperID = (int)($ownerStmt->get_result()->fetch_column() ?: 0);
+
+$calStmt = $conn->prepare("
+    SELECT hour_multiplier FROM calendar_events
+    WHERE event_date = ? AND superID IN (?, 0) AND studentID IN (?, '')
+    ORDER BY (studentID <> '') DESC, superID DESC LIMIT 1
+");
+$calStmt->bind_param("sis", $date, $studentSuperID, $studentID);
+$calStmt->execute();
+$cal = $calStmt->get_result()->fetch_assoc();
+$hourMultiplier = $cal ? (float)$cal['hour_multiplier'] : 1.0;
+
+$pg = $conn->prepare("SELECT COALESCE(completed_hours,0) AS done, required_hours, completion_status FROM student_progress WHERE studentID = ?");
+$pg->bind_param("s", $studentID);
+$pg->execute();
+$prog = $pg->get_result()->fetch_assoc();
+
+if ($prog && strtoupper($prog['completion_status']) === 'COMPLETED') {
+    respond(false, 'OJT already completed.');
+}
+
+$totalHours = round($totalHours * $hourMultiplier, 2);
+if ($prog) {
+    $totalHours = min($totalHours, max(0, round($prog['required_hours'] - $prog['done'], 2)));
+}
 $roleLabel = ($role === 'ADMIN') ? 'Admin' : 'Supervisor';
 $remarks = "Manually recorded by {$roleLabel}: " . ucfirst($status) . " (break: {$breakMinutes} min)";
 
@@ -109,6 +139,17 @@ $stmt->bind_param(
 );
 
 if ($stmt->execute()) {
+
+    $up = $conn->prepare("
+        UPDATE student_progress
+        SET completed_hours   = LEAST(required_hours, COALESCE(completed_hours, 0) + ?),
+            completion_status = IF(completed_hours >= required_hours, 'COMPLETED', completion_status),
+            ojt_start_date    = IF(ojt_start_date IS NULL OR ? < ojt_start_date, ?, ojt_start_date),
+            ojt_end_date      = IF(completed_hours >= required_hours AND ojt_end_date IS NULL, ?, ojt_end_date)
+        WHERE studentID = ?
+    ");
+    $up->bind_param("dssss", $totalHours, $date, $date, $date, $studentID);
+    $up->execute();
 
     $activityStmt = $conn->prepare("
         INSERT INTO activity_log 

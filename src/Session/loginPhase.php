@@ -32,10 +32,10 @@ include("../Shared/kapstongConnection.php");
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta property="og:title" content="Granby OJT Monitoring System" />
   <meta property="og:description" content="Fast, reliable RFID-based attendance and OJT monitoring for administrators, coordinators, and students." />
-  <meta property="og:image" content="../../public/kapstongImage/logo.jpg" />
+  <meta property="og:image" content="../../public/kapstongImage/Graduate Colleges Science Seal.png" />
   <meta property="og:type" content="website" />
   <title>Granby Monitoring System</title>
-  <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
+  <link rel="icon" type="image/png" href="../../public/kapstongImage/Graduate Colleges Science Seal.png">
   <link rel="stylesheet" href="../../public/css/loginPhase.css" />
   <link
     href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
@@ -48,7 +48,7 @@ include("../Shared/kapstongConnection.php");
   <header class="header">
     <div class="container">
       <h1 class="logo-text">
-        <img src="../../public/kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
+        <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="logo-img" style="border-radius: 50%;">
         <div class="header-title">
           <div>Granby</div>
           <small>OJT Monitoring System </small>
@@ -133,7 +133,7 @@ include("../Shared/kapstongConnection.php");
               <div class="brand">
 
                 <div class="logo">
-                  <img src="../../public/kapstongImage/logo.jpg" class="logo-img" style="border-radius: 50%;">
+                  <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="logo-img" style="border-radius: 50%;">
                 </div>
 
 
@@ -370,7 +370,7 @@ include("../Shared/kapstongConnection.php");
  <footer class="landing-footer">
   <div class="container footer-grid">
     <div class="footer-brand">
-      <img src="../../public/kapstongImage/logo.jpg" class="footer-logo" alt="Kapstong logo">
+      <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="footer-logo" alt="Kapstong logo">
       <p>Granby OJT Monitoring System</p>
     </div>
 
@@ -387,7 +387,7 @@ include("../Shared/kapstongConnection.php");
 
   <div id="loadingScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="logo-img-loading">
     </div>
     <p>Signing up..</p>
     <div class="loading-dots">
@@ -397,7 +397,7 @@ include("../Shared/kapstongConnection.php");
 
   <div id="loginLoadingnScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="logo-img-loading">
     </div>
     <p>Logging in..</p>
     <div class="loading-dots">
@@ -407,7 +407,7 @@ include("../Shared/kapstongConnection.php");
 
   <div id="loginSetLoadingScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="logo-img-loading">
     </div>
     <p>Setting up your account..</p>
     <div class="loading-dots">
@@ -417,7 +417,7 @@ include("../Shared/kapstongConnection.php");
 
    <div id="signupSetloadingScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="logo-img-loading">
     </div>
     <p>Signing up..</p>
     <div class="loading-dots">
@@ -427,7 +427,7 @@ include("../Shared/kapstongConnection.php");
 
   <div id="forgotLoadingScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="logo-img-loading">
     </div>
     <p>Redirecting..</p>
     <div class="loading-dots">

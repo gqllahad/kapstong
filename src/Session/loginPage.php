@@ -60,7 +60,7 @@ if (isset($_GET['locked']) && isset($_GET['email'])) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Granby Monitoring System</title>
-  <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
+  <link rel="icon" type="image/png" href="../../public/kapstongImage/Graduate Colleges Science Seal.png">
   <link rel="stylesheet" href="../../public/css/loginPhase.css" />
   <link
     href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
@@ -71,7 +71,7 @@ if (isset($_GET['locked']) && isset($_GET['email'])) {
 <body style="overflow:hidden;margin:0;padding:0;"> 
 <div class="header-login-container">
   <a href="loginPhase.php" class="back-home-logo tooltip tooltip-right" data-tooltip="Back to login">
-    <img src="../../public/kapstongImage/logo.jpg" alt="Kapstong logo">
+    <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" alt="Kapstong logo">
     <div class="header-title">
       <span class="header-brand">Granby</span>
       <small class="header-subtitle">OJT Monitoring System</small>
@@ -195,7 +195,7 @@ if (isset($_GET['locked']) && isset($_GET['email'])) {
 
   <div id="loadingScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="logo-img-loading">
     </div>
     <p>Signing up..</p>
     <div class="loading-dots">
@@ -205,7 +205,7 @@ if (isset($_GET['locked']) && isset($_GET['email'])) {
 
   <div id="loginLoadingnScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="logo-img-loading">
     </div>
     <p>Logging in..</p>
     <div class="loading-dots">
@@ -215,7 +215,7 @@ if (isset($_GET['locked']) && isset($_GET['email'])) {
 
   <div id="forgotLoadingScreen" class="loading-screen">
     <div class="logo-loader">
-      <img src="../../public/kapstongImage/logo.jpg" class="logo-img-loading">
+      <img src="../../public/kapstongImage/Graduate Colleges Science Seal.png" class="logo-img-loading">
     </div>
     <p>Redirecting..</p>
     <div class="loading-dots">

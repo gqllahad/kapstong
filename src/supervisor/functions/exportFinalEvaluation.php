@@ -14,19 +14,7 @@ if (!$studentID) {
     die("Missing studentID");
 }
 
-$stmt = $conn->prepare("
-    SELECT 
-        fe.*,
-        os.name AS student_name,
-        os.studentID
-    FROM final_evaluation fe
-    INNER JOIN ojtstudent os
-        ON fe.studentID = os.studentID
-    WHERE fe.studentID = ?
-      AND fe.superID = ?
-    ORDER BY fe.created_at DESC
-    LIMIT 1
-");
+$stmt = $conn->prepare(" SELECT fe.*, os.name AS student_name, os.studentID, su.name AS supervisor_name FROM final_evaluation fe INNER JOIN ojtstudent os ON fe.studentID = os.studentID LEFT JOIN users su ON su.userID = fe.superID WHERE fe.studentID = ? AND fe.superID = ? ORDER BY fe.created_at DESC LIMIT 1 ");
 
 $stmt->bind_param("si", $studentID, $superID);
 $stmt->execute();
@@ -189,6 +177,7 @@ ul {
 <div class="header">
     <h1>OJT Final Evaluation Report</h1>
     <p>'.$data['student_name'].' ('.$data['studentID'].')</p>
+    <p>Supervisor: '.$data['supervisor_name'].'</p>
     <p>Generated: '.date("F d, Y h:i A").'</p>
 </div>
 

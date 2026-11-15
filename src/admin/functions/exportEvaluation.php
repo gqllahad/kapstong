@@ -9,11 +9,13 @@ use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use Dompdf\Dompdf;
 
+
 require_once __DIR__ . '/../../../PHPMailer/src/PHPMailer.php';
 require_once __DIR__ . '/../../../PHPMailer/src/SMTP.php';
 require_once __DIR__ . '/../../../PHPMailer/src/Exception.php';
 
 header('Content-Type: application/json');
+ini_set('display_errors', 0);
 
 $id = (int)($_POST['evaluationID'] ?? 0);
 $row = $id ? getEvaluationData($conn, $id) : null;
@@ -29,12 +31,12 @@ $dompdf->setPaper('A4');
 $dompdf->render();
 $evaluationPdf = $dompdf->output();
 
-$certificatePdf = generateCertificatePdf(
-    $conn,
-    $row['student_name'],
-    $row['studentID'],
-    $row['course'] ?? ''
-);
+try {
+    $certificatePdf = generateCertificatePdf($conn, $row['student_name'], $row['studentID'], $row['course'] ?? '');
+} catch (Throwable $e) {
+    error_log($e->getMessage());
+    $certificatePdf = null;
+}
 
 try {
     $mail = new PHPMailer(true);
@@ -63,6 +65,23 @@ try {
     }
 
     $mail->send();
+
+     if ($certificatePdf && !empty($row['student_email'])) {
+        $m2 = new PHPMailer(true);
+        $m2->isSMTP();
+        $m2->Host       = 'smtp.gmail.com';
+        $m2->SMTPAuth   = true;
+        $m2->Username   = MAIL_USERNAME;
+        $m2->Password   = MAIL_PASSWORD;
+        $m2->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $m2->Port       = 587;
+        $m2->setFrom(MAIL_USERNAME, 'OJT Monitoring System');
+        $m2->addAddress($row['student_email']);
+        $m2->Subject = "OJT Certificate of Completion";
+        $m2->Body    = "Congratulations {$row['student_name']}! Your certificate of completion is attached.";
+        $m2->addStringAttachment($certificatePdf, "Certificate_{$row['studentID']}.pdf");
+        $m2->send();
+    }
 
     $message = $certificatePdf
         ? "Evaluation and certificate sent to coordinator"

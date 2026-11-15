@@ -54,7 +54,7 @@ foreach ($nameParts as $part) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
-    <link rel="icon" type="image/png" href="../../public/kapstongImage/logo.jpg">
+    <link rel="icon" type="image/png" href="../../public/kapstongImage/Graduate Colleges Science Seal.png">
     <link rel="stylesheet" href="../../public/css/student/studentDashboard2.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>

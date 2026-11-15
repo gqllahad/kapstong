@@ -2691,12 +2691,12 @@ function renderAdminFinalEvaluation($conn, $search = '', $course = '', $superID 
 
 
 function getEvaluationData($conn, $evaluationID) {
-    $stmt = $conn->prepare("
-        SELECT fe.*, o.name AS student_name, o.course, o.yearLevel,
+ $stmt = $conn->prepare("
+        SELECT fe.*, o.name AS student_name, o.email AS student_email, o.course, o.yearLevel,
                o.semester, o.schoolYear, s.name AS supervisor_name
         FROM final_evaluation fe
         LEFT JOIN ojtstudent o ON o.studentID = fe.studentID
-        LEFT JOIN users s ON s.superID = fe.superID
+        LEFT JOIN users s ON s.userID = fe.superID
         WHERE fe.evaluationID = ? AND fe.status = 'FINALIZED'
     ");
     $stmt->bind_param("i", $evaluationID);
@@ -2819,41 +2819,176 @@ function generateCertificatePdf($conn, $studentName, $studentID, $courseName = '
     $templateRow = $stmt->get_result()->fetch_assoc();
 
     if (!$templateRow || !file_exists($templateRow['file_path'])) {
-        return null; 
+        return null;
     }
+    $path = $templateRow['file_path'];
+    $ext  = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+    $q = $conn->prepare("SELECT course, schoolYear FROM ojtstudent WHERE studentID = ?");
+    $q->bind_param("s", $studentID);
+    $q->execute();
+    $info = $q->get_result()->fetch_assoc() ?: [];
+
+    $courseName = $info['course'] ?? $courseName;
+
+    $pr = $conn->prepare("SELECT prg_name, prg_department FROM program WHERE prg_name = ? OR prg_acro = ? LIMIT 1");
+    $pr->bind_param("ss", $courseName, $courseName);
+    $pr->execute();
+    $pg = $pr->get_result()->fetch_assoc() ?: [];
+    $programName = $pg['prg_name'] ?? $courseName;
+    $department  = $pg['prg_department'] ?? '';
+
+    $issued = date('F j, Y');
+    $certNo = 'OJT-' . date('Y') . '-' . $studentID;
+
+
+    $schoolYear = $info['schoolYear'] ?? '';
+
+    $p = $conn->prepare("
+        SELECT p.completed_hours, p.ojt_start_date, p.ojt_end_date, o.semester
+        FROM student_progress p
+        LEFT JOIN ojtstudent o ON o.studentID = p.studentID
+        WHERE p.studentID = ?
+    ");
+    $p->bind_param("s", $studentID);
+    $p->execute();
+    $prog = $p->get_result()->fetch_assoc() ?: [];
+
+    $hours = isset($prog['completed_hours']) ? rtrim(rtrim(number_format($prog['completed_hours'], 2), '0'), '.') : '';
+    $fmt   = fn($d) => $d ? date('F j, Y', strtotime($d)) : '';
+    $start = $fmt($prog['ojt_start_date'] ?? null);
+    $end   = $fmt($prog['ojt_end_date'] ?? null);
+    $sem   = $prog['semester'] ?? '';
+
+    // TODO: load from your DB
+    $supervisorName  = '';
+    $sv = $conn->prepare("
+        SELECT u.name FROM final_evaluation fe
+        JOIN users u ON u.userID = fe.superID
+        WHERE fe.studentID = ? ORDER BY fe.created_at DESC LIMIT 1
+    ");
+    $sv->bind_param("s", $studentID);
+    $sv->execute();
+    $supervisorName = $sv->get_result()->fetch_assoc()['name'] ?? '';
+
+    $co = $conn->query("SELECT name FROM users WHERE role = 'admin' ORDER BY userID LIMIT 1")->fetch_assoc();
+    $coordinatorName = $co['name'] ?? '';
+
+    $enc = fn($t) => iconv('UTF-8', 'windows-1252//TRANSLIT', (string)$t);
+
+    $details = "Student ID: {$studentID}";
+    if ($courseName) $details .= "  |  {$courseName}";
+    if ($schoolYear) $details .= "  |  S.Y. {$schoolYear}";
 
     $pdf = new Fpdi();
-    $pageCount = $pdf->setSourceFile($templateRow['file_path']);
+    $pageCount = ($ext === 'pdf') ? $pdf->setSourceFile($path) : 1;
 
     for ($i = 1; $i <= $pageCount; $i++) {
-        $templateId = $pdf->importPage($i);
-        $size = $pdf->getTemplateSize($templateId);
+        if ($ext === 'pdf') {
+            $tpl  = $pdf->importPage($i);
+            $size = $pdf->getTemplateSize($tpl);
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $pdf->useTemplate($tpl);
+        } else {
+            $size = ['width' => 210, 'height' => 297];
+            $pdf->AddPage('P', 'A4');
+            $pdf->Image($path, 0, 0, 210, 297);
+        }
 
-        $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-        $pdf->useTemplate($templateId);
-
-        
         if ($i === 1) {
-            $pdf->SetFont('Helvetica', 'B', 28);
-            $pdf->SetTextColor(20, 30, 70);
+            $w = $size['width']; $h = $size['height'];
+            $pdf->SetTextColor(11, 31, 75);
 
-            
-            $pdf->SetXY(0, $size['height'] / 2 - 10);
-            $pdf->Cell($size['width'], 10, $studentName, 0, 1, 'C');
+            // student name
+            $pdf->SetFont('Helvetica', 'B', 24);
+            $pdf->SetXY(0, $h * 0.473 - 5);
+            $pdf->Cell($w, 10, $enc(strtoupper($studentName)), 0, 1, 'C');
 
-            $pdf->SetFont('Helvetica', '', 12);
-            $pdf->SetXY(0, $size['height'] / 2 + 10);
-            $pdf->Cell($size['width'], 8, "Student ID: {$studentID}" . ($courseName ? " | {$courseName}" : ""), 0, 1, 'C');
+            // details
+            $pdf->SetFont('Helvetica', 'B', 9);
+            $pdf->SetXY(0, $h * 0.513 - 3);
+            $pdf->Cell($w, 6, $enc($details), 0, 1, 'C');
+
+
+            // subtitle (between the gold lines)
+            $pdf->SetFont('Helvetica', 'I', 8);
+            $pdf->SetTextColor(90, 90, 90);
+            $pdf->SetXY(0, $h * 0.390 - 2.5);
+            $pdf->Cell($w, 5, 'On-the-Job Training Completion', 0, 1, 'C');
+
+            // intro
+            $pdf->SetFont('Helvetica', '', 10);
+            $pdf->SetTextColor(60, 60, 60);
+            $pdf->SetXY($w * 0.15, $h * 0.552);
+            $pdf->MultiCell($w * 0.70, 5, $enc('In recognition of the successful completion of the required On-the-Job Training as part of the academic requirements of the program.'), 0, 'C');
+
+            // title between the rules
+            $pdf->SetTextColor(11, 31, 75);
+            $pdf->SetFont('Helvetica', 'B', 18);
+            $pdf->SetXY(0, $h * 0.622);
+            $pdf->Cell($w, 8, 'ON-THE-JOB TRAINING', 0, 1, 'C');
+            if ($hours !== '') {
+                $pdf->SetFont('Helvetica', 'B', 11);
+                $pdf->SetXY(0, $h * 0.658);
+                $pdf->Cell($w, 6, $hours . ' HOURS', 0, 1, 'C');
+            }
+
+            // closing paragraph
+            $pdf->SetFont('Helvetica', '', 10);
+            $pdf->SetTextColor(60, 60, 60);
+            $line = "Having rendered {$hours} hours of training";
+            if ($start && $end) $line .= " from {$start} to {$end}";
+            $line .= ", in accordance with the requirements of the OJT program";
+            if ($schoolYear) $line .= " for S.Y. {$schoolYear}" . ($sem ? ", {$sem}" : '');
+            $line .= '.';
+            $pdf->SetXY($w * 0.16, $h * 0.698);
+            $pdf->MultiCell($w * 0.68, 5, $enc($line), 0, 'C');
+
+            // signature names
+            $y = $h * 0.842;
+            foreach ([
+                [0.246, $supervisorName,  'OJT SUPERVISOR'],
+                [0.758, $coordinatorName, 'OJT COORDINATOR'],
+            ] as [$cx, $nm, $role]) {
+                $pdf->SetFont('Helvetica', 'B', 9);
+                $pdf->SetXY($w * $cx - 30, $y);
+                $pdf->Cell(60, 5, $enc($nm), 0, 0, 'C');
+                $pdf->SetFont('Helvetica', '', 7);
+                $pdf->SetXY($w * $cx - 30, $y + 5);
+                $pdf->Cell(60, 4, $role, 0, 0, 'C');
+            }
+
+            // department + program (header)
+            $pdf->SetTextColor(11, 31, 75);
+            if ($department) {
+                $pdf->SetFont('Helvetica', 'B', 8);
+                $pdf->SetXY(0, $h * 0.2715 - 2.5);
+                $pdf->Cell($w, 5, $enc(strtoupper($department)), 0, 1, 'C');
+            }
+            $pdf->SetFont('Helvetica', 'I', 9);
+            $pdf->SetTextColor(90, 90, 90);
+            $pdf->SetXY(0, $h * 0.291 - 2.5);
+            $pdf->Cell($w, 5, $enc($programName), 0, 1, 'C');
+
+            // date issued
+            $pdf->SetFont('Helvetica', 'B', 9);
+            $pdf->SetTextColor(11, 31, 75);
+            $pdf->SetXY($w * 0.5 - 30, $h * 0.842);
+            $pdf->Cell(60, 5, $issued, 0, 0, 'C');
+            $pdf->SetFont('Helvetica', '', 7);
+            $pdf->SetXY($w * 0.5 - 30, $h * 0.842 + 5);
+            $pdf->Cell(60, 4, 'DATE ISSUED', 0, 0, 'C');
+
+            // certificate number (bottom)
+            $pdf->SetFont('Helvetica', '', 7);
+            $pdf->SetTextColor(150, 150, 150);
+            $pdf->SetXY(0, $h * 0.915);
+            $pdf->Cell($w, 4, 'Certificate No. ' . $certNo, 0, 0, 'C');
         }
     }
 
-    return $pdf->Output('S'); 
+    return $pdf->Output('S');
 }
-
-
-
-
-
 
 // function renderActivityLogTable($conn, $search = '', $module = '')
 // {

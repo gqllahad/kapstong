@@ -571,21 +571,27 @@ function submitManualAttendance(){
 
     if(!studentID){
         showToast("Please select a student.", false);
+        return; 
     }
     if(!date){
         showToast("Please select a date..", false);
+        return; 
     }
     if(!timeIn){
         showToast("Please fill out time in..", false);
+        return; 
     }
     if(!timeOut){
         showToast("Please fill out time out..", false);
+        return; 
     }
     if(!breakTime){
         showToast("Please fill out break time..", false);
+        return; 
     }
     if(!reason){
         showToast("Please fill out reason for manual attendance..", false);
+        return; 
     }
 
     fetch("saveManualAttendance.php", {

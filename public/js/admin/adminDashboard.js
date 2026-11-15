@@ -522,6 +522,7 @@ function approveStudent(studentID) {
     .then(response => {
         showToast("Approve student - ", "success", response);
         closeApproveModal();
+         refreshTable();
         // location.reload();
     })
     .catch(err => {
@@ -555,11 +556,28 @@ function approveWithoutRFID(studentID) {
     .then(response => {
         showToast("Approved Without RFID - ", "success", response);
         closeApproveModal();
+         refreshTable();
         // location.reload();
     })
     showToast(err, "error", "Please try again.");
 }
 
+
+function refreshTable() {
+    const search = document.getElementById("approvalSearch").value;
+
+    fetch(window.location.href, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "search=" + encodeURIComponent(search)
+    })
+    .then(res => res.text())
+    .then(html => {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const fresh = doc.getElementById("approvalTableBody");
+        if (fresh) document.getElementById("approvalTableBody").innerHTML = fresh.innerHTML;
+    });
+}
 
 function rejectUser(studentID) {
     
@@ -587,6 +605,7 @@ function rejectUser(studentID) {
                 btn.disabled = !checkbox.checked;
             });
         }
+         refreshTable();
     });
 };
 
@@ -614,6 +633,7 @@ function rejectStudent(studentID) {
         showToast("Student rejected successfully!", "success", response);
 
         closeRejectModal();
+         refreshTable();
         // location.reload();
     })
     showToast(err, "error", "Please try again.");
@@ -2631,6 +2651,7 @@ allSupervisorClose.addEventListener("click", () => {
     });
 
     removeBtn.addEventListener("click", async (e) => {
+         console.log("remove clicked", isSavedOnServer);
         e.stopPropagation();
 
         if (!isSavedOnServer) {
