@@ -302,7 +302,7 @@ foreach ($nameParts as $part) {
 
                                 <div class="mini-score-grid">
                                     <div>Attendance <span id="attendanceScore"></span></div>
-                                    <div>Reports <span id="progressScore"></span></div>
+                                    <div>Performance <span id="progressScore"></span></div>
                                     <div>Tasks <span id="taskScore"></span></div>
                                 </div>
                             </div>
@@ -397,11 +397,8 @@ foreach ($nameParts as $part) {
 
                         </div>
 
-
-
                         <div class="evaluation-actions">
-                            <button class="save-btn" onclick="saveFinalEvaluation()">
-                                Finalize Evaluation
+                            <button class="save-btn" onclick="saveFinalEvaluation(this)">Save Evaluation</button>
                             </button>
                         </div>
 
@@ -794,29 +791,6 @@ foreach ($nameParts as $part) {
                     </div>
                 </div>
 
-                <!-- <div class="info-card active">
-
-                    <div class="card-header" onclick="toggleSection(this)">
-                        <h4>Task Guidelines</h4>
-                        <span class="arrow">▼</span>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="task-guidelines">
-                            <h4><i class="bi bi-pin-angle"></i> Task Creation Guidelines</h4>
-                            <ul>
-                                <li>✔ Be specific — clearly state what the student must submit</li>
-                                <li>✔ Include expected output (PDF, report, screenshot, etc.)</li>
-                                <li>✔ Set realistic deadlines based on workload</li>
-                                <li>✔ Use action words like “Create”, “Submit”, “Prepare”, “Develop”</li>
-                                <li>✔ Avoid vague titles like “Documentation Task”</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="divider"></div> -->
-
                 <form id="createTaskForm">
 
                 <div class="ct-panel active" data-panel="1" id="panel-1">
@@ -899,92 +873,57 @@ foreach ($nameParts as $part) {
 
                 <!-- <div class="divider"></div> -->
 
-    <div class="ct-panel" data-panel="2" id="panel-2">
- 
-      <div class="form-group" style="margin-bottom:12px;" >
-        <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;">
-          <i class="bi bi-people" style="color:var(--accent);"></i> Assign Students
-        </label>
-        <div class="ct-subtitle" style="margin-top:-2px;">Select one or more students for this task</div>
-      </div>
- 
-      <div class="ct-search-wrap">
-        <div class="ct-search">
-          <i class="bi bi-search"></i>
-          <input type="text" id="taskStudentSearch" placeholder="Search by name, ID, course, or year level…" autocomplete="off">
-        </div>
-      </div>
- 
-      <div class="ct-sel-bar">
-        <div class="ct-sel-count">
-          <span>Selected:</span>
-          <span class="ct-sel-badge" id="selBadge">0</span>
-        </div>
-        <button type="button" class="ct-clear-sel" id="clearSel">Clear all</button>
-      </div>
- 
-      <div class="list-box" id="taskStudentList">
-        <?php
-          $search = $_POST['search'] ?? '';
-          echo renderTaskAssignStudentList($conn, $superID, $search);
-        ?>
-      </div>
- 
-      <div class="ct-assign-empty-hint" id="assignEmptyHint" style="display:none;">
-        <i class="bi bi-exclamation-circle"></i> Select at least one student before creating the task.
-      </div>
- 
-      <input type="hidden" id="superID" value="<?= $superID ?>">
-
-      <div class="ct-footer">
-                        <div class="ct-footer-meta">
-                            <i class="bi bi-shield-check"></i> Task will be saved and students notified
-                        </div>
-                        <div class="ct-footer-actions" id="ctFooterActions">
-                            <button type="button" class="ct-cancel-btn" onclick="backToStep1()">Back</button>
-                            <button type="submit" class="submit-btn"> <i class="bi bi-send"></i>
-                            Create Task & Assign 
-                            </button>
+                    <div class="ct-panel" data-panel="2" id="panel-2">
+                
+                    <div class="form-group" style="margin-bottom:12px;" >
+                        <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;">
+                        <i class="bi bi-people" style="color:var(--accent);"></i> Assign Students
+                        </label>
+                        <div class="ct-subtitle" style="margin-top:-2px;">Select one or more students for this task</div>
+                    </div>
+                
+                    <div class="ct-search-wrap">
+                        <div class="ct-search">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="taskStudentSearch" placeholder="Search by name, ID, course, or year level…" autocomplete="off">
                         </div>
                     </div>
- 
-    </div><!-- /panel 2 -->
-
-                    <!-- <div class="info-card">
-
-                        <div class="card-header" onclick="toggleSection(this)">
-                            <h4>Assignment</h4>
-                            <span class="arrow">▼</span>
+                
+                    <div class="ct-sel-bar">
+                        <div class="ct-sel-count">
+                        <span>Selected:</span>
+                        <span class="ct-sel-badge" id="selBadge">0</span>
                         </div>
-
-                        <div class="card-body">
-                            <div class="assign-section">
-                                <h4><i class="bi bi-people"></i> Assign Students</h4>
-                                <p>Select one or multiple students for this task</p>
-
-                                <input
-                                    type="text"
-                                    id="taskStudentSearch"
-                                    placeholder="🔍 Search student by name, ID, Course or Yearlevel...">
-
-                                <div class="list-box" id="taskStudentList">
-                                    <?php
-                                    $search =  $_POST['search'] ?? '';
-                                     renderTaskAssignStudentList($conn, $superID, $search);
-                                    ?>
-                                </div>
-                            </div>
-                        </div>
+                        <button type="button" class="ct-clear-sel" id="clearSel">Clear all</button>
                     </div>
-
+                
+                    <div class="list-box" id="taskStudentList">
+                        <?php
+                        $search = $_POST['search'] ?? '';
+                        echo renderTaskAssignStudentList($conn, $superID, $search);
+                        ?>
+                    </div>
+                
+                    <div class="ct-assign-empty-hint" id="assignEmptyHint" style="display:none;">
+                        <i class="bi bi-exclamation-circle"></i> Select at least one student before creating the task.
+                    </div>
+                
                     <input type="hidden" id="superID" value="<?= $superID ?>">
 
-                    <button type="submit" class="submit-btn">
-                        Create Task & Assign
-                    </button> -->
+                    <div class="ct-footer">
+                                        <div class="ct-footer-meta">
+                                            <i class="bi bi-shield-check"></i> Task will be saved and students notified
+                                        </div>
+                                        <div class="ct-footer-actions" id="ctFooterActions">
+                                            <button type="button" class="ct-cancel-btn" onclick="backToStep1()">Back</button>
+                                            <button type="submit" class="submit-btn"> <i class="bi bi-send"></i>
+                                            Create Task & Assign 
+                                            </button>
+                                        </div>
+                                    </div>
+                
+                    </div><!-- /panel 2 -->
 
-
-                    
 
                 </form>
             </div>

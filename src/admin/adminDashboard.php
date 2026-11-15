@@ -117,7 +117,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                                 <th>Student ID</th>
                                 <th>Name</th>
                                 <th>Course</th>
-                                <th>Year</th>
+                                <th>Program Type</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -206,7 +206,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                                 <th>Student ID</th>
                                 <th>Name</th>
                                 <th>Course</th>
-                                <th>Year</th>
+                                <th>Program Type</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -355,14 +355,6 @@ if ($_SESSION['role'] !== "ADMIN") {
 
                             <select name="course">
                                 <?php echo renderSelectOptions($conn, 'program'); ?>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Year Level</label>
-
-                            <select name="year">
-                                <?php echo renderSelectOptions($conn, 'year'); ?>
                             </select>
                         </div>
 
@@ -1483,7 +1475,7 @@ if ($_SESSION['role'] !== "ADMIN") {
                                     <th>Student ID</th>
                                     <th>Name</th>
                                     <th>Course</th>
-                                    <th>Year</th>
+                                    <th>Program Type</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>

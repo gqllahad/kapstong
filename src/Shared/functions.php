@@ -1687,7 +1687,7 @@ function renderManualAttendanceStudentList($conn, $superID, $role = 'supervisor'
 
 function renderManualAttendanceWatchlist($conn, $threshold = 3, $daysWindow = 90) {
 
-    $sql = "
+     $sql = "
         SELECT 
             al.studentID,
             os.name,
@@ -1698,8 +1698,14 @@ function renderManualAttendanceWatchlist($conn, $threshold = 3, $daysWindow = 90
             GROUP_CONCAT(al.log_date ORDER BY al.log_date DESC SEPARATOR '||') AS dates
         FROM attendance_logs al
         INNER JOIN ojtstudent os ON os.studentID = al.studentID
+        LEFT JOIN (
+            SELECT studentID, MAX(changed_at) AS last_change
+            FROM rfid_card_history
+            GROUP BY studentID
+        ) rh ON rh.studentID = al.studentID
         WHERE al.entry_method = 'MANUAL'
         AND al.log_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+        AND (rh.last_change IS NULL OR al.log_date > DATE(rh.last_change))
         GROUP BY al.studentID
         HAVING manual_count >= ?
         ORDER BY manual_count DESC, last_manual_date DESC
@@ -1732,7 +1738,7 @@ function renderManualAttendanceWatchlist($conn, $threshold = 3, $daysWindow = 90
             $jsStudentID = json_encode($row['studentID']);
 
             $cardsHtml .= "
-            <div class='ris-card risk-{$riskLevel}'>
+            <div class='ris-card risk-{$riskLevel}' data-student='" . e($row['studentID']) . "'>
                 <div class='ris-top'>
                     <div class='ris-avatar'>{$initial}</div>
                     <div class='ris-identity'>
@@ -1753,7 +1759,7 @@ function renderManualAttendanceWatchlist($conn, $threshold = 3, $daysWindow = 90
                     <span class='watchlist-last-seen'>
                         <i class='bx bx-time-five'></i> Last: " . e(date('M d, Y', strtotime($row['last_manual_date']))) . "
                     </span>
-                    <button class='rfid-reregister-btn' onclick='openRfidRegisterModal({$jsStudentID})'>
+                    <button class='rfid-reregister-btn' onclick='openLostRfidModal({$jsStudentID})'>
                         <i class='bx bx-id-card'></i> Re-register RFID
                     </button>
                 </div>
@@ -2763,7 +2769,7 @@ function buildEvaluationHTML($r) {
             </tr>
             <tr>
                 <td><small>Course</small>{$e($r['course'])}</td>
-                <td><small>Year Level</small>{$e($r['yearLevel'])}</td>
+                <td><small>Program Type</small>{$e($r['yearLevel'])}</td>
             </tr>
         </table>
 
@@ -4081,35 +4087,6 @@ function getSupervisorActivities($conn, $superID)
 function getStudentAlerts($conn, $studentID)
 {
     $alerts = [];
-
-    // $sql1 = "
-    //     SELECT COUNT(*) AS attendance_count
-    //     FROM attendance_logs
-    //     WHERE studentID = ?
-    //     AND log_date >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
-    // ";
-
-    // $stmt1 = $conn->prepare($sql1);
-
-    // if (!$stmt1) {
-    //     die("SQL1 Error: " . $conn->error);
-    // }
-
-    // $stmt1->bind_param("s", $studentID);
-    // $stmt1->execute();
-
-    // $attendanceData = $stmt1->get_result()->fetch_assoc();
-
-    // if ($attendanceData['attendance_count'] == 0) {
-
-    //     $alerts[] = [
-    //         "type" => "warning",
-    //         "priority" => 1,
-    //         "message" => "You have no attendance recorded in the last 5 days.",
-    //         "action" => "openAttendance",
-    //         "id" => null
-    //     ];
-    // }
 
     $sql2 = "
         SELECT taskID, title

@@ -338,14 +338,11 @@ body.dark-mode #menuToggle {
   left: 0;
   bottom: 0;
   width: var(--sidebar-w);
-  background: var(--navy-900);
-  background-image: linear-gradient(
-    180deg,
-    var(--navy-950) 0%,
-    var(--navy-800) 60%,
-    #0a1e36 100%
-  );
-  color: var(--white);
+  background: #fff;
+  background-image: linear-gradient(180deg, #f8fbff 0%, #eef4fc 100%);
+  color: #0f2a4a;
+  box-shadow: 3px 0 24px rgba(15, 42, 74, 0.08);
+  border-right: 1px solid #dbe6f4;
   overflow: hidden;
   transition: width 0.4s var(--ease);
   z-index: 200;
@@ -444,6 +441,26 @@ body.dark-mode #menuToggle {
   position: relative;
 }
 
+.menu li button,
+.menu li a {
+  color: #475b75;
+}
+.menu li:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+.menu li:hover button,
+.menu li:hover a {
+  color: #0f2a4a;
+}
+.menu li.active {
+  background: rgba(59, 130, 246, 0.14);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.menu li.active button,
+.menu li.active a {
+  color: #1d4ed8;
+}
+
 .sidebar-badge {
   display: inline-flex;
   align-items: center;
@@ -495,6 +512,16 @@ body.dark-mode .sidebar-badge {
   transition: 0.2s;
 }
 
+.sidebar-profile {
+  border-top: 1px solid #dbe6f4;
+}
+.sidebar-profile .profile-name {
+  color: #0f2a4a;
+}
+.sidebar-profile small {
+  color: #6b7f99;
+}
+
 .profile-trigger:hover {
   background: rgba(255, 255, 255, 0.08);
 }
@@ -534,6 +561,46 @@ body.dark-mode .sidebar-badge {
 .profile-info small {
   color: rgba(255, 255, 255, 0.6);
   font-size: 11px;
+}
+
+body.dark-mode .sidebar {
+  background: var(--navy-900);
+  background-image: linear-gradient(
+    180deg,
+    var(--navy-950) 0%,
+    var(--navy-800) 60%,
+    #0a1e36 100%
+  );
+  color: var(--white);
+  border-right: none;
+  box-shadow: 3px 0 24px rgba(2, 11, 24, 0.4);
+}
+body.dark-mode .menu li button,
+body.dark-mode .menu li a {
+  color: rgba(255, 255, 255, 0.58);
+}
+body.dark-mode .menu li:hover {
+  background: rgba(59, 130, 246, 0.16);
+}
+body.dark-mode .menu li:hover button,
+body.dark-mode .menu li:hover a {
+  color: rgba(255, 255, 255, 0.92);
+}
+body.dark-mode .menu li.active {
+  background: rgba(59, 130, 246, 0.22);
+}
+body.dark-mode .menu li.active button,
+body.dark-mode .menu li.active a {
+  color: #fff;
+}
+body.dark-mode .sidebar-profile {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .sidebar-profile .profile-name {
+  color: #fff;
+}
+body.dark-mode .sidebar-profile small {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* ══════════════════════════════════════════════════════════════

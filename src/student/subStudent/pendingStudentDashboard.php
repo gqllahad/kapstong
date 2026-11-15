@@ -512,7 +512,7 @@ foreach ($nameParts as $part) {
                             </div>
 
                             <div class="form-group">
-                                <label>Year Level</label>
+                                <label>Program Type</label>
                                 <input type="text" value="<?php echo htmlspecialchars($studentInfo['yearLevel'] ?? ''); ?>" readonly>
                             </div>
 

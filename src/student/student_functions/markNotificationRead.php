@@ -18,7 +18,8 @@ if (($_POST['all'] ?? '') === '1') {
     $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE notificationID = ? AND userID = ?");
     $stmt->bind_param("is", $id, $studentID);
 }
-$stmt->execute();
-
-
+if (!$stmt->execute()) {
+    echo json_encode(["status" => "error", "message" => "Update failed"]);
+    exit;
+}
 echo json_encode(["status" => "ok", "updated" => $stmt->affected_rows]);

@@ -95,7 +95,7 @@ if ($row = $result->fetch_assoc()) {
                         <span class="info-value"><?= e($row['course']) ?: '-' ?></span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Year Level</span>
+                        <span class="info-label">Program Type</span>
                         <span class="info-value"><?= e($row['yearLevel']) ?: '-' ?></span>
                     </div>
                     <div class="info-row">

@@ -672,7 +672,7 @@ foreach ($nameParts as $part) {
                 <section class="title-header">
                     <div class="welcome-row">
                         <h2>Welcome, <?php echo htmlspecialchars($studentName); ?>!</h2>
-                        <button class="icon-btn" id="notifBell"
+                        <button class="notif-btn" id="notifBell"
                                 onclick="openNotifications()"
                                 aria-label="Notifications">
                             <i class="bi bi-bell"></i>
@@ -690,22 +690,6 @@ foreach ($nameParts as $part) {
                         <h3>OJT Progress</h3>
                         <p>Track your hours and training progress.</p>
                     </div>
-                    <!-- <div class="card notification" id="notification-btn">
-                        <h3>Notifications</h3>
-                        <p>Check announcements from your mentor.</p>
-                    </div> -->   
-
-                    <!-- <div class="card attendance" id="attendance-btn">
-                        <h3>Attendance</h3>
-                        <p>View your daily time-in and time-out logs.</p>
-                    </div> -->
-
-                    <!-- <div class="card submitted-task" id="reports-btn">
-                        <h3>Reports</h3>
-                        <p>Upload or review submitted reports.</p>
-                    </div> -->
-
-
                 </section>
 
 
@@ -829,7 +813,7 @@ foreach ($nameParts as $part) {
                             </div>
 
                             <div class="form-group">
-                                <label>Year Level</label>
+                                <label>Program Type</label>
                                 <input type="text" value="<?php echo htmlspecialchars($studentInfo['yearLevel'] ?? ''); ?>" readonly>
                             </div>
 

@@ -101,13 +101,8 @@ try {
     $emailStmt->execute();
     $student = $emailStmt->get_result()->fetch_assoc();
 
-    if ($student) {
-        sendEvaluationEmail(
-            $student['email'],
-            $student['name'],
-            $final,
-            $recommendation
-        );
+    if ($student && !sendEvaluationEmail($student['email'], $student['name'], $final, $recommendation)) {
+        error_log("Evaluation email failed for $studentID");
     }
 
     echo json_encode(["success" => true]);

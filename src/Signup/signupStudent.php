@@ -214,16 +214,8 @@ $currentAcademicYear = academicYearOptions($conn);
                                 </div>
                             </div>
 
-                            <div class="field-grid col-2">
-                                <div class="field" style="position:relative;">
-                                    <i class="ti ti-school field-icon" aria-hidden="true"></i>
-                                    <select class="field-select" id="signLevel" name="signLevel">
-                                        <option value="" disabled selected hidden></option>
-                                        <option value="4th year">4th Year</option>
-                                    </select>
-                                    <label class="field-label" for="signLevel">Year Level <b style="color:red;">*</b></label>
-                                    <i class="ti ti-chevron-down select-arrow" aria-hidden="true"></i>
-                                </div>
+                            <div class="field-grid col-1">
+                                <input type="hidden" name="signLevel" id="signLevel" value="OJT">
                                 <div class="field" style="position:relative;">
                                     <i class="ti ti-calendar-event field-icon" aria-hidden="true"></i>
                                     <select class="field-select" id="signSemester" name="signSemester">

@@ -353,10 +353,11 @@ function submitRFIDRegister()
     .then(response => response.text())
     .then(data => {
 
-        if(data === "success")
-        {
+        if (data === "success") {
             showToast("RFID Registered Successfully", "success", "RFID registered!");
-            
+            document.getElementById("rfid_uid").value = "";
+            rfidRegister.classList.remove("show");
+            overlay.classList.remove("show");
         }
         else
         {
@@ -3132,21 +3133,39 @@ function showManualAttendance(){
 
 
 // reregister rfid
-function openRfidRegisterModal(studentID) {
+function openLostRfidModal(studentID) {
     document.getElementById('lostRfidStudentID').value = studentID;
-    
+
     const input = document.getElementById("lost_rfid_uid");
     input.value = "";
-    
+
     lostRfidRegister.classList.add('show');
     overlay.classList.add('show');
 
-    setTimeout(() => input.focus(), 100);
+    setTimeout(() => input.focus(), 200);
 }
 
 function closeRfidRegisterModal(){
     lostRfidRegister.classList.remove('show');
     overlay.classList.remove("show");
+}
+
+function removeWatchlistCard(studentID) {
+    const card = document.querySelector(`.ris-card[data-student="${CSS.escape(studentID)}"]`);
+    if (card) card.remove();
+
+    const left = document.querySelectorAll('.ris-card').length;
+    const count = document.querySelector('.rsb-count');
+    if (count) count.textContent = left;
+
+    if (!left) {
+        const list = document.querySelector('.risk-list');
+        if (list) list.outerHTML = `
+            <div class='risk-empty'>
+                <i class='bx bx-check-shield'></i>
+                <p>No students have hit the manual-entry threshold. RFID usage looks healthy.</p>
+            </div>`;
+    }
 }
 
 
@@ -3174,8 +3193,12 @@ function reRegisterRfid() {
     .then(response => response.text())
     .then(data => {
         if (data === "success") {
-            showToast("Register RFID", "success","RFID re-registered successfully");
-            setTimeout(() => location.reload(), 500);
+            showToast("Register RFID", "success", "RFID re-registered successfully");
+            removeWatchlistCard(studentID);
+            document.getElementById("lost_rfid_uid").value = "";
+            lostRfidRegister.classList.remove("show");
+            overlay.classList.remove("show");
+            btn.disabled = false;
         } else {
             showToast("Something went wrong", "error", data);
             btn.disabled = false;

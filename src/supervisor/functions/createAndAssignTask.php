@@ -10,6 +10,10 @@ $title = $_POST['title'];
 $taskDescription = $_POST['description'];
 $due_date = $_POST['due_date'];
 $studentIDs = $_POST['studentIDs'] ?? [];
+$priority = strtolower($_POST['priority'] ?? 'low');
+if (!in_array($priority, ['low', 'medium', 'high'], true)) {
+    $priority = 'low';
+}
 
 if (empty($due_date) || $due_date < date("Y-m-d")) {
     echo json_encode([
@@ -48,26 +52,12 @@ $successCount = 0;
 
 foreach ($studentIDs as $studentID) {
 
-    $stmt = $conn->prepare("
-        INSERT INTO student_tasks (
-            studentID,
-            superID,
-            title,
-            description,
-            status,
-            due_date
-        )
-        VALUES (?, ?, ?, ?, 'NOT STARTED', ?)
+   $stmt = $conn->prepare("
+        INSERT INTO student_tasks (studentID, superID, title, description, status, due_date, priority)
+        VALUES (?, ?, ?, ?, 'NOT STARTED', ?, ?)
     ");
 
-    $stmt->bind_param(
-        "sisss",
-        $studentID,
-        $superID,
-        $title,
-        $taskDescription,
-        $due_date
-    );
+    $stmt->bind_param("sissss", $studentID, $superID, $title, $taskDescription, $due_date, $priority);
 
     if ($stmt->execute()) {
         $successCount++;

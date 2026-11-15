@@ -18,9 +18,6 @@ function backWithError($msg) {
     exit();
 }
 
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
-
 
 if (isset($_POST['login-submit'])) {
     $userEmail = filter_var($_POST["loginEmail"], FILTER_VALIDATE_EMAIL);
@@ -31,41 +28,6 @@ if (isset($_POST['login-submit'])) {
     }
 
     $ip = getUserIP();
-    // $email = $userEmail;
-
-    //     $stmt_brute = $conn->prepare("
-    //         SELECT attempts, last_attempt 
-    //         FROM login_attempts 
-    //         WHERE email = ? AND ip_address = ?
-    //     ");
-    //     $stmt_brute->bind_param("ss", $email, $ip);
-    //     $stmt_brute->execute();
-    //     $attemptData = $stmt_brute->get_result()->fetch_assoc();
-
-    //     if ($attemptData && $attemptData['attempts'] >= 5) {
-
-    //         if (!empty($attemptData['last_attempt'])) {
-    //             $lastAttempt = strtotime($attemptData['last_attempt']);
-    //             $lockTime = 10 * 60;
-
-    //             if (time() - $lastAttempt < $lockTime) {
-    //                 header("Location: loginPhase.php?warning=Too many attempts. Try again later.");
-    //                 exit();
-    //             }
-    //         }
-    //     }
-
-    // $stmt_brute = $conn->prepare("
-    //     SELECT id, attempts, last_attempt 
-    //     FROM login_attempts 
-    //     WHERE email = ?
-    // ");
-    // $stmt_brute->bind_param("s", $userEmail);
-    // $stmt_brute->execute();
-    // $attemptData = $stmt_brute->get_result()->fetch_assoc();
-
-    // $lockTime = 10 * 60; 
-    // $maxAttempts = 5;
 
     $stmt_brute = $conn->prepare("
         SELECT id, attempts, 
@@ -79,27 +41,6 @@ if (isset($_POST['login-submit'])) {
 
     $lockTime = 10 * 60;
     $maxAttempts = 5;
-
-    // if ($attemptData && $attemptData['attempts'] >= $maxAttempts) {
-
-    // $elapsed = max(0, (int) $attemptData['elapsed_seconds']);
-//         $lastAttempt = strtotime($attemptData['last_attempt']);
-// $elapsed = time() - $lastAttempt;
-
-//     if ($elapsed < $lockTime) {
-//     header("Location: loginPage.php?locked=1&email=" . urlencode($userEmail));
-//     exit();
-// }
-    
-    //  $reset = $conn->prepare("UPDATE login_attempts SET attempts = 0 WHERE id = ?");
-    //     $reset->bind_param("i", $attemptData['id']);
-    //     $reset->execute();
-
-
-//     $reset = $conn->prepare("DELETE FROM login_attempts WHERE id = ?");
-// $reset->bind_param("i", $attemptData['id']);
-// $reset->execute();
-    // }
 
     // new updated
     if ($attemptData && $attemptData['attempts'] >= $maxAttempts) {
@@ -303,8 +244,7 @@ if (isset($_POST['signupForm'])) {
     $course = trim($_POST['signCourse'] ?? '');
     if ($course === '') backWithError('Please select a program');
 
-    $level = $_POST['signLevel'] ?? '';
-    if (!in_array($level, ['1st year', '2nd year', '3rd year', '4th year'], true)) backWithError('Invalid year level');
+    $level = 'OJT';
 
     $semester = $_POST['signSemester'] ?? '';
     if (!in_array($semester, ['1st semester', '2nd semester'], true)) backWithError('Invalid semester');

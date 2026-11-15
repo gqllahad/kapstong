@@ -234,27 +234,6 @@ function updateBadge(elementId, count) {
     });
   });
 
-//   document.getElementById('taskStudentSearch').addEventListener('input', function () {
-//     const q = this.value.toLowerCase();
-//     document.querySelectorAll('#taskStudentList [data-name]').forEach(row => {
-//       row.style.display = row.dataset.name.includes(q) ? '' : 'none';
-//     });
-//   });
- 
-//   const list = document.getElementById('taskStudentList');
-//   list.addEventListener('change', e => {
-//     if (e.target.name === 'student_ids[]') updateSelectionState();
-//   });
- 
-//   document.getElementById('clearSel').addEventListener('click', () => {
-//     list.querySelectorAll('input[name="student_ids[]"]').forEach(cb => cb.checked = false);
-//     updateSelectionState();
-//   });
-
-//   function getSelectedCount() {
-//     return list.querySelectorAll('input[name="student_ids[]"]:checked').length;
-//   }
-
   studentList.addEventListener('click', e => {
 
         const student = e.target.closest('.task-student-item');
@@ -269,14 +248,18 @@ function updateBadge(elementId, count) {
 
     document.getElementById('clearSel').addEventListener('click', () => {
 
-    studentList.querySelectorAll('.task-student-item.selected-student' && '.task-student-item.selected').forEach(student => {
-        student.classList.remove('selected-student');
-        student.classList.remove('selected');
-        
-    });
+    studentList.querySelectorAll('.task-student-item.selected, .task-student-item.selected-student').forEach(student => student.classList.remove('selected', 'selected-student'));
     selectedTaskStudentIDs = [];
     updateSelectionState();
 });
+
+function resetPriorityUI() {
+  ['low', 'medium', 'high'].forEach(pp => {
+    document.getElementById('p-' + pp).className =
+      'ct-priority-btn' + (pp === 'low' ? ' sel-low' : '');
+  });
+  document.getElementById('ct-priority').value = 'low';
+}
 
 function getSelectedCount() {
 
@@ -821,7 +804,10 @@ function openFinalEvaluation(studentID){
     bindSlider("disciplineRating", "disciplineValue");
 }
 
-function saveFinalEvaluation() {
+function saveFinalEvaluation(btn) {
+    if (btn) btn.disabled = true;
+
+    showToast("Saving evaluation", "loading", "Saving and sending email to the student...");
 
     const studentID = document.getElementById("evalID").innerText.replace("ID: ", "").trim();
 
@@ -866,22 +852,23 @@ function saveFinalEvaluation() {
             "&rec_title=" + encodeURIComponent(rec_title) +
             "&rec_text=" + encodeURIComponent(rec_text)
     })
-    .then(res => res.json())
+     .then(res => res.json())
     .then(data => {
-
         if (data.success) {
-            showToast("Evaluation saved successfully!", "success");
-
+            showToast("Evaluation saved", "success", "The student has been notified.");
             studentFinalEvaluation.classList.remove("show");
             overlay.classList.remove("show");
-
+            if (typeof window.fetchReports === "function") window.fetchReports();
         } else {
-            showToast("Server error", "error", "Could not save the evaluation.");  
+            showToast("Save failed", "error", data.message || "Could not save the evaluation.");
         }
-
     })
     .catch(err => {
-         showToast("Server error", "error", "Could not save the evaluation.");  
+        console.error(err);
+        showToast("Save failed", "error", "Please try again.");
+    })
+    .finally(() => {
+        if (btn) btn.disabled = false;
     });
 }
 
@@ -2998,6 +2985,7 @@ document.getElementById("createTaskForm").addEventListener("submit", function (e
         reloadApprovalReportTable();
         reloadTaskTable();
         document.getElementById("createTaskForm").reset();
+        resetPriorityUI();
 
         selectedTaskStudentIDs = [];
         
@@ -3348,6 +3336,8 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Reports fetch error:", err);
         });
     }
+
+    window.fetchReports = fetchReports;
 
     searchInput.addEventListener("keyup", function () {
         clearTimeout(timer);

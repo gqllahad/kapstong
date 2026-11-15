@@ -9,7 +9,6 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 
 $course = $_GET['course'] ?? '';
-$year   = $_GET['year'] ?? '';
 
 $where = [];
 $params = [];
@@ -18,12 +17,6 @@ $types  = '';
 if (!empty($course)) {
     $where[] = "course = ?";
     $params[] = $course;
-    $types .= 's';
-}
-
-if (!empty($year)) {
-    $where[] = "yearLevel = ?";
-    $params[] = $year;
     $types .= 's';
 }
 
@@ -68,9 +61,6 @@ if (!empty($course)) {
     $filterText[] = "Course: " . htmlspecialchars($course);
 }
 
-if (!empty($year)) {
-    $filterText[] = "Year Level: " . htmlspecialchars($year);
-}
 
 $filterDisplay = !empty($filterText)
     ? implode(' | ', $filterText)
@@ -252,7 +242,7 @@ body{
     <th>Name</th>
     <th>Email</th>
     <th>Course</th>
-    <th>Year</th>
+    <th>Program Type</th>
     <th>Semester</th>
     <th>School Year</th>
     <th>Gender</th>
